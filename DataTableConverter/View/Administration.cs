@@ -1,4 +1,5 @@
 ﻿using CheckComboBoxTest;
+using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
@@ -35,28 +36,28 @@ namespace DataTableConverter.View
         private Proc selectedProc;
         
 
-        internal Administration(List<Proc> proc, List<Work> wf, List<Tolerance> tolerances, List<Case> cases, object[] headers)
+        internal Administration(object[] headers)
         {
             InitializeComponent();
             setOrderList();
             assignGroupBoxToEnum();
             cmbProcedureType.SelectedIndex = 0;
-            Procedures = proc;
-            Workflows = wf;
-            Cases = cases;
-            Tolerances = tolerances;
+            
             loadProcedures();
+            loadTolerances();
+            loadCases();
+            loadWorkflows();
+            setHeaders(headers);
+
             ltbProcedures_SelectedIndexChanged(null, null);
             generateProceduresForWorkflow();
             loadProceduresWorkflow(false);
-            loadWorkflows();
+            
             lbWorkflows_SelectedIndexChanged(null, null);
-            setHeaders(headers);
-
-            loadTolerances();
+            
             lbTolerances_SelectedIndexChanged(null, null);
 
-            loadCases();
+            
             lbCases_SelectedIndexChanged(null, null);
             
         }
@@ -100,6 +101,7 @@ namespace DataTableConverter.View
 
         private void loadProcedures()
         {
+            Procedures = ImportHelper.loadProcedures();
             bindingProcedure = new BindingList<Proc>(Procedures);
             ltbProcedures.DataSource = bindingProcedure;
             ltbProcedures.DisplayMember = "Name";
@@ -329,6 +331,7 @@ namespace DataTableConverter.View
         #region Workflows
         private void loadWorkflows()
         {
+            Workflows = ImportHelper.loadWorkflows();
             bindingWorkflow = new BindingList<Work>(Workflows);
             lbWorkflows.DataSource = bindingWorkflow;
             lbWorkflows.DisplayMember = "Name";
@@ -775,6 +778,7 @@ namespace DataTableConverter.View
 
         private void loadTolerances()
         {
+            Tolerances = ImportHelper.loadTolerances();
             bindingTolerance = new BindingList<Tolerance>(Tolerances);
             lbTolerances.DataSource = bindingTolerance;
             lbTolerances.DisplayMember = "Name";
@@ -889,6 +893,7 @@ namespace DataTableConverter.View
 
         private void loadCases()
         {
+            Cases = ImportHelper.loadCases();
             bindingCase = new BindingList<Case>(Cases);
             lbCases.DataSource = bindingCase;
             lbCases.DisplayMember = "Name";

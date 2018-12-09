@@ -1512,7 +1512,7 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(procedures, workflows, tolerances, cases,dgTable.DataSource != null ? getHeaders(getDataSource()) : new object[0]);
+            Administration form = new Administration(dgTable.DataSource != null ? getHeaders(getDataSource()) : new object[0]);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show();
         }
