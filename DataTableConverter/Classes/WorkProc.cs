@@ -31,7 +31,20 @@ namespace DataTableConverter.Classes
             {
                 //System-Proc
                 case 1:
-                    Type = id == 1 ? ProcedureState.Trim : ProcedureState.Merge;
+                    switch (id)
+                    {
+                        case 1:
+                            Type = ProcedureState.Trim;
+                            break;
+
+                        case 2:
+                            Type = ProcedureState.Merge;
+                            break;
+
+                        default:
+                            Type = ProcedureState.Order;
+                            break;
+                    }
                     break;
 
                 //Duplicate

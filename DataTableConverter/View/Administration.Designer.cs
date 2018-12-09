@@ -95,6 +95,13 @@
             this.lblWorkProcName = new System.Windows.Forms.Label();
             this.lblOriginalNameText = new System.Windows.Forms.Label();
             this.lblOriginalName = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.gbOrder = new System.Windows.Forms.GroupBox();
+            this.dgOrderColumns = new System.Windows.Forms.DataGridView();
+            this.label8 = new System.Windows.Forms.Label();
+            this.zeileEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clbHeaderOrder = new CheckComboBoxTest.CheckedComboBox();
+            this.clbHeaderProcedure = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -119,6 +126,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgColumnDefDuplicate)).BeginInit();
             this.gbMerge.SuspendLayout();
             this.gbTrim.SuspendLayout();
+            this.gbOrder.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -248,6 +257,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.gbOrder);
             this.tabPage2.Controls.Add(this.gbWorkflow);
             this.tabPage2.Controls.Add(this.button1);
             this.tabPage2.Controls.Add(this.button2);
@@ -414,6 +424,8 @@
             // 
             // gbProcedure
             // 
+            this.gbProcedure.Controls.Add(this.label7);
+            this.gbProcedure.Controls.Add(this.clbHeaderProcedure);
             this.gbProcedure.Controls.Add(this.lblNewColumn);
             this.gbProcedure.Controls.Add(this.lblHeaders);
             this.gbProcedure.Controls.Add(this.txtNewColumn);
@@ -439,11 +451,11 @@
             // lblHeaders
             // 
             this.lblHeaders.AutoSize = true;
-            this.lblHeaders.Location = new System.Drawing.Point(3, 75);
+            this.lblHeaders.Location = new System.Drawing.Point(3, 131);
             this.lblHeaders.Name = "lblHeaders";
-            this.lblHeaders.Size = new System.Drawing.Size(107, 13);
+            this.lblHeaders.Size = new System.Drawing.Size(121, 13);
             this.lblHeaders.TabIndex = 5;
-            this.lblHeaders.Text = "Auswahl der Spalten:";
+            this.lblHeaders.Text = "Angewendeten Spalten:";
             // 
             // txtNewColumn
             // 
@@ -469,10 +481,10 @@
             // 
             this.dgvColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvColumns.Location = new System.Drawing.Point(6, 91);
+            this.dgvColumns.Location = new System.Drawing.Point(6, 150);
             this.dgvColumns.Name = "dgvColumns";
             this.dgvColumns.RowHeadersVisible = false;
-            this.dgvColumns.Size = new System.Drawing.Size(256, 208);
+            this.dgvColumns.Size = new System.Drawing.Size(256, 149);
             this.dgvColumns.TabIndex = 0;
             this.dgvColumns.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DataGridViewContext_MouseClick);
             // 
@@ -683,10 +695,11 @@
             // ctxRow
             // 
             this.ctxRow.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.zeileEinfügenToolStripMenuItem,
             this.zeileLöschenToolStripMenuItem,
             this.zwischenablageEinfügenToolStripMenuItem1});
             this.ctxRow.Name = "ctxRow";
-            this.ctxRow.Size = new System.Drawing.Size(210, 48);
+            this.ctxRow.Size = new System.Drawing.Size(210, 70);
             // 
             // zeileLöschenToolStripMenuItem
             // 
@@ -816,6 +829,84 @@
             this.lblOriginalName.TabIndex = 11;
             this.lblOriginalName.Text = "Originaler Funktionsname:";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 86);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(209, 13);
+            this.label7.TabIndex = 9;
+            this.label7.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // gbOrder
+            // 
+            this.gbOrder.Controls.Add(this.label8);
+            this.gbOrder.Controls.Add(this.clbHeaderOrder);
+            this.gbOrder.Controls.Add(this.dgOrderColumns);
+            this.gbOrder.Location = new System.Drawing.Point(856, 88);
+            this.gbOrder.Name = "gbOrder";
+            this.gbOrder.Size = new System.Drawing.Size(268, 304);
+            this.gbOrder.TabIndex = 17;
+            this.gbOrder.TabStop = false;
+            this.gbOrder.Text = "Spaltenangabe";
+            // 
+            // dgOrderColumns
+            // 
+            this.dgOrderColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgOrderColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgOrderColumns.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.dgOrderColumns.Location = new System.Drawing.Point(6, 86);
+            this.dgOrderColumns.Name = "dgOrderColumns";
+            this.dgOrderColumns.RowHeadersVisible = false;
+            this.dgOrderColumns.Size = new System.Drawing.Size(253, 213);
+            this.dgOrderColumns.TabIndex = 16;
+            this.dgOrderColumns.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgOrderColumns_CellFormatting);
+            this.dgOrderColumns.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgOrderColumns_EditingControlShowing);
+            this.dgOrderColumns.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgOrderColumns_MouseClick);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 20);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(209, 13);
+            this.label8.TabIndex = 18;
+            this.label8.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // zeileEinfügenToolStripMenuItem
+            // 
+            this.zeileEinfügenToolStripMenuItem.Name = "zeileEinfügenToolStripMenuItem";
+            this.zeileEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.zeileEinfügenToolStripMenuItem.Text = "Zeile einfügen";
+            // 
+            // clbHeaderOrder
+            // 
+            this.clbHeaderOrder.CheckOnClick = true;
+            this.clbHeaderOrder.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.clbHeaderOrder.DropDownHeight = 1;
+            this.clbHeaderOrder.FormattingEnabled = true;
+            this.clbHeaderOrder.IntegralHeight = false;
+            this.clbHeaderOrder.Location = new System.Drawing.Point(6, 35);
+            this.clbHeaderOrder.Name = "clbHeaderOrder";
+            this.clbHeaderOrder.Size = new System.Drawing.Size(256, 21);
+            this.clbHeaderOrder.TabIndex = 17;
+            this.clbHeaderOrder.ValueSeparator = ", ";
+            this.clbHeaderOrder.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderOrder_ItemCheck);
+            // 
+            // clbHeaderProcedure
+            // 
+            this.clbHeaderProcedure.CheckOnClick = true;
+            this.clbHeaderProcedure.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.clbHeaderProcedure.DropDownHeight = 1;
+            this.clbHeaderProcedure.FormattingEnabled = true;
+            this.clbHeaderProcedure.IntegralHeight = false;
+            this.clbHeaderProcedure.Location = new System.Drawing.Point(6, 100);
+            this.clbHeaderProcedure.Name = "clbHeaderProcedure";
+            this.clbHeaderProcedure.Size = new System.Drawing.Size(256, 21);
+            this.clbHeaderProcedure.TabIndex = 8;
+            this.clbHeaderProcedure.ValueSeparator = ", ";
+            this.clbHeaderProcedure.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderProcedure_ItemCheck);
+            // 
             // cbHeaders
             // 
             this.cbHeaders.CheckOnClick = true;
@@ -870,6 +961,9 @@
             this.gbMerge.PerformLayout();
             this.gbTrim.ResumeLayout(false);
             this.gbTrim.PerformLayout();
+            this.gbOrder.ResumeLayout(false);
+            this.gbOrder.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -943,5 +1037,12 @@
         private System.Windows.Forms.Label lblOriginalNameText;
         private System.Windows.Forms.Label lblWorkProcName;
         private System.Windows.Forms.TextBox txtWorkProcName;
+        private System.Windows.Forms.Label label7;
+        private CheckComboBoxTest.CheckedComboBox clbHeaderProcedure;
+        private System.Windows.Forms.GroupBox gbOrder;
+        private System.Windows.Forms.DataGridView dgOrderColumns;
+        private System.Windows.Forms.Label label8;
+        private CheckComboBoxTest.CheckedComboBox clbHeaderOrder;
+        private System.Windows.Forms.ToolStripMenuItem zeileEinfügenToolStripMenuItem;
     }
 }

@@ -30,18 +30,6 @@ namespace DataTableConverter.View
         {
             if (!string.IsNullOrWhiteSpace(orderBefore))
             {
-                //Regex re = new Regex(@"\[(.*?)\]");
-                //MatchCollection matches = re.Matches(orderBefore);
-                //string[] headers = new string[matches.Count];
-                //for (int i = 0; i < matches.Count; i++)
-                //{
-                //    string header = matches[i].Value.Substring(1, matches[i].Value.Length - 2);
-                //    int index;
-                //    if ((index = clBoxHeaders.Items.IndexOf(header)) != -1)
-                //    {
-                //        clBoxHeaders.SetItemChecked(index, true);
-                //    }
-                //}
                 clBoxHeaders.ItemCheck -= clBoxHeaders_ItemCheck;
 
                 string[] headersInformation = orderBefore.Split(new string[] { ","}, StringSplitOptions.RemoveEmptyEntries);

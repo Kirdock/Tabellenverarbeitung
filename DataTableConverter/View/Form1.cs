@@ -59,11 +59,9 @@ namespace DataTableConverter
         private void assignDataSource(DataTable table, bool isNewTable = false)
         {
             DataView view = table.DefaultView;
-            if (!isNewTable)
-            {
-                view.Sort = tempOrder ?? getSorting();
-                tempOrder = null;
-            }
+            view.Sort = tempOrder ?? getSorting();
+            tempOrder = null;
+
             saveDataGridSortMode();
 
             dgTable.DataSource = null;
@@ -232,11 +230,8 @@ namespace DataTableConverter
         private void addDataSourceValueChange(DataTable tableOld, DataTable tableNew)
         {
             List<CellMatrix> oldValues = getChanges(tableOld, tableNew, -1);
-            if (oldValues.Count > 0)
-            {
-                addHistory(new History { State = State.ValueChange, Table = oldValues });
-                assignDataSource(tableNew);
-            }
+            addHistory(new History { State = State.ValueChange, Table = oldValues });
+            assignDataSource(tableNew);
         }
 
         private void addDataSourceNewTable(DataTable table)
@@ -491,6 +486,7 @@ namespace DataTableConverter
                 List<string> notFoundColumns = new List<string>();
                 string[] wpHeaders = new string[0];
                 switch (wp.Type) {
+                    case ProcedureState.Order:
                     case ProcedureState.User:
                         checkHeaders(headers, notFoundColumns, out string[] col, wp.Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
                         wpHeaders = col;
@@ -557,6 +553,7 @@ namespace DataTableConverter
 
                                     switch (nf.Wp.Type)
                                     {
+                                        case ProcedureState.Order:
                                         case ProcedureState.User:
                                             foreach(DataRow row in nf.Wp.Columns.Rows)
                                             {
@@ -860,6 +857,10 @@ namespace DataTableConverter
                     trimDataTable(table, false);
                     break;
 
+                case ProcedureState.Order:
+                    tempOrder = buildOrder(wp.Columns);
+                    break;
+
                 case ProcedureState.Merge:
                     mergeColumns(wp.NewColumn,wp.Formula, table, columns);
                     break;
@@ -923,6 +924,24 @@ namespace DataTableConverter
                     addDataSourceValueChange(getDataSource(), table);
                 }
             }
+        }
+
+        private string buildOrder(DataTable table)
+        {
+            StringBuilder builder = new StringBuilder();
+            
+            foreach(DataRow row in table.Rows)
+            {
+                object col = row[0];
+                bool orderDESC = string.IsNullOrWhiteSpace(row[1]?.ToString()) ? false : (bool)row[1];
+                builder.Append("[").Append(col.ToString()).Append("] ").Append(orderDESC ? "DESC" : "ASC").Append(", ");
+            }
+            string result = builder.ToString();
+            if(result.Length > 2)
+            {
+                result = result.Substring(0, builder.Length - 2);
+            }
+            return result;
         }
 
         private List<int> getHeaderIndices(DataTable table, string[] columns)
@@ -1757,7 +1776,6 @@ namespace DataTableConverter
             {
                 DataView view = getDataView();
                 view.Sort = form.SortString;
-                Console.WriteLine(form.SortString);
                 setDataView(view);
             }
         }

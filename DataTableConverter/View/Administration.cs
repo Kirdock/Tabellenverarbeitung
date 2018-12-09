@@ -1,4 +1,5 @@
-﻿using DataTableConverter.Classes;
+﻿using CheckComboBoxTest;
+using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +22,9 @@ namespace DataTableConverter.View
         private BindingList<Case> bindingCase;
         private EventHandler ctxRowDeleteRowHandler;
         private EventHandler ctxRowClipboard;
+        private EventHandler ctxRowInsertRowHandler;
         private Dictionary<GroupBox, ProcedureState> gbState;
+        private List<KeyValuePair<string, bool>> OrderList;
 
         internal List<Proc> Procedures { get; set; }
         internal List<Proc> SystemProc { get; set; }
@@ -35,6 +38,7 @@ namespace DataTableConverter.View
         internal Administration(List<Proc> proc, List<Work> wf, List<Tolerance> tolerances, List<Case> cases, object[] headers)
         {
             InitializeComponent();
+            setOrderList();
             assignGroupBoxToEnum();
             cmbProcedureType.SelectedIndex = 0;
             Procedures = proc;
@@ -47,7 +51,7 @@ namespace DataTableConverter.View
             loadProceduresWorkflow(false);
             loadWorkflows();
             lbWorkflows_SelectedIndexChanged(null, null);
-            cbHeaders.Items.AddRange(headers);
+            setHeaders(headers);
 
             loadTolerances();
             lbTolerances_SelectedIndexChanged(null, null);
@@ -57,6 +61,20 @@ namespace DataTableConverter.View
             
         }
 
+        private void setOrderList()
+        {
+            OrderList = new List<KeyValuePair<string, bool>>();
+            OrderList.Add(new KeyValuePair<string, bool>("Aufsteigend", false));
+            OrderList.Add(new KeyValuePair<string, bool>("Absteigend", true));
+        }
+
+        private void setHeaders(object[] headers)
+        {
+            cbHeaders.Items.AddRange(headers);
+            clbHeaderProcedure.Items.AddRange(headers);
+            clbHeaderOrder.Items.AddRange(headers);
+        }
+
         private void assignGroupBoxToEnum()
         {
             gbState = new Dictionary<GroupBox, ProcedureState>();
@@ -64,6 +82,7 @@ namespace DataTableConverter.View
             gbState.Add(gbMerge, ProcedureState.Merge);
             //gbState.Add(gbTrim, ProcedureState.Trim);
             gbState.Add(gbProcedure, ProcedureState.User);
+            gbState.Add(gbOrder, ProcedureState.Order);
         }
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
@@ -228,7 +247,7 @@ namespace DataTableConverter.View
 
         }
 
-        private void openContextDataGridView(DataGridView sender, MouseEventArgs e)
+        private void openContextDataGridView(DataGridView sender, MouseEventArgs e, bool showClipboard = true)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -252,13 +271,16 @@ namespace DataTableConverter.View
                     if (ctxRowDeleteRowHandler != null)
                     {
                         zeileLöschenToolStripMenuItem.Click -= ctxRowDeleteRowHandler;
+                        zeileEinfügenToolStripMenuItem.Click -= ctxRowInsertRowHandler;
                     }
 
                     List<int> selectedRows = ViewHelper.SelectedRows(sender);
 
                     zeileLöschenToolStripMenuItem.Text = (selectedRows.Count > 1) ? "Zeilen löschen" : "Zeile löschen";
                     zeileLöschenToolStripMenuItem.Click += ctxRowDeleteRowHandler = (sender2, e2) => zeileLöschenToolStripMenuItem_Click(sender2, e2, sender, selectedRows);
+                    zeileEinfügenToolStripMenuItem.Click += ctxRowInsertRowHandler = (sender2, e2) => zeileEinfügenToolStripMenuItem_Click(sender2, e2, sender, selectedRow);
                 }
+                ctxRow.Items[2].Visible = showClipboard;
                 ctxRow.Show(sender, new Point(e.X, e.Y));
             }
         }
@@ -270,12 +292,23 @@ namespace DataTableConverter.View
             {
                 dgView.Rows.RemoveAt(rowIndizes[i]);
             }
-            
-            if(dgView.Name == "dgCaseColumns")
+            if (dgView.DataSource != null)
             {
-                dgCaseColumns.BindingContext[dgCaseColumns.DataSource].EndCurrentEdit();
+                dgView.BindingContext[dgView.DataSource].EndCurrentEdit();
+            }
+            if (dgView.Name == "dgCaseColumns")
+            {
                 lbUsedProcedures_SelectedIndexChanged(null, null);
             }
+        }
+
+        private void zeileEinfügenToolStripMenuItem_Click(object sender, EventArgs e, DataGridView dgView,int rowIndex)
+        {
+            dgView.BindingContext[dgView.DataSource].EndCurrentEdit();
+            DataTable table = (DataTable)dgView.DataSource;
+            DataRow row = table.NewRow();
+            table.Rows.InsertAt(row, rowIndex);
+            dgView.DataSource = table;
         }
 
         private void txtName_TextChanged(object sender, EventArgs e)
@@ -319,6 +352,7 @@ namespace DataTableConverter.View
             SystemProc = new List<Proc>();
             SystemProc.Add(new Proc("Trim", null, 1));
             SystemProc.Add(new Proc("Spalten zusammenfügen", null, 2));
+            SystemProc.Add(new Proc("Sortieren", null, 3));
 
             generateDuplicateProc();
         }
@@ -453,14 +487,46 @@ namespace DataTableConverter.View
                 txtWorkProcName.Text = selectedProc.Name;
                 txtFormula.Text = selectedProc.Formula;
                 setNewColumnText(selectedProc.NewColumn);
-                clearCmb();
                 setGroupBoxVisibility(selectedProc.Type);
 
 
                 switch (selectedProc.Type)
                 {
                     case ProcedureState.Merge:
+                        setCmbHeader(selectedProc.Formula);
                         lblOriginalNameText.Text = "Spalten zusammenfügen";
+                        break;
+
+                    case ProcedureState.Order:
+                        {
+                            setHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+                            lblOriginalNameText.Text = "Sortieren";
+
+                            if(selectedProc.Columns.Columns.Count <= 1)
+                            {
+                                DataTable table = new DataTable { TableName = "Order" };
+                                table.Columns.Add("Spalte");
+                                table.Columns.Add("Sortierung");
+                                table.Columns[1].DataType = typeof(bool);
+                                selectedProc.Columns = table;
+                            }
+                            dgOrderColumns.DataSource = null;
+                            dgOrderColumns.DataSource = selectedProc.Columns;
+                            
+                            dgOrderColumns.Columns[1].Visible = false;
+
+                            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn();
+
+
+                            cmb.DataSource = OrderList;
+                            cmb.HeaderText = "Sortierung";
+                            cmb.DisplayMember = "key";
+                            cmb.ValueMember = "value";
+                            cmb.DataPropertyName = "Sortierung";
+                            
+
+                            dgOrderColumns.Columns.Add(cmb);
+                        }
                         break;
 
                     case ProcedureState.Trim:
@@ -471,41 +537,44 @@ namespace DataTableConverter.View
                         lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
                         cbNewColumn.Checked = selectedProc.NewColumn != string.Empty;
                         dgvColumns.DataSource = selectedProc.Columns;
+                        setHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
                         break;
 
                     case ProcedureState.Duplicate:
-                        Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
-                        lblOriginalNameText.Text = myCase.Name;
-                        DataTable temp = myCase.Columns.Copy();
-                        DataTable table = new DataTable { TableName = "WorkDuplicates"};
-                        object[] firstColumn = temp.Rows.Cast<DataRow>().Select(dc => dc.ItemArray[0]).ToArray();
-
-                        table.Columns.Add("Bezeichnung");
-                        table.Columns.Add("Zuweisung");
-                        
-                        if (selectedProc.DuplicateColumns.Length < firstColumn.Length)
                         {
-                            List<string> list = new List<string>();
-                            if (selectedProc.DuplicateColumns.Length > 0)
+                            Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
+                            lblOriginalNameText.Text = myCase.Name;
+                            DataTable temp = myCase.Columns.Copy();
+                            DataTable table = new DataTable { TableName = "WorkDuplicates" };
+                            object[] firstColumn = temp.Rows.Cast<DataRow>().Select(dc => dc.ItemArray[0]).ToArray();
+
+                            table.Columns.Add("Bezeichnung");
+                            table.Columns.Add("Zuweisung");
+
+                            if (selectedProc.DuplicateColumns.Length < firstColumn.Length)
                             {
-                                list.AddRange(selectedProc.DuplicateColumns);
+                                List<string> list = new List<string>();
+                                if (selectedProc.DuplicateColumns.Length > 0)
+                                {
+                                    list.AddRange(selectedProc.DuplicateColumns);
+                                }
+
+                                list.AddRange(firstColumn.Skip(selectedProc.DuplicateColumns.Length).Select(ob => ob.ToString()));
+
+
+                                selectedProc.DuplicateColumns = list.ToArray();
                             }
-
-                            list.AddRange(firstColumn.Skip(selectedProc.DuplicateColumns.Length).Select(ob => ob.ToString()));
-
-
-                            selectedProc.DuplicateColumns = list.ToArray();
+                            else if (selectedProc.DuplicateColumns.Length > firstColumn.Length)
+                            {
+                                selectedProc.DuplicateColumns = selectedProc.DuplicateColumns.Take(firstColumn.Length).ToArray();
+                            }
+                            for (int i = 0; i < firstColumn.Length; i++)
+                            {
+                                table.Rows.Add(new object[] { firstColumn[i], selectedProc.DuplicateColumns[i] });
+                            }
+                            dgColumnDefDuplicate.DataSource = table;
+                            dgColumnDefDuplicate.Columns[0].ReadOnly = true;
                         }
-                        else if(selectedProc.DuplicateColumns.Length > firstColumn.Length)
-                        {
-                            selectedProc.DuplicateColumns = selectedProc.DuplicateColumns.Take(firstColumn.Length).ToArray();
-                        }
-                        for (int i = 0; i < firstColumn.Length; i++)
-                        {
-                            table.Rows.Add(new object[] { firstColumn[i], selectedProc.DuplicateColumns[i] });
-                        }
-                        dgColumnDefDuplicate.DataSource = table;
-                        dgColumnDefDuplicate.Columns[0].ReadOnly = true;
                         break;
                 }
             }
@@ -529,14 +598,47 @@ namespace DataTableConverter.View
             return Procedures[getProcedureIndexThroughId(id)].Name;
         }
 
-        private void clearCmb()
+        private void setCmbHeader(string formula)
         {
-            cbHeaders.ItemCheck -= cbHeaders_ItemCheck;
-            for (int i = 0; i < cbHeaders.Items.Count; i++)
+            if (formula != null)
             {
-                cbHeaders.SetItemChecked(i, false);
+                cbHeaders.ItemCheck -= cbHeaders_ItemCheck;
+                Regex re = new Regex(@"\[(.*?)\]");
+                MatchCollection matches = re.Matches(formula);
+                string[] headers = new string[matches.Count];
+                for (int i = 0; i < matches.Count; i++)
+                {
+                    string header = matches[i].Value.Substring(1, matches[i].Value.Length - 2);
+                    int index;
+                    if ((index = cbHeaders.Items.IndexOf(header)) != -1)
+                    {
+                        cbHeaders.SetItemChecked(index, true);
+                    }
+                }
+                cbHeaders.ItemCheck += cbHeaders_ItemCheck;
             }
-            cbHeaders.ItemCheck += cbHeaders_ItemCheck;
+        }
+
+        private void setHeaderProcedure(string[] headers)
+        {
+            clbHeaderProcedure.ItemCheck -= clbHeaderProcedure_ItemCheck;
+            setChecked(clbHeaderProcedure, headers);
+            clbHeaderProcedure.ItemCheck += clbHeaderProcedure_ItemCheck;
+        }
+
+        private void setChecked(CheckedComboBox box, string[] headers)
+        {
+            for (int i = 0; i < box.Items.Count; i++)
+            {
+                box.SetItemChecked(i, headers.Contains(box.Items[i].ToString()));
+            }
+        }
+
+        private void setHeaderOrder(string[] headers)
+        {
+            clbHeaderOrder.ItemCheck -= clbHeaderOrder_ItemCheck;
+            setChecked(clbHeaderOrder, headers);
+            clbHeaderOrder.ItemCheck += clbHeaderOrder_ItemCheck;
         }
 
         private WorkProc getSelectedWorkProcedure()
@@ -926,6 +1028,85 @@ namespace DataTableConverter.View
         {
             dgv.BindingContext[dgv.DataSource].EndCurrentEdit();
             return ((DataTable)dgv.DataSource).Copy();
+        }
+
+        private void clbHeaderProcedure_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (e.NewValue == CheckState.Checked)
+            {
+                dgvColumns.Rows.Add(clbHeaderProcedure.Items[e.Index]);
+            }
+            else
+            {
+                bool found = false;
+                for(int i = dgvColumns.Rows.Count-1; i >= 0 && !found; i--)
+                {
+                    if(dgvColumns.Rows[i].Cells[0] == clbHeaderProcedure.Items[e.Index])
+                    {
+                        dgvColumns.Rows.RemoveAt(i);
+                        found = true;
+                    }
+                }
+            }
+        }
+
+        private void clbHeaderOrder_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            WorkProc selectedProc = getSelectedWorkProcedure();
+            DataTable table = getDataSource(dgOrderColumns);
+            string value = clbHeaderOrder.Items[e.Index].ToString();
+            if (e.NewValue == CheckState.Checked)
+            {
+                table.Rows.Add(new object[] { value, false });
+            }
+            else
+            {
+                bool found = false;
+                for (int i = table.Rows.Count - 1; i >= 0 && !found; i--)
+                {
+                    if(table.Rows[i][0].ToString() == value)
+                    {
+                        table.Rows.RemoveAt(i);
+                        found = true;
+                    }
+                }
+            }
+            selectedProc.Columns = table;
+            assignDataSource(table, dgOrderColumns);
+        }
+
+        private void assignDataSource(DataTable table, DataGridView sender)
+        {
+            sender.DataSource = table;
+        }
+
+        private void dgOrderColumns_MouseClick(object sender, MouseEventArgs e)
+        {
+            openContextDataGridView((DataGridView)sender, e, false);
+        }
+
+        private void dgOrderColumns_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.ColumnIndex == 2 && e.Value?.ToString() == string.Empty)
+            {
+                e.Value = OrderList[0].Key;
+            }
+        }
+        
+
+        private void dgOrderColumns_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (e.Control is ComboBox)
+            {
+                ComboBox ctl = e.Control as ComboBox;
+                ctl.Enter -= new EventHandler(ctl_Enter);
+                ctl.Enter += new EventHandler(ctl_Enter);
+            }
+        }
+
+        private void ctl_Enter(object sender, EventArgs e)
+        {
+            (sender as ComboBox).DroppedDown = true;
         }
     }
 }
