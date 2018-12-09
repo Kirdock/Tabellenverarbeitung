@@ -122,6 +122,7 @@
             this.Controls.Add(this.btnUp);
             this.Controls.Add(this.clBoxHeaders);
             this.Name = "SortForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SortForm";
             this.ResumeLayout(false);
 

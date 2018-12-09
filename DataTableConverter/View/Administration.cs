@@ -21,6 +21,7 @@ namespace DataTableConverter.View
         private BindingList<Case> bindingCase;
         private EventHandler ctxRowDeleteRowHandler;
         private EventHandler ctxRowClipboard;
+        private Dictionary<GroupBox, ProcedureState> gbState;
 
         internal List<Proc> Procedures { get; set; }
         internal List<Proc> SystemProc { get; set; }
@@ -34,6 +35,7 @@ namespace DataTableConverter.View
         internal Administration(List<Proc> proc, List<Work> wf, List<Tolerance> tolerances, List<Case> cases, object[] headers)
         {
             InitializeComponent();
+            assignGroupBoxToEnum();
             cmbProcedureType.SelectedIndex = 0;
             Procedures = proc;
             Workflows = wf;
@@ -52,6 +54,16 @@ namespace DataTableConverter.View
 
             loadCases();
             lbCases_SelectedIndexChanged(null, null);
+            
+        }
+
+        private void assignGroupBoxToEnum()
+        {
+            gbState = new Dictionary<GroupBox, ProcedureState>();
+            gbState.Add(gbDefDuplicate, ProcedureState.Duplicate);
+            gbState.Add(gbMerge, ProcedureState.Merge);
+            //gbState.Add(gbTrim, ProcedureState.Trim);
+            gbState.Add(gbProcedure, ProcedureState.User);
         }
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
@@ -437,39 +449,33 @@ namespace DataTableConverter.View
         {
             if (gbProcedure.Enabled = (lbUsedProcedures.SelectedIndex != -1))
             {
-                clearCmb();
                 WorkProc selectedProc = getSelectedWorkProcedure();
                 txtWorkProcName.Text = selectedProc.Name;
                 txtFormula.Text = selectedProc.Formula;
-                txtNewColumn.Text = selectedProc.NewColumn;
-                
+                setNewColumnText(selectedProc.NewColumn);
+                clearCmb();
+                setGroupBoxVisibility(selectedProc.Type);
+
+
                 switch (selectedProc.Type)
                 {
                     case ProcedureState.Merge:
-                        lblOriginalName.Text = "Spalten zusammenfügen";
-                        cbNewColumn.Checked = true;
-                        cbNewColumn.Visible = dgvColumns.Visible = false;
-                        lblNewColumn.Visible = lblFormula.Visible = txtFormula.Visible = cbHeaders.Visible = lblHeaders.Visible = txtNewColumn.Visible = true;
+                        lblOriginalNameText.Text = "Spalten zusammenfügen";
                         break;
 
                     case ProcedureState.Trim:
-                        lblOriginalName.Text = "Trim";
-                        lblNewColumn.Visible = txtNewColumn.Visible = dgvColumns.Visible = cbHeaders.Visible = lblHeaders.Visible = lblFormula.Visible = txtFormula.Visible = cbNewColumn.Visible = txtNewColumn.ReadOnly = false;
+                        lblOriginalNameText.Text = "Trim";
                         break;
 
                     case ProcedureState.User:
-                        lblOriginalName.Text = getProcedureName(selectedProc.ProcedureId);
-                        setFormUserProcedure();
-
+                        lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
+                        cbNewColumn.Checked = selectedProc.NewColumn != string.Empty;
                         dgvColumns.DataSource = selectedProc.Columns;
-                        dgvColumns.Columns[0].ReadOnly = false;
-                        dgvColumns.AllowUserToAddRows = true;
                         break;
 
                     case ProcedureState.Duplicate:
-                        setFormUserProcedure();
                         Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
-                        lblOriginalName.Text = myCase.Name;
+                        lblOriginalNameText.Text = myCase.Name;
                         DataTable temp = myCase.Columns.Copy();
                         DataTable table = new DataTable { TableName = "WorkDuplicates"};
                         object[] firstColumn = temp.Rows.Cast<DataRow>().Select(dc => dc.ItemArray[0]).ToArray();
@@ -498,30 +504,29 @@ namespace DataTableConverter.View
                         {
                             table.Rows.Add(new object[] { firstColumn[i], selectedProc.DuplicateColumns[i] });
                         }
-                        dgvColumns.DataSource = table;
-                        dgvColumns.Columns[0].ReadOnly = true;
-                        cbNewColumn.Visible = dgvColumns.AllowUserToAddRows = false;
+                        dgColumnDefDuplicate.DataSource = table;
+                        dgColumnDefDuplicate.Columns[0].ReadOnly = true;
                         break;
                 }
             }
-            else
+        }
+
+        private void setGroupBoxVisibility(ProcedureState state)
+        {
+            foreach (GroupBox box in gbState.Keys)
             {
-                dgvColumns.DataSource = null;
+                box.Visible = gbState[box] == state;
             }
-            
+        }
+
+        private void setNewColumnText(string text)
+        {
+            txtNewColumn.Text = txtNewColumnMerge.Text = text;
         }
 
         private string getProcedureName(int id)
         {
             return Procedures[getProcedureIndexThroughId(id)].Name;
-        }
-
-        private void setFormUserProcedure()
-        {
-            lblFormula.Visible = txtFormula.Visible = cbHeaders.Visible = lblHeaders.Visible = false;
-            cbNewColumn.Visible = dgvColumns.Visible = true;
-
-            txtNewColumn.Visible = lblNewColumn.Visible = cbNewColumn.Checked = txtNewColumn.Text.Length > 0;
         }
 
         private void clearCmb()
@@ -602,17 +607,17 @@ namespace DataTableConverter.View
 
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
-            txtNewColumn.ReadOnly = !cbNewColumn.Checked;
             lblNewColumn.Visible = txtNewColumn.Visible = cbNewColumn.Checked;
-            if (txtNewColumn.ReadOnly)
+            if (!txtNewColumn.Visible)
             {
-                getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].NewColumn = txtNewColumn.Text = string.Empty;
+                txtNewColumn.Text = string.Empty;
+                txtNewColumn_TextChanged(txtNewColumn, e);
             }
         }
 
         private void txtNewColumn_TextChanged(object sender, EventArgs e)
         {
-            getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].NewColumn = txtNewColumn.Text;
+            getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].NewColumn = ((TextBox)sender).Text;
         }
 
         private void txtFormula_TextChanged(object sender, EventArgs e)
@@ -658,21 +663,6 @@ namespace DataTableConverter.View
         private void cmbProcedureType_SelectedIndexChanged(object sender, EventArgs e)
         {
             loadProceduresWorkflow();
-        }
-
-        private void dgvColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            WorkProc selecteWorkProc = getSelectedWorkProcedure();
-            if (selecteWorkProc.Type == ProcedureState.Duplicate)
-            {
-                selecteWorkProc.DuplicateColumns = getDataSource().Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
-            }
-        }
-
-        private DataTable getDataSource()
-        {
-            dgvColumns.BindingContext[dgvColumns.DataSource].EndCurrentEdit();
-            return ((DataTable)dgvColumns.DataSource).Copy();
         }
 
         #endregion
@@ -924,6 +914,18 @@ namespace DataTableConverter.View
         private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ViewHelper.insertClipboardToDataGridView((DataGridView)sender);
+        }
+
+        private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            WorkProc selecteWorkProc = getSelectedWorkProcedure();
+            selecteWorkProc.DuplicateColumns = getDataSource(dgColumnDefDuplicate).Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
+        }
+
+        private DataTable getDataSource(DataGridView dgv)
+        {
+            dgv.BindingContext[dgv.DataSource].EndCurrentEdit();
+            return ((DataTable)dgv.DataSource).Copy();
         }
     }
 }
