@@ -112,14 +112,6 @@ namespace DataTableConverter.Assisstant
                     oldValues = oldValues.Where(cm => cm.bigChange != null).ToList();
                     if(oldValues.Count > 0)
                     {
-                        foreach (CellMatrix matrix in oldValues.OrderByDescending(cm => cm.bigChange.ColumnIndex))
-                        {
-                            Console.WriteLine(matrix.bigChange.ColumnIndex);
-                        }
-                        foreach (CellMatrix matrix in oldValues.OrderBy(cm => cm.ColumnIndex))
-                        {
-                            Console.WriteLine(matrix.bigChange.ColumnIndex);
-                        }
                         if (oldValues[0].bigChange.State == State.InsertColumn)
                         {
                             foreach (CellMatrix matrix in oldValues.OrderByDescending(cm => cm.bigChange.ColumnIndex))

@@ -80,6 +80,33 @@ namespace DataTableConverter.Assisstant
             return table.Columns.Cast<DataColumn>().Select(dt => dt.ColumnName.ToLower()).ToList();
         }
 
+        internal static void concatTables(DataTable originalTable, DataTable table)
+        {
+            List<int> ColumnIndizes = new List<int>();
+
+            table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToList().ForEach(x => {
+                int index = originalTable.Columns.IndexOf(x);
+                if (index == -1)
+                {
+                    index = originalTable.Columns.Count;
+                    originalTable.Columns.Add(x);
+                }
+                ColumnIndizes.Add(index);
+            });
+
+            foreach (DataRow row in table.Rows)
+            {
+                object[] itemArray = new object[originalTable.Columns.Count];
+                int count = 0;
+                foreach (int index in ColumnIndizes)
+                {
+                    itemArray[index] = row.ItemArray[count];
+                    count++;
+                }
+                originalTable.Rows.Add(itemArray);
+            }
+        }
+
         internal static List<CellMatrix> getChangesOfDataTable(DataTable tableOld, DataTable tableNew, int columnIndex)
         {
             //Löschen und Hinzufügen von Zeilen und Löschen von Spalten nicht berücksichtigt

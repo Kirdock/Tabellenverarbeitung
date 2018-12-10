@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using DataTableConverter.View;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -9,6 +11,19 @@ namespace DataTableConverter
 {
     class ViewHelper
     {
+        private EventHandler ctxRowDeleteRowHandler, ctxRowClipboard, ctxRowInsertRowHandler;
+        private ContextMenuStrip ctxRow;
+        private ToolStripItem clipboardItem, deleteRowItem, insertRowItem;
+        private Action<object, EventArgs> myFunction;
+
+        public ViewHelper(ContextMenuStrip ctxrow, Action<object,EventArgs> myfunction = null)
+        {
+            ctxRow = ctxrow;
+            myFunction = myfunction;
+            clipboardItem = ctxRow.Items.Cast<ToolStripItem>().First(x=> x.Name == "clipboardItem");
+            deleteRowItem = ctxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "deleteRowItem");
+            insertRowItem = ctxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "insertRowItem");
+        }
 
         internal static void addNumerationToDataGridView(object sender, DataGridViewRowPostPaintEventArgs e, Font font)
         {
@@ -42,31 +57,119 @@ namespace DataTableConverter
             e.Handled = !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar);
         }
 
-        internal static void insertClipboardToDataGridView(DataGridView myDataGridView)
+        internal static void insertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex)
         {
             myDataGridView.BindingContext[myDataGridView.DataSource].EndCurrentEdit();
             DataTable table = ((DataTable)myDataGridView.DataSource).Copy();
 
             DataObject o = (DataObject)Clipboard.GetDataObject();
             int columnCount = table.Columns.Count;
+            DataTable clipboardTable = new DataTable();
             if (o.GetDataPresent(DataFormats.Text))
             {
                 string[] pastedRows = Regex.Split(o.GetData(DataFormats.Text).ToString().TrimEnd("\r\n".ToCharArray()), "\r\n");
                 foreach (string pastedRow in pastedRows)
                 {
                     string[] pastedRowCells = pastedRow.Split(new char[] { '\t' });
-                    try
+                    for(int i = clipboardTable.Columns.Count; i < pastedRowCells.Length; i++)
                     {
-                        DataRow row = table.NewRow();
-                        row.ItemArray = pastedRowCells.Length > columnCount ? pastedRowCells.Take(columnCount).ToArray() : pastedRowCells;
-                        table.Rows.Add(row);
+                        clipboardTable.Columns.Add($"Spalte{i+1}");
                     }
-                    catch { } //Keine Übereinstimmung mit dem ColumnTyp z.B. int
+                    clipboardTable.Rows.Add(pastedRowCells);
                 }
-                myDataGridView.DataSource = null;
-                myDataGridView.DataSource = table;
+
+                ClipboardForm form = new ClipboardForm(clipboardTable);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    foreach(DataRow row in form.getTable().Rows)
+                    {
+                        try
+                        {
+                            DataRow newRow = table.NewRow();
+                            object[] itemArray = row.ItemArray.Clone() as object[];
+                            newRow.ItemArray = itemArray.Length > table.Columns.Count ? itemArray.Take(table.Columns.Count).ToArray() : itemArray;
+                            table.Rows.InsertAt(newRow, rowIndex);
+                            rowIndex++;
+                        }
+                        catch { } //Error, wenn Typen wie int nicht übereinstimmen
+                    }
+                    myDataGridView.DataSource = null;
+                    myDataGridView.DataSource = table;
+                }
             }
         }
+
+        internal void addContextMenuToDataGridView(DataGridView view,bool clipboard)
+        {
+            view.MouseClick +=(sender, e)=> dataGridView_MouseClick(view, e, clipboard);
+        }
+
+        private void dataGridView_MouseClick(DataGridView view, MouseEventArgs e, bool clipboard)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                int selectedRow = view.HitTest(e.X, e.Y).RowIndex;
+                int selectedColumn = view.HitTest(e.X, e.Y).ColumnIndex;
+
+                if (selectedColumn > -1 && selectedRow > -1 && !view.SelectedCells.Contains(view[selectedColumn, selectedRow]))
+                {
+                    view.SelectedCells.Cast<DataGridViewCell>().ToList().ForEach(cell => cell.Selected = false);
+                    view[selectedColumn, selectedRow].Selected = true;
+                }
+
+                if (ctxRowClipboard != null)
+                {
+                    clipboardItem.Click -= ctxRowClipboard;
+                }
+
+                clipboardItem.Click += ctxRowClipboard = (sender2, e2) => insertClipboardToDataGridView(view, selectedRow);
+
+                if (deleteRowItem.Visible = (selectedRow > -1 && selectedRow != view.Rows.Count - 1))
+                {
+                    if (ctxRowDeleteRowHandler != null)
+                    {
+                        deleteRowItem.Click -= ctxRowDeleteRowHandler;
+                        insertRowItem.Click -= ctxRowInsertRowHandler;
+                    }
+
+                    List<int> selectedRows = SelectedRows(view);
+
+                    deleteRowItem.Text = (selectedRows.Count > 1) ? "Zeilen löschen" : "Zeile löschen";
+                    deleteRowItem.Click += ctxRowDeleteRowHandler = (sender2, e2) => deleteRowClick(view, selectedRows);
+                    insertRowItem.Click += ctxRowInsertRowHandler = (sender2, e2) => insertRowClick(view, selectedRow);
+                }
+                clipboardItem.Visible = clipboard;
+                
+                ctxRow.Show(view, new Point(e.X, e.Y));
+
+            }
+        }
+
+        private void deleteRowClick(DataGridView view, List<int> rowIndizes)
+        {
+            for (int i = rowIndizes.Count - 1; i >= 0; i--)
+            {
+                view.Rows.RemoveAt(rowIndizes[i]);
+            }
+            if (view.DataSource != null)
+            {
+                view.BindingContext[view.DataSource].EndCurrentEdit();
+            }
+            if (view.Name == "dgCaseColumns")
+            {
+                myFunction(null, null);
+            }
+        }
+
+        private void insertRowClick(DataGridView dgView, int rowIndex)
+        {
+            dgView.BindingContext[dgView.DataSource].EndCurrentEdit();
+            DataTable table = (DataTable)dgView.DataSource;
+            DataRow row = table.NewRow();
+            table.Rows.InsertAt(row, rowIndex);
+            dgView.DataSource = table;
+        }
+
 
         internal static List<int> SelectedRows(DataGridView sender)
         {

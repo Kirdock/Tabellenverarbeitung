@@ -21,9 +21,6 @@ namespace DataTableConverter.View
         private BindingList<Work> bindingWorkflow;
         private BindingList<Tolerance> bindingTolerance;
         private BindingList<Case> bindingCase;
-        private EventHandler ctxRowDeleteRowHandler;
-        private EventHandler ctxRowClipboard;
-        private EventHandler ctxRowInsertRowHandler;
         private Dictionary<GroupBox, ProcedureState> gbState;
         private List<KeyValuePair<string, bool>> OrderList;
 
@@ -34,11 +31,15 @@ namespace DataTableConverter.View
         internal List<Tolerance> Tolerances { get; set; }
         internal List<Case> Cases { get; set; }
         private Proc selectedProc;
-        
+        private ViewHelper viewHelper;
 
-        internal Administration(object[] headers)
+
+        internal Administration(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
+            viewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged);
+            addContextMenu();
+            
             setOrderList();
             assignGroupBoxToEnum();
             cmbProcedureType.SelectedIndex = 0;
@@ -60,6 +61,15 @@ namespace DataTableConverter.View
             
             lbCases_SelectedIndexChanged(null, null);
             
+        }
+
+        private void addContextMenu()
+        {
+            viewHelper.addContextMenuToDataGridView(dgTolerance, true);
+            viewHelper.addContextMenuToDataGridView(dgCaseColumns, true);
+            viewHelper.addContextMenuToDataGridView(dgvColumns, true);
+            viewHelper.addContextMenuToDataGridView(dgvReplaces, true);
+            viewHelper.addContextMenuToDataGridView(dgOrderColumns, false);
         }
 
         private void setOrderList()
@@ -240,77 +250,6 @@ namespace DataTableConverter.View
             Procedures.Sort();
             bindingProcedure.ResetBindings();
             ltbProcedures.SelectedIndex = getProcedureIndexThroughId(selectedId);
-        }
-        
-
-        private void DataGridViewContext_MouseClick(object sender, MouseEventArgs e)
-        {
-            openContextDataGridView((DataGridView)sender, e);
-
-        }
-
-        private void openContextDataGridView(DataGridView sender, MouseEventArgs e, bool showClipboard = true)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                int selectedRow = sender.HitTest(e.X, e.Y).RowIndex;
-                int selectedColumn = sender.HitTest(e.X, e.Y).ColumnIndex;
-                if (selectedColumn > -1 && selectedRow > -1 && !sender.SelectedCells.Contains(sender[selectedColumn, selectedRow]))
-                {
-                    sender.SelectedCells.Cast<DataGridViewCell>().ToList().ForEach(cell => cell.Selected = false);
-                    sender[selectedColumn, selectedRow].Selected = true;
-                }
-
-                if (ctxRowClipboard != null)
-                {
-                    zwischenablageEinfügenToolStripMenuItem1.Click -= ctxRowClipboard;
-                }
-
-                zwischenablageEinfügenToolStripMenuItem1.Click += ctxRowClipboard = (sender2, e2) => zwischenablageEinfügenToolStripMenuItem_Click(sender, e2);
-
-                if (zeileLöschenToolStripMenuItem.Visible = (selectedRow > -1 && selectedRow != sender.Rows.Count - 1))
-                {
-                    if (ctxRowDeleteRowHandler != null)
-                    {
-                        zeileLöschenToolStripMenuItem.Click -= ctxRowDeleteRowHandler;
-                        zeileEinfügenToolStripMenuItem.Click -= ctxRowInsertRowHandler;
-                    }
-
-                    List<int> selectedRows = ViewHelper.SelectedRows(sender);
-
-                    zeileLöschenToolStripMenuItem.Text = (selectedRows.Count > 1) ? "Zeilen löschen" : "Zeile löschen";
-                    zeileLöschenToolStripMenuItem.Click += ctxRowDeleteRowHandler = (sender2, e2) => zeileLöschenToolStripMenuItem_Click(sender2, e2, sender, selectedRows);
-                    zeileEinfügenToolStripMenuItem.Click += ctxRowInsertRowHandler = (sender2, e2) => zeileEinfügenToolStripMenuItem_Click(sender2, e2, sender, selectedRow);
-                }
-                ctxRow.Items[2].Visible = showClipboard;
-                ctxRow.Show(sender, new Point(e.X, e.Y));
-            }
-        }
-
-
-        private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e, DataGridView dgView, List<int> rowIndizes)
-        {
-            for (int i = rowIndizes.Count - 1; i >= 0; i--)
-            {
-                dgView.Rows.RemoveAt(rowIndizes[i]);
-            }
-            if (dgView.DataSource != null)
-            {
-                dgView.BindingContext[dgView.DataSource].EndCurrentEdit();
-            }
-            if (dgView.Name == "dgCaseColumns")
-            {
-                lbUsedProcedures_SelectedIndexChanged(null, null);
-            }
-        }
-
-        private void zeileEinfügenToolStripMenuItem_Click(object sender, EventArgs e, DataGridView dgView,int rowIndex)
-        {
-            dgView.BindingContext[dgView.DataSource].EndCurrentEdit();
-            DataTable table = (DataTable)dgView.DataSource;
-            DataRow row = table.NewRow();
-            table.Rows.InsertAt(row, rowIndex);
-            dgView.DataSource = table;
         }
 
         private void txtName_TextChanged(object sender, EventArgs e)
@@ -1018,9 +957,9 @@ namespace DataTableConverter.View
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 
-        private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e)
+        private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.insertClipboardToDataGridView((DataGridView)sender);
+            ViewHelper.insertClipboardToDataGridView((DataGridView)sender, selectedRow);
         }
 
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -1083,11 +1022,6 @@ namespace DataTableConverter.View
         private void assignDataSource(DataTable table, DataGridView sender)
         {
             sender.DataSource = table;
-        }
-
-        private void dgOrderColumns_MouseClick(object sender, MouseEventArgs e)
-        {
-            openContextDataGridView((DataGridView)sender, e, false);
         }
 
         private void dgOrderColumns_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)

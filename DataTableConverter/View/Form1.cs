@@ -49,7 +49,7 @@ namespace DataTableConverter
         }
 
 
-        private void assignDataSource(DataTable table, bool isNewTable = false)
+        private void assignDataSource(DataTable table)
         {
             DataView view = table.DefaultView;
             view.Sort = tempOrder ?? getSorting();
@@ -59,7 +59,6 @@ namespace DataTableConverter
 
             dgTable.DataSource = null;
             dgTable.DataSource = view;
-            dgTable.Columns.Cast<DataGridViewColumn>().ToList().ForEach(column => column.SortMode = DataGridViewColumnSortMode.Programmatic);
 
             restoreDataGridSortMode();
         }
@@ -79,6 +78,7 @@ namespace DataTableConverter
             for (int i = 0; i < dgTable.Columns.Count; i++)
             {
                 string key = dgTable.Columns[i].HeaderText;
+                dgTable.Columns[i].SortMode = DataGridViewColumnSortMode.Programmatic;
                 if (DataGridOrders.ContainsKey(key))
                 {
                     dgTable.Columns[i].HeaderCell.SortGlyphDirection = DataGridOrders[key];
@@ -146,7 +146,7 @@ namespace DataTableConverter
         private void addDataSourceNewTable(DataTable table)
         {
             historyHelper.resetHistory();
-            assignDataSource(table, true);
+            assignDataSource(table);
         }
 
         private void addDataSourceAddColumn(int columnIndex)
@@ -1126,7 +1126,7 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(dgTable.DataSource != null ? DataHelper.getHeadersOfDataTable(getDataSource()) : new object[0]);
+            Administration form = new Administration(dgTable.DataSource != null ? DataHelper.getHeadersOfDataTable(getDataSource()) : new object[0], contextGlobal);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show();
         }
@@ -1320,33 +1320,9 @@ namespace DataTableConverter
             DataTable originalTable = getDataSource();
             int ColumnIndexNew = originalTable.Columns.Count;
             int RowIndexNew = originalTable.Rows.Count;
-            List<int> ColumnIndizes = new List<int>();
-
-            table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToList().ForEach(x=> {
-                int index = originalTable.Columns.IndexOf(x);
-                if(index == -1)
-                {
-                    index = originalTable.Columns.Count;
-                    originalTable.Columns.Add(x);
-                }
-                ColumnIndizes.Add(index);
-            });
-
-            foreach(DataRow row in table.Rows)
-            {
-                object[] itemArray = new object[originalTable.Columns.Count];
-                int count = 0;
-                foreach (int index in ColumnIndizes)
-                {
-                    itemArray[index] = row.ItemArray[count];
-                    count++;
-                }
-                originalTable.Rows.Add(itemArray);
-            }
+            DataHelper.concatTables(originalTable, table);
 
             assignDataSource(originalTable);
-
-
             addDataSourceAddColumnAndRows(ColumnIndexNew, RowIndexNew);
         }
 

@@ -30,6 +30,16 @@ namespace DataTableConverter
                                 MessageBoxDefaultButton.Button1);
         }
 
+        public static DialogResult MessagesOkCancel(MessageBoxIcon messageBoxIcon, string text)
+        {
+            string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? "Achtung!" : ((messageBoxIcon == MessageBoxIcon.Error)) ? "Warnung!" : "Frage";
+            return MessageBox.Show(text,
+                                warnung,
+                                MessageBoxButtons.OKCancel,
+                                messageBoxIcon,
+                                MessageBoxDefaultButton.Button1);
+        }
+
         public static void MessagesOK(MessageBoxIcon messageBoxIcon, string text)
         {
             MessageBox.Show(text,

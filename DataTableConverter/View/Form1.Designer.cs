@@ -43,16 +43,17 @@
             this.rückgängigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wiederholenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabellenZusammenfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.zeilenZusammenfügenToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.zählenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabelleHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zeilenZusammenfügenToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.überschriftEinlesenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zählenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.verwaltungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.funktionenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeilenZusammenfügenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.arbeitsablaufToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.duplikateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sortierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pgbLoading = new System.Windows.Forms.ProgressBar();
             this.ctxBody = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.spalteHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,13 +69,18 @@
             this.lblFilename = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblRows = new System.Windows.Forms.ToolStripStatusLabel();
+            this.spalteEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.sortierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
             this.ctxRow.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.contextGlobal.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -200,20 +206,6 @@
             this.tabellenZusammenfügenToolStripMenuItem.Text = "Tabellen zusammenfügen";
             this.tabellenZusammenfügenToolStripMenuItem.Click += new System.EventHandler(this.tabellenZusammenfügenToolStripMenuItem_Click);
             // 
-            // zeilenZusammenfügenToolStripMenuItem2
-            // 
-            this.zeilenZusammenfügenToolStripMenuItem2.Name = "zeilenZusammenfügenToolStripMenuItem2";
-            this.zeilenZusammenfügenToolStripMenuItem2.Size = new System.Drawing.Size(210, 22);
-            this.zeilenZusammenfügenToolStripMenuItem2.Text = "Spalten zusammenfügen";
-            this.zeilenZusammenfügenToolStripMenuItem2.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click);
-            // 
-            // zählenToolStripMenuItem
-            // 
-            this.zählenToolStripMenuItem.Name = "zählenToolStripMenuItem";
-            this.zählenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.zählenToolStripMenuItem.Text = "Zählen";
-            this.zählenToolStripMenuItem.Click += new System.EventHandler(this.zählenToolStripMenuItem_Click);
-            // 
             // tabelleHinzufügenToolStripMenuItem
             // 
             this.tabelleHinzufügenToolStripMenuItem.Name = "tabelleHinzufügenToolStripMenuItem";
@@ -221,12 +213,26 @@
             this.tabelleHinzufügenToolStripMenuItem.Text = "Tabelle hinzufügen";
             this.tabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabelleHinzufügenToolStripMenuItem_Click);
             // 
+            // zeilenZusammenfügenToolStripMenuItem2
+            // 
+            this.zeilenZusammenfügenToolStripMenuItem2.Name = "zeilenZusammenfügenToolStripMenuItem2";
+            this.zeilenZusammenfügenToolStripMenuItem2.Size = new System.Drawing.Size(210, 22);
+            this.zeilenZusammenfügenToolStripMenuItem2.Text = "Spalten zusammenfügen";
+            this.zeilenZusammenfügenToolStripMenuItem2.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click);
+            // 
             // überschriftEinlesenToolStripMenuItem
             // 
             this.überschriftEinlesenToolStripMenuItem.Name = "überschriftEinlesenToolStripMenuItem";
             this.überschriftEinlesenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.überschriftEinlesenToolStripMenuItem.Text = "Überschrift einlesen";
             this.überschriftEinlesenToolStripMenuItem.Click += new System.EventHandler(this.überschriftenEinlesenToolStripMenuItem_Click);
+            // 
+            // zählenToolStripMenuItem
+            // 
+            this.zählenToolStripMenuItem.Name = "zählenToolStripMenuItem";
+            this.zählenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.zählenToolStripMenuItem.Text = "Zählen";
+            this.zählenToolStripMenuItem.Click += new System.EventHandler(this.zählenToolStripMenuItem_Click);
             // 
             // verwaltungToolStripMenuItem
             // 
@@ -268,6 +274,13 @@
             this.duplikateToolStripMenuItem.Name = "duplikateToolStripMenuItem";
             this.duplikateToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
             this.duplikateToolStripMenuItem.Text = "Duplikate";
+            // 
+            // sortierenToolStripMenuItem
+            // 
+            this.sortierenToolStripMenuItem.Name = "sortierenToolStripMenuItem";
+            this.sortierenToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
+            this.sortierenToolStripMenuItem.Text = "Sortieren";
+            this.sortierenToolStripMenuItem.Click += new System.EventHandler(this.sortierenToolStripMenuItem_Click);
             // 
             // pgbLoading
             // 
@@ -327,21 +340,22 @@
             // 
             this.ctxRow.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zeileLöschenToolStripMenuItem,
-            this.zeileEinfügenToolStripMenuItem});
+            this.zeileEinfügenToolStripMenuItem,
+            this.spalteEinfügenToolStripMenuItem});
             this.ctxRow.Name = "ctxRow";
-            this.ctxRow.Size = new System.Drawing.Size(150, 48);
+            this.ctxRow.Size = new System.Drawing.Size(157, 70);
             // 
             // zeileLöschenToolStripMenuItem
             // 
             this.zeileLöschenToolStripMenuItem.Name = "zeileLöschenToolStripMenuItem";
-            this.zeileLöschenToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.zeileLöschenToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.zeileLöschenToolStripMenuItem.Text = "Zeile löschen";
             this.zeileLöschenToolStripMenuItem.Click += new System.EventHandler(this.zeileLöschenToolStripMenuItem_Click);
             // 
             // zeileEinfügenToolStripMenuItem
             // 
             this.zeileEinfügenToolStripMenuItem.Name = "zeileEinfügenToolStripMenuItem";
-            this.zeileEinfügenToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.zeileEinfügenToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.zeileEinfügenToolStripMenuItem.Text = "Zeile einfügen";
             this.zeileEinfügenToolStripMenuItem.Click += new System.EventHandler(this.zeileEinfügenToolStripMenuItem_Click);
             // 
@@ -385,6 +399,39 @@
             this.lblRows.Name = "lblRows";
             this.lblRows.Size = new System.Drawing.Size(0, 19);
             // 
+            // spalteEinfügenToolStripMenuItem
+            // 
+            this.spalteEinfügenToolStripMenuItem.Name = "spalteEinfügenToolStripMenuItem";
+            this.spalteEinfügenToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.spalteEinfügenToolStripMenuItem.Text = "Spalte einfügen";
+            // 
+            // contextGlobal
+            // 
+            this.contextGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteRowItem,
+            this.insertRowItem,
+            this.clipboardItem});
+            this.contextGlobal.Name = "ctxRow";
+            this.contextGlobal.Size = new System.Drawing.Size(210, 70);
+            // 
+            // deleteRowItem
+            // 
+            this.deleteRowItem.Name = "deleteRowItem";
+            this.deleteRowItem.Size = new System.Drawing.Size(209, 22);
+            this.deleteRowItem.Text = "Zeile löschen";
+            // 
+            // insertRowItem
+            // 
+            this.insertRowItem.Name = "insertRowItem";
+            this.insertRowItem.Size = new System.Drawing.Size(209, 22);
+            this.insertRowItem.Text = "Zeile einfügen";
+            // 
+            // clipboardItem
+            // 
+            this.clipboardItem.Name = "clipboardItem";
+            this.clipboardItem.Size = new System.Drawing.Size(209, 22);
+            this.clipboardItem.Text = "Zwischenablage einfügen";
+            // 
             // dgTable
             // 
             this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -404,13 +451,6 @@
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
-            // 
-            // sortierenToolStripMenuItem
-            // 
-            this.sortierenToolStripMenuItem.Name = "sortierenToolStripMenuItem";
-            this.sortierenToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
-            this.sortierenToolStripMenuItem.Text = "Sortieren";
-            this.sortierenToolStripMenuItem.Click += new System.EventHandler(this.sortierenToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -432,6 +472,7 @@
             this.ctxRow.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.contextGlobal.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -482,6 +523,11 @@
         private System.Windows.Forms.ToolStripMenuItem tabelleHinzufügenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem überschriftEinlesenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sortierenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem spalteEinfügenToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip contextGlobal;
+        private System.Windows.Forms.ToolStripMenuItem deleteRowItem;
+        private System.Windows.Forms.ToolStripMenuItem insertRowItem;
+        private System.Windows.Forms.ToolStripMenuItem clipboardItem;
     }
 }
 

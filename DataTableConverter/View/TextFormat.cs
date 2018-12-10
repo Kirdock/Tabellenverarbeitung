@@ -439,7 +439,7 @@ namespace DataTableConverter.View
                     zwischenablageEinfügenToolStripMenuItem.Click -= ctxRowClipboard;
                 }
 
-                zwischenablageEinfügenToolStripMenuItem.Click += ctxRowClipboard = (sender2, e2) => zwischenablageEinfügenToolStripMenuItem_Click(sender, e2);
+                zwischenablageEinfügenToolStripMenuItem.Click += ctxRowClipboard = (sender2, e2) => zwischenablageEinfügenToolStripMenuItem_Click(sender, e2, selectedRow);
 
                 if (zeileLöschenToolStripMenuItem.Visible = (selectedRow > -1 && selectedRow != sender.Rows.Count - 1))
                 {
@@ -465,9 +465,9 @@ namespace DataTableConverter.View
             dgvSetting_CellValueChanged(null, null);
         }
 
-        private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e)
+        private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.insertClipboardToDataGridView((DataGridView)sender);
+            ViewHelper.insertClipboardToDataGridView((DataGridView)sender, selectedRow);
         }
 
         private void txtBegin_TextChanged(object sender, EventArgs e)

@@ -88,6 +88,12 @@
     <Compile Include="View\CheckedComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="View\ClipboardForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\ClipboardForm.Designer.cs">
+      <DependentUpon>ClipboardForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\DataGridViewDoubleBuffered.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -131,11 +137,23 @@
     <Compile Include="View\SelectDuplicateColumns.Designer.cs">
       <DependentUpon>SelectDuplicateColumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\SetString.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\SetString.Designer.cs">
+      <DependentUpon>SetString.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\SortForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="View\SortForm.Designer.cs">
       <DependentUpon>SortForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\SplitForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\SplitForm.Designer.cs">
+      <DependentUpon>SplitForm.cs</DependentUpon>
     </Compile>
     <Compile Include="View\TextFormat.cs">
       <SubType>Form</SubType>
@@ -145,6 +163,9 @@
     </Compile>
     <EmbeddedResource Include="View\Administration.resx">
       <DependentUpon>Administration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\ClipboardForm.resx">
+      <DependentUpon>ClipboardForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\ExcelSheets.resx">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
@@ -173,8 +194,14 @@
     <EmbeddedResource Include="View\SelectDuplicateColumns.resx">
       <DependentUpon>SelectDuplicateColumns.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="View\SetString.resx">
+      <DependentUpon>SetString.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="View\SortForm.resx">
       <DependentUpon>SortForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\SplitForm.resx">
+      <DependentUpon>SplitForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\TextFormat.resx">
       <DependentUpon>TextFormat.cs</DependentUpon>
