@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -155,15 +156,17 @@ namespace DataTableConverter.View
 
         private void dgTable_ColumnDisplayIndexChanged(object sender, DataGridViewColumnEventArgs e)
         {
-            dgTable.ColumnDisplayIndexChanged -= dgTable_ColumnDisplayIndexChanged;
-            DataTable table = ((DataView)dgTable.DataSource).Table.Copy();
-            dgTable.DataSource = null;
-
-            table.Columns[e.Column.Name].SetOrdinal(e.Column.DisplayIndex); //triggers in another form: thisForm.ShowDialog() == DialogResult.OK
-
-            
-            dgTable.ColumnDisplayIndexChanged += dgTable_ColumnDisplayIndexChanged;
-            //adjustDataGridView();
+            if (e.Column.Index != e.Column.DisplayIndex)
+            {
+                new Thread(() =>
+                {
+                    Thread.Sleep(100);
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        ((DataView)dgTable.DataSource).Table.Columns[e.Column.Name].SetOrdinal(e.Column.DisplayIndex);
+                    }));
+                }).Start();
+            }
         }
 
         private void setSelectedCells(bool status)
