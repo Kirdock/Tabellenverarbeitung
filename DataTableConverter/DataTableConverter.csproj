@@ -65,6 +65,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assisstant\DataHelper.cs" />
+    <Compile Include="Assisstant\HistoryHelper.cs" />
     <Compile Include="Classes\CellMatrix.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
     <Compile Include="Classes\History.cs" />

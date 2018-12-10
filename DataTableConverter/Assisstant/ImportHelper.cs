@@ -40,7 +40,7 @@ namespace DataTableConverter.Assisstant
 
                 foreach (string column in list)
                 {
-                    addColumn(dt, column.Trim());
+                    DataHelper.addColumn(column.Trim(), dt);
                 }
 
 
@@ -86,7 +86,7 @@ namespace DataTableConverter.Assisstant
 
                 foreach (string field in headerRow)
                 {
-                    addColumn(dt, field);
+                    DataHelper.addColumn(field, dt);
                 }
 
                 string[] lines = new string[0];
@@ -152,27 +152,6 @@ namespace DataTableConverter.Assisstant
 
                 }
                 return row.ToArray();
-            }
-        }
-
-
-
-        private static void addColumn(DataTable dt, string column, int i = 1)
-        {
-            try
-            {
-
-                DataColumn tableCol = new DataColumn(i == 1 ? column : $"{column}{i}");
-                dt.Columns.Add(tableCol);
-            }
-            catch (DuplicateNameException)
-            {
-                if (i == 1)
-                {
-                    i = renameColumn(dt, column, i);
-                }
-                i++;
-                addColumn(dt, column,i);
             }
         }
 

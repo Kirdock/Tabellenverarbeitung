@@ -25,8 +25,7 @@ namespace DataTableConverter
         private List<Work> workflows;
         private List<Tolerance> tolerances;
         private List<Case> cases;
-        private List<History> history = new List<History>();
-        private int historyPointer;
+        private HistoryHelper historyHelper;
         private string tableValueBefore;
         private Dictionary<string, SortOrder> DataGridOrders;
         private string tempOrder;
@@ -39,7 +38,7 @@ namespace DataTableConverter
             loadWorkflows();
             loadTolerances();
             loadCases();
-            resetHistory();
+            historyHelper = new HistoryHelper();
             öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click(sender, e);
             trimToolStripMenuItem.Click += (sender, e) => trimToolStripMenuItem_Click(sender, e);
             cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click(sender, e);
@@ -47,12 +46,6 @@ namespace DataTableConverter
             {
                 assignDataSource(table);
             }
-        }
-
-        private void resetHistory()
-        {
-            history.Clear();
-            historyPointer = -1;
         }
 
 
@@ -85,11 +78,11 @@ namespace DataTableConverter
 
             for (int i = 0; i < dgTable.Columns.Count; i++)
             {
-                try
+                string key = dgTable.Columns[i].HeaderText;
+                if (DataGridOrders.ContainsKey(key))
                 {
-                    dgTable.Columns[i].HeaderCell.SortGlyphDirection = DataGridOrders[dgTable.Columns[i].HeaderText];
+                    dgTable.Columns[i].HeaderCell.SortGlyphDirection = DataGridOrders[key];
                 }
-                catch { }
             }
             DataGridOrders = null;
         }
@@ -141,130 +134,46 @@ namespace DataTableConverter
             return (DataView)dgTable.DataSource;
         }
 
-        private List<CellMatrix> getChanges(DataTable tableOld, DataTable tableNew, int columnIndex)
-        {
-            //Löschen und Hinzufügen von Zeilen und Löschen von Spalten nicht berücksichtigt
-
-            List<CellMatrix> result = new List<CellMatrix>();
-            int beginIndex = 0;
-            int endIndex = tableOld.Columns.Count-1;
-            if(columnIndex != -1)
-            {
-                beginIndex = columnIndex;
-                endIndex = columnIndex + 1;
-            }
-
-            object[] oldHeaders = getHeaders(tableOld);
-            object[] newHeaders = getHeaders(tableNew);
-
-            for (int colIndexOld = beginIndex; colIndexOld < endIndex; colIndexOld++)
-            {
-                string oldColName = tableOld.Columns[colIndexOld].ColumnName;
-                int colIndexNew = tableNew.Columns.IndexOf(oldColName);
-
-                if (colIndexNew != -1)
-                {
-                    for (int rowIndex = 0; rowIndex < tableOld.Rows.Count; rowIndex++)
-                    {
-                        if (tableOld.Rows[rowIndex].ItemArray[colIndexOld]?.ToString() != tableNew.Rows[rowIndex].ItemArray[colIndexNew]?.ToString())
-                        {
-                            result.Add(new CellMatrix(rowIndex, colIndexOld, tableOld.Rows[rowIndex].ItemArray[colIndexOld]?.ToString()));
-                        }
-                    }
-                }
-            }
-
-
-            //for (int colIndex = beginIndex; colIndex < endIndex; colIndex++)
-            //{
-            //    for(int rowIndex = 0; rowIndex < tableOld.Rows.Count; rowIndex++)
-            //    {
-            //        if(tableOld.Rows[rowIndex].ItemArray[colIndex]?.ToString() != tableNew.Rows[rowIndex].ItemArray[colIndex]?.ToString())
-            //        {
-            //            result.Add(new CellMatrix(rowIndex, colIndex, tableOld.Rows[rowIndex].ItemArray[colIndex]?.ToString()));
-            //        }
-            //    }
-            //}
-
-            if (oldHeaders.Length < newHeaders.Length)
-            {
-                for (int i = 0; i < newHeaders.Length; i++)
-                {
-                    //Spalte wurde hinzugefügt
-                    if (!oldHeaders.Contains(newHeaders[i]))
-                    {
-
-                        result.Add(new CellMatrix(new History { State = State.InsertColumn, ColumnIndex = i }));
-                    }
-                }
-            }
-            return result;
-        }
-        
-        private void addHistory(History his)
-        {
-            historyPointer++;
-            his.Order = getSorting();
-            if (historyPointer >= history.Count)
-            {
-                history.Add(his);
-            }
-            else
-            {
-                history[historyPointer] = his;
-            }
-
-            adjustHistory();
-        }
-
-        private void adjustHistory()
-        {
-            for (int i = historyPointer + 1; i < history.Count;)
-            {
-                history.RemoveAt(i);
-            }
-        }
-
         #region Add History Entry
 
         private void addDataSourceValueChange(DataTable tableOld, DataTable tableNew)
         {
-            List<CellMatrix> oldValues = getChanges(tableOld, tableNew, -1);
-            addHistory(new History { State = State.ValueChange, Table = oldValues });
+            List<CellMatrix> oldValues = DataHelper.getChangesOfDataTable(tableOld, tableNew, -1);
+            historyHelper.addHistory(new History { State = State.ValueChange, Table = oldValues}, getSorting());
             assignDataSource(tableNew);
         }
 
         private void addDataSourceNewTable(DataTable table)
         {
-            resetHistory();
+            historyHelper.resetHistory();
             assignDataSource(table, true);
         }
 
         private void addDataSourceAddColumn(int columnIndex)
         {
-            addHistory(new History { State = State.InsertColumn, ColumnIndex = columnIndex });
+            historyHelper.addHistory(new History { State = State.InsertColumn, ColumnIndex = columnIndex }, getSorting());
         }
 
         private void addDataSourceAddColumnAndRows(int columnIndex, int rowIndex)
         {
-            addHistory(new History { State = State.AddColumnsAndRows, ColumnIndex = columnIndex, RowIndex = rowIndex });
+            historyHelper.addHistory(new History { State = State.AddColumnsAndRows, ColumnIndex = columnIndex, RowIndex = rowIndex }, getSorting());
         }
 
         private void addDataSourceAddRow(int rowIndex)
         {
-            addHistory(new History { State = State.InsertRow, RowIndex = rowIndex });
+            historyHelper.addHistory(new History { State = State.InsertRow, RowIndex = rowIndex }, getSorting());
         }
 
         private void addDataSourceHeaderChange(int columnIndex, string text)
         {
-            addHistory(new History { State = State.HeaderChange, NewText = text, ColumnIndex = columnIndex });
+            historyHelper.addHistory(new History { State = State.HeaderChange, NewText = text, ColumnIndex = columnIndex }, getSorting());
         }
 
         private void addDataSourceHeadersChange(object[] oldHeader)
         {
             object[][] newItem = new object[1][];
             newItem[0] = oldHeader;
-            addHistory(new History { State = State.HeadersChange, Row = newItem});
+            historyHelper.addHistory(new History { State = State.HeadersChange, Row = newItem}, getSorting());
         }
 
         private void addDataSourceDeleteColumn(DataColumn col, int index, object[] columnValues)
@@ -273,24 +182,24 @@ namespace DataTableConverter
             newItem[0] = col;
             object[][] newValues = new object[1][];
             newValues[0] = columnValues;
-            addHistory(new History { State = State.DeleteColumn, ColumnIndex = index, Column = newItem, ColumnValues = newValues, Order = getSorting() });
+            historyHelper.addHistory(new History { State = State.DeleteColumn, ColumnIndex = index, Column = newItem, ColumnValues = newValues }, getSorting());
         }
 
         private void addDataSourceColumnValuesChanged(DataTable oldTable, DataTable newTable, int selectedColumn)
         {
-            addHistory(new History { State = State.ValueChange, Table = getChanges(oldTable, newTable, selectedColumn)});
+            historyHelper.addHistory(new History { State = State.ValueChange, Table = DataHelper.getChangesOfDataTable(oldTable, newTable, selectedColumn)}, getSorting());
         }
 
         private void addDataSourceDeleteRow(object[] itemArray, int rowIndex)
         {
             object[][] newItem = new object[1][];
             newItem[0] = itemArray;
-            addHistory(new History { State = State.DeleteRow, RowIndex = rowIndex, Row = newItem });
+            historyHelper.addHistory(new History { State = State.DeleteRow, RowIndex = rowIndex, Row = newItem }, getSorting());
         }
 
         private void addDataSourceCellChanged(string newText, int columnIndex, int rowIndex)
         {
-            addHistory(new History { State = State.CellValueChange, NewText = newText, ColumnIndex = columnIndex, RowIndex = rowIndex });
+            historyHelper.addHistory(new History { State = State.CellValueChange, NewText = newText, ColumnIndex = columnIndex, RowIndex = rowIndex }, getSorting());
         }
 
         #endregion
@@ -344,14 +253,9 @@ namespace DataTableConverter
             }
         }
 
-        private List<string> getHeadersToLower(DataTable table)
-        {
-            return table.Columns.Cast<DataColumn>().Select(dt => dt.ColumnName.ToLower()).ToList();
-        }
-
         private void case_Click(object sender, EventArgs e, Case cas, string[] caseColumnsWorkflow, DataTable originalTable)
         {
-            List <string> headers = getHeadersToLower(originalTable);
+            List <string> headers = DataHelper.getHeadersToLower(originalTable);
             bool contains = true;
             List<string> columns = new List<string>();
             string[] caseColumns = caseColumnsWorkflow ?? cas.getColumnsAsArray();
@@ -375,7 +279,7 @@ namespace DataTableConverter
             }
             else
             {
-                SelectDuplicateColumns form = new SelectDuplicateColumns(cas.getColumnsAsArray(), getHeaders(originalTable));
+                SelectDuplicateColumns form = new SelectDuplicateColumns(cas.getColumnsAsArray(), DataHelper.getHeadersOfDataTable(originalTable));
                 form.FormClosed += (sender2, e2) => duplicateClosed(sender2, e2, cas, originalTable, null, caseColumnsWorkflow != null);
                 form.Show();
             }
@@ -395,7 +299,7 @@ namespace DataTableConverter
             if (columnAdded = lastIndex == -1)
             {
                 lastIndex = originalTable.Columns.Count;
-                addColumn("Duplikat", originalTable);
+                DataHelper.addColumn("Duplikat", originalTable);
 
             }
             
@@ -479,7 +383,7 @@ namespace DataTableConverter
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
             
             List<TempReplaceProcedure> tempReplace = new List<TempReplaceProcedure>();
-            List<string> headers = getHeadersToLower(getDataSource());
+            List<string> headers = DataHelper.getHeadersToLower(getDataSource());
             DataTable table = getDataSource();
             foreach (WorkProc wp in workflow.Procedures)
             {
@@ -537,7 +441,7 @@ namespace DataTableConverter
                         columns.Add(col);
                     }
                 }
-                SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), getHeaders(table));
+                SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), DataHelper.getHeadersOfDataTable(table));
                 if (form.ShowDialog() == DialogResult.OK) {
                     string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
                     string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
@@ -707,8 +611,8 @@ namespace DataTableConverter
 
                 case ImportState.Header:
 
-                    object[] headers = getHeaders(oldTable);
-                    setHeaders(table, oldTable);
+                    object[] headers = DataHelper.getHeadersOfDataTable(oldTable);
+                    DataHelper.setHeaders(table, oldTable);
                     dgTable.Invoke(new MethodInvoker(() => { assignDataSource(oldTable); }));
                     addDataSourceHeadersChange(headers);
                     break;
@@ -720,68 +624,42 @@ namespace DataTableConverter
         }
         }
 
-        private void showMergeForm(DataTable dt, DataTable table)
+        private void showMergeForm(DataTable importTable, DataTable sourceTable)
         {
-            MergeTable form = new MergeTable(getHeaders(table), getHeaders(dt));
+            MergeTable form = new MergeTable(DataHelper.getHeadersOfDataTable(sourceTable), DataHelper.getHeadersOfDataTable(importTable));
             if (form.ShowDialog() == DialogResult.OK)
             {
+                DataTable tableOld = sourceTable.Copy();
                 string[] columns = form.getSelectedColumns();
                 int oldIndex = form.getSelectedOriginal();
                 int mergeIndex = form.getSelectedMerge();
                 bool newColumn = form.getOrderColumnName() != string.Empty;
                 
                 #region Compare Everything
-                int oldCount = table.Columns.Count;
+                int oldCount = sourceTable.Columns.Count;
                 int newColumnIndex = oldCount + columns.Length;
 
                 for (int i = 0; i < columns.Length; i++)
                 {
-                    addTryColumn(table, columns[i]);
-                    addDataSourceAddColumn(oldCount + i);  //sollte noch geändert werden
+                    DataHelper.addColumn(columns[i], sourceTable);
+                    //addDataSourceAddColumn(oldCount + i);  //sollte noch geändert werden
                 }
                 if (newColumn)
                 {
-                    addTryColumn(table, form.getOrderColumnName());
-                    addDataSourceAddColumn(newColumnIndex); //sollte noch geändert werden
+                    DataHelper.addColumn(form.getOrderColumnName(), sourceTable);
+                    //addDataSourceAddColumn(newColumnIndex); //sollte noch geändert werden
                 }
                 pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Marquee; }));
-                //pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Maximum = table.Rows.Count; pgbLoading.Value = 0; }));
-
-                #region OldImplementation
-                //foreach (DataRow source in table.Rows)
-                //{
-                //    for (int y = 0; y < dt.Rows.Count; y++)
-                //    {
-                //        DataRow row = dt.Rows[y];
-                //        if (source.ItemArray[oldIndex].Equals(row.ItemArray[mergeIndex]))
-                //        {
-                //            for (int i = 0; i < columns.Length; i++)
-                //            {
-                //                source.SetField(oldCount + i, row.ItemArray[i]);
-                //            }
-                //            if (newColumn)
-                //            {
-                //                source.SetField(newColumnIndex, realCount.ToString());
-                //                realCount++;
-                //            }
-                //            dt.Rows.RemoveAt(y);
-                //            break;
-                //        }
-                //    }
-                //    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Increment(1); }));
-                //}
-                #endregion
-
 
                 HashSet<int> hs = new HashSet<int>();
-                for (int y = 0; y < dt.Rows.Count; y++)
+                for (int y = 0; y < importTable.Rows.Count; y++)
                 {
-                    DataRow row = dt.Rows[y];
-                    for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
+                    DataRow row = importTable.Rows[y];
+                    for (int rowIndex = 0; rowIndex < sourceTable.Rows.Count; rowIndex++)
                     {
                         if (hs.Contains(rowIndex)) continue;
 
-                        DataRow source = table.Rows[rowIndex];
+                        DataRow source = sourceTable.Rows[rowIndex];
                         if (source.ItemArray[oldIndex].Equals(row.ItemArray[mergeIndex]))
                         {
                             for (int i = 0; i < columns.Length; i++)
@@ -796,26 +674,11 @@ namespace DataTableConverter
                             break;
                         }
                     }
-                    //pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Increment(1); }));
                 }
                 #endregion
 
-                dgTable.Invoke(new MethodInvoker(() => { assignDataSource(table); }));
-                //pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; }));
+                dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(tableOld, sourceTable); }));
                 pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
-            }
-        }
-
-        private void addTryColumn(DataTable table, string name, int counter = 0)
-        {
-            try
-            {
-                table.Columns.Add(counter > 0 ? name + counter : name);
-            }
-            catch
-            {
-                counter++;
-                addTryColumn(table, name, counter);
             }
         }
 
@@ -840,7 +703,7 @@ namespace DataTableConverter
 
         private void procedure_Click(object sender, EventArgs e, Proc procedure)
         {
-            Formula formula = new Formula(FormulaState.Procedure, getHeaders(getDataSource()));
+            Formula formula = new Formula(FormulaState.Procedure, DataHelper.getHeadersOfDataTable(getDataSource()));
             formula.Text = "Bitte Spalten angeben";
             formula.FormClosed += (sender2, e2) => procedureClosed(sender2, e2, procedure);
             formula.Show();
@@ -894,7 +757,7 @@ namespace DataTableConverter
                         table.Columns.Add(columnHeader);
                         intoNewCol = true;
                     }
-                    List<int> headerIndices = getHeaderIndices(table, columns);
+                    List<int> headerIndices = DataHelper.getHeaderIndices(table, columns);
                     foreach (DataRow rep in replaces.Rows)
                     {
                         foreach (DataRow row in table.Rows)
@@ -944,20 +807,6 @@ namespace DataTableConverter
             return result;
         }
 
-        private List<int> getHeaderIndices(DataTable table, string[] columns)
-        {
-            List<int> indices = new List<int>();
-            foreach(string col in columns)
-            {
-                int index = table.Columns.IndexOf(col);
-                if(index != -1)
-                {
-                    indices.Add(index);
-                }
-            }
-
-            return indices;
-        }
 
         private Case getCaseThroughId(int id)
         {
@@ -1087,44 +936,19 @@ namespace DataTableConverter
             DataColumn col = table.Columns[selectedColumn];
             
             
-            addDataSourceDeleteColumn(col, selectedColumn, getColumnValues(table, selectedColumn));
+            addDataSourceDeleteColumn(col, selectedColumn, DataHelper.getColumnValues(table, selectedColumn));
             table.Columns.RemoveAt(selectedColumn);
             assignDataSourceColumnChange(table, col.ColumnName);
             setRowCount();
         }
 
-        private object[] getColumnValues(DataTable table, int column)
-        {
-            object[] columnValues = new object[table.Rows.Count];
-
-            for (int i = 0; i < table.Rows.Count; i++)
-            {
-                columnValues[i] = table.Rows[i].ItemArray[column];
-            }
-            return columnValues;
-        }
 
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Formula formula = new Formula(FormulaState.Merge, getHeaders(getDataSource()));
+            Formula formula = new Formula(FormulaState.Merge, DataHelper.getHeadersOfDataTable(getDataSource()));
             formula.FormClosed += new FormClosedEventHandler(formulaClosed);
             formula.Show();
 
-        }
-
-        private object[] getHeaders(DataTable table)
-        {
-            object[] headers = new object[0];
-            if(table != null)
-            {
-                headers = new object[table.Columns.Count];
-
-                for (int i = 0; i < table.Columns.Count; i++)
-                {
-                    headers[i] = table.Columns[i].ColumnName;
-                }
-            }
-            return headers;
         }
 
         private void formulaClosed(object sender, FormClosedEventArgs e)
@@ -1135,10 +959,10 @@ namespace DataTableConverter
                 DataTable data = getDataSource();
                 List<string> notFoundColumns = new List<string>();
                 string formu = formula.getFormula();
-                checkMergeHeaders(getHeadersToLower(data), formu, notFoundColumns, out string[] headers);
+                checkMergeHeaders(DataHelper.getHeadersToLower(data), formu, notFoundColumns, out string[] headers);
                 if (notFoundColumns.Count > 0)
                 {
-                    SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundColumns.ToArray(), getHeaders(data));
+                    SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundColumns.ToArray(), DataHelper.getHeadersOfDataTable(data));
                     if(form.ShowDialog() == DialogResult.OK)
                     {
                         string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
@@ -1182,11 +1006,11 @@ namespace DataTableConverter
         private int mergeColumns(string headerName, string form, DataTable data, string[] headers)
         {
             int column = data.Columns.Count;
-            addColumn(headerName, data);
+            DataHelper.addColumn(headerName, data);
 
             headers = headers.Select(h => h.ToLower()).ToArray();
             
-            List<string> tableHeaders = getHeadersToLower(data);
+            List<string> tableHeaders = DataHelper.getHeadersToLower(data);
             
 
             for (int rowIndex = 0; rowIndex < data.Rows.Count; rowIndex++)
@@ -1232,19 +1056,6 @@ namespace DataTableConverter
             return column;
         }
 
-        private void addColumn(string headerName, DataTable data, int counter = 0)
-        {
-            string name = counter == 0 ? headerName : headerName + counter;
-            if (data.Columns.Contains(name))
-            {
-                counter++;
-                addColumn(headerName, data, counter);
-            }
-            else
-            {
-                data.Columns.Add(name);
-            }
-        }
 
         private void dBASEToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1276,218 +1087,21 @@ namespace DataTableConverter
 
         private void rückgängigToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (historyPointer >= 0)
-            {
-                //Umwandlung
-                //es muss nur eine Version in der History gespeichert werden
-                //bei "Rückgängig" formt man den aktuellen Wert um
-                //d.h. wenn CellChange
-                //Value = "meinText" in der History
-                //tableCell = "meinText" und Value in der History = alter Wert von tableCell
-                //NUR alte Werte in der History. Die neuen sind eh in der Tabelle und werden bei "rückgängig" richtig getauscht
-                takeOverHistory();
-                historyPointer--;
-            }
+            DataTable table = historyHelper.goBack(getDataSource(), getSorting());
+            takeOverHistory(table, historyHelper.OrderString);
         }
 
-        private DataTable takeOverHistory(History His = null, DataTable Table = null)
+        private void takeOverHistory(DataTable table, string orderString)
         {
-            bool isIteration;
-            DataTable table;
-            History his;
-            if (isIteration = His != null)
-            {
-                table = Table;
-                his = His;
-            }
-            else
-            {
-                table = getDataSource();
-                his = history[historyPointer];
-            }
-            switch (his.State)
-            {
-                case State.CellValueChange:
-                    string textOld = his.NewText;
-                    his.NewText = table.Rows[his.RowIndex].ItemArray[his.ColumnIndex]?.ToString();
-                    table.Rows[his.RowIndex].SetField(his.ColumnIndex, textOld);
-                    break;
-
-                case State.ColumnValuesChange:
-                case State.ValueChange:
-                    List<CellMatrix> oldValues = his.Table;
-                    foreach (CellMatrix matrix in oldValues.Where(cm => cm.bigChange == null))
-                    {
-                        string temp = matrix.Value;
-                        matrix.Value = table.Rows[matrix.RowIndex].ItemArray[matrix.ColumnIndex]?.ToString();
-                        table.Rows[matrix.RowIndex].SetField(matrix.ColumnIndex, temp);
-                    }
-                    foreach (CellMatrix matrix in oldValues.Where(cm => cm.bigChange != null))
-                    {
-                        table = takeOverHistory(matrix.bigChange, table);
-                    }
-                    break;
-
-                case State.DeleteColumn:
-                    his.State = State.InsertColumn;
-                    DataTable newTable = new DataTable();
-                    for (int i = 0; i <= table.Columns.Count; i++)
-                    {
-                        if (i == his.ColumnIndex)
-                        {
-                            newTable.Columns.Add(his.Column[0].ColumnName);
-                        }
-                        if (i < table.Columns.Count)
-                        {
-                            newTable.Columns.Add(table.Columns[i].ColumnName);
-                        }
-                    }
-
-                    for (int y = 0; y < table.Rows.Count; y++)
-                    {
-                        object[] newArray = new object[table.Rows[y].ItemArray.Length + 1];
-                        Array.Copy(table.Rows[y].ItemArray, 0, newArray, 0, his.ColumnIndex); //kein Index sondern length
-                        newArray[his.ColumnIndex] = his.ColumnValues[0][y];
-                        Array.Copy(table.Rows[y].ItemArray, his.ColumnIndex, newArray, his.ColumnIndex + 1, table.Rows[y].ItemArray.Length - his.ColumnIndex);
-                        newTable.Rows.Add(newArray);
-                    }
-                    his.Column = null;
-                    table = newTable;
-                    break;
-
-                case State.DeleteRow:
-                    DataRow row = table.NewRow();
-                    row.ItemArray = his.Row[0];
-                    his.State = State.InsertRow;
-                    table.Rows.InsertAt(row, his.RowIndex);
-                    his.Row = null;
-                    break;
-
-                case State.HeaderChange:
-                    string oldHeader = his.NewText;
-                    his.NewText = table.Columns[his.ColumnIndex].ColumnName;
-                    table.Columns[his.ColumnIndex].ColumnName = oldHeader;
-                    break;
-
-                case State.HeadersChange:
-                    object[] oldHeaders = his.Row[0];
-                    object[] newHeaders = getHeaders(table);
-                    for(int i = 0; i < oldHeaders.Length; i++)
-                    {
-                        int index;
-                        if((index = table.Columns.IndexOf(oldHeaders[i].ToString()))!= -1){
-                            table.Columns[index].ColumnName = table.Columns[index].ColumnName + "1";
-                        }
-                        table.Columns[i].ColumnName = oldHeaders[i].ToString();
-                    }
-                    his.Row[0] = newHeaders;
-                    break;
-
-                case State.InsertColumn:
-                    DataColumn[] col = new DataColumn[1];
-
-                    col[0] = table.Columns[his.ColumnIndex];
-                    his.Column = col;
-                    object[][] newValues = new object[0][];
-                    newValues[0] = getColumnValues(table, his.ColumnIndex);
-                    his.ColumnValues = newValues;
-                    table.Columns.RemoveAt(his.ColumnIndex);
-                    his.State = State.DeleteColumn;
-                    break;
-
-                case State.InsertRow:
-                    object[][] newItem = new object[1][];
-                    newItem[0] = table.Rows[his.RowIndex].ItemArray;
-                    his.Row = newItem;
-                    table.Rows.RemoveAt(his.RowIndex);
-                    his.State = State.DeleteRow;
-                    break;
-
-                case State.AddColumnsAndRows:
-                    int count = 0;
-
-                    #region Delete Rows
-                    object[][] newItems = new object[table.Rows.Count - his.RowIndex][];
-                    for (int i = his.RowIndex; i < table.Rows.Count; i++)
-                    {
-                        newItems[count] = table.Rows[i].ItemArray;
-                        count++;
-                    }
-                    his.Row = newItems;
-
-                    for (int i = his.RowIndex; i < table.Rows.Count;)
-                    {
-                        table.Rows.RemoveAt(his.RowIndex);
-                    }
-
-                    #endregion
-
-                    count = 0;
-                    #region Delete Columns
-                    DataColumn[] columns = null;
-                    if (table.Columns.Count != his.ColumnIndex) //Nur ausführen, wenn Spalten hinzugekommen sind
-                    {
-                        columns = new DataColumn[table.Columns.Count - his.ColumnIndex];  //ab ColumnIndex ist neu
-
-                        for (int i = his.ColumnIndex; i < table.Columns.Count; i++)
-                        {
-
-                            columns[count] = table.Columns[i];
-                            //newValue[count] = getColumnValues(table, i);
-                            count++;
-                        }
-                        //his.ColumnValues = newValue;
-
-                        for (int i = his.ColumnIndex; i < table.Columns.Count;)
-                        {
-                            table.Columns.RemoveAt(i);
-                        }
-                    }
-                    his.Column = columns;
-                    #endregion
-                    his.State = State.DeleteColumnsAndRows;
-                    break;
-
-                case State.DeleteColumnsAndRows:
-
-                    for (int i = 0; his.Column != null && i < his.Column.Length; i++)
-                    {
-                        table.Columns.Add(his.Column[i].ColumnName);
-                    }
-
-                    his.Column = null;
-
-                    foreach (object[] item in his.Row)
-                    {
-                        DataRow newRow = table.NewRow();
-                        newRow.ItemArray = item;
-
-                        table.Rows.Add(newRow);
-                    }
-                    his.Row = null;
-                    his.State = State.AddColumnsAndRows;
-                    break;
-            }
-
-            if (!isIteration)
-            {
-                string orderBefore = getSorting();
-                tempOrder = his.Order;
-                assignDataSource(table);
-                his.Order = orderBefore;
-                setRowCount();
-            }
-            return table;
+            tempOrder = orderString;
+            assignDataSource(table);
+            setRowCount();
         }
 
         private void wiederholenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int maxIndex = history.Count - 1;
-            if (historyPointer < maxIndex)
-            {
-                historyPointer++;
-                takeOverHistory();
-            }
+            DataTable table = historyHelper.repeat(getDataSource(), getSorting());
+            takeOverHistory(table, historyHelper.OrderString);
         }
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -1512,7 +1126,7 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(dgTable.DataSource != null ? getHeaders(getDataSource()) : new object[0]);
+            Administration form = new Administration(dgTable.DataSource != null ? DataHelper.getHeadersOfDataTable(getDataSource()) : new object[0]);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show();
         }
@@ -1552,7 +1166,7 @@ namespace DataTableConverter
 
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Formula formula = new Formula(FormulaState.Export, getHeaders(getDataSource()));
+            Formula formula = new Formula(FormulaState.Export, DataHelper.getHeadersOfDataTable(getDataSource()));
             formula.Text = "Bitte Spalten angeben";
             formula.FormClosed += new FormClosedEventHandler(saveCustomClosed);
             formula.Show();
@@ -1563,7 +1177,7 @@ namespace DataTableConverter
             if (((Formula)sender).DialogResult == DialogResult.OK)
             {
                 DataTable table = getDataSource(true);
-                HashSet<int> columns = new HashSet<int>(getHeaderIndices(table, ((Formula)sender).getSelectedHeaders()));
+                HashSet<int> columns = new HashSet<int>(DataHelper.getHeaderIndices(table, ((Formula)sender).getSelectedHeaders()));
 
                 int realCounter = 0;
                 for (int i = 0; i < table.Columns.Count; i++)
@@ -1582,7 +1196,7 @@ namespace DataTableConverter
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCustom formula = new ExportCustom(getHeaders(getDataSource()), true);
+            ExportCustom formula = new ExportCustom(DataHelper.getHeadersOfDataTable(getDataSource()), true);
             formula.FormClosed += new FormClosedEventHandler(saveExportClosed);
             formula.Show();
         }
@@ -1607,7 +1221,7 @@ namespace DataTableConverter
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCustom form = new ExportCustom(getHeaders(getDataSource()), false);
+            ExportCustom form = new ExportCustom(DataHelper.getHeadersOfDataTable(getDataSource()), false);
             form.FormClosed += new FormClosedEventHandler(CountContendClosed);
             form.Show();
         }
@@ -1635,30 +1249,9 @@ namespace DataTableConverter
                     }
                 }
 
-                Form1 form = new Form1(DictionaryToDataTable(pair, export.getSelectedValue()));
+                Form1 form = new Form1(DataHelper.DictionaryToDataTable(pair, export.getSelectedValue()));
                 form.Show();
             }
-        }
-
-        private DataTable DictionaryToDataTable(Dictionary<string, int> dict, string columnName)
-        {
-            DataTable result = new DataTable();
-            if (dict.Count == 0)
-            {
-                return result;
-            }
-
-            var columnNames = dict.Keys;
-            result.Columns.AddRange(new string[] { columnName, "Anzahl", "Von", "Bis" }.Select(c => new DataColumn(c)).ToArray());
-            int count = 1;
-            foreach (KeyValuePair<string, int> item in dict)
-            {
-                int newCount = count + item.Value;
-                result.Rows.Add(new object[]{ item.Key, item.Value.ToString(), count.ToString(), (newCount-1).ToString()});
-                count = newCount;
-            }
-
-            return result;
         }
 
 
@@ -1771,7 +1364,7 @@ namespace DataTableConverter
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Console.WriteLine(getDataView().Sort);
-            SortForm form = new SortForm(getHeaders(getDataSource()), getDataView().Sort);
+            SortForm form = new SortForm(DataHelper.getHeadersOfDataTable(getDataSource()), getDataView().Sort);
             if(form.ShowDialog() == DialogResult.OK)
             {
                 DataView view = getDataView();
@@ -1793,23 +1386,5 @@ namespace DataTableConverter
                 column.SortMode = DataGridViewColumnSortMode.Programmatic;
             });
         }
-
-        
-
-        private void setHeaders(DataTable table, DataTable oldTable)
-        {
-            string[] newHeaders = table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToArray();
-            for(int i = 0; i < newHeaders.Length && i < oldTable.Columns.Count; i++)
-            {
-                int index;
-                if((index = oldTable.Columns.IndexOf(newHeaders[i])) != -1)
-                {
-                    oldTable.Columns[index].ColumnName = oldTable.Columns[index].ColumnName + "1";
-                }
-                oldTable.Columns[i].ColumnName = newHeaders[i];
-            }
-        }
-
-
     }
 }
