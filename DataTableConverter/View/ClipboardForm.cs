@@ -158,14 +158,12 @@ namespace DataTableConverter.View
         {
             if (e.Column.Index != e.Column.DisplayIndex)
             {
-                new Thread(() =>
+                dgTable.BeginInvoke(new MethodInvoker(() =>
                 {
-                    Thread.Sleep(100);
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        ((DataView)dgTable.DataSource).Table.Columns[e.Column.Name].SetOrdinal(e.Column.DisplayIndex);
-                    }));
-                }).Start();
+                    dgTable.ColumnDisplayIndexChanged -= dgTable_ColumnDisplayIndexChanged;
+                    ((DataView)dgTable.DataSource).Table.Columns[e.Column.Name].SetOrdinal(e.Column.DisplayIndex);
+                    dgTable.ColumnDisplayIndexChanged += dgTable_ColumnDisplayIndexChanged;
+                }));
             }
         }
 
