@@ -57,7 +57,7 @@ namespace DataTableConverter.View
 
         private void spalteLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dgTable.Columns.RemoveAt(selectedColumn);
+            getDataView().Table.Columns.RemoveAt(selectedColumn);
         }
 
         private void zeileHinzufügenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -73,18 +73,18 @@ namespace DataTableConverter.View
             DataRow oldRow = ((DataRowView)dgTable.Rows[rowIndex].DataBoundItem).Row;
             return ((DataView)dgTable.DataSource).Table.Rows.IndexOf(oldRow);
         }
-        
+
 
         private void spalteHinzufügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SetString form = new SetString();
-            if (form.ShowDialog() == DialogResult.OK)
+            string newColumn = Microsoft.VisualBasic.Interaction.InputBox("Bitte Spaltennamen eingeben", "Spalte hinzufügen", string.Empty);
+            if (!string.IsNullOrWhiteSpace(newColumn))
             {
-                if (!dgTable.Columns.Cast<DataGridViewColumn>().Any(col => col.HeaderText == form.getName()))
+                if (!dgTable.Columns.Cast<DataGridViewColumn>().Any(col => col.HeaderText == newColumn))
                 {
                     dgTable.ColumnDisplayIndexChanged -= dgTable_ColumnDisplayIndexChanged;
                     DataTable table = getTable();
-                    DataColumn col = table.Columns.Add(form.getName());
+                    DataColumn col = table.Columns.Add(newColumn);
                     col.SetOrdinal(selectedColumn == -1 ? 0 : selectedColumn);
                     dgTable.DataSource = null;
                     dgTable.DataSource = table.DefaultView;
@@ -94,7 +94,7 @@ namespace DataTableConverter.View
                 {
                     if (MessageHandler.MessagesOkCancel(MessageBoxIcon.Warning,"Der Spaltenname wird bereits verwendet. Bitte geben Sie einen anderen ein.") == DialogResult.OK)
                     {
-                        spalteHinzufügenToolStripMenuItem_Click(null, null);
+                        spalteHinzufügenToolStripMenuItem_Click(sender, e);
                     }
                 }
             }

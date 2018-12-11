@@ -137,12 +137,6 @@
     <Compile Include="View\SelectDuplicateColumns.Designer.cs">
       <DependentUpon>SelectDuplicateColumns.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\SetString.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="View\SetString.Designer.cs">
-      <DependentUpon>SetString.cs</DependentUpon>
-    </Compile>
     <Compile Include="View\SortForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -193,9 +187,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\SelectDuplicateColumns.resx">
       <DependentUpon>SelectDuplicateColumns.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="View\SetString.resx">
-      <DependentUpon>SetString.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\SortForm.resx">
       <DependentUpon>SortForm.cs</DependentUpon>
