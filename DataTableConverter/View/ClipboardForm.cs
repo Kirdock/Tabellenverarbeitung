@@ -138,16 +138,22 @@ namespace DataTableConverter.View
                 int column = table.Columns.IndexOf(header);
                 int newColumnIndizes = table.Columns.Count;
 
-                DataHelper.addColumn(header + "1", table);
-                DataHelper.addColumn(header + "2", table);
+                int counter = 0;
 
-                foreach (DataRow row in table.Rows)
+                for(int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
                 {
-                    if (row[column].ToString() == string.Empty) continue;
+                    if (table.Rows[rowIndex][column].ToString() == string.Empty) continue;
 
-                    string[] cols = row[column].ToString().Split(new string[] { splitString }, StringSplitOptions.RemoveEmptyEntries);
-                    row[newColumnIndizes] = cols[0];
-                    row[newColumnIndizes+1] = cols.Length > 1 ? cols[1] : string.Empty;
+                    string[] cols = table.Rows[rowIndex][column].ToString().Split(new string[] { splitString }, StringSplitOptions.RemoveEmptyEntries);
+                    while(cols.Length > counter)
+                    {
+                        counter++;
+                        DataHelper.addColumn(header + counter, table);
+                    }
+                    for(int i = 0; i <cols.Length; i++)
+                    {
+                        table.Rows[rowIndex][newColumnIndizes + i] = cols[i];
+                    }
                 }
                 table.Columns.RemoveAt(column);
 
