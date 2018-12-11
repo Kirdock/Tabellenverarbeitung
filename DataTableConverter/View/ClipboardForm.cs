@@ -45,7 +45,7 @@ namespace DataTableConverter.View
             }
             foreach (int row in selectedRows.OrderByDescending(x => x))
             {
-                dgTable.Rows.RemoveAt(row);
+                getDataView().Table.Rows.RemoveAt(row);
             }
         }
 
@@ -57,7 +57,15 @@ namespace DataTableConverter.View
 
         private void spalteLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            getDataView().Table.Columns.RemoveAt(selectedColumn);
+            List<int> selectedColumns = ViewHelper.SelectedColumns(dgTable);
+            if (selectedColumns.Count == 0)
+            {
+                selectedColumns.Add(selectedColumn);
+            }
+            foreach (int col in selectedColumns.OrderByDescending(x => x))
+            {
+                getDataView().Table.Columns.RemoveAt(col);
+            }
         }
 
         private void zeileHinzufügenToolStripMenuItem_Click(object sender, EventArgs e)

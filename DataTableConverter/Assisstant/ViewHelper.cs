@@ -177,5 +177,12 @@ namespace DataTableConverter
             selectedRows.Sort();
             return selectedRows;
         }
+
+        internal static List<int> SelectedColumns(DataGridView sender)
+        {
+            List<int> selectedColumns = sender.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.ColumnIndex).Where(col => col != sender.Columns.Count - 1).Distinct().ToList();
+            selectedColumns.Sort();
+            return selectedColumns;
+        }
     }
 }

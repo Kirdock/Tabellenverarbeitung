@@ -1339,7 +1339,6 @@ namespace DataTableConverter
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Console.WriteLine(getDataView().Sort);
             SortForm form = new SortForm(DataHelper.getHeadersOfDataTable(getDataSource()), getDataView().Sort);
             if(form.ShowDialog() == DialogResult.OK)
             {
