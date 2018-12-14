@@ -1,4 +1,5 @@
-﻿using DataTableConverter.View;
+﻿using DataTableConverter.Assisstant;
+using DataTableConverter.View;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -97,6 +98,45 @@ namespace DataTableConverter
                     myDataGridView.DataSource = table;
                 }
             }
+        }
+
+        internal static DataView getSortedView(string order, DataTable table)
+        {
+            Dictionary<string, SortOrder> dict = generateSortingList(order);
+            if (dict.Count == 0)
+            {
+                return table.DefaultView;
+            }
+            else
+            {
+                var enumerable = table.AsEnumerable();
+                var firstElement = dict.First();
+                var enum2 = enumerable.OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
+                dict.Remove(firstElement.Key);
+                foreach (var column in dict)
+                {
+                    enum2 = enum2.ThenBy(field => field.Field<string>(column.Key), new NaturalStringComparer(column.Value));
+                }
+                return enum2.AsDataView();
+            }
+        }
+
+        private static Dictionary<string, SortOrder> generateSortingList(string orderBefore)
+        {
+            Dictionary<string, SortOrder> dict = new Dictionary<string, SortOrder>();
+            if (!string.IsNullOrWhiteSpace(orderBefore))
+            {
+
+                string[] headersInformation = orderBefore.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string info in headersInformation)
+                {
+                    string[] headerInfo = info.Split(new string[] { "] " }, StringSplitOptions.RemoveEmptyEntries);
+                    string header = headerInfo[0].Trim().Substring(1);
+                    SortOrder order = headerInfo[1].ToUpper() == "ASC" ? SortOrder.Ascending : SortOrder.Descending;
+                    dict.Add(header, order);
+                }
+            }
+            return dict;
         }
 
         internal void addContextMenuToDataGridView(DataGridView view,bool clipboard)

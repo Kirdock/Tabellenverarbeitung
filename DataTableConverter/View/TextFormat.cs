@@ -24,19 +24,41 @@ namespace DataTableConverter.View
             this.path = path;
             setEncodingCmb();
 
-            readData();
-            loadPresets();
-            cmbVariant.SelectedIndex = 0;
-            adjustSettingsDataGrid();
-            dgvSetting.CellValueChanged += new DataGridViewCellEventHandler(dgvSetting_CellValueChanged);
-            loadSettings();
-            radioButton_CheckedChanged(null, null);
-            cmbEncoding.SelectedIndexChanged += (sender, e) => cmbEncoding_SelectedIndexChanged(sender, e);
+            
         }
 
-        private void readData()
+        private void TextFormat_Load(object sender, EventArgs e)
         {
-            data = File.ReadAllText(path, Encoding.GetEncoding(((EncodingInfo)cmbEncoding.SelectedItem).CodePage));
+            if (readData())
+            {
+                DialogResult = DialogResult.Abort;
+                Dispose();
+            }
+            else
+            {
+                loadPresets();
+                cmbVariant.SelectedIndex = 0;
+                adjustSettingsDataGrid();
+                dgvSetting.CellValueChanged += new DataGridViewCellEventHandler(dgvSetting_CellValueChanged);
+                loadSettings();
+                radioButton_CheckedChanged(null, null);
+                cmbEncoding.SelectedIndexChanged += (sender2, e2) => cmbEncoding_SelectedIndexChanged(sender2, e2);
+            }
+        }
+
+        private bool readData()
+        {
+            bool error = false;
+            try
+            {
+                data = File.ReadAllText(path, Encoding.GetEncoding(((EncodingInfo)cmbEncoding.SelectedItem).CodePage));
+            }
+            catch
+            {
+                error = true;
+                MessageHandler.MessagesOK(MessageBoxIcon.Error, "Die Datei kann nicht geöffnet werden. Wird sie gerade benutzt?");
+            }
+            return error;
         }
 
 
@@ -486,8 +508,6 @@ namespace DataTableConverter.View
         {
             return txtBegin.Text.Length > 0 && txtEnd.Text.Length > 0;
         }
-
-
 
 
 

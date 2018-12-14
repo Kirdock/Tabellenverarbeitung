@@ -77,6 +77,7 @@ namespace DataTableConverter.View
         {
             if(lBoxSelectedHeaders.SelectedIndex != -1)
             {
+                Orders.Remove(lBoxSelectedHeaders.SelectedItem.ToString());
                 clBoxHeaders.SetItemChecked(clBoxHeaders.Items.IndexOf(lBoxSelectedHeaders.SelectedItem), false);
             }
         }
@@ -131,16 +132,19 @@ namespace DataTableConverter.View
 
         private void lBoxSelectedHeaders_DrawItem(object sender, DrawItemEventArgs e)
         {
-            // Draw the background of the ListBox control for each item.
-            e.DrawBackground();
-            // Define the default color of the brush as black.
-            Brush myBrush = Brushes.Black;
+            if (e.Index != -1)
+            {
+                // Draw the background of the ListBox control for each item.
+                e.DrawBackground();
+                // Define the default color of the brush as black.
+                Brush myBrush = Brushes.Black;
 
-            string value = lBoxSelectedHeaders.Items[e.Index].ToString();
-            e.Graphics.DrawString($"{value} {Orders[value]}",
-                e.Font, myBrush, e.Bounds, StringFormat.GenericDefault);
-            // If the ListBox has focus, draw a focus rectangle around the selected item.
-            e.DrawFocusRectangle();
+                string value = lBoxSelectedHeaders.Items[e.Index].ToString();
+                e.Graphics.DrawString($"{value} {Orders[value]}",
+                    e.Font, myBrush, e.Bounds, StringFormat.GenericDefault);
+                // If the ListBox has focus, draw a focus rectangle around the selected item.
+                e.DrawFocusRectangle();
+            }
         }
 
 

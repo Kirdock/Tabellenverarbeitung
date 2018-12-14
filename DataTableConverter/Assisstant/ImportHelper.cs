@@ -35,7 +35,7 @@ namespace DataTableConverter.Assisstant
                 //.ForEach(x => dt.Columns.Add(x.Trim()));
 
                 List<string> list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
-                .SelectMany(x => x.Split(new string[] { separator }, StringSplitOptions.RemoveEmptyEntries))
+                .SelectMany(x => x.Split(new string[] { separator }, StringSplitOptions.None))
                 .Select(ln => ln.Trim()).ToList();
 
                 foreach (string column in list)
@@ -47,14 +47,14 @@ namespace DataTableConverter.Assisstant
                 if (isPreview)
                 {
                     File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4).Skip(1)
-                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.RemoveEmptyEntries))
+                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None))
                     .ToList()
                     .ForEach(line => dt.Rows.Add(line.Select(ln => ln.ToString().Trim()).ToArray()));
                 }
                 else
                 {
                     File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(1)
-                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.RemoveEmptyEntries))
+                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None))
                     .ToList()
                     .ForEach(line => dt.Rows.Add(line.Select(ln => ln.ToString().Trim()).ToArray()));
                 }
@@ -176,7 +176,7 @@ namespace DataTableConverter.Assisstant
             string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={Path.GetDirectoryName(path)};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
             OleDbConnection con = new OleDbConnection(constr);
 
-            var sql = $@"select * from {Path.GetDirectoryName(path)}\{ Path.GetFileNameWithoutExtension(path)}";
+            var sql = $@"select * from [{ Path.GetFileNameWithoutExtension(path)}]";
             OleDbCommand cmd = new OleDbCommand(sql, con);
             con.Open();
             OleDbDataAdapter da = new OleDbDataAdapter(cmd);

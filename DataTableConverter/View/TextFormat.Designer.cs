@@ -35,6 +35,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cmbEncoding = new System.Windows.Forms.ComboBox();
             this.gbSeparated = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtEnd = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtBegin = new System.Windows.Forms.TextBox();
+            this.rbBetween = new System.Windows.Forms.RadioButton();
             this.rbSep = new System.Windows.Forms.RadioButton();
             this.rbTab = new System.Windows.Forms.RadioButton();
             this.btnAcceptSeparate = new System.Windows.Forms.Button();
@@ -54,11 +59,6 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rbBetween = new System.Windows.Forms.RadioButton();
-            this.txtBegin = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtEnd = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             this.gbFixed.SuspendLayout();
@@ -147,6 +147,52 @@
             this.gbSeparated.TabStop = false;
             this.gbSeparated.Text = "Getrennt";
             this.gbSeparated.Visible = false;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(273, 88);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Ende:";
+            // 
+            // txtEnd
+            // 
+            this.txtEnd.Location = new System.Drawing.Point(276, 104);
+            this.txtEnd.Name = "txtEnd";
+            this.txtEnd.Size = new System.Drawing.Size(63, 20);
+            this.txtEnd.TabIndex = 8;
+            this.txtEnd.TextChanged += new System.EventHandler(this.txtBegin_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(196, 87);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(44, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Anfang:";
+            // 
+            // txtBegin
+            // 
+            this.txtBegin.Location = new System.Drawing.Point(199, 103);
+            this.txtBegin.Name = "txtBegin";
+            this.txtBegin.Size = new System.Drawing.Size(63, 20);
+            this.txtBegin.TabIndex = 6;
+            this.txtBegin.TextChanged += new System.EventHandler(this.txtBegin_TextChanged);
+            // 
+            // rbBetween
+            // 
+            this.rbBetween.AutoSize = true;
+            this.rbBetween.Location = new System.Drawing.Point(84, 104);
+            this.rbBetween.Name = "rbBetween";
+            this.rbBetween.Size = new System.Drawing.Size(113, 17);
+            this.rbBetween.TabIndex = 5;
+            this.rbBetween.TabStop = true;
+            this.rbBetween.Text = "Eingeschlossen in:";
+            this.rbBetween.UseVisualStyleBackColor = true;
+            this.rbBetween.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // rbSep
             // 
@@ -348,52 +394,6 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
-            // rbBetween
-            // 
-            this.rbBetween.AutoSize = true;
-            this.rbBetween.Location = new System.Drawing.Point(84, 104);
-            this.rbBetween.Name = "rbBetween";
-            this.rbBetween.Size = new System.Drawing.Size(113, 17);
-            this.rbBetween.TabIndex = 5;
-            this.rbBetween.TabStop = true;
-            this.rbBetween.Text = "Eingeschlossen in:";
-            this.rbBetween.UseVisualStyleBackColor = true;
-            this.rbBetween.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
-            // 
-            // txtBegin
-            // 
-            this.txtBegin.Location = new System.Drawing.Point(199, 103);
-            this.txtBegin.Name = "txtBegin";
-            this.txtBegin.Size = new System.Drawing.Size(63, 20);
-            this.txtBegin.TabIndex = 6;
-            this.txtBegin.TextChanged += new System.EventHandler(this.txtBegin_TextChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(196, 87);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(44, 13);
-            this.label3.TabIndex = 7;
-            this.label3.Text = "Anfang:";
-            // 
-            // txtEnd
-            // 
-            this.txtEnd.Location = new System.Drawing.Point(276, 104);
-            this.txtEnd.Name = "txtEnd";
-            this.txtEnd.Size = new System.Drawing.Size(63, 20);
-            this.txtEnd.TabIndex = 8;
-            this.txtEnd.TextChanged += new System.EventHandler(this.txtBegin_TextChanged);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(273, 88);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 13);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "Ende:";
-            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -407,6 +407,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Textkonvertierung";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TextFormat_FormClosing);
+            this.Load += new System.EventHandler(this.TextFormat_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.gbSeparated.ResumeLayout(false);

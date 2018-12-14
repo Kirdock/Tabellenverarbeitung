@@ -28,7 +28,9 @@ namespace DataTableConverter
         private HistoryHelper historyHelper;
         private string tableValueBefore;
         private Dictionary<string, SortOrder> DataGridOrders;
-        private string tempOrder;
+        private DataTable sourceTable;
+        private string SortingOrder;
+        private int rowBefore; //Wenn eine Zelle im DataGridView geändert wird, kann ich mit dgTable[col, row] den geänderten Wert nicht holen, da die DataGridView zu diesem Zeitpunkt wieder sortiert wurde
 
         internal Form1(DataTable table = null)
         {
@@ -49,17 +51,25 @@ namespace DataTableConverter
         }
 
 
-        private void assignDataSource(DataTable table)
+        private void assignDataSource(DataTable table = null)
         {
-            DataView view = table.DefaultView;
-            view.Sort = tempOrder ?? getSorting();
-            tempOrder = null;
+            sourceTable = table ?? sourceTable;
 
             saveDataGridSortMode();
+            int scrollBarHorizontal = dgTable.FirstDisplayedScrollingColumnIndex;
+            int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
 
             dgTable.DataSource = null;
-            dgTable.DataSource = view;
+            dgTable.DataSource = ViewHelper.getSortedView(SortingOrder,sourceTable);
 
+            if (scrollBarHorizontal != -1)
+            {
+                dgTable.FirstDisplayedScrollingColumnIndex = scrollBarHorizontal;
+            }
+            if (scrollBarVertical != -1)
+            {
+                dgTable.FirstDisplayedScrollingRowIndex = scrollBarVertical;
+            }
             restoreDataGridSortMode();
         }
 
@@ -89,7 +99,6 @@ namespace DataTableConverter
 
         private void assignDataSourceColumnChange(DataTable table, string column, string newColumn = null)
         {
-            DataView view = table.DefaultView;
             string adjustSort = getSorting();
             saveDataGridSortMode();
             if (newColumn == null)
@@ -105,32 +114,43 @@ namespace DataTableConverter
             {
                 adjustSort = adjustSort.Replace($"[{column}]", $"[{newColumn}]");
             }
-            view.Sort = adjustSort;
-            setDataView(view);
+            SortingOrder = adjustSort;
+            assignDataSource(table);
+            
             restoreDataGridSortMode();
         }
 
         private string getSorting()
         {
-            return dgTable.DataSource == null ? string.Empty : getDataView().Sort;
+            return SortingOrder;
         }
 
         private DataTable getDataSource(bool withSort = false)
         {
-            if (dgTable.DataSource == null)
+            DataTable table = sourceTable;
+            if (table != null)
             {
-                return null;
+                endEdit();
+                if (withSort)
+                {
+                    table = getDataView().ToTable();
+                }
+                else
+                {
+                    table = sourceTable.Copy();
+                }
             }
-            else
-            {
-                DataView view = getDataView();
-                return withSort ? view.ToTable() : view.Table.Copy();
-            }
+            return table;
+        }
+
+        private void endEdit()
+        {
+            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
         }
 
         private DataView getDataView()
         {
-            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
+            endEdit();
             return (DataView)dgTable.DataSource;
         }
 
@@ -629,56 +649,58 @@ namespace DataTableConverter
             MergeTable form = new MergeTable(DataHelper.getHeadersOfDataTable(sourceTable), DataHelper.getHeadersOfDataTable(importTable));
             if (form.ShowDialog() == DialogResult.OK)
             {
-                DataTable tableOld = sourceTable.Copy();
-                string[] columns = form.getSelectedColumns();
-                int oldIndex = form.getSelectedOriginal();
-                int mergeIndex = form.getSelectedMerge();
-                bool newColumn = form.getOrderColumnName() != string.Empty;
-                
-                #region Compare Everything
-                int oldCount = sourceTable.Columns.Count;
-                int newColumnIndex = oldCount + columns.Length;
+                new Thread(() =>
+                {
+                    DataTable tableOld = sourceTable.Copy();
+                    string[] columns = form.getSelectedColumns();
+                    int oldIndex = form.getSelectedOriginal();
+                    int mergeIndex = form.getSelectedMerge();
+                    bool newColumn = form.getOrderColumnName() != string.Empty;
 
-                for (int i = 0; i < columns.Length; i++)
-                {
-                    DataHelper.addColumn(columns[i], sourceTable);
-                    //addDataSourceAddColumn(oldCount + i);  //sollte noch geändert werden
-                }
-                if (newColumn)
-                {
-                    DataHelper.addColumn(form.getOrderColumnName(), sourceTable);
-                    //addDataSourceAddColumn(newColumnIndex); //sollte noch geändert werden
-                }
-                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Marquee; }));
+                    #region Compare Everything
+                    int oldCount = sourceTable.Columns.Count;
+                    int newColumnIndex = oldCount + columns.Length;
 
-                HashSet<int> hs = new HashSet<int>();
-                for (int y = 0; y < importTable.Rows.Count; y++)
-                {
-                    DataRow row = importTable.Rows[y];
-                    for (int rowIndex = 0; rowIndex < sourceTable.Rows.Count; rowIndex++)
+                    for (int i = 0; i < columns.Length; i++)
                     {
-                        if (hs.Contains(rowIndex)) continue;
+                        DataHelper.addColumn(columns[i], sourceTable);
+                    }
+                    if (newColumn)
+                    {
+                        DataHelper.addColumn(form.getOrderColumnName(), sourceTable);
+                    }
+                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Marquee; }));
 
-                        DataRow source = sourceTable.Rows[rowIndex];
-                        if (source.ItemArray[oldIndex].Equals(row.ItemArray[mergeIndex]))
+
+                    HashSet<int> hs = new HashSet<int>();
+                    for (int y = 0; y < importTable.Rows.Count; y++)
+                    {
+                        DataRow row = importTable.Rows[y];
+                        for (int rowIndex = 0; rowIndex < sourceTable.Rows.Count; rowIndex++)
                         {
-                            for (int i = 0; i < columns.Length; i++)
+                            if (hs.Contains(rowIndex)) continue;
+
+                            DataRow source = sourceTable.Rows[rowIndex];
+                            if (source.ItemArray[oldIndex].ToString() == row.ItemArray[mergeIndex].ToString())
                             {
-                                source.SetField(oldCount + i, row.ItemArray[i]);
+                                for (int i = 0; i < columns.Length; i++)
+                                {
+                                    source.SetField(oldCount + i, row.ItemArray[i]);
+                                }
+                                if (newColumn)
+                                {
+                                    source.SetField(newColumnIndex, (y + 1).ToString());
+                                }
+                                hs.Add(rowIndex);
+                                break;
                             }
-                            if (newColumn)
-                            {
-                                source.SetField(newColumnIndex, y.ToString());
-                            }
-                            hs.Add(rowIndex);
-                            break;
                         }
                     }
-                }
-                #endregion
+                    #endregion
 
-                dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(tableOld, sourceTable); }));
-                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                    dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(tableOld, sourceTable); }));
+                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                }).Start();
             }
         }
 
@@ -721,7 +743,7 @@ namespace DataTableConverter
                     break;
 
                 case ProcedureState.Order:
-                    tempOrder = buildOrder(wp.Columns);
+                    SortingOrder = buildOrder(wp.Columns);
                     break;
 
                 case ProcedureState.Merge:
@@ -1093,7 +1115,7 @@ namespace DataTableConverter
 
         private void takeOverHistory(DataTable table, string orderString)
         {
-            tempOrder = orderString;
+            SortingOrder = orderString;
             assignDataSource(table);
             setRowCount();
         }
@@ -1106,12 +1128,13 @@ namespace DataTableConverter
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            addDataSourceCellChanged(tableValueBefore, e.ColumnIndex, getDataTableRowIndexOfDataGridView(e.RowIndex));
+            addDataSourceCellChanged(tableValueBefore, e.ColumnIndex, rowBefore);
         }
 
         private void dgTable_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             tableValueBefore = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
+            rowBefore = e.RowIndex >= 0 && e.RowIndex < sourceTable.Rows.Count ? getDataTableRowIndexOfDataGridView(e.RowIndex) : 0;
         }
 
         private void dgTable_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
@@ -1231,10 +1254,8 @@ namespace DataTableConverter
             ExportCustom export = (ExportCustom)sender;
             if (export.DialogResult == DialogResult.OK)
             {
-                DataTable table = getDataSource();
-                DataView view = table.DefaultView;
-                view.Sort = $"[{export.getSelectedValue()}] asc";
-                table = view.ToTable();
+                DataTable table = ViewHelper.getSortedView($"[{export.getSelectedValue()}] asc", getDataSource()).ToTable();
+
                 Dictionary<string, int> pair = new Dictionary<string, int>();
                 foreach (DataRow row in table.Rows)
                 {
@@ -1266,24 +1287,26 @@ namespace DataTableConverter
                 DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
                 if (dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection == SortOrder.Descending)
                 {
+                    dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = SortOrder.None;
                     resetSort(col);
                 }
                 else
                 {
                     
                     bool asc = col.HeaderCell.SortGlyphDirection == SortOrder.Ascending;
-                    DataView view = getDataView();
+                    
+                    SortingOrder = $"[{col.Name}] {(asc ? "DESC" : "ASC")}";
+                    assignDataSource();
 
-                    view.Sort = $"[{col.Name}] {(asc ? "DESC" : "ASC")}";
-                    col.HeaderCell.SortGlyphDirection = asc ? SortOrder.Descending : SortOrder.Ascending;
+                    dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = asc ? SortOrder.Descending : SortOrder.Ascending;
                 }
             }
         }
 
         private void resetSort(DataGridViewColumn col)
         {
-            getDataView().Sort = string.Empty;
-            col.HeaderCell.SortGlyphDirection = SortOrder.None;
+            SortingOrder = string.Empty;
+            assignDataSource(sourceTable);
         }
 
         private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1293,6 +1316,7 @@ namespace DataTableConverter
 
             object[] oldContent = oldRow.ItemArray.Clone() as object[];
             dgTable.Rows.RemoveAt(selectedRow);
+
             addDataSourceDeleteRow(oldContent, tableIndex);
 
             setRowCount();
@@ -1300,10 +1324,9 @@ namespace DataTableConverter
 
         private void zeileEinfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
-            int tableRowIndex = getDataTableRowIndexOfDataGridView(selectedRow);
             DataTable table = getDataSource();
             DataRow row = table.NewRow();
+            int tableRowIndex = string.IsNullOrEmpty(SortingOrder) ? getDataTableRowIndexOfDataGridView(selectedRow) : table.Rows.Count;
             table.Rows.InsertAt(row, tableRowIndex);
             assignDataSource(table);
 
@@ -1329,7 +1352,7 @@ namespace DataTableConverter
         private int getDataTableRowIndexOfDataGridView(int rowIndex)
         {
             DataRow oldRow = ((DataRowView)dgTable.Rows[rowIndex].DataBoundItem).Row;
-            return ((DataView)dgTable.DataSource).Table.Rows.IndexOf(oldRow);
+            return sourceTable.Rows.IndexOf(oldRow);
         }
 
         private void überschriftenEinlesenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1339,27 +1362,12 @@ namespace DataTableConverter
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SortForm form = new SortForm(DataHelper.getHeadersOfDataTable(getDataSource()), getDataView().Sort);
+            SortForm form = new SortForm(DataHelper.getHeadersOfDataTable(getDataSource()), SortingOrder);
             if(form.ShowDialog() == DialogResult.OK)
             {
-                DataView view = getDataView();
-                view.Sort = form.SortString;
-                setDataView(view);
+                SortingOrder = form.SortString;
+                assignDataSource();
             }
-        }
-
-        private void setDataView(DataView view)
-        {
-            List<SortOrder> orders = new List<SortOrder>();
-            foreach (DataGridViewColumn col in dgTable.Columns)
-            {
-                orders.Add(col.HeaderCell.SortGlyphDirection);
-            }
-            dgTable.DataSource = null;
-            dgTable.DataSource = view;
-            dgTable.Columns.Cast<DataGridViewColumn>().ToList().ForEach(column => {
-                column.SortMode = DataGridViewColumnSortMode.Programmatic;
-            });
         }
     }
 }
