@@ -1,6 +1,7 @@
 ﻿using CheckComboBoxTest;
 using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
+using DataTableConverter.Classes.WorkProcs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +22,7 @@ namespace DataTableConverter.View
         private BindingList<Work> bindingWorkflow;
         private BindingList<Tolerance> bindingTolerance;
         private BindingList<Case> bindingCase;
-        private Dictionary<GroupBox, ProcedureState> gbState;
+        private Dictionary<GroupBox, Type> gbState;
         private List<KeyValuePair<string, bool>> OrderList;
 
         internal List<Proc> Procedures { get; set; }
@@ -32,6 +33,7 @@ namespace DataTableConverter.View
         internal List<Case> Cases { get; set; }
         private Proc selectedProc;
         private ViewHelper viewHelper;
+        private Dictionary<Type, Action<WorkProc>> assignControls;
 
 
         internal Administration(object[] headers, ContextMenuStrip ctxRow)
@@ -88,12 +90,20 @@ namespace DataTableConverter.View
 
         private void assignGroupBoxToEnum()
         {
-            gbState = new Dictionary<GroupBox, ProcedureState>();
-            gbState.Add(gbDefDuplicate, ProcedureState.Duplicate);
-            gbState.Add(gbMerge, ProcedureState.Merge);
+            gbState = new Dictionary<GroupBox, Type>();
+            gbState.Add(gbDefDuplicate, typeof(ProcDuplicate));
+            gbState.Add(gbMerge, typeof(ProcMerge));
             //gbState.Add(gbTrim, ProcedureState.Trim);
-            gbState.Add(gbProcedure, ProcedureState.User);
-            gbState.Add(gbOrder, ProcedureState.Order);
+            gbState.Add(gbProcedure, typeof(ProcMerge));
+            gbState.Add(gbOrder, typeof(ProcOrder));
+
+            assignControls = new Dictionary<Type, Action<WorkProc>> {
+                { typeof(ProcUser), setMergeControls },
+                { typeof(ProcDuplicate), setDuplicateControls },
+                { typeof(ProcMerge), setMergeControls },
+                { typeof(ProcOrder), setOrderControls },
+                { typeof(ProcTrim), setTrimControls }
+            };
         }
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
@@ -157,7 +167,7 @@ namespace DataTableConverter.View
             {
                 DialogResult? result = null;
                 int id = Procedures[ltbProcedures.SelectedIndex].Id;
-                if (isProcedureUsed(id, out string usedWorkflows, ProcedureState.User))
+                if (isProcedureUsed(id, out string usedWorkflows, typeof(ProcUser)))
                 {
                     result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Diese Funktion wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
                 }
@@ -168,20 +178,20 @@ namespace DataTableConverter.View
                     ltbProcedures_SelectedIndexChanged(null, null);
                     if (result == DialogResult.Yes)
                     {
-                        deleteProcedureOfWorkflows(id, ProcedureState.User);
+                        deleteProcedureOfWorkflows(id, typeof(ProcUser));
                     }
                 }
                 loadProceduresWorkflow();
             }
         }
 
-        private void deleteProcedureOfWorkflows(int id, ProcedureState state)
+        private void deleteProcedureOfWorkflows(int id, Type type)
         {
             foreach (Work w in Workflows)
             {
                 for (int i = 0; i < w.Procedures.Count; i++)
                 {
-                    if (w.Procedures[i].Type == state && w.Procedures[i].ProcedureId == id)
+                    if (w.Procedures[i].GetType() == type && w.Procedures[i].ProcedureId == id)
                     {
                         w.Procedures.RemoveAt(i);
                         i--;
@@ -199,7 +209,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private bool isProcedureUsed(int id, out string usedWorkflows, ProcedureState state)
+        private bool isProcedureUsed(int id, out string usedWorkflows, Type type)
         {
             bool status = false;
             StringBuilder builder = new StringBuilder();
@@ -207,7 +217,7 @@ namespace DataTableConverter.View
             {
                 foreach (WorkProc wp in w.Procedures)
                 {
-                    if (wp.Type == state && wp.ProcedureId == id)
+                    if (wp.GetType() == type && wp.ProcedureId == id)
                     {
                         status = true;
                         builder.Append(w.Name + ", ");
@@ -404,14 +414,14 @@ namespace DataTableConverter.View
             List<Proc> procs = new List<Proc>();
             foreach(WorkProc wp in proc)
             {
-                procs.Add(getMergeProcedureIndexThroughId(wp.ProcedureId, wp.Type));
+                procs.Add(getMergeProcedureIndexThroughId(wp.ProcedureId, wp.GetType()));
             }
             return procs;
         }
 
-        private Proc getMergeProcedureIndexThroughId(int selectedId, ProcedureState state)
+        private Proc getMergeProcedureIndexThroughId(int selectedId, Type type)
         {
-            List <Proc> procs = state == ProcedureState.User ? Procedures : state == ProcedureState.Duplicate ? DuplicateProc : SystemProc;
+            List <Proc> procs = type == typeof(ProcUser)? Procedures : type == typeof(ProcDuplicate) ? DuplicateProc : SystemProc;
             return procs[procs.FindIndex(proc => proc.Id == selectedId)];
         }
 
@@ -420,113 +430,116 @@ namespace DataTableConverter.View
             return ((Work)lbWorkflows.SelectedItem);
         }
 
+        private void setMergeControls( WorkProc selectedProc)
+        {
+            setCmbHeader(selectedProc.Formula);
+            lblOriginalNameText.Text = ProcMerge.ClassName;
+        }
+
+        private void setTrimControls(WorkProc selectedProc)
+        {
+            lblOriginalNameText.Text = ProcTrim.ClassName;
+        }
+
+        private void setUserControls(WorkProc selectedProc)
+        {
+            lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
+            cbNewColumn.Checked = selectedProc.NewColumn != string.Empty;
+            dgvColumns.DataSource = selectedProc.Columns;
+            setHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+        }
+
+        private void setDuplicateControls(WorkProc selectedProc)
+        {
+            Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
+            lblOriginalNameText.Text = myCase.Name;
+            DataTable temp = myCase.Columns.Copy();
+            DataTable table = new DataTable { TableName = "WorkDuplicates" };
+            object[] firstColumn = temp.Rows.Cast<DataRow>().Select(dc => dc.ItemArray[0]).ToArray();
+
+            table.Columns.Add("Bezeichnung");
+            table.Columns.Add("Zuweisung");
+
+            if (selectedProc.DuplicateColumns.Length < firstColumn.Length)
+            {
+                List<string> list = new List<string>();
+                if (selectedProc.DuplicateColumns.Length > 0)
+                {
+                    list.AddRange(selectedProc.DuplicateColumns);
+                }
+
+                list.AddRange(firstColumn.Skip(selectedProc.DuplicateColumns.Length).Select(ob => ob.ToString()));
+
+
+                selectedProc.DuplicateColumns = list.ToArray();
+            }
+            else if (selectedProc.DuplicateColumns.Length > firstColumn.Length)
+            {
+                selectedProc.DuplicateColumns = selectedProc.DuplicateColumns.Take(firstColumn.Length).ToArray();
+            }
+            for (int i = 0; i < firstColumn.Length; i++)
+            {
+                table.Rows.Add(new object[] { firstColumn[i], selectedProc.DuplicateColumns[i] });
+            }
+            dgColumnDefDuplicate.DataSource = table;
+            dgColumnDefDuplicate.Columns[0].ReadOnly = true;
+        }
+
+        private void setOrderControls(WorkProc selectedProc)
+        {
+            setHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            lblOriginalNameText.Text = ProcOrder.ClassName;
+
+            if (selectedProc.Columns.Columns.Count <= 1)
+            {
+                DataTable table = new DataTable { TableName = "Order" };
+                table.Columns.Add("Spalte");
+                table.Columns.Add("Sortierung");
+                table.Columns[1].DataType = typeof(bool);
+                selectedProc.Columns = table;
+            }
+            dgOrderColumns.DataSource = null;
+            dgOrderColumns.DataSource = selectedProc.Columns;
+
+            dgOrderColumns.Columns[1].Visible = false;
+
+            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn();
+
+
+            cmb.DataSource = OrderList;
+            cmb.HeaderText = "Sortierung";
+            cmb.DisplayMember = "key";
+            cmb.ValueMember = "value";
+            cmb.DataPropertyName = "Sortierung";
+
+
+            dgOrderColumns.Columns.Add(cmb);
+        }
+
+        private void setProcValues(WorkProc selectedProc)
+        {
+            txtWorkProcName.Text = selectedProc.Name;
+            txtFormula.Text = selectedProc.Formula;
+            setNewColumnText(selectedProc.NewColumn);
+            setGroupBoxVisibility(selectedProc.GetType());
+        }
+
 
         private void lbUsedProcedures_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (gbProcedure.Enabled = (lbUsedProcedures.SelectedIndex != -1))
             {
                 WorkProc selectedProc = getSelectedWorkProcedure();
-                txtWorkProcName.Text = selectedProc.Name;
-                txtFormula.Text = selectedProc.Formula;
-                setNewColumnText(selectedProc.NewColumn);
-                setGroupBoxVisibility(selectedProc.Type);
-
-
-                switch (selectedProc.Type)
-                {
-                    case ProcedureState.Merge:
-                        setCmbHeader(selectedProc.Formula);
-                        lblOriginalNameText.Text = "Spalten zusammenfügen";
-                        break;
-
-                    case ProcedureState.Order:
-                        {
-                            setHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
-                            lblOriginalNameText.Text = "Sortieren";
-
-                            if(selectedProc.Columns.Columns.Count <= 1)
-                            {
-                                DataTable table = new DataTable { TableName = "Order" };
-                                table.Columns.Add("Spalte");
-                                table.Columns.Add("Sortierung");
-                                table.Columns[1].DataType = typeof(bool);
-                                selectedProc.Columns = table;
-                            }
-                            dgOrderColumns.DataSource = null;
-                            dgOrderColumns.DataSource = selectedProc.Columns;
-                            
-                            dgOrderColumns.Columns[1].Visible = false;
-
-                            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn();
-
-
-                            cmb.DataSource = OrderList;
-                            cmb.HeaderText = "Sortierung";
-                            cmb.DisplayMember = "key";
-                            cmb.ValueMember = "value";
-                            cmb.DataPropertyName = "Sortierung";
-                            
-
-                            dgOrderColumns.Columns.Add(cmb);
-                        }
-                        break;
-
-                    case ProcedureState.Trim:
-                        lblOriginalNameText.Text = "Trim";
-                        break;
-
-                    case ProcedureState.User:
-                        lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
-                        cbNewColumn.Checked = selectedProc.NewColumn != string.Empty;
-                        dgvColumns.DataSource = selectedProc.Columns;
-                        setHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
-                        break;
-
-                    case ProcedureState.Duplicate:
-                        {
-                            Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
-                            lblOriginalNameText.Text = myCase.Name;
-                            DataTable temp = myCase.Columns.Copy();
-                            DataTable table = new DataTable { TableName = "WorkDuplicates" };
-                            object[] firstColumn = temp.Rows.Cast<DataRow>().Select(dc => dc.ItemArray[0]).ToArray();
-
-                            table.Columns.Add("Bezeichnung");
-                            table.Columns.Add("Zuweisung");
-
-                            if (selectedProc.DuplicateColumns.Length < firstColumn.Length)
-                            {
-                                List<string> list = new List<string>();
-                                if (selectedProc.DuplicateColumns.Length > 0)
-                                {
-                                    list.AddRange(selectedProc.DuplicateColumns);
-                                }
-
-                                list.AddRange(firstColumn.Skip(selectedProc.DuplicateColumns.Length).Select(ob => ob.ToString()));
-
-
-                                selectedProc.DuplicateColumns = list.ToArray();
-                            }
-                            else if (selectedProc.DuplicateColumns.Length > firstColumn.Length)
-                            {
-                                selectedProc.DuplicateColumns = selectedProc.DuplicateColumns.Take(firstColumn.Length).ToArray();
-                            }
-                            for (int i = 0; i < firstColumn.Length; i++)
-                            {
-                                table.Rows.Add(new object[] { firstColumn[i], selectedProc.DuplicateColumns[i] });
-                            }
-                            dgColumnDefDuplicate.DataSource = table;
-                            dgColumnDefDuplicate.Columns[0].ReadOnly = true;
-                        }
-                        break;
-                }
+                setProcValues(selectedProc);
+                assignControls[selectedProc.GetType()](selectedProc);
             }
         }
 
-        private void setGroupBoxVisibility(ProcedureState state)
+        private void setGroupBoxVisibility(Type type)
         {
             foreach (GroupBox box in gbState.Keys)
             {
-                box.Visible = gbState[box] == state;
+                box.Visible = gbState[box] == type;
             }
         }
 
@@ -599,6 +612,37 @@ namespace DataTableConverter.View
             if (lbProcedures.SelectedIndex != -1)
             {
                 Work workflow = getSelectedWorkflow();
+                WorkProc newProc;
+                switch ((int)lbProcedures.SelectedValue)
+                {
+                    //System-Proc
+                    case 1:
+                        switch (cmbProcedureType.SelectedIndex)
+                        {
+                            case 1:
+                                newProc = new ProcTrim(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
+                                break;
+
+                            case 2:
+                                newProc = new ProcMerge(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
+                                break;
+
+                            default:
+                                newProc = new ProcOrder(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
+                                break;
+                        }
+                        break;
+
+                    //Duplicate
+                    case 2:
+                        newProc = new ProcDuplicate(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
+                        break;
+
+                    //User-Proc
+                    default:
+                        newProc = new ProcUser(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
+                        break;
+                }
                 workflow.Procedures.Add(new WorkProc(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name));
 
                 setWorkflowProcedures(workflow.Procedures);
@@ -909,7 +953,7 @@ namespace DataTableConverter.View
             {
                 DialogResult? result = null;
                 int id = ((Case)lbCases.SelectedItem).Id;
-                if (isProcedureUsed(id, out string usedWorkflows, ProcedureState.Duplicate))
+                if (isProcedureUsed(id, out string usedWorkflows, typeof(ProcDuplicate)))
                 {
                     result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Dieser Fall wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
                 }
@@ -919,7 +963,7 @@ namespace DataTableConverter.View
                     lbCases_SelectedIndexChanged(null, null);
                     if (result == DialogResult.Yes)
                     {
-                        deleteProcedureOfWorkflows(id, ProcedureState.Duplicate);
+                        deleteProcedureOfWorkflows(id, typeof(ProcDuplicate));
                     }
                 }
                 generateDuplicateProc();

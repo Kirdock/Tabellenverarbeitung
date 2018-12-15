@@ -1,23 +1,27 @@
-﻿using System;
+﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Classes.WorkProcs;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace DataTableConverter.Classes
 {
     [Serializable()]
-    class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>
+    class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>, WorkProcInterface
     {
-        public int ProcedureId { get; set; }
-        public DataTable Columns { get; set; }
-        public string[] DuplicateColumns { get; set; }
-        public int Ordinal { get; set; }
-        public ProcedureState Type { get; set; }
-        public string NewColumn { get; set; }
-        public string Formula { get; set; }
-        public string[] Headers { get; set; }
-        public string Name { get; set; }
+        internal int ProcedureId { get; set; }
+        internal DataTable Columns { get; set; }
+        internal string[] DuplicateColumns { get; set; }
+        internal int Ordinal { get; set; }
+        virtual internal string NewColumn { get; set; }
+        internal string Formula { get; set; }
+        //internal string[] Headers { get; set; }
+        internal string Name { get; set; }
 
-        public WorkProc(int ordinal, int id, int type, string name)
+        internal WorkProc() { }
+
+        internal WorkProc(int ordinal, int id, int type, string name)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
@@ -25,38 +29,6 @@ namespace DataTableConverter.Classes
             ProcedureId = id;
             DuplicateColumns = new string[0];
             Name = name;
-
-
-            switch (type)
-            {
-                //System-Proc
-                case 1:
-                    switch (id)
-                    {
-                        case 1:
-                            Type = ProcedureState.Trim;
-                            break;
-
-                        case 2:
-                            Type = ProcedureState.Merge;
-                            break;
-
-                        default:
-                            Type = ProcedureState.Order;
-                            break;
-                    }
-                    break;
-
-                //Duplicate
-                case 2:
-                    Type = ProcedureState.Duplicate;
-                    break;
-
-                //User-Proc
-                default:
-                    Type = ProcedureState.User;
-                    break;
-            }
 
         }
 
@@ -77,6 +49,22 @@ namespace DataTableConverter.Classes
             hashCode = hashCode * -1521134295 + EqualityComparer<DataTable>.Default.GetHashCode(Columns);
             hashCode = hashCode * -1521134295 + Ordinal.GetHashCode();
             return hashCode;
+        }
+
+        virtual public string[] getHeaders()
+        {
+            return new string[0];
+        }
+
+        virtual public void renameHeaders(string oldName, string newName)
+        {
+            return;
+        }
+
+        virtual public void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
+        {
+            sortingOrder = string.Empty;
+            return;
         }
     }
 }

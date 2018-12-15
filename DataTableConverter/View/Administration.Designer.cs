@@ -250,12 +250,12 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.gbProcedure);
             this.tabPage2.Controls.Add(this.gbOrder);
             this.tabPage2.Controls.Add(this.gbWorkflow);
             this.tabPage2.Controls.Add(this.button1);
             this.tabPage2.Controls.Add(this.button2);
             this.tabPage2.Controls.Add(this.gbTrim);
-            this.tabPage2.Controls.Add(this.gbProcedure);
             this.tabPage2.Controls.Add(this.gbDefDuplicate);
             this.tabPage2.Controls.Add(this.gbMerge);
             this.tabPage2.Controls.Add(this.lbWorkflows);

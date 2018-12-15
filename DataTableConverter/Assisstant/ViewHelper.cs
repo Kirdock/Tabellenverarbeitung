@@ -224,5 +224,23 @@ namespace DataTableConverter
             selectedColumns.Sort();
             return selectedColumns;
         }
+
+        internal static string adjustSort(string adjustSort, string column, string newColumn)
+        {
+            if (newColumn == null)
+            {
+                int indexFrom = adjustSort.IndexOf($"[{column}]");
+                if (indexFrom != -1)
+                {
+                    int indexTo = adjustSort.IndexOf(",", column.Length + 2 + indexFrom);
+                    adjustSort = adjustSort.Remove(indexFrom, indexTo == -1 ? adjustSort.Length : (indexTo - indexFrom + 2)); //+2 weil nach "," noch ein Leerzeichen ist
+                }
+            }
+            else
+            {
+                adjustSort = adjustSort.Replace($"[{column}]", $"[{newColumn}]");
+            }
+            return adjustSort;
+        }
     }
 }

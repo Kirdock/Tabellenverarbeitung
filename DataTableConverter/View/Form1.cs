@@ -1,5 +1,6 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
+using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.View;
 using System;
 using System.Collections;
@@ -99,22 +100,9 @@ namespace DataTableConverter
 
         private void assignDataSourceColumnChange(DataTable table, string column, string newColumn = null)
         {
-            string adjustSort = getSorting();
             saveDataGridSortMode();
-            if (newColumn == null)
-            {
-                int indexFrom = adjustSort.IndexOf($"[{column}]");
-                if (indexFrom != -1)
-                {
-                    int indexTo = adjustSort.IndexOf(",", column.Length + 2 + indexFrom);
-                    adjustSort = adjustSort.Remove(indexFrom, indexTo == -1 ? adjustSort.Length : (indexTo - indexFrom + 2)); //+2 weil nach "," noch ein Leerzeichen ist
-                }
-            }
-            else
-            {
-                adjustSort = adjustSort.Replace($"[{column}]", $"[{newColumn}]");
-            }
-            SortingOrder = adjustSort;
+            SortingOrder = ViewHelper.adjustSort(getSorting(), column, newColumn);
+            
             assignDataSource(table);
             
             restoreDataGridSortMode();
@@ -327,7 +315,7 @@ namespace DataTableConverter
 
             for (int index = 0; index < originalTable.Rows.Count; index++)
             {
-                string identifier = getColumnsAsObjectArray(originalTable.Rows[index], columns,subStringBegin, subStringEnd);
+                string identifier = WorkflowHelper.getColumnsAsObjectArray(originalTable.Rows[index], columns,subStringBegin, subStringEnd, tolerances);
                 
                 if (hTable.Contains(identifier))
                 {
@@ -353,107 +341,35 @@ namespace DataTableConverter
             }
         }
 
-        private string getColumnsAsObjectArray(DataRow row, string[] columns, int[] subStringBegin, int[] subStringEnd)
-        {
-            StringBuilder res = new StringBuilder();
-            for (int i = 0; i < columns.Length; i++)
-            {
-                #region Set Tolerances
-                StringBuilder result = new StringBuilder(row[columns[i]].ToString().ToLower());
-                foreach (Tolerance tol in tolerances)
-                {
-                    foreach (string t in tol.getColumnsAsArrayToLower())
-                    {
-                        result.Replace(t, tol.Name);
-                    }
-                }
-                #endregion
-
-                string resultString = result.ToString();
-
-                #region Set Substring
-                int begin = subStringBegin[i];
-                int end = subStringEnd[i];
-                if ( begin != 0 && end != 0 && end >= begin)
-                {
-                    if (begin - 1 > resultString.Length)
-                    {
-                        resultString = string.Empty;
-                    }
-                    else
-                    {
-                        int count = end - begin + 1;
-                        if (begin + count > resultString.Length)
-                        {
-                            count = resultString.Length - begin + 1;
-                        }
-                        resultString = resultString.Substring(begin - 1, count);
-                    }
-                }
-                #endregion
-
-                res.Append("|").Append(resultString);
-            }
-            return res.ToString();
-        }
-
-
         private void workflow_Click(object sender, EventArgs e, Work workflow)
         {
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
             
-            List<TempReplaceProcedure> tempReplace = new List<TempReplaceProcedure>();
+            
             List<string> headers = DataHelper.getHeadersToLower(getDataSource());
             DataTable table = getDataSource();
             foreach (WorkProc wp in workflow.Procedures)
             {
                 List<string> notFoundColumns = new List<string>();
-                string[] wpHeaders = new string[0];
-                switch (wp.Type) {
-                    case ProcedureState.Order:
-                    case ProcedureState.User:
-                        checkHeaders(headers, notFoundColumns, out string[] col, wp.Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
-                        wpHeaders = col;
-                        if (!string.IsNullOrWhiteSpace(wp.NewColumn))
-                        {
-                            headers.Add(wp.NewColumn.ToLower());
-                        }
-                        break;
+                //string[] wpHeaders = new string[0];
 
-                    case ProcedureState.Duplicate:
-                        checkHeaders(headers, notFoundColumns, out string[] col2, wp.DuplicateColumns);
-                        wpHeaders = col2;
-                        headers.Add("duplikat");
-                        break;
-
-                    case ProcedureState.Merge:
-                        checkMergeHeaders(headers, wp.Formula, notFoundColumns, out string[] col3);
-                        wpHeaders = col3;
-                        headers.Add(wp.NewColumn.ToLower());
-                        break;
-
-                    //Bei Trim ist nichts
+                WorkflowHelper.checkHeaders(headers, notFoundColumns, wp.getHeaders());
+                if (!string.IsNullOrWhiteSpace(wp.NewColumn))
+                {
+                    headers.Add(wp.NewColumn);
                 }
-                wp.Headers = wpHeaders;
+
                 if(notFoundColumns.Count > 0)
                 {
-                    notFound.Add(new NotFoundHeaders(notFoundColumns, wp, tempReplace.Count));
+                    notFound.Add(new NotFoundHeaders(notFoundColumns, wp));
                 }
-                tempReplace.Add(new TempReplaceProcedure(wpHeaders, wp));
             }
             if (notFound.Count == 0)
             {
-                replaceThroughTemp(tempReplace);
+                replaceThroughTemp(workflow.Procedures);
             }
             else
             {
-                //New Form
-                //NotFoundHeader = newHeader (combobox)
-                //DialogResult res = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Es wurden folgende Spaltennamen nicht gefunden: {notFoundColumns}\nTrotzdem ausführen?");
-                //if(res == DialogResult.Yes)
-                //{
-                //    replaceThroughTemp(tempReplace);
-                //}
                 HashSet<string> columns = new HashSet<string>();
                 foreach (NotFoundHeaders nf in notFound)
                 {
@@ -468,84 +384,32 @@ namespace DataTableConverter
 
                     foreach (NotFoundHeaders nf in notFound)
                     {
-                        for(int y = 0; y < nf.Wp.Headers.Length; y++)
+                        string[] wpHeaders = nf.Wp.getHeaders();
+                        for (int y = 0; y < wpHeaders.Length; y++)
                         {
                             for (int i = 0; i < from.Length; i++)
                             {
-                                if (nf.Wp.Headers[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
+                                if (wpHeaders[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
                                 {
-
-                                    switch (nf.Wp.Type)
-                                    {
-                                        case ProcedureState.Order:
-                                        case ProcedureState.User:
-                                            foreach(DataRow row in nf.Wp.Columns.Rows)
-                                            {
-                                                if(row.ItemArray[0].ToString() == from[i])
-                                                {
-                                                    row.SetField(0, to[i]);
-                                                }
-                                            }
-                                            break;
-
-                                        case ProcedureState.Duplicate:
-                                            for(int x = 0; x < nf.Wp.DuplicateColumns.Length; x++)
-                                            {
-                                                if (nf.Wp.DuplicateColumns[x] == from[i])
-                                                {
-                                                    nf.Wp.DuplicateColumns[x] = to[i];
-                                                }
-                                            }
-                                            break;
-
-                                        case ProcedureState.Merge:
-                                            nf.Wp.Formula = nf.Wp.Formula.Replace($"[{from[i]}]", $"[{to[i]}]");
-                                            break;
-
-
-                                    }
-
-
-                                    nf.Wp.Headers[y] = to[i];
+                                    nf.Wp.renameHeaders(from[i], to[i]);
                                 }
                             }
                         }
-                        //tempReplace[nf.Index].workProc = nf.Wp; //brauch ich das? hab ja ne Referenz...
                     }
-                    replaceThroughTemp(tempReplace);
+                    replaceThroughTemp(workflow.Procedures);
                 }
             }
         }
 
-        private void checkHeaders(List<string> tableHeader, List<string> notFoundColumns, out string[] columns, string[] headers)
-        {
-            columns = new string[headers.Length];
-            for (int i = 0; i < headers.Length; i++)
-            {
-                string headerText = headers[i];
-
-                if (headerText == null)
-                {
-                    continue;
-                }
-                columns[i] = headerText;
-                if (!tableHeader.Contains(headerText.ToLower()))
-                {
-                    notFoundColumns.Add(headerText);
-                }
-            }
-        }
-
-        private void replaceThroughTemp(List<TempReplaceProcedure> temp)
+        private void replaceThroughTemp(List<WorkProc> temp)
         {
             DataTable table = getDataSource();
             pgbLoading.Style = ProgressBarStyle.Marquee;
             new Thread(() =>
             {
-                foreach (TempReplaceProcedure t in temp)
+                foreach (WorkProc t in temp)
                 {
-                    TempReplaceProcedure temporary = t;
-                    replaceProcedure(table, null, temporary.Columns, null, temporary.workProc);
+                    replaceProcedure(table, null, null, t);
                 }
                 pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
                 dgTable.Invoke(new MethodInvoker(() => {
@@ -556,13 +420,7 @@ namespace DataTableConverter
 
         private int getProcedureThroughId(int id)
         {
-            int index = -1;
-            try
-            {
-                index = procedures.FindIndex(p => p.Id == id);
-            }
-            catch { }
-            return index;
+            return procedures.FindIndex(p => p.Id == id);
         }
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e, ImportState state = ImportState.None)
@@ -719,7 +577,7 @@ namespace DataTableConverter
             if (dgTable.DataSource != null)
             {
                 pgbLoading.Style = ProgressBarStyle.Marquee;
-                new Thread(() => trimDataTable(getDataSource(), true)).Start();
+                new Thread(() => trimDataTable(getDataSource())).Start();
             }
         }
 
@@ -731,108 +589,29 @@ namespace DataTableConverter
             formula.Show();
         }
 
-        private void replaceProcedure(DataTable table, Proc procedure, string[] columns, string columnHeader, WorkProc wp = null)
+        private void replaceProcedure(DataTable table, Proc procedure, string columnHeader, WorkProc wp)
         {
-            bool intoNewCol = false;
-            int lastCol = table.Columns.Count;
-            ProcedureState type = wp == null ? ProcedureState.User : wp.Type;
-
-            switch (type) {
-                case ProcedureState.Trim:
-                    trimDataTable(table, false);
-                    break;
-
-                case ProcedureState.Order:
-                    SortingOrder = buildOrder(wp.Columns);
-                    break;
-
-                case ProcedureState.Merge:
-                    mergeColumns(wp.NewColumn,wp.Formula, table, columns);
-                    break;
-
-                case ProcedureState.Duplicate:
-                    Case cas = getCaseThroughId(wp.ProcedureId);
-                    string[] tempCol = cas.getColumnsAsArray();
-                    if (tempCol.Length < wp.DuplicateColumns.Length)
-                    {
-                        wp.DuplicateColumns = wp.DuplicateColumns.Take(tempCol.Length).ToArray();
-                    }
-                    else if(tempCol.Length > wp.DuplicateColumns.Length)
-                    {
-                        List<string> list = new List<string>();
-                        list.AddRange(wp.DuplicateColumns);
-                        list.AddRange(tempCol.Skip(wp.DuplicateColumns.Length).ToArray());
-                        wp.DuplicateColumns = list.ToArray();
-                    }
-                    
-                    case_Click(null, null, cas, wp.DuplicateColumns, table);
-                    break;
-
-                case ProcedureState.User:
-                    if(procedure == null)
-                    {
-                        procedure = procedures[getProcedureThroughId(wp.ProcedureId)];
-                    }
-                    DataTable replaces = procedure.Replace;
-                    if (!string.IsNullOrWhiteSpace(columnHeader))
-                    {
-                        table.Columns.Add(columnHeader);
-                        intoNewCol = true;
-                    }
-                    List<int> headerIndices = DataHelper.getHeaderIndices(table, columns);
-                    foreach (DataRow rep in replaces.Rows)
-                    {
-                        foreach (DataRow row in table.Rows)
-                        {
-                            for (int i = 0; i < row.ItemArray.Length; i++)
-                            {
-                                
-                                if ((columns == null || headerIndices.Contains(i)) && rep.ItemArray[0].ToString().Length > 0)
-                                {
-                                    int index = intoNewCol ? lastCol : i;
-                                    row.SetField(index, row.ItemArray[i].ToString().Replace(rep.ItemArray[0].ToString(), rep.ItemArray[1].ToString()));
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
-            if (wp == null) //Started through Workflow
+            wp.doWork(table, out string newOrder, getCaseThroughId(wp.ProcedureId), tolerances, procedure ?? getProcedure(wp.ProcedureId));
+            if (newOrder != string.Empty)
             {
-                if (intoNewCol)
-                {
-                    addDataSourceAddColumn(lastCol);
-                    assignDataSource(table);
-                }
-                else
-                {
-                    addDataSourceValueChange(getDataSource(), table);
-                }
+                SortingOrder = newOrder;
             }
         }
 
-        private string buildOrder(DataTable table)
+        private Proc getProcedure(int id)
         {
-            StringBuilder builder = new StringBuilder();
-            
-            foreach(DataRow row in table.Rows)
-            {
-                object col = row[0];
-                bool orderDESC = string.IsNullOrWhiteSpace(row[1]?.ToString()) ? false : (bool)row[1];
-                builder.Append("[").Append(col.ToString()).Append("] ").Append(orderDESC ? "DESC" : "ASC").Append(", ");
+            Proc proc = null;
+            int index = getProcedureThroughId(id);
+            if (index != -1) {
+                proc = procedures[index];
             }
-            string result = builder.ToString();
-            if(result.Length > 2)
-            {
-                result = result.Substring(0, builder.Length - 2);
-            }
-            return result;
+            return proc;
         }
-
 
         private Case getCaseThroughId(int id)
         {
-            return cases[cases.FindIndex(cs => cs.Id == id)];
+            int index = cases.FindIndex(cs => cs.Id == id);
+            return index != -1 ? cases[index] : null;
         }
 
         private void procedureClosed(object sender, FormClosedEventArgs e, Proc procedure)
@@ -843,33 +622,25 @@ namespace DataTableConverter
                 
                 if (columns.Length > 0)
                 {
-                    replaceProcedure(getDataSource(),procedure, columns, ((Formula)sender).getHeaderName());
+                    ProcUser user = new ProcUser(columns);
+
+                    DataTable newTable = getDataSource();
+                    replaceProcedure(newTable,procedure, ((Formula)sender).getHeaderName(), user);
+                    addDataSourceValueChange(getDataSource(), newTable);
                 }
             }
         }
 
-        private void trimDataTable(DataTable dt, bool addHistory)
+        private void trimDataTable(DataTable dt)
         {
             Thread.CurrentThread.IsBackground = true;
-            foreach (DataRow row in dt.Rows)
+            ProcTrim proc = new ProcTrim();
+            proc.doWork(dt, out string sortingOrder, null, null, null);
+            dgTable.Invoke(new MethodInvoker(() =>
             {
-                for (int i = 0; i < row.ItemArray.Length; i++)
-                {
-                    row.SetField(i, row.ItemArray[i].ToString().Trim());
-                }
-            }
-            foreach(DataColumn col in dt.Columns)
-            {
-                col.ColumnName = col.ColumnName.Trim();
-            }
-            if (addHistory)
-            {
-                dgTable.Invoke(new MethodInvoker(() =>
-                {
-                    addDataSourceValueChange(getDataSource(), dt);
-                }));
-                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
-            }
+                addDataSourceValueChange(getDataSource(), dt);
+            }));
+            pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
         }
 
         private void speichernToolStripMenuItem_Click(object sender, EventArgs e)
@@ -980,8 +751,11 @@ namespace DataTableConverter
             {
                 DataTable data = getDataSource();
                 List<string> notFoundColumns = new List<string>();
-                string formu = formula.getFormula();
-                checkMergeHeaders(DataHelper.getHeadersToLower(data), formu, notFoundColumns, out string[] headers);
+                ProcMerge proc = new ProcMerge(formula.getFormula());
+
+                WorkflowHelper.checkHeaders(DataHelper.getHeadersToLower(data), notFoundColumns, proc.getHeaders());
+                int column = data.Columns.Count;
+
                 if (notFoundColumns.Count > 0)
                 {
                     SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundColumns.ToArray(), DataHelper.getHeadersOfDataTable(data));
@@ -991,91 +765,24 @@ namespace DataTableConverter
                         string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
                         for(int i = 0; i < from.Length; i++)
                         {
-                            formu.Replace($"[{from[i]}]", $"[{to[i]}]");
+                            proc.Formula.Replace($"[{from[i]}]", $"[{to[i]}]");
                         }
 
 
-                        int column = mergeColumns(formula.getHeaderName(), formu, data, headers);
+                        
+                        proc.doWork(data, out string sortingOrder, null, null, null);
+
                         assignDataSource(data);
                         addDataSourceAddColumn(column);
                     }
                 }
                 else
                 {
-                    int column = mergeColumns(formula.getHeaderName(), formu, data, headers);
+                    proc.doWork(data, out string sortingOrder, null, null, null);
                     assignDataSource(data);
                     addDataSourceAddColumn(column);
                 }
             }
-        }
-
-        private void checkMergeHeaders(List<string> tableHeaders, string form, List<string> notFoundColumns, out string[] headers)
-        {
-            string regularExpressionPattern = @"\[(.*?)\]";
-            Regex re = new Regex(regularExpressionPattern);
-
-            MatchCollection matches = re.Matches(form);
-            //string []columns = new string[matches.Count];
-            headers = new string[matches.Count];
-            for (int i = 0; i < matches.Count; i++)
-            {
-                headers[i] = matches[i].Value.Substring(1, matches[i].Value.Length - 2);
-            }
-            
-            checkHeaders(tableHeaders, notFoundColumns, out string[] columns, headers);
-        }
-
-        private int mergeColumns(string headerName, string form, DataTable data, string[] headers)
-        {
-            int column = data.Columns.Count;
-            DataHelper.addColumn(headerName, data);
-
-            headers = headers.Select(h => h.ToLower()).ToArray();
-            
-            List<string> tableHeaders = DataHelper.getHeadersToLower(data);
-            
-
-            for (int rowIndex = 0; rowIndex < data.Rows.Count; rowIndex++)
-            {
-                DataRow row = data.Rows[rowIndex];
-                string format = "";
-
-                int counter = headers.Length - 1;
-
-                bool skipWhenEmpty = false;
-                for (int i = form.Length - 1; i >= 0; i--)
-                {
-                    string header = headers[counter];
-                    int index = tableHeaders.IndexOf(header.ToLower());
-                    char c = form[i];
-
-                    if (c != ']')
-                    {
-                        if (skipWhenEmpty)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            format = c + format;
-                        }
-                    }
-                    else
-                    {
-                        skipWhenEmpty = string.IsNullOrWhiteSpace(row[index]?.ToString());
-                        if (!skipWhenEmpty)
-                        {
-                            format = row[index] + format;
-                        }
-
-                        i -= (header.Length + 1);
-                        counter--;
-                    }
-                }
-
-                data.Rows[rowIndex].SetField(column, format);
-            }
-            return column;
         }
 
 
@@ -1306,7 +1013,7 @@ namespace DataTableConverter
         private void resetSort(DataGridViewColumn col)
         {
             SortingOrder = string.Empty;
-            assignDataSource(sourceTable);
+            assignDataSource();
         }
 
         private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e)

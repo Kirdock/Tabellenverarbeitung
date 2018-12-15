@@ -10,13 +10,13 @@ namespace DataTableConverter.Classes
     {
         public List<string> Headers { get; set; }
         public WorkProc Wp { get; set; }
-        public int Index { get; set; }
+        
 
-        public NotFoundHeaders(List<string> headers, WorkProc wp, int index)
+        public NotFoundHeaders(List<string> headers, WorkProc wp)
         {
             Headers = headers;
             Wp = wp;
-            Index = index;
+            
         }
     }
 }
