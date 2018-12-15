@@ -263,95 +263,24 @@ namespace DataTableConverter
 
         private void case_Click(object sender, EventArgs e, Case cas, string[] caseColumnsWorkflow, DataTable originalTable)
         {
-            List <string> headers = DataHelper.getHeadersToLower(originalTable);
-            bool contains = true;
-            List<string> columns = new List<string>();
-            string[] caseColumns = caseColumnsWorkflow ?? cas.getColumnsAsArray();
-            caseColumns = caseColumns.Select(cs => cs.ToLower()).ToArray();
-            for (int i = 0; i < caseColumns.Length; i++)
-            {
-                if (!headers.Contains(caseColumns[i]))
-                {
-                    contains = false;
-                    break;
-                }
-                else
-                {
-                    columns.Add(originalTable.Columns[i].ColumnName);
-                }
-            }
+            List<WorkProc> procs = new List<WorkProc>();
+            ProcDuplicate procDuplicate = new ProcDuplicate(0, cas.Id, cas.Name);
+            procs.Add(procDuplicate);
 
-            if (contains)
-            {
-                duplicateClosed(null, null, cas, originalTable, columns.ToArray(), caseColumnsWorkflow != null);
-            }
-            else
-            {
-                SelectDuplicateColumns form = new SelectDuplicateColumns(cas.getColumnsAsArray(), DataHelper.getHeadersOfDataTable(originalTable));
-                form.FormClosed += (sender2, e2) => duplicateClosed(sender2, e2, cas, originalTable, null, caseColumnsWorkflow != null);
-                form.Show();
-            }
-        }
-
-        private void duplicateClosed (object sender, FormClosedEventArgs e, Case cas, DataTable originalTable, string[] Col, bool startedThroughWorkflow)
-        {
-            Hashtable hTable = new Hashtable();
-            ArrayList duplicateList = new ArrayList();
-
-            string[] columns = Col ?? ((SelectDuplicateColumns)sender).Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
-            int[] subStringBegin = cas.getBeginSubstring();
-            int[] subStringEnd = cas.getEndSubstring();
-            DataTable oldTable = originalTable.Copy();
-            int lastIndex = originalTable.Columns.IndexOf("Duplikat");
-            bool columnAdded;
-            if (columnAdded = lastIndex == -1)
-            {
-                lastIndex = originalTable.Columns.Count;
-                DataHelper.addColumn("Duplikat", originalTable);
-
-            }
-            
-
-
-            for (int index = 0; index < originalTable.Rows.Count; index++)
-            {
-                string identifier = WorkflowHelper.getColumnsAsObjectArray(originalTable.Rows[index], columns,subStringBegin, subStringEnd, tolerances);
-                
-                if (hTable.Contains(identifier))
-                {
-                    originalTable.Rows[(int)hTable[identifier]].SetField(lastIndex, cas.Shortcut);
-                    originalTable.Rows[index].SetField(lastIndex, cas.Shortcut);
-                }
-                else
-                {
-                    hTable.Add(identifier, index);
-                }
-            }
-            if (!startedThroughWorkflow)
-            {
-                if (columnAdded)
-                {
-                    addDataSourceAddColumn(lastIndex);
-                }
-                else
-                {
-                    addDataSourceColumnValuesChanged(oldTable, originalTable, lastIndex);
-                }
-                assignDataSource(originalTable);
-            }
+            Work workflow = new Work(string.Empty, procs, 0);
+            workflow_Click(null, null, workflow);
         }
 
         private void workflow_Click(object sender, EventArgs e, Work workflow)
         {
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
-            
-            
-            List<string> headers = DataHelper.getHeadersToLower(getDataSource());
             DataTable table = getDataSource();
+            List<string> headers = DataHelper.getHeadersToLower(table);
+            
+
             foreach (WorkProc wp in workflow.Procedures)
             {
                 List<string> notFoundColumns = new List<string>();
-                //string[] wpHeaders = new string[0];
 
                 WorkflowHelper.checkHeaders(headers, notFoundColumns, wp.getHeaders());
                 if (!string.IsNullOrWhiteSpace(wp.NewColumn))
@@ -625,8 +554,11 @@ namespace DataTableConverter
                     ProcUser user = new ProcUser(columns);
 
                     DataTable newTable = getDataSource();
-                    replaceProcedure(newTable,procedure, ((Formula)sender).getHeaderName(), user);
-                    addDataSourceValueChange(getDataSource(), newTable);
+                    new Thread(() =>
+                    {
+                        replaceProcedure(newTable, procedure, ((Formula)sender).getHeaderName(), user);
+                        dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(getDataSource(), newTable); }));
+                    }).Start();
                 }
             }
         }
@@ -756,27 +688,21 @@ namespace DataTableConverter
                 WorkflowHelper.checkHeaders(DataHelper.getHeadersToLower(data), notFoundColumns, proc.getHeaders());
                 int column = data.Columns.Count;
 
+                bool cont = true;
                 if (notFoundColumns.Count > 0)
                 {
                     SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundColumns.ToArray(), DataHelper.getHeadersOfDataTable(data));
-                    if(form.ShowDialog() == DialogResult.OK)
+                    if( cont = (form.ShowDialog() == DialogResult.OK))
                     {
                         string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
                         string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
                         for(int i = 0; i < from.Length; i++)
                         {
-                            proc.Formula.Replace($"[{from[i]}]", $"[{to[i]}]");
+                            proc.renameHeaders(from[i], to[i]);
                         }
-
-
-                        
-                        proc.doWork(data, out string sortingOrder, null, null, null);
-
-                        assignDataSource(data);
-                        addDataSourceAddColumn(column);
                     }
                 }
-                else
+                if(cont)
                 {
                     proc.doWork(data, out string sortingOrder, null, null, null);
                     assignDataSource(data);

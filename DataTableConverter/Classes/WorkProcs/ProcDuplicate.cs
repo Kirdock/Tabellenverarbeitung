@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
+    [Serializable()]
     internal class ProcDuplicate : WorkProc
     {
         internal override string NewColumn => "Duplikat";
 
-        internal ProcDuplicate(int ordinal, int id, int type, string name) : base(ordinal, id, type, name)
+        internal ProcDuplicate(int ordinal, int id, string name) : base(ordinal, id,name)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));

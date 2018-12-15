@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Classes;
+using DataTableConverter.Classes.WorkProcs;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -70,6 +71,87 @@ namespace DataTableConverter.Assisstant
         internal static string[] removeEmptyHeaders(string[] headers)
         {
             return headers.Where(header => !string.IsNullOrWhiteSpace(header)).ToArray();
+        }
+
+        internal static WorkProc createWorkProc(int type, int id, int ordinal, string name)
+        {
+            WorkProc newProc;
+            switch (type)
+            {
+                //System-Proc
+                case 1:
+                    switch (id)
+                    {
+                        case 1:
+                            newProc = new ProcTrim(ordinal, id, name);
+                            break;
+
+                        case 2:
+                            newProc = new ProcMerge(ordinal, id, name);
+                            break;
+
+                        default:
+                            newProc = new ProcOrder(ordinal, id, name);
+                            break;
+                    }
+                    break;
+
+                //Duplicate
+                case 2:
+                    newProc = new ProcDuplicate(ordinal, id, name);
+                    break;
+
+                //User-Proc
+                default:
+                    newProc = new ProcUser(ordinal, id, name);
+                    break;
+            }
+            return newProc;
+        }
+
+        internal static void removeRowThroughCaseChange(List<Work> workflows, List<int> rowIndizes, int casId)
+        {
+            foreach(Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == casId && proc.GetType() == typeof(ProcDuplicate)).ToList().ForEach((caseProc) =>
+                {
+                    List<string> columns = caseProc.DuplicateColumns.ToList();
+                    foreach(int index in rowIndizes.OrderByDescending(x => x))
+                    {
+                        columns.RemoveAt(index);
+                    }
+                    caseProc.DuplicateColumns = columns.ToArray();
+                });
+            }
+        }
+
+        internal static void insertRowThroughCaseChange(List<Work> workflows, int rowIndex, int casId)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == casId).ToList().ForEach((caseProc) =>
+                {
+                    List<string> columns = caseProc.DuplicateColumns.ToList();
+                    columns.Insert(rowIndex, string.Empty);
+                    caseProc.DuplicateColumns = columns.ToArray();
+                });
+            }
+        }
+
+        internal static void adjustDuplicateColumns(Case selectedItem, List<Work> workflows)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == selectedItem.Id).ToList().ForEach((caseProc) =>
+                {
+                    if(selectedItem.Columns.Rows.Count > caseProc.DuplicateColumns.Length)
+                    {
+                        List<string> temp = caseProc.DuplicateColumns.ToList();
+                        temp.Add(string.Empty);
+                        caseProc.DuplicateColumns = temp.ToArray();
+                    }
+                });
+            }
         }
     }
 }

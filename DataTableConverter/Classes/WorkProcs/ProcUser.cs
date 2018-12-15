@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
+    [Serializable()]
     internal class ProcUser : WorkProc
     {
 
@@ -16,7 +17,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.removeEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
         }
 
-        public ProcUser(int ordinal, int id, int type, string name) : base(ordinal, id, type, name) { }
+        public ProcUser(int ordinal, int id,string name) : base(ordinal, id, name) { }
 
         public ProcUser(string[] columns)
         {

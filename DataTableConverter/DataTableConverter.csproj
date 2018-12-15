@@ -68,6 +68,7 @@
     <Compile Include="Assisstant\DataHelper.cs" />
     <Compile Include="Assisstant\HistoryHelper.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
+    <Compile Include="Assisstant\WorkflowHelper.cs" />
     <Compile Include="Classes\CellMatrix.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
     <Compile Include="Classes\History.cs" />
@@ -80,6 +81,11 @@
     <Compile Include="Classes\Work.cs" />
     <Compile Include="Classes\WorkProc.cs" />
     <Compile Include="Assisstant\ViewHelper.cs" />
+    <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
+    <Compile Include="Classes\WorkProcs\ProcTrim.cs" />
+    <Compile Include="Classes\WorkProcs\ProcMerge.cs" />
+    <Compile Include="Classes\WorkProcs\ProcDuplicate.cs" />
+    <Compile Include="Classes\WorkProcs\ProcUser.cs" />
     <Compile Include="View\Administration.cs">
       <SubType>Form</SubType>
     </Compile>

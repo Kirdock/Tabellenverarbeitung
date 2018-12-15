@@ -8,20 +8,20 @@ using System.Linq;
 namespace DataTableConverter.Classes
 {
     [Serializable()]
-    class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>, WorkProcInterface
+    class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>
     {
-        internal int ProcedureId { get; set; }
+        public int ProcedureId { get; set; }
         internal DataTable Columns { get; set; }
         internal string[] DuplicateColumns { get; set; }
         internal int Ordinal { get; set; }
         virtual internal string NewColumn { get; set; }
         internal string Formula { get; set; }
         //internal string[] Headers { get; set; }
-        internal string Name { get; set; }
+        public string Name { get; set; }
 
         internal WorkProc() { }
 
-        internal WorkProc(int ordinal, int id, int type, string name)
+        internal WorkProc(int ordinal, int id, string name)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));

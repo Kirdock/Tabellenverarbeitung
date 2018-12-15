@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
+    [Serializable()]
     internal class ProcMerge : WorkProc
     {
         internal static readonly string ClassName = "Spalten zusammenfügen";
-        internal ProcMerge(int ordinal, int id, int type, string name) : base(ordinal, id, type, name){}
+        internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         internal ProcMerge(string formula)
         {

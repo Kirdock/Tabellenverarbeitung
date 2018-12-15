@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Classes;
 using DataTableConverter.View;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,17 @@ namespace DataTableConverter
         private ContextMenuStrip ctxRow;
         private ToolStripItem clipboardItem, deleteRowItem, insertRowItem;
         private Action<object, EventArgs> myFunction;
+        private List<Work> Workflows;
+        internal int selectedCase { get; set; }
 
-        public ViewHelper(ContextMenuStrip ctxrow, Action<object,EventArgs> myfunction = null)
+        public ViewHelper(ContextMenuStrip ctxrow, Action<object,EventArgs> myfunction, List<Work> workflows)
         {
             ctxRow = ctxrow;
             myFunction = myfunction;
             clipboardItem = ctxRow.Items.Cast<ToolStripItem>().First(x=> x.Name == "clipboardItem");
             deleteRowItem = ctxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "deleteRowItem");
             insertRowItem = ctxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "insertRowItem");
+            Workflows = workflows;
         }
 
         internal static void addNumerationToDataGridView(object sender, DataGridViewRowPostPaintEventArgs e, Font font)
@@ -141,13 +145,14 @@ namespace DataTableConverter
 
         internal void addContextMenuToDataGridView(DataGridView view,bool clipboard)
         {
-            view.MouseClick +=(sender, e)=> dataGridView_MouseClick(view, e, clipboard);
+            view.MouseClick +=(sender, e)=> dataGridView_MouseClick((DataGridView)sender, e, clipboard);
         }
 
         private void dataGridView_MouseClick(DataGridView view, MouseEventArgs e, bool clipboard)
         {
             if (e.Button == MouseButtons.Right)
             {
+                clear();
                 int selectedRow = view.HitTest(e.X, e.Y).RowIndex;
                 int selectedColumn = view.HitTest(e.X, e.Y).ColumnIndex;
 
@@ -157,24 +162,14 @@ namespace DataTableConverter
                     view[selectedColumn, selectedRow].Selected = true;
                 }
 
-                if (ctxRowClipboard != null)
-                {
-                    clipboardItem.Click -= ctxRowClipboard;
-                }
-
                 clipboardItem.Click += ctxRowClipboard = (sender2, e2) => insertClipboardToDataGridView(view, selectedRow);
 
                 if (deleteRowItem.Visible = (selectedRow > -1 && selectedRow != view.Rows.Count - 1))
                 {
-                    if (ctxRowDeleteRowHandler != null)
-                    {
-                        deleteRowItem.Click -= ctxRowDeleteRowHandler;
-                        insertRowItem.Click -= ctxRowInsertRowHandler;
-                    }
 
                     List<int> selectedRows = SelectedRows(view);
-
                     deleteRowItem.Text = (selectedRows.Count > 1) ? "Zeilen löschen" : "Zeile löschen";
+
                     deleteRowItem.Click += ctxRowDeleteRowHandler = (sender2, e2) => deleteRowClick(view, selectedRows);
                     insertRowItem.Click += ctxRowInsertRowHandler = (sender2, e2) => insertRowClick(view, selectedRow);
                 }
@@ -182,6 +177,20 @@ namespace DataTableConverter
                 
                 ctxRow.Show(view, new Point(e.X, e.Y));
 
+            }
+        }
+
+        internal void clear()
+        {
+            if (ctxRowDeleteRowHandler != null)
+            {
+                deleteRowItem.Click -= ctxRowDeleteRowHandler;
+                insertRowItem.Click -= ctxRowInsertRowHandler;
+            }
+            
+            if (ctxRowClipboard != null)
+            {
+                clipboardItem.Click -= ctxRowClipboard;
             }
         }
 
@@ -197,17 +206,24 @@ namespace DataTableConverter
             }
             if (view.Name == "dgCaseColumns")
             {
+                WorkflowHelper.removeRowThroughCaseChange(Workflows, rowIndizes, selectedCase);
                 myFunction(null, null);
             }
         }
 
-        private void insertRowClick(DataGridView dgView, int rowIndex)
+        private void insertRowClick(DataGridView view, int rowIndex)
         {
-            dgView.BindingContext[dgView.DataSource].EndCurrentEdit();
-            DataTable table = (DataTable)dgView.DataSource;
+            view.BindingContext?[view.DataSource].EndCurrentEdit();
+            DataTable table = (DataTable)view.DataSource;
             DataRow row = table.NewRow();
             table.Rows.InsertAt(row, rowIndex);
-            dgView.DataSource = table;
+            view.DataSource = table;
+
+            if (view.Name == "dgCaseColumns")
+            {
+                WorkflowHelper.insertRowThroughCaseChange(Workflows, rowIndex, selectedCase);
+                myFunction(null, null);
+            }
         }
 
 

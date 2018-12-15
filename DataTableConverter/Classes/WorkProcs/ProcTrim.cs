@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
+    [Serializable()]
     internal class ProcTrim : WorkProc
     {
         internal static readonly string ClassName = "Spalten zusammenfügen";
 
         public ProcTrim() { }
-        public ProcTrim(int ordinal, int id, int type, string name) : base(ordinal, id, type, name) { }
+        public ProcTrim(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         public override string[] getHeaders()
         {

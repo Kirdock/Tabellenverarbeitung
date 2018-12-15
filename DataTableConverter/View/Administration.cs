@@ -39,29 +39,39 @@ namespace DataTableConverter.View
         internal Administration(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
-            viewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged);
-            addContextMenu();
-            
+
+            setHeaders(headers);
             setOrderList();
             assignGroupBoxToEnum();
             cmbProcedureType.SelectedIndex = 0;
-            
+
             loadProcedures();
             loadTolerances();
             loadCases();
             loadWorkflows();
-            setHeaders(headers);
+
+            viewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
 
             ltbProcedures_SelectedIndexChanged(null, null);
             generateProceduresForWorkflow();
             loadProceduresWorkflow(false);
-            
+
             lbWorkflows_SelectedIndexChanged(null, null);
-            
+
             lbTolerances_SelectedIndexChanged(null, null);
 
-            
+
             lbCases_SelectedIndexChanged(null, null);
+            setGroupBoxVisibility(null);
+            lbUsedProcedures_SelectedIndexChanged(null, null);
+
+            
+            addContextMenu();
+
+        }
+
+        private void Administration_Load(object sender, EventArgs e)
+        {
             
         }
 
@@ -94,11 +104,11 @@ namespace DataTableConverter.View
             gbState.Add(gbDefDuplicate, typeof(ProcDuplicate));
             gbState.Add(gbMerge, typeof(ProcMerge));
             //gbState.Add(gbTrim, ProcedureState.Trim);
-            gbState.Add(gbProcedure, typeof(ProcMerge));
+            gbState.Add(gbProcedure, typeof(ProcUser));
             gbState.Add(gbOrder, typeof(ProcOrder));
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
-                { typeof(ProcUser), setMergeControls },
+                { typeof(ProcUser), setUserControls},
                 { typeof(ProcDuplicate), setDuplicateControls },
                 { typeof(ProcMerge), setMergeControls },
                 { typeof(ProcOrder), setOrderControls },
@@ -108,6 +118,7 @@ namespace DataTableConverter.View
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
         {
+            viewHelper.clear();
             if (ExportHelper.saveWorkflows(Workflows) || ExportHelper.saveProcedures(Procedures) || ExportHelper.saveTolerances(Tolerances) || ExportHelper.saveCases(Cases))
             {
                 DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
@@ -393,8 +404,11 @@ namespace DataTableConverter.View
             bindingWorkProc = newList ?? new BindingList<WorkProc>(proc);
             lbUsedProcedures.DataSource = null;
             lbUsedProcedures.DataSource = bindingWorkProc;
-            lbUsedProcedures.DisplayMember = "Name";
-            lbUsedProcedures.ValueMember = "ProcedureId";
+            if (bindingWorkProc.Count > 0)
+            {
+                lbUsedProcedures.DisplayMember = "Name";
+                lbUsedProcedures.ValueMember = "ProcedureId";
+            }
         }
 
         private void sortWorkProcList(int ordinal)
@@ -444,7 +458,7 @@ namespace DataTableConverter.View
         private void setUserControls(WorkProc selectedProc)
         {
             lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
-            cbNewColumn.Checked = selectedProc.NewColumn != string.Empty;
+            cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             dgvColumns.DataSource = selectedProc.Columns;
             setHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
@@ -462,21 +476,9 @@ namespace DataTableConverter.View
 
             if (selectedProc.DuplicateColumns.Length < firstColumn.Length)
             {
-                List<string> list = new List<string>();
-                if (selectedProc.DuplicateColumns.Length > 0)
-                {
-                    list.AddRange(selectedProc.DuplicateColumns);
-                }
-
-                list.AddRange(firstColumn.Skip(selectedProc.DuplicateColumns.Length).Select(ob => ob.ToString()));
-
-
-                selectedProc.DuplicateColumns = list.ToArray();
+                selectedProc.DuplicateColumns = new string[firstColumn.Length];
             }
-            else if (selectedProc.DuplicateColumns.Length > firstColumn.Length)
-            {
-                selectedProc.DuplicateColumns = selectedProc.DuplicateColumns.Take(firstColumn.Length).ToArray();
-            }
+
             for (int i = 0; i < firstColumn.Length; i++)
             {
                 table.Rows.Add(new object[] { firstColumn[i], selectedProc.DuplicateColumns[i] });
@@ -541,6 +543,7 @@ namespace DataTableConverter.View
             {
                 box.Visible = gbState[box] == type;
             }
+            gbTrim.Visible = type != null;
         }
 
         private void setNewColumnText(string text)
@@ -612,38 +615,7 @@ namespace DataTableConverter.View
             if (lbProcedures.SelectedIndex != -1)
             {
                 Work workflow = getSelectedWorkflow();
-                WorkProc newProc;
-                switch ((int)lbProcedures.SelectedValue)
-                {
-                    //System-Proc
-                    case 1:
-                        switch (cmbProcedureType.SelectedIndex)
-                        {
-                            case 1:
-                                newProc = new ProcTrim(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
-                                break;
-
-                            case 2:
-                                newProc = new ProcMerge(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
-                                break;
-
-                            default:
-                                newProc = new ProcOrder(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
-                                break;
-                        }
-                        break;
-
-                    //Duplicate
-                    case 2:
-                        newProc = new ProcDuplicate(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
-                        break;
-
-                    //User-Proc
-                    default:
-                        newProc = new ProcUser(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name);
-                        break;
-                }
-                workflow.Procedures.Add(new WorkProc(workflow.Procedures.Count, (int)lbProcedures.SelectedValue, cmbProcedureType.SelectedIndex, ((Proc)lbProcedures.SelectedItem).Name));
+                workflow.Procedures.Add(WorkflowHelper.createWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
 
                 setWorkflowProcedures(workflow.Procedures);
             }
@@ -923,6 +895,10 @@ namespace DataTableConverter.View
                 txtCaseName.Text = selectedCase.Name;
                 txtShortcut.Text = selectedCase.Shortcut;
                 dgCaseColumns.DataSource = selectedCase.Columns;
+                if (viewHelper != null)
+                {
+                    viewHelper.selectedCase = selectedCase.Id;
+                }
             }
         }
 
@@ -975,10 +951,6 @@ namespace DataTableConverter.View
         {
             ViewHelper.handleDataGridViewNumber(sender, e);
         }
-
-
-
-
         #endregion
 
         private void txtWorkProcName_TextChanged(object sender, EventArgs e)
@@ -998,6 +970,7 @@ namespace DataTableConverter.View
         private void dgCaseColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             dgCaseColumns.BindingContext[dgCaseColumns.DataSource].EndCurrentEdit();
+            WorkflowHelper.adjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 
@@ -1091,5 +1064,6 @@ namespace DataTableConverter.View
         {
             (sender as ComboBox).DroppedDown = true;
         }
+
     }
 }
