@@ -265,6 +265,7 @@ namespace DataTableConverter
         {
             List<WorkProc> procs = new List<WorkProc>();
             ProcDuplicate procDuplicate = new ProcDuplicate(0, cas.Id, cas.Name);
+            procDuplicate.DuplicateColumns = cas.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray();
             procs.Add(procDuplicate);
 
             Work workflow = new Work(string.Empty, procs, 0);
@@ -281,7 +282,7 @@ namespace DataTableConverter
             foreach (WorkProc wp in workflow.Procedures)
             {
                 List<string> notFoundColumns = new List<string>();
-
+                
                 WorkflowHelper.checkHeaders(headers, notFoundColumns, wp.getHeaders());
                 if (!string.IsNullOrWhiteSpace(wp.NewColumn))
                 {

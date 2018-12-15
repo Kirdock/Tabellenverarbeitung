@@ -48,7 +48,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             int[] subStringBegin = duplicateCase.getBeginSubstring();
             int[] subStringEnd = duplicateCase.getEndSubstring();
-            DataTable oldTable = table.Copy();
+            
             int lastIndex = table.Columns.IndexOf("Duplikat");
             bool columnAdded;
             if (columnAdded = lastIndex == -1)
