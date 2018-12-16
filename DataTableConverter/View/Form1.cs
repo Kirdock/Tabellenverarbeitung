@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,13 +29,16 @@ namespace DataTableConverter
         private List<Case> cases;
         private HistoryHelper historyHelper;
         private string tableValueBefore;
-        private Dictionary<string, SortOrder> DataGridOrders;
         private DataTable sourceTable;
         private string SortingOrder;
+        Dictionary<string, SortOrder> dictSorting;
         private int rowBefore; //Wenn eine Zelle im DataGridView geändert wird, kann ich mit dgTable[col, row] den geänderten Wert nicht holen, da die DataGridView zu diesem Zeitpunkt wieder sortiert wurde
+        private List<string> dictKeys;
 
         internal Form1(DataTable table = null)
         {
+            dictSorting = new Dictionary<string, SortOrder>();
+            dictKeys = new List<string>();
             InitializeComponent();
             ExportHelper.checkFolders();
             loadProcedures();
@@ -51,12 +55,19 @@ namespace DataTableConverter
             }
         }
 
+        private void setSorting(string order)
+        {
+            SortingOrder = order;
+            dictSorting = ViewHelper.generateSortingList(getSorting());
+            dictKeys = dictSorting.Keys.ToList();
+        }
+
 
         private void assignDataSource(DataTable table = null)
         {
             sourceTable = table ?? sourceTable;
 
-            saveDataGridSortMode();
+            
             int scrollBarHorizontal = dgTable.FirstDisplayedScrollingColumnIndex;
             int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
 
@@ -74,37 +85,21 @@ namespace DataTableConverter
             restoreDataGridSortMode();
         }
 
-        private void saveDataGridSortMode()
-        {
-            DataGridOrders = new Dictionary<string, SortOrder>();
-            foreach (DataGridViewColumn col in dgTable.Columns)
-            {
-                DataGridOrders.Add(col.HeaderText, col.HeaderCell.SortGlyphDirection);
-            }
-        }
 
         private void restoreDataGridSortMode()
         {
 
             for (int i = 0; i < dgTable.Columns.Count; i++)
             {
-                string key = dgTable.Columns[i].HeaderText;
                 dgTable.Columns[i].SortMode = DataGridViewColumnSortMode.Programmatic;
-                if (DataGridOrders.ContainsKey(key))
-                {
-                    dgTable.Columns[i].HeaderCell.SortGlyphDirection = DataGridOrders[key];
-                }
             }
-            DataGridOrders = null;
         }
 
         private void assignDataSourceColumnChange(DataTable table, string column, string newColumn = null)
         {
-            saveDataGridSortMode();
-            SortingOrder = ViewHelper.adjustSort(getSorting(), column, newColumn);
+            setSorting(ViewHelper.adjustSort(getSorting(), column, newColumn));
             
-            assignDataSource(table);
-            
+            assignDataSource(table);            
             restoreDataGridSortMode();
         }
 
@@ -341,10 +336,10 @@ namespace DataTableConverter
                 {
                     replaceProcedure(table, null, null, t);
                 }
-                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
                 dgTable.Invoke(new MethodInvoker(() => {
                     addDataSourceValueChange(getDataSource(), table);
                 }));
+                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
             }).Start();
         }
 
@@ -524,7 +519,7 @@ namespace DataTableConverter
             wp.doWork(table, out string newOrder, getCaseThroughId(wp.ProcedureId), tolerances, procedure ?? getProcedure(wp.ProcedureId));
             if (newOrder != string.Empty)
             {
-                SortingOrder = newOrder;
+                setSorting(newOrder);
             }
         }
 
@@ -743,21 +738,43 @@ namespace DataTableConverter
 
         private void rückgängigToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable table = historyHelper.goBack(getDataSource(), getSorting());
-            takeOverHistory(table, historyHelper.OrderString);
+            DataTable oldTable = getDataSource();
+            pgbLoading.Style = ProgressBarStyle.Marquee;
+
+            new Thread(() =>
+            {
+                DataTable newTable = historyHelper.goBack(oldTable, getSorting());
+                dgTable.Invoke(new MethodInvoker(() =>
+                {
+                    takeOverHistory(newTable, historyHelper.OrderString);
+                }));
+                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+            }).Start();
+            
+            
         }
 
         private void takeOverHistory(DataTable table, string orderString)
         {
-            SortingOrder = orderString;
+            setSorting(orderString);
             assignDataSource(table);
             setRowCount();
         }
 
         private void wiederholenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable table = historyHelper.repeat(getDataSource(), getSorting());
-            takeOverHistory(table, historyHelper.OrderString);
+            DataTable oldTable = getDataSource();
+            pgbLoading.Style = ProgressBarStyle.Marquee;
+
+            new Thread(() =>
+            {
+                DataTable newTable = historyHelper.repeat(getDataSource(), getSorting());
+                dgTable.Invoke(new MethodInvoker(() =>
+                {
+                    takeOverHistory(newTable, historyHelper.OrderString);
+                }));
+                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+            }).Start();
         }
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -928,8 +945,8 @@ namespace DataTableConverter
                 {
                     
                     bool asc = col.HeaderCell.SortGlyphDirection == SortOrder.Ascending;
-                    
-                    SortingOrder = $"[{col.Name}] {(asc ? "DESC" : "ASC")}";
+
+                    setSorting($"[{col.Name}] {(asc ? "DESC" : "ASC")}");
                     assignDataSource();
 
                     dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = asc ? SortOrder.Descending : SortOrder.Ascending;
@@ -939,7 +956,7 @@ namespace DataTableConverter
 
         private void resetSort(DataGridViewColumn col)
         {
-            SortingOrder = string.Empty;
+            setSorting(string.Empty);
             assignDataSource();
         }
 
@@ -994,12 +1011,45 @@ namespace DataTableConverter
             importToolStripMenuItem_Click(null, null, ImportState.Header);
         }
 
+        private void dgTable_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex == -1 && e.ColumnIndex > -1)
+            {
+                string header = e.Value.ToString();
+                var count = dictKeys.IndexOf(header);
+                SortOrder order = SortOrder.None;
+                if (count >= 0)
+                {
+                    count++;
+                    e.Graphics.FillRectangle(new SolidBrush(e.CellStyle.BackColor), e.CellBounds);
+                    e.Paint(e.ClipBounds, (DataGridViewPaintParts.All & ~DataGridViewPaintParts.Background));
+                    
+                    e.Graphics.DrawString($"{count}", dgTable.DefaultCellStyle.Font, new SolidBrush(Color.Black), e.CellBounds.X + e.CellBounds.Width-20, e.CellBounds.Y + 5, StringFormat.GenericDefault);
+                    e.Handled = true;
+                    order = dictSorting[header];
+                }
+                dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = order;
+            }
+
+        }
+
+        private void großKleinschreibungToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UpLowCaseForm form = new UpLowCaseForm(DataHelper.getHeadersOfDataTable(getDataSource()));
+            if (form.ShowDialog() == DialogResult.OK) {
+                List<WorkProc> list = new List<WorkProc>();
+                list.Add(new ProcUpLowCase(form.getColumns(), form.allColumns(), form.getOption()));
+                Work workflow = new Work(string.Empty, list, 0);
+                workflow_Click(null, null, workflow);
+            }
+        }
+
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SortForm form = new SortForm(DataHelper.getHeadersOfDataTable(getDataSource()), SortingOrder);
             if(form.ShowDialog() == DialogResult.OK)
             {
-                SortingOrder = form.SortString;
+                setSorting(form.SortString);
                 assignDataSource();
             }
         }

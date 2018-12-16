@@ -70,17 +70,13 @@ namespace DataTableConverter.View
 
         }
 
-        private void Administration_Load(object sender, EventArgs e)
-        {
-            
-        }
-
         private void addContextMenu()
         {
             viewHelper.addContextMenuToDataGridView(dgTolerance, true);
             viewHelper.addContextMenuToDataGridView(dgCaseColumns, true);
             viewHelper.addContextMenuToDataGridView(dgvColumns, true);
             viewHelper.addContextMenuToDataGridView(dgvReplaces, true);
+            viewHelper.addContextMenuToDataGridView(dgUpLow, true);
             viewHelper.addContextMenuToDataGridView(dgOrderColumns, false);
         }
 
@@ -106,12 +102,14 @@ namespace DataTableConverter.View
             //gbState.Add(gbTrim, ProcedureState.Trim);
             gbState.Add(gbProcedure, typeof(ProcUser));
             gbState.Add(gbOrder, typeof(ProcOrder));
+            gbState.Add(gbUpLowCase, typeof(ProcUpLowCase));
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
                 { typeof(ProcUser), setUserControls},
                 { typeof(ProcDuplicate), setDuplicateControls },
                 { typeof(ProcMerge), setMergeControls },
                 { typeof(ProcOrder), setOrderControls },
+                { typeof(ProcUpLowCase), setUpLowCaseControls },
                 { typeof(ProcTrim), setTrimControls }
             };
         }
@@ -313,9 +311,10 @@ namespace DataTableConverter.View
         private void generateProceduresForWorkflow()
         {
             SystemProc = new List<Proc>();
-            SystemProc.Add(new Proc("Trim", null, 1));
-            SystemProc.Add(new Proc("Spalten zusammenfügen", null, 2));
-            SystemProc.Add(new Proc("Sortieren", null, 3));
+            SystemProc.Add(new Proc(ProcTrim.ClassName, null, 1));
+            SystemProc.Add(new Proc(ProcMerge.ClassName, null, 2));
+            SystemProc.Add(new Proc(ProcOrder.ClassName, null, 3));
+            SystemProc.Add(new Proc(ProcUpLowCase.ClassName, null, 4));
 
             generateDuplicateProc();
         }
@@ -485,6 +484,18 @@ namespace DataTableConverter.View
             }
             dgColumnDefDuplicate.DataSource = table;
             dgColumnDefDuplicate.Columns[0].ReadOnly = true;
+        }
+
+        private void setUpLowCaseControls(WorkProc proc)
+        {
+            ProcUpLowCase selectedProc = ((ProcUpLowCase)proc);
+            lblOriginalNameText.Text = ProcUpLowCase.ClassName;
+            cbUpLow.Checked = selectedProc.AllColumns;
+            cmbUpLow.SelectedIndex = selectedProc.Option;
+            dgUpLow.DataSource = null;
+            dgUpLow.DataSource = selectedProc.Columns;
+            setUpLowEnabled(!selectedProc.AllColumns);
+
         }
 
         private void setOrderControls(WorkProc selectedProc)
@@ -993,22 +1004,7 @@ namespace DataTableConverter.View
 
         private void clbHeaderProcedure_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (e.NewValue == CheckState.Checked)
-            {
-                dgvColumns.Rows.Add(clbHeaderProcedure.Items[e.Index]);
-            }
-            else
-            {
-                bool found = false;
-                for(int i = dgvColumns.Rows.Count-1; i >= 0 && !found; i--)
-                {
-                    if(dgvColumns.Rows[i].Cells[0] == clbHeaderProcedure.Items[e.Index])
-                    {
-                        dgvColumns.Rows.RemoveAt(i);
-                        found = true;
-                    }
-                }
-            }
+            ViewHelper.addRemoveHeaderThroughCheckedListBox(dgvColumns, e, (CheckedListBox)sender);
         }
 
         private void clbHeaderOrder_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -1065,5 +1061,26 @@ namespace DataTableConverter.View
             (sender as ComboBox).DroppedDown = true;
         }
 
+        private void cmbUpLow_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ((ProcUpLowCase)getSelectedWorkProcedure()).Option = cmbUpLow.SelectedIndex;
+        }
+
+        private void cbUpLow_CheckedChanged(object sender, EventArgs e)
+        {
+            
+            ((ProcUpLowCase)getSelectedWorkProcedure()).AllColumns = cbUpLow.Checked;
+            setUpLowEnabled(!cbUpLow.Checked);
+        }
+
+        private void setUpLowEnabled(bool status)
+        {
+            clbUpLowHeader.Enabled = dgUpLow.Enabled = status;
+        }
+
+        private void clbUpLowHeader_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.addRemoveHeaderThroughCheckedListBox(dgUpLow, e, (CheckedListBox)sender);
+        }
     }
 }

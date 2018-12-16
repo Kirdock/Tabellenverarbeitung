@@ -125,7 +125,7 @@ namespace DataTableConverter
             }
         }
 
-        private static Dictionary<string, SortOrder> generateSortingList(string orderBefore)
+        internal static Dictionary<string, SortOrder> generateSortingList(string orderBefore)
         {
             Dictionary<string, SortOrder> dict = new Dictionary<string, SortOrder>();
             if (!string.IsNullOrWhiteSpace(orderBefore))
@@ -239,6 +239,26 @@ namespace DataTableConverter
             List<int> selectedColumns = sender.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.ColumnIndex).Where(col => col != sender.Columns.Count - 1).Distinct().ToList();
             selectedColumns.Sort();
             return selectedColumns;
+        }
+
+        internal static void addRemoveHeaderThroughCheckedListBox(DataGridView sender, ItemCheckEventArgs e, CheckedListBox headers)
+        {
+            if (e.NewValue == CheckState.Checked)
+            {
+                sender.Rows.Add(headers.Items[e.Index]);
+            }
+            else
+            {
+                bool found = false;
+                for (int i = sender.Rows.Count - 1; i >= 0 && !found; i--)
+                {
+                    if (sender.Rows[i].Cells[0] == headers.Items[e.Index])
+                    {
+                        sender.Rows.RemoveAt(i);
+                        found = true;
+                    }
+                }
+            }
         }
 
         internal static string adjustSort(string adjustSort, string column, string newColumn)

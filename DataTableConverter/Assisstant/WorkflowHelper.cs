@@ -82,16 +82,21 @@ namespace DataTableConverter.Assisstant
                 case 1:
                     switch (id)
                     {
-                        case 1:
-                            newProc = new ProcTrim(ordinal, id, name);
-                            break;
-
                         case 2:
                             newProc = new ProcMerge(ordinal, id, name);
                             break;
 
-                        default:
+                        case 3:
                             newProc = new ProcOrder(ordinal, id, name);
+                            break;
+
+                        case 4:
+                            newProc = new ProcUpLowCase(ordinal, id, name);
+                            break;
+
+                        case 1:
+                        default:
+                            newProc = new ProcTrim(ordinal, id, name);
                             break;
                     }
                     break;

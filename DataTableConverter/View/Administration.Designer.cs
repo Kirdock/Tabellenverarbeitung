@@ -95,6 +95,13 @@
             this.txtToleranceName = new System.Windows.Forms.TextBox();
             this.lbTolerances = new System.Windows.Forms.ListBox();
             this.dgTolerance = new System.Windows.Forms.DataGridView();
+            this.gbUpLowCase = new System.Windows.Forms.GroupBox();
+            this.lblUpLowCaseHeader = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.dgUpLow = new System.Windows.Forms.DataGridView();
+            this.cmbUpLow = new System.Windows.Forms.ComboBox();
+            this.cbUpLow = new System.Windows.Forms.CheckBox();
+            this.clbUpLowHeader = new CheckComboBoxTest.CheckedComboBox();
             this.clbHeaderProcedure = new CheckComboBoxTest.CheckedComboBox();
             this.clbHeaderOrder = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
@@ -122,6 +129,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgTolerance)).BeginInit();
+            this.gbUpLowCase.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgUpLow)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -250,6 +259,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.gbUpLowCase);
             this.tabPage2.Controls.Add(this.gbProcedure);
             this.tabPage2.Controls.Add(this.gbOrder);
             this.tabPage2.Controls.Add(this.gbWorkflow);
@@ -843,6 +853,88 @@
             this.dgTolerance.Size = new System.Drawing.Size(175, 282);
             this.dgTolerance.TabIndex = 2;
             // 
+            // gbUpLowCase
+            // 
+            this.gbUpLowCase.Controls.Add(this.cbUpLow);
+            this.gbUpLowCase.Controls.Add(this.cmbUpLow);
+            this.gbUpLowCase.Controls.Add(this.lblUpLowCaseHeader);
+            this.gbUpLowCase.Controls.Add(this.clbUpLowHeader);
+            this.gbUpLowCase.Controls.Add(this.label12);
+            this.gbUpLowCase.Controls.Add(this.dgUpLow);
+            this.gbUpLowCase.Location = new System.Drawing.Point(856, 88);
+            this.gbUpLowCase.Name = "gbUpLowCase";
+            this.gbUpLowCase.Size = new System.Drawing.Size(268, 304);
+            this.gbUpLowCase.TabIndex = 10;
+            this.gbUpLowCase.TabStop = false;
+            this.gbUpLowCase.Text = "Spaltenangabe";
+            // 
+            // lblUpLowCaseHeader
+            // 
+            this.lblUpLowCaseHeader.AutoSize = true;
+            this.lblUpLowCaseHeader.Location = new System.Drawing.Point(6, 86);
+            this.lblUpLowCaseHeader.Name = "lblUpLowCaseHeader";
+            this.lblUpLowCaseHeader.Size = new System.Drawing.Size(209, 13);
+            this.lblUpLowCaseHeader.TabIndex = 9;
+            this.lblUpLowCaseHeader.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(3, 131);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(121, 13);
+            this.label12.TabIndex = 5;
+            this.label12.Text = "Angewendeten Spalten:";
+            // 
+            // dgUpLow
+            // 
+            this.dgUpLow.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgUpLow.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgUpLow.Location = new System.Drawing.Point(6, 150);
+            this.dgUpLow.Name = "dgUpLow";
+            this.dgUpLow.RowHeadersVisible = false;
+            this.dgUpLow.Size = new System.Drawing.Size(256, 149);
+            this.dgUpLow.TabIndex = 0;
+            // 
+            // cmbUpLow
+            // 
+            this.cmbUpLow.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbUpLow.FormattingEnabled = true;
+            this.cmbUpLow.Items.AddRange(new object[] {
+            "Alles Großbuchstaben",
+            "Alles Kleinbuchstaben",
+            "Erster Buchstabe groß"});
+            this.cmbUpLow.Location = new System.Drawing.Point(9, 16);
+            this.cmbUpLow.Name = "cmbUpLow";
+            this.cmbUpLow.Size = new System.Drawing.Size(250, 21);
+            this.cmbUpLow.TabIndex = 10;
+            this.cmbUpLow.SelectedIndexChanged += new System.EventHandler(this.cmbUpLow_SelectedIndexChanged);
+            // 
+            // cbUpLow
+            // 
+            this.cbUpLow.AutoSize = true;
+            this.cbUpLow.Location = new System.Drawing.Point(6, 58);
+            this.cbUpLow.Name = "cbUpLow";
+            this.cbUpLow.Size = new System.Drawing.Size(159, 17);
+            this.cbUpLow.TabIndex = 11;
+            this.cbUpLow.Text = "Auf alle Spalten anwenden?";
+            this.cbUpLow.UseVisualStyleBackColor = true;
+            this.cbUpLow.CheckedChanged += new System.EventHandler(this.cbUpLow_CheckedChanged);
+            // 
+            // clbUpLowHeader
+            // 
+            this.clbUpLowHeader.CheckOnClick = true;
+            this.clbUpLowHeader.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.clbUpLowHeader.DropDownHeight = 1;
+            this.clbUpLowHeader.FormattingEnabled = true;
+            this.clbUpLowHeader.IntegralHeight = false;
+            this.clbUpLowHeader.Location = new System.Drawing.Point(6, 100);
+            this.clbUpLowHeader.Name = "clbUpLowHeader";
+            this.clbUpLowHeader.Size = new System.Drawing.Size(256, 21);
+            this.clbUpLowHeader.TabIndex = 8;
+            this.clbUpLowHeader.ValueSeparator = ", ";
+            this.clbUpLowHeader.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbUpLowHeader_ItemCheck);
+            // 
             // clbHeaderProcedure
             // 
             this.clbHeaderProcedure.CheckOnClick = true;
@@ -895,7 +987,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Verwaltung";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Administration_FormClosing);
-            this.Load += new System.EventHandler(this.Administration_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -928,6 +1019,9 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgTolerance)).EndInit();
+            this.gbUpLowCase.ResumeLayout(false);
+            this.gbUpLowCase.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgUpLow)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1004,5 +1098,12 @@
         private System.Windows.Forms.DataGridView dgOrderColumns;
         private System.Windows.Forms.Label label8;
         private CheckComboBoxTest.CheckedComboBox clbHeaderOrder;
+        private System.Windows.Forms.GroupBox gbUpLowCase;
+        private System.Windows.Forms.ComboBox cmbUpLow;
+        private System.Windows.Forms.Label lblUpLowCaseHeader;
+        private CheckComboBoxTest.CheckedComboBox clbUpLowHeader;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.DataGridView dgUpLow;
+        private System.Windows.Forms.CheckBox cbUpLow;
     }
 }

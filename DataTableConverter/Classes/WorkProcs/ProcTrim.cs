@@ -12,7 +12,7 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     internal class ProcTrim : WorkProc
     {
-        internal static readonly string ClassName = "Spalten zusammenfügen";
+        internal static readonly string ClassName = "Trim";
 
         public ProcTrim() { }
         public ProcTrim(int ordinal, int id, string name) : base(ordinal, id, name) { }

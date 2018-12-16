@@ -64,17 +64,18 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeileEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.spalteEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblFilename = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblRows = new System.Windows.Forms.ToolStripStatusLabel();
-            this.spalteEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -178,7 +179,8 @@
             this.tabelleHinzufügenToolStripMenuItem,
             this.zeilenZusammenfügenToolStripMenuItem2,
             this.überschriftEinlesenToolStripMenuItem,
-            this.zählenToolStripMenuItem});
+            this.zählenToolStripMenuItem,
+            this.großKleinschreibungToolStripMenuItem});
             this.bearbeitenToolStripMenuItem.Name = "bearbeitenToolStripMenuItem";
             this.bearbeitenToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
             this.bearbeitenToolStripMenuItem.Text = "Bearbeiten";
@@ -359,6 +361,12 @@
             this.zeileEinfügenToolStripMenuItem.Text = "Zeile einfügen";
             this.zeileEinfügenToolStripMenuItem.Click += new System.EventHandler(this.zeileEinfügenToolStripMenuItem_Click);
             // 
+            // spalteEinfügenToolStripMenuItem
+            // 
+            this.spalteEinfügenToolStripMenuItem.Name = "spalteEinfügenToolStripMenuItem";
+            this.spalteEinfügenToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.spalteEinfügenToolStripMenuItem.Text = "Spalte einfügen";
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -398,12 +406,6 @@
             this.lblRows.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblRows.Name = "lblRows";
             this.lblRows.Size = new System.Drawing.Size(0, 19);
-            // 
-            // spalteEinfügenToolStripMenuItem
-            // 
-            this.spalteEinfügenToolStripMenuItem.Name = "spalteEinfügenToolStripMenuItem";
-            this.spalteEinfügenToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.spalteEinfügenToolStripMenuItem.Text = "Spalte einfügen";
             // 
             // contextGlobal
             // 
@@ -446,11 +448,19 @@
             this.dgTable.Size = new System.Drawing.Size(800, 369);
             this.dgTable.TabIndex = 0;
             this.dgTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellClick);
+            this.dgTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgTable_CellPainting);
             this.dgTable.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgTable_CellValidating);
             this.dgTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellValueChanged);
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
+            // 
+            // großKleinschreibungToolStripMenuItem
+            // 
+            this.großKleinschreibungToolStripMenuItem.Name = "großKleinschreibungToolStripMenuItem";
+            this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.großKleinschreibungToolStripMenuItem.Text = "Groß-/Kleinschreibung";
+            this.großKleinschreibungToolStripMenuItem.Click += new System.EventHandler(this.großKleinschreibungToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -528,6 +538,7 @@
         private System.Windows.Forms.ToolStripMenuItem deleteRowItem;
         private System.Windows.Forms.ToolStripMenuItem insertRowItem;
         private System.Windows.Forms.ToolStripMenuItem clipboardItem;
+        private System.Windows.Forms.ToolStripMenuItem großKleinschreibungToolStripMenuItem;
     }
 }
 

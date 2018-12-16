@@ -16,7 +16,6 @@ namespace DataTableConverter.Classes
         internal int Ordinal { get; set; }
         virtual internal string NewColumn { get; set; }
         internal string Formula { get; set; }
-        //internal string[] Headers { get; set; }
         public string Name { get; set; }
 
         internal WorkProc() { }
