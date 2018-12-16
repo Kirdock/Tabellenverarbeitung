@@ -489,7 +489,7 @@ namespace DataTableConverter.View
 
         private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.insertClipboardToDataGridView((DataGridView)sender, selectedRow);
+            ViewHelper.insertClipboardToDataGridView((DataGridView)sender, selectedRow, dgvSetting_CellValueChanged);
         }
 
         private void txtBegin_TextChanged(object sender, EventArgs e)

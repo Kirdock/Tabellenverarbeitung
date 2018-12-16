@@ -72,8 +72,7 @@ namespace DataTableConverter
             int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
 
             dgTable.DataSource = null;
-            dgTable.DataSource = ViewHelper.getSortedView(SortingOrder,sourceTable);
-
+            dgTable.DataSource = ViewHelper.getSortedView(SortingOrder, sourceTable);
             if (scrollBarHorizontal != -1)
             {
                 dgTable.FirstDisplayedScrollingColumnIndex = scrollBarHorizontal;
@@ -938,18 +937,14 @@ namespace DataTableConverter
                 DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
                 if (dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection == SortOrder.Descending)
                 {
-                    dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = SortOrder.None;
                     resetSort(col);
                 }
                 else
                 {
-                    
                     bool asc = col.HeaderCell.SortGlyphDirection == SortOrder.Ascending;
 
                     setSorting($"[{col.Name}] {(asc ? "DESC" : "ASC")}");
                     assignDataSource();
-
-                    dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = asc ? SortOrder.Descending : SortOrder.Ascending;
                 }
             }
         }

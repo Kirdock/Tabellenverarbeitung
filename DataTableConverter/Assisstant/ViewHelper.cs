@@ -62,7 +62,7 @@ namespace DataTableConverter
             e.Handled = !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar);
         }
 
-        internal static void insertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex)
+        internal static void insertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, Action<object, DataGridViewCellEventArgs> myfunc = null)
         {
             myDataGridView.BindingContext[myDataGridView.DataSource].EndCurrentEdit();
             DataTable table = ((DataTable)myDataGridView.DataSource).Copy();
@@ -102,6 +102,7 @@ namespace DataTableConverter
                     myDataGridView.DataSource = table;
                 }
             }
+            myfunc?.Invoke(null, null);
         }
 
         internal static DataView getSortedView(string order, DataTable table)
