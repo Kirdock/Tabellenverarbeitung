@@ -67,7 +67,18 @@ namespace DataTableConverter.View
 
             
             addContextMenu();
+            restoreSplitterDistance();
+        }
 
+        private void restoreSplitterDistance()
+        {
+            splitCases.SplitterDistance = Properties.Settings.Default.splitCases;
+            splitTolerances.SplitterDistance = Properties.Settings.Default.splitTolerances;
+            splitDuplicates.SplitterDistance = Properties.Settings.Default.splitDuplicates;
+            splitProcedures.SplitterDistance = Properties.Settings.Default.splitProcedures;
+            splitWorkflow.SplitterDistance = Properties.Settings.Default.splitWorkflow;
+            splitWorkflowProcProperties.SplitterDistance = Properties.Settings.Default.splitWorkflowProcProperties;
+            splitWorkflowProperties.SplitterDistance = Properties.Settings.Default.splitWorkflowProperties;
         }
 
         private void addContextMenu()
@@ -117,11 +128,25 @@ namespace DataTableConverter.View
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
         {
             viewHelper.clear();
+            saveSplitterDistance();
+            
             if (ExportHelper.saveWorkflows(Workflows) || ExportHelper.saveProcedures(Procedures) || ExportHelper.saveTolerances(Tolerances) || ExportHelper.saveCases(Cases))
             {
                 DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
                 e.Cancel = result == DialogResult.No;
             }
+        }
+
+        private void saveSplitterDistance()
+        {
+            Properties.Settings.Default.splitCases = splitCases.SplitterDistance;
+            Properties.Settings.Default.splitTolerances = splitTolerances.SplitterDistance;
+            Properties.Settings.Default.splitDuplicates = splitDuplicates.SplitterDistance;
+            Properties.Settings.Default.splitProcedures = splitProcedures.SplitterDistance;
+            Properties.Settings.Default.splitWorkflow = splitWorkflow.SplitterDistance;
+            Properties.Settings.Default.splitWorkflowProcProperties = splitWorkflowProcProperties.SplitterDistance;
+            Properties.Settings.Default.splitWorkflowProperties = splitWorkflowProperties.SplitterDistance;
+            Properties.Settings.Default.Save();
         }
 
         

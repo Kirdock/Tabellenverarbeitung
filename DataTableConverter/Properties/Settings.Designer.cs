@@ -129,5 +129,89 @@ namespace DataTableConverter.Properties {
                 this["TextEnd"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("456")]
+        public int splitDuplicates {
+            get {
+                return ((int)(this["splitDuplicates"]));
+            }
+            set {
+                this["splitDuplicates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("207")]
+        public int splitTolerances {
+            get {
+                return ((int)(this["splitTolerances"]));
+            }
+            set {
+                this["splitTolerances"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("220")]
+        public int splitCases {
+            get {
+                return ((int)(this["splitCases"]));
+            }
+            set {
+                this["splitCases"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("375")]
+        public int splitProcedures {
+            get {
+                return ((int)(this["splitProcedures"]));
+            }
+            set {
+                this["splitProcedures"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("240")]
+        public int splitWorkflow {
+            get {
+                return ((int)(this["splitWorkflow"]));
+            }
+            set {
+                this["splitWorkflow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("596")]
+        public int splitWorkflowProcProperties {
+            get {
+                return ((int)(this["splitWorkflowProcProperties"]));
+            }
+            set {
+                this["splitWorkflowProcProperties"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("239")]
+        public int splitWorkflowProperties {
+            get {
+                return ((int)(this["splitWorkflowProperties"]));
+            }
+            set {
+                this["splitWorkflowProperties"] = value;
+            }
+        }
     }
 }

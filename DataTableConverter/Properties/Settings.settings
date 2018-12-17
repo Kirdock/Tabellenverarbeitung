@@ -29,5 +29,26 @@
     <Setting Name="TextEnd" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="splitDuplicates" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">456</Value>
+    </Setting>
+    <Setting Name="splitTolerances" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">207</Value>
+    </Setting>
+    <Setting Name="splitCases" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">220</Value>
+    </Setting>
+    <Setting Name="splitProcedures" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">375</Value>
+    </Setting>
+    <Setting Name="splitWorkflow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">240</Value>
+    </Setting>
+    <Setting Name="splitWorkflowProcProperties" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">596</Value>
+    </Setting>
+    <Setting Name="splitWorkflowProperties" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">239</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
