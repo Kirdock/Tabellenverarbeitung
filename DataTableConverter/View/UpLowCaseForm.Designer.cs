@@ -36,6 +36,7 @@
             // 
             // clbHeaders
             // 
+            this.clbHeaders.CheckOnClick = true;
             this.clbHeaders.FormattingEnabled = true;
             this.clbHeaders.Location = new System.Drawing.Point(12, 73);
             this.clbHeaders.Name = "clbHeaders";
@@ -60,7 +61,8 @@
             this.cmbOption.Items.AddRange(new object[] {
             "Alles Großbuchstaben",
             "Alles Kleinbuchstaben",
-            "Erster Buchstabe groß"});
+            "Erster Buchstabe groß",
+            "Erste Buchstaben groß"});
             this.cmbOption.Location = new System.Drawing.Point(12, 12);
             this.cmbOption.Name = "cmbOption";
             this.cmbOption.Size = new System.Drawing.Size(205, 21);

@@ -12,7 +12,7 @@ namespace DataTableConverter.Classes.WorkProcs
     internal class ProcUpLowCase : WorkProc
     {
         public static readonly string ClassName = "Groß-/Kleinschreibung";
-        public int Option; //0: UpperCase; 1: LowerCase, 2: first letter UpperCase
+        public int Option; //0: UpperCase; 1: LowerCase, 2: first letter UpperCase, 3: first letters Uppercase
         public bool AllColumns { get; set; }
         public override string[] getHeaders()
         {
@@ -75,6 +75,11 @@ namespace DataTableConverter.Classes.WorkProcs
                                 value = value.ToLower();
                                 break;
 
+                            //Erster Buchstabe groß
+                            case 2:
+                                value = value.First().ToString().ToUpper() + value.Substring(1).ToLower();
+                                break;
+
                             //Erste Buchstaben groß
                             default:
                                 value = firstLettersUpperCase(value);
@@ -107,6 +112,10 @@ namespace DataTableConverter.Classes.WorkProcs
                     {
                         array[i] = char.ToUpper(array[i]);
                     }
+                }
+                else
+                {
+                    array[i] = char.ToLower(array[i]);
                 }
             }
             return new string(array);
