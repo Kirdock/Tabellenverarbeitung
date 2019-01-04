@@ -190,6 +190,7 @@
             // 
             this.splitProcedures.BackColor = System.Drawing.Color.Gainsboro;
             this.splitProcedures.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitProcedures.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitProcedures.Location = new System.Drawing.Point(3, 3);
             this.splitProcedures.Name = "splitProcedures";
             // 
@@ -303,6 +304,7 @@
             // 
             this.splitWorkflow.BackColor = System.Drawing.Color.Gainsboro;
             this.splitWorkflow.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitWorkflow.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitWorkflow.Location = new System.Drawing.Point(3, 3);
             this.splitWorkflow.Name = "splitWorkflow";
             // 
@@ -357,6 +359,7 @@
             // 
             this.splitWorkflowProcProperties.BackColor = System.Drawing.Color.Transparent;
             this.splitWorkflowProcProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitWorkflowProcProperties.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitWorkflowProcProperties.Location = new System.Drawing.Point(0, 0);
             this.splitWorkflowProcProperties.Name = "splitWorkflowProcProperties";
             // 
@@ -393,6 +396,7 @@
             // 
             this.splitWorkflowProperties.BackColor = System.Drawing.Color.Gainsboro;
             this.splitWorkflowProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitWorkflowProperties.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitWorkflowProperties.Location = new System.Drawing.Point(3, 16);
             this.splitWorkflowProperties.Name = "splitWorkflowProperties";
             // 
@@ -960,6 +964,7 @@
             // 
             this.splitDuplicates.BackColor = System.Drawing.Color.Gainsboro;
             this.splitDuplicates.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitDuplicates.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitDuplicates.Location = new System.Drawing.Point(3, 3);
             this.splitDuplicates.Name = "splitDuplicates";
             // 
@@ -991,6 +996,7 @@
             // 
             this.splitTolerances.BackColor = System.Drawing.Color.Gainsboro;
             this.splitTolerances.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitTolerances.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitTolerances.Location = new System.Drawing.Point(3, 16);
             this.splitTolerances.Name = "splitTolerances";
             // 
@@ -1091,6 +1097,7 @@
             // 
             this.splitCases.BackColor = System.Drawing.Color.Gainsboro;
             this.splitCases.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitCases.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitCases.Location = new System.Drawing.Point(3, 16);
             this.splitCases.Name = "splitCases";
             // 
