@@ -23,6 +23,7 @@ namespace DataTableConverter
         internal static readonly string ProjectTolerance = $@"{ProjectPath}\Toleranzen.bin";
         internal static readonly string ProjectCases = $@"{ProjectPath}\Fälle.bin";
         internal static readonly string ProjectWorkflows = $@"{ProjectPath}\Arbeitsabläufe.bin";
+        private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(858);
 
 
@@ -112,12 +113,12 @@ namespace DataTableConverter
             StringBuilder sb = new StringBuilder();
 
             IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
-            sb.AppendLine(string.Join(",", columnNames));
+            sb.AppendLine(string.Join(CSVSeparator, columnNames));
 
             foreach (DataRow row in dt.Rows)
             {
                 IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                sb.AppendLine(string.Join(",", fields));
+                sb.AppendLine(string.Join(CSVSeparator, fields));
             }
             File.WriteAllText($@"{directory}\{filename}.csv", sb.ToString());
         }
