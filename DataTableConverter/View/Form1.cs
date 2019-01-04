@@ -277,7 +277,7 @@ namespace DataTableConverter
             {
                 List<string> notFoundColumns = new List<string>();
                 
-                WorkflowHelper.checkHeaders(headers, notFoundColumns, wp.getHeaders());
+                WorkflowHelper.checkHeaders(headers, notFoundColumns, wp.GetHeaders());
                 if (!string.IsNullOrWhiteSpace(wp.NewColumn))
                 {
                     headers.Add(wp.NewColumn);
@@ -308,7 +308,7 @@ namespace DataTableConverter
 
                     foreach (NotFoundHeaders nf in notFound)
                     {
-                        string[] wpHeaders = nf.Wp.getHeaders();
+                        string[] wpHeaders = nf.Wp.GetHeaders();
                         for (int y = 0; y < wpHeaders.Length; y++)
                         {
                             for (int i = 0; i < from.Length; i++)
@@ -676,33 +676,9 @@ namespace DataTableConverter
             Formula formula = (Formula)sender;
             if (formula.DialogResult == DialogResult.OK)
             {
-                DataTable data = getDataSource();
-                List<string> notFoundColumns = new List<string>();
                 ProcMerge proc = new ProcMerge(formula.getFormula());
-
-                WorkflowHelper.checkHeaders(DataHelper.getHeadersToLower(data), notFoundColumns, proc.getHeaders());
-                int column = data.Columns.Count;
-
-                bool cont = true;
-                if (notFoundColumns.Count > 0)
-                {
-                    SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundColumns.ToArray(), DataHelper.getHeadersOfDataTable(data));
-                    if( cont = (form.ShowDialog() == DialogResult.OK))
-                    {
-                        string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
-                        string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
-                        for(int i = 0; i < from.Length; i++)
-                        {
-                            proc.renameHeaders(from[i], to[i]);
-                        }
-                    }
-                }
-                if(cont)
-                {
-                    proc.doWork(data, out string sortingOrder, null, null, null);
-                    assignDataSource(data);
-                    addDataSourceAddColumn(column);
-                }
+                proc.NewColumn = formula.getHeaderName();
+                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc>() { proc }, 0));
             }
         }
 

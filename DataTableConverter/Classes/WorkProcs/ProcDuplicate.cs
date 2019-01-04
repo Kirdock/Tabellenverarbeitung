@@ -24,7 +24,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Name = name;
         }
 
-        public override string[] getHeaders()
+        public override string[] GetHeaders()
         {
             return WorkflowHelper.removeEmptyHeaders(DuplicateColumns);
         }

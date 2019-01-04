@@ -15,7 +15,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public ProcOrder(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public override string[] getHeaders()
+        public override string[] GetHeaders()
         {
             return WorkflowHelper.removeEmptyHeaders(DuplicateColumns);
         }

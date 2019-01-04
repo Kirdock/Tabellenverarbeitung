@@ -44,9 +44,9 @@
             this.wiederholenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabellenZusammenfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabelleHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.zeilenZusammenfügenToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.überschriftEinlesenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zählenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.verwaltungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.funktionenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,7 +75,6 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -177,7 +176,6 @@
             this.wiederholenToolStripMenuItem,
             this.tabellenZusammenfügenToolStripMenuItem,
             this.tabelleHinzufügenToolStripMenuItem,
-            this.zeilenZusammenfügenToolStripMenuItem2,
             this.überschriftEinlesenToolStripMenuItem,
             this.zählenToolStripMenuItem,
             this.großKleinschreibungToolStripMenuItem});
@@ -215,13 +213,6 @@
             this.tabelleHinzufügenToolStripMenuItem.Text = "Tabelle hinzufügen";
             this.tabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabelleHinzufügenToolStripMenuItem_Click);
             // 
-            // zeilenZusammenfügenToolStripMenuItem2
-            // 
-            this.zeilenZusammenfügenToolStripMenuItem2.Name = "zeilenZusammenfügenToolStripMenuItem2";
-            this.zeilenZusammenfügenToolStripMenuItem2.Size = new System.Drawing.Size(210, 22);
-            this.zeilenZusammenfügenToolStripMenuItem2.Text = "Spalten zusammenfügen";
-            this.zeilenZusammenfügenToolStripMenuItem2.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click);
-            // 
             // überschriftEinlesenToolStripMenuItem
             // 
             this.überschriftEinlesenToolStripMenuItem.Name = "überschriftEinlesenToolStripMenuItem";
@@ -235,6 +226,13 @@
             this.zählenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.zählenToolStripMenuItem.Text = "Zählen";
             this.zählenToolStripMenuItem.Click += new System.EventHandler(this.zählenToolStripMenuItem_Click);
+            // 
+            // großKleinschreibungToolStripMenuItem
+            // 
+            this.großKleinschreibungToolStripMenuItem.Name = "großKleinschreibungToolStripMenuItem";
+            this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.großKleinschreibungToolStripMenuItem.Text = "Groß-/Kleinschreibung";
+            this.großKleinschreibungToolStripMenuItem.Click += new System.EventHandler(this.großKleinschreibungToolStripMenuItem_Click);
             // 
             // verwaltungToolStripMenuItem
             // 
@@ -261,8 +259,8 @@
             // zeilenZusammenfügenToolStripMenuItem1
             // 
             this.zeilenZusammenfügenToolStripMenuItem1.Name = "zeilenZusammenfügenToolStripMenuItem1";
-            this.zeilenZusammenfügenToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
-            this.zeilenZusammenfügenToolStripMenuItem1.Text = "Zeilen zusammenfügen";
+            this.zeilenZusammenfügenToolStripMenuItem1.Size = new System.Drawing.Size(205, 22);
+            this.zeilenZusammenfügenToolStripMenuItem1.Text = "Spalten zusammenfügen";
             this.zeilenZusammenfügenToolStripMenuItem1.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click);
             // 
             // arbeitsablaufToolStripMenuItem
@@ -455,13 +453,6 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
-            // großKleinschreibungToolStripMenuItem
-            // 
-            this.großKleinschreibungToolStripMenuItem.Name = "großKleinschreibungToolStripMenuItem";
-            this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.großKleinschreibungToolStripMenuItem.Text = "Groß-/Kleinschreibung";
-            this.großKleinschreibungToolStripMenuItem.Click += new System.EventHandler(this.großKleinschreibungToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -516,7 +507,6 @@
         private System.Windows.Forms.ToolStripStatusLabel lblRows;
         private System.Windows.Forms.ToolStripMenuItem zeilenZusammenfügenToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem tabellenZusammenfügenToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem zeilenZusammenfügenToolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem spalteHinzufügenToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem verwaltungToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem öffnenToolStripMenuItem1;

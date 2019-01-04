@@ -8,7 +8,7 @@ using System.Linq;
 namespace DataTableConverter.Classes
 {
     [Serializable()]
-    class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>
+    abstract class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>
     {
         public int ProcedureId { get; set; }
         internal DataTable Columns { get; set; }
@@ -50,20 +50,10 @@ namespace DataTableConverter.Classes
             return hashCode;
         }
 
-        virtual public string[] getHeaders()
-        {
-            return new string[0];
-        }
+        abstract public string[] GetHeaders();
 
-        virtual public void renameHeaders(string oldName, string newName)
-        {
-            return;
-        }
+        abstract public void renameHeaders(string oldName, string newName);
 
-        virtual public void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
-        {
-            sortingOrder = string.Empty;
-            return;
-        }
+        abstract public void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure);
     }
 }

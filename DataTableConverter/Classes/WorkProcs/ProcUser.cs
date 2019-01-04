@@ -12,7 +12,7 @@ namespace DataTableConverter.Classes.WorkProcs
     internal class ProcUser : WorkProc
     {
 
-        public override string[] getHeaders()
+        public override string[] GetHeaders()
         {
             return WorkflowHelper.removeEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
         }
@@ -43,7 +43,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
         {
             int lastCol = table.Columns.Count;
-            string[] columns = getHeaders();
+            string[] columns = GetHeaders();
             sortingOrder = string.Empty;
             bool intoNewCol = false;
             DataTable replaces = procedure.Replace;

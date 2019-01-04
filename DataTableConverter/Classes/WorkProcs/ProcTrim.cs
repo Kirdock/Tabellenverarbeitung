@@ -17,7 +17,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public ProcTrim() { }
         public ProcTrim(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public override string[] getHeaders()
+        public override string[] GetHeaders()
         {
             return new string[0];
         }

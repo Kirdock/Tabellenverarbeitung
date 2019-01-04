@@ -20,7 +20,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Formula = formula;
         }
 
-        public override string[] getHeaders()
+        public override string[] GetHeaders()
         {
             string regularExpressionPattern = @"\[(.*?)\]";
             Regex re = new Regex(regularExpressionPattern);
@@ -43,7 +43,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
         {
             sortingOrder = string.Empty; //base(table, sortingOrder, columns)
-            string[] columns = getHeaders();
+            string[] columns = GetHeaders();
             int column = table.Columns.Count;
             DataHelper.addColumn(NewColumn, table);
 

@@ -14,7 +14,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public static readonly string ClassName = "Groß-/Kleinschreibung";
         public int Option; //0: UpperCase; 1: LowerCase, 2: first letter UpperCase, 3: first letters Uppercase
         public bool AllColumns { get; set; }
-        public override string[] getHeaders()
+        public override string[] GetHeaders()
         {
             return AllColumns ? new string[0] : WorkflowHelper.removeEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
         }
@@ -49,7 +49,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
         {
 
-            string[] columns = getHeaders();
+            string[] columns = GetHeaders();
             sortingOrder = string.Empty;
             
             

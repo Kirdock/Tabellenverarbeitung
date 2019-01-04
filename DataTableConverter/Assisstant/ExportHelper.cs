@@ -216,22 +216,21 @@ namespace DataTableConverter
 
                 FileStream stream = new FileStream(fullpath, FileMode.Open);
                 byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
-
-                stream.Position = 4;
-                stream.Write(records, 0, records.Length);
-                stream.Close();
-
-                #endregion
-
-                //write all records to file
-                string text;
-                File.AppendAllText(fullpath, text = joinTable(dataTable, max), DbaseEncoding);
-                #region Add End-Terminator
-
                 byte[] bytes = new byte[1];
                 bytes[0] = 0x1A;
 
-                stream = new FileStream(fullpath, FileMode.Append);
+                string text = joinTable(dataTable, max);
+                stream.Position = 4;
+                stream.Write(records, 0, records.Length);
+
+                stream.Position = stream.Length;
+                
+                if(stream.ReadByte() == bytes[0])
+                {
+                    stream.Position--;
+                }
+                
+                stream.Write(DbaseEncoding.GetBytes(text), 0, text.Length);
                 stream.Write(bytes, 0, bytes.Length);
                 stream.Close();
 
@@ -246,7 +245,7 @@ namespace DataTableConverter
 
         private static void createTable(DataTable table, int[] max, string path, string filename)
         {
-            StringBuilder csb = new StringBuilder($"create table {filename} (");
+            StringBuilder csb = new StringBuilder($"create table [{filename}] (");
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 csb.Append($"[{table.Columns[i].ColumnName}] varchar({max[i]}),");
