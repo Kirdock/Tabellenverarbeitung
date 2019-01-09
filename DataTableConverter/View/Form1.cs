@@ -31,9 +31,10 @@ namespace DataTableConverter
         private string tableValueBefore;
         private DataTable sourceTable;
         private string SortingOrder;
-        Dictionary<string, SortOrder> dictSorting;
+        private Dictionary<string, SortOrder> dictSorting;
         private int rowBefore; //Wenn eine Zelle im DataGridView geändert wird, kann ich mit dgTable[col, row] den geänderten Wert nicht holen, da die DataGridView zu diesem Zeitpunkt wieder sortiert wurde
         private List<string> dictKeys;
+        private readonly int SystemProcedureCount = 4;
 
         internal Form1(DataTable table = null)
         {
@@ -72,7 +73,7 @@ namespace DataTableConverter
             int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
 
             dgTable.DataSource = null;
-            dgTable.DataSource = ViewHelper.getSortedView(SortingOrder, sourceTable);
+            dgTable.DataSource = ViewHelper.GetSortedView(SortingOrder, sourceTable);
             if (scrollBarHorizontal != -1)
             {
                 dgTable.FirstDisplayedScrollingColumnIndex = scrollBarHorizontal;
@@ -96,7 +97,7 @@ namespace DataTableConverter
 
         private void assignDataSourceColumnChange(DataTable table, string column, string newColumn = null)
         {
-            setSorting(ViewHelper.adjustSort(getSorting(), column, newColumn));
+            setSorting(ViewHelper.AdjustSort(getSorting(), column, newColumn));
             
             assignDataSource(table);            
             restoreDataGridSortMode();
@@ -208,7 +209,7 @@ namespace DataTableConverter
 
         private void loadProcedures(List<Proc> proc = null)
         {
-            for (int i = 2; i < funktionenToolStripMenuItem.DropDownItems.Count;)
+            for (int i = SystemProcedureCount; i < funktionenToolStripMenuItem.DropDownItems.Count;)
             {
                 funktionenToolStripMenuItem.DropDownItems.RemoveAt(i);
             }
@@ -277,7 +278,7 @@ namespace DataTableConverter
             {
                 List<string> notFoundColumns = new List<string>();
                 
-                WorkflowHelper.checkHeaders(headers, notFoundColumns, wp.GetHeaders());
+                WorkflowHelper.CheckHeaders(headers, notFoundColumns, wp.GetHeaders());
                 if (!string.IsNullOrWhiteSpace(wp.NewColumn))
                 {
                     headers.Add(wp.NewColumn);
@@ -708,7 +709,7 @@ namespace DataTableConverter
 
         private void dgTable_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
-            ViewHelper.addNumerationToDataGridView(sender, e, Font);
+            ViewHelper.AddNumerationToDataGridView(sender, e, Font);
         }
 
         private void rückgängigToolStripMenuItem_Click(object sender, EventArgs e)
@@ -880,7 +881,7 @@ namespace DataTableConverter
             ExportCustom export = (ExportCustom)sender;
             if (export.DialogResult == DialogResult.OK)
             {
-                DataTable table = ViewHelper.getSortedView($"[{export.getSelectedValue()}] asc", getDataSource()).ToTable();
+                DataTable table = ViewHelper.GetSortedView($"[{export.getSelectedValue()}] asc", getDataSource()).ToTable();
 
                 Dictionary<string, int> pair = new Dictionary<string, int>();
                 foreach (DataRow row in table.Rows)
@@ -1012,6 +1013,15 @@ namespace DataTableConverter
                 list.Add(new ProcUpLowCase(form.getColumns(), form.allColumns(), form.getOption()));
                 Work workflow = new Work(string.Empty, list, 0);
                 workflow_Click(null, null, workflow);
+            }
+        }
+
+        private void rundenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RoundForm form = new RoundForm(DataHelper.getHeadersOfDataTable(getDataSource()));
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { new ProcRound(form.GetSelectedHeaders(), form.GetDecimals(), form.NewColumn()) }, 0));
             }
         }
 

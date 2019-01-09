@@ -1,4 +1,5 @@
-﻿using DataTableConverter.Assisstant;
+﻿using CheckComboBoxTest;
+using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
 using DataTableConverter.View;
 using System;
@@ -13,24 +14,24 @@ namespace DataTableConverter
 {
     class ViewHelper
     {
-        private EventHandler ctxRowDeleteRowHandler, ctxRowClipboard, ctxRowInsertRowHandler;
-        private ContextMenuStrip ctxRow;
-        private ToolStripItem clipboardItem, deleteRowItem, insertRowItem;
-        private Action<object, EventArgs> myFunction;
+        private EventHandler CtxRowDeleteRowHandler, CtxRowClipboard, CtxRowInsertRowHandler;
+        private ContextMenuStrip CtxRow;
+        private ToolStripItem ClipboardItem, DeleteRowItem, InsertRowItem;
+        private Action<object, EventArgs> MyFunction;
         private List<Work> Workflows;
-        internal int selectedCase { get; set; }
+        internal int SelectedCase { get; set; }
 
         public ViewHelper(ContextMenuStrip ctxrow, Action<object,EventArgs> myfunction, List<Work> workflows)
         {
-            ctxRow = ctxrow;
-            myFunction = myfunction;
-            clipboardItem = ctxRow.Items.Cast<ToolStripItem>().First(x=> x.Name == "clipboardItem");
-            deleteRowItem = ctxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "deleteRowItem");
-            insertRowItem = ctxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "insertRowItem");
+            CtxRow = ctxrow;
+            MyFunction = myfunction;
+            ClipboardItem = CtxRow.Items.Cast<ToolStripItem>().First(x=> x.Name == "clipboardItem");
+            DeleteRowItem = CtxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "deleteRowItem");
+            InsertRowItem = CtxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "insertRowItem");
             Workflows = workflows;
         }
 
-        internal static void addNumerationToDataGridView(object sender, DataGridViewRowPostPaintEventArgs e, Font font)
+        internal static void AddNumerationToDataGridView(object sender, DataGridViewRowPostPaintEventArgs e, Font font)
         {
             var grid = sender as DataGridView;
             var rowIdx = (e.RowIndex + 1).ToString();
@@ -47,22 +48,22 @@ namespace DataTableConverter
             e.Graphics.DrawString(rowIdx, f, SystemBrushes.ControlText, headerBounds, centerFormat);
         }
 
-        internal static void handleDataGridViewNumber(object sender, DataGridViewEditingControlShowingEventArgs e)
+        internal static void HandleDataGridViewNumber(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
-            e.Control.KeyPress -= new KeyPressEventHandler(tx_KeyPress);
+            e.Control.KeyPress -= new KeyPressEventHandler(Tx_KeyPress);
             if (((DataGridView)sender).CurrentCell.ColumnIndex >= 1)
             {
                 TextBox tx = e.Control as TextBox;
-                tx.KeyPress += new KeyPressEventHandler(tx_KeyPress);
+                tx.KeyPress += new KeyPressEventHandler(Tx_KeyPress);
             }
         }
 
-        internal static void tx_KeyPress(object sender, KeyPressEventArgs e)
+        internal static void Tx_KeyPress(object sender, KeyPressEventArgs e)
         {
             e.Handled = !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar);
         }
 
-        internal static void insertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, Action<object, DataGridViewCellEventArgs> myfunc = null)
+        internal static void InsertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, Action<object, DataGridViewCellEventArgs> myfunc = null)
         {
             myDataGridView.BindingContext[myDataGridView.DataSource].EndCurrentEdit();
             DataTable table = ((DataTable)myDataGridView.DataSource).Copy();
@@ -105,7 +106,7 @@ namespace DataTableConverter
             myfunc?.Invoke(null, null);
         }
 
-        internal static DataView getSortedView(string order, DataTable table)
+        internal static DataView GetSortedView(string order, DataTable table)
         {
             Dictionary<string, SortOrder> dict = generateSortingList(order);
             if (dict.Count == 0)
@@ -144,16 +145,16 @@ namespace DataTableConverter
             return dict;
         }
 
-        internal void addContextMenuToDataGridView(DataGridView view,bool clipboard)
+        internal void AddContextMenuToDataGridView(DataGridView view,bool clipboard)
         {
-            view.MouseClick +=(sender, e)=> dataGridView_MouseClick((DataGridView)sender, e, clipboard);
+            view.MouseClick +=(sender, e)=> DataGridView_MouseClick((DataGridView)sender, e, clipboard);
         }
 
-        private void dataGridView_MouseClick(DataGridView view, MouseEventArgs e, bool clipboard)
+        private void DataGridView_MouseClick(DataGridView view, MouseEventArgs e, bool clipboard)
         {
             if (e.Button == MouseButtons.Right)
             {
-                clear();
+                Clear();
                 int selectedRow = view.HitTest(e.X, e.Y).RowIndex;
                 int selectedColumn = view.HitTest(e.X, e.Y).ColumnIndex;
 
@@ -163,39 +164,39 @@ namespace DataTableConverter
                     view[selectedColumn, selectedRow].Selected = true;
                 }
 
-                clipboardItem.Click += ctxRowClipboard = (sender2, e2) => insertClipboardToDataGridView(view, selectedRow);
+                ClipboardItem.Click += CtxRowClipboard = (sender2, e2) => InsertClipboardToDataGridView(view, selectedRow);
 
-                if (deleteRowItem.Visible = (selectedRow > -1 && selectedRow != view.Rows.Count - 1))
+                if (DeleteRowItem.Visible = (selectedRow > -1 && selectedRow != view.Rows.Count - 1))
                 {
 
                     List<int> selectedRows = SelectedRows(view);
-                    deleteRowItem.Text = (selectedRows.Count > 1) ? "Zeilen löschen" : "Zeile löschen";
+                    DeleteRowItem.Text = (selectedRows.Count > 1) ? "Zeilen löschen" : "Zeile löschen";
 
-                    deleteRowItem.Click += ctxRowDeleteRowHandler = (sender2, e2) => deleteRowClick(view, selectedRows);
-                    insertRowItem.Click += ctxRowInsertRowHandler = (sender2, e2) => insertRowClick(view, selectedRow);
+                    DeleteRowItem.Click += CtxRowDeleteRowHandler = (sender2, e2) => DeleteRowClick(view, selectedRows);
+                    InsertRowItem.Click += CtxRowInsertRowHandler = (sender2, e2) => InsertRowClick(view, selectedRow);
                 }
-                clipboardItem.Visible = clipboard;
+                ClipboardItem.Visible = clipboard;
                 
-                ctxRow.Show(view, new Point(e.X, e.Y));
+                CtxRow.Show(view, new Point(e.X, e.Y));
 
             }
         }
 
-        internal void clear()
+        internal void Clear()
         {
-            if (ctxRowDeleteRowHandler != null)
+            if (CtxRowDeleteRowHandler != null)
             {
-                deleteRowItem.Click -= ctxRowDeleteRowHandler;
-                insertRowItem.Click -= ctxRowInsertRowHandler;
+                DeleteRowItem.Click -= CtxRowDeleteRowHandler;
+                InsertRowItem.Click -= CtxRowInsertRowHandler;
             }
             
-            if (ctxRowClipboard != null)
+            if (CtxRowClipboard != null)
             {
-                clipboardItem.Click -= ctxRowClipboard;
+                ClipboardItem.Click -= CtxRowClipboard;
             }
         }
 
-        private void deleteRowClick(DataGridView view, List<int> rowIndizes)
+        private void DeleteRowClick(DataGridView view, List<int> rowIndizes)
         {
             for (int i = rowIndizes.Count - 1; i >= 0; i--)
             {
@@ -207,12 +208,12 @@ namespace DataTableConverter
             }
             if (view.Name == "dgCaseColumns")
             {
-                WorkflowHelper.removeRowThroughCaseChange(Workflows, rowIndizes, selectedCase);
-                myFunction(null, null);
+                WorkflowHelper.RemoveRowThroughCaseChange(Workflows, rowIndizes, SelectedCase);
+                MyFunction(null, null);
             }
         }
 
-        private void insertRowClick(DataGridView view, int rowIndex)
+        private void InsertRowClick(DataGridView view, int rowIndex)
         {
             view.BindingContext?[view.DataSource].EndCurrentEdit();
             DataTable table = (DataTable)view.DataSource;
@@ -222,8 +223,8 @@ namespace DataTableConverter
 
             if (view.Name == "dgCaseColumns")
             {
-                WorkflowHelper.insertRowThroughCaseChange(Workflows, rowIndex, selectedCase);
-                myFunction(null, null);
+                WorkflowHelper.InsertRowThroughCaseChange(Workflows, rowIndex, SelectedCase);
+                MyFunction(null, null);
             }
         }
 
@@ -242,7 +243,7 @@ namespace DataTableConverter
             return selectedColumns;
         }
 
-        internal static void addRemoveHeaderThroughCheckedListBox(DataGridView sender, ItemCheckEventArgs e, CheckedListBox headers)
+        internal static void AddRemoveHeaderThroughCheckedListBox(DataGridView sender, ItemCheckEventArgs e, CheckedListBox headers)
         {
             if (e.NewValue == CheckState.Checked)
             {
@@ -262,8 +263,12 @@ namespace DataTableConverter
             }
         }
 
-        internal static string adjustSort(string adjustSort, string column, string newColumn)
+        internal static string AdjustSort(string adjustSort, string column, string newColumn)
         {
+            if (string.IsNullOrWhiteSpace(adjustSort))
+            {
+                return adjustSort;
+            }
             if (newColumn == null)
             {
                 int indexFrom = adjustSort.IndexOf($"[{column}]");
@@ -278,6 +283,29 @@ namespace DataTableConverter
                 adjustSort = adjustSort.Replace($"[{column}]", $"[{newColumn}]");
             }
             return adjustSort;
+        }
+
+        internal static void CheckAllItemsOfCheckedCombobox(CheckedComboBox cbHeaders,bool status)
+        {
+            for (int i = 0; i < cbHeaders.Items.Count; i++)
+            {
+                cbHeaders.SetItemChecked(i, status);
+            }
+        }
+
+        internal static string[] GetSelectedHeaders(CheckedComboBox cbHeaders)
+        {
+            string[] columns = new string[cbHeaders.CheckedItems.Count];
+            int counter = 0;
+            for (int i = 0; i < cbHeaders.Items.Count; i++)
+            {
+                if (cbHeaders.GetItemChecked(i))
+                {
+                    columns[counter] = cbHeaders.Items[i].ToString();
+                    counter++;
+                }
+            }
+            return columns;
         }
     }
 }

@@ -46,7 +46,6 @@
             this.tabelleHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.überschriftEinlesenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zählenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.verwaltungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.funktionenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,6 +74,8 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rundenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -177,8 +178,7 @@
             this.tabellenZusammenfügenToolStripMenuItem,
             this.tabelleHinzufügenToolStripMenuItem,
             this.überschriftEinlesenToolStripMenuItem,
-            this.zählenToolStripMenuItem,
-            this.großKleinschreibungToolStripMenuItem});
+            this.zählenToolStripMenuItem});
             this.bearbeitenToolStripMenuItem.Name = "bearbeitenToolStripMenuItem";
             this.bearbeitenToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
             this.bearbeitenToolStripMenuItem.Text = "Bearbeiten";
@@ -227,13 +227,6 @@
             this.zählenToolStripMenuItem.Text = "Zählen";
             this.zählenToolStripMenuItem.Click += new System.EventHandler(this.zählenToolStripMenuItem_Click);
             // 
-            // großKleinschreibungToolStripMenuItem
-            // 
-            this.großKleinschreibungToolStripMenuItem.Name = "großKleinschreibungToolStripMenuItem";
-            this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.großKleinschreibungToolStripMenuItem.Text = "Groß-/Kleinschreibung";
-            this.großKleinschreibungToolStripMenuItem.Click += new System.EventHandler(this.großKleinschreibungToolStripMenuItem_Click);
-            // 
             // verwaltungToolStripMenuItem
             // 
             this.verwaltungToolStripMenuItem.Name = "verwaltungToolStripMenuItem";
@@ -245,7 +238,9 @@
             // 
             this.funktionenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.trimToolStripMenuItem,
-            this.zeilenZusammenfügenToolStripMenuItem1});
+            this.zeilenZusammenfügenToolStripMenuItem1,
+            this.großKleinschreibungToolStripMenuItem,
+            this.rundenToolStripMenuItem});
             this.funktionenToolStripMenuItem.Name = "funktionenToolStripMenuItem";
             this.funktionenToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
             this.funktionenToolStripMenuItem.Text = "Funktionen";
@@ -253,7 +248,7 @@
             // trimToolStripMenuItem
             // 
             this.trimToolStripMenuItem.Name = "trimToolStripMenuItem";
-            this.trimToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.trimToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
             this.trimToolStripMenuItem.Text = "Trim";
             // 
             // zeilenZusammenfügenToolStripMenuItem1
@@ -453,6 +448,20 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // großKleinschreibungToolStripMenuItem
+            // 
+            this.großKleinschreibungToolStripMenuItem.Name = "großKleinschreibungToolStripMenuItem";
+            this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.großKleinschreibungToolStripMenuItem.Text = "Groß-/Kleinschreibung";
+            this.großKleinschreibungToolStripMenuItem.Click += new System.EventHandler(this.großKleinschreibungToolStripMenuItem_Click);
+            // 
+            // rundenToolStripMenuItem
+            // 
+            this.rundenToolStripMenuItem.Name = "rundenToolStripMenuItem";
+            this.rundenToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.rundenToolStripMenuItem.Text = "Runden";
+            this.rundenToolStripMenuItem.Click += new System.EventHandler(this.rundenToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -529,6 +538,7 @@
         private System.Windows.Forms.ToolStripMenuItem insertRowItem;
         private System.Windows.Forms.ToolStripMenuItem clipboardItem;
         private System.Windows.Forms.ToolStripMenuItem großKleinschreibungToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rundenToolStripMenuItem;
     }
 }
 

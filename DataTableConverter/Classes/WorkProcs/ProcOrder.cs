@@ -17,7 +17,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.removeEmptyHeaders(DuplicateColumns);
+            return WorkflowHelper.RemoveEmptyHeaders(DuplicateColumns);
         }
 
         public override void renameHeaders(string oldName, string newName)

@@ -12,7 +12,7 @@ namespace DataTableConverter.Assisstant
     class WorkflowHelper
     {
 
-        internal static string getColumnsAsObjectArray(DataRow row, string[] columns, int[] subStringBegin, int[] subStringEnd, List<Tolerance> tolerances)
+        internal static string GetColumnsAsObjectArray(DataRow row, string[] columns, int[] subStringBegin, int[] subStringEnd, List<Tolerance> tolerances)
         {
             StringBuilder res = new StringBuilder();
             for (int i = 0; i < columns.Length; i++)
@@ -56,7 +56,7 @@ namespace DataTableConverter.Assisstant
             return res.ToString();
         }
 
-        internal static void checkHeaders(List<string> tableHeader, List<string> notFoundColumns, string[] headers)
+        internal static void CheckHeaders(List<string> tableHeader, List<string> notFoundColumns, string[] headers)
         {
             for (int i = 0; i < headers.Length; i++)
             {
@@ -68,12 +68,12 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static string[] removeEmptyHeaders(string[] headers)
+        internal static string[] RemoveEmptyHeaders(string[] headers)
         {
             return headers.Where(header => !string.IsNullOrWhiteSpace(header)).ToArray();
         }
 
-        internal static WorkProc createWorkProc(int type, int id, int ordinal, string name)
+        internal static WorkProc CreateWorkProc(int type, int id, int ordinal, string name)
         {
             WorkProc newProc;
             switch (type)
@@ -92,6 +92,10 @@ namespace DataTableConverter.Assisstant
 
                         case 4:
                             newProc = new ProcUpLowCase(ordinal, id, name);
+                            break;
+
+                        case 5:
+                            newProc = new ProcRound(ordinal, id, name);
                             break;
 
                         case 1:
@@ -114,7 +118,7 @@ namespace DataTableConverter.Assisstant
             return newProc;
         }
 
-        internal static void removeRowThroughCaseChange(List<Work> workflows, List<int> rowIndizes, int casId)
+        internal static void RemoveRowThroughCaseChange(List<Work> workflows, List<int> rowIndizes, int casId)
         {
             foreach(Work work in workflows)
             {
@@ -130,7 +134,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void insertRowThroughCaseChange(List<Work> workflows, int rowIndex, int casId)
+        internal static void InsertRowThroughCaseChange(List<Work> workflows, int rowIndex, int casId)
         {
             foreach (Work work in workflows)
             {
@@ -143,7 +147,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void adjustDuplicateColumns(Case selectedItem, List<Work> workflows)
+        internal static void AdjustDuplicateColumns(Case selectedItem, List<Work> workflows)
         {
             foreach (Work work in workflows)
             {

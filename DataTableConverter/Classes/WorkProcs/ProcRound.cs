@@ -9,21 +9,25 @@ using System.Threading.Tasks;
 namespace DataTableConverter.Classes.WorkProcs
 {
     [Serializable()]
-    internal class ProcUser : WorkProc
+    class ProcRound : WorkProc
     {
+        internal static readonly string ClassName = "Runden";
+        internal int Decimals;
 
         public override string[] GetHeaders()
         {
             return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
         }
 
-        public ProcUser(int ordinal, int id,string name) : base(ordinal, id, name) { }
+        public ProcRound(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public ProcUser(string[] columns)
+        public ProcRound(string[] columns, int decimals, string newColumn)
         {
+            Decimals = decimals;
+            NewColumn = newColumn;
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
-            foreach(string col in columns)
+            foreach (string col in columns)
             {
                 Columns.Rows.Add(col);
             }
@@ -46,24 +50,24 @@ namespace DataTableConverter.Classes.WorkProcs
             string[] columns = GetHeaders();
             sortingOrder = string.Empty;
             bool intoNewCol = false;
-            DataTable replaces = procedure.Replace;
+            
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
                 table.Columns.Add(NewColumn);
                 intoNewCol = true;
             }
             List<int> headerIndices = DataHelper.getHeaderIndices(table, columns);
-            foreach (DataRow rep in replaces.Rows)
+            foreach (DataRow row in table.Rows)
             {
-                foreach (DataRow row in table.Rows)
+                for (int i = 0; i < row.ItemArray.Length; i++)
                 {
-                    for (int i = 0; i < row.ItemArray.Length; i++)
-                    {
 
-                        if ((columns == null || headerIndices.Contains(i)) && rep.ItemArray[0].ToString().Length > 0)
+                    if (columns == null || headerIndices.Contains(i))
+                    {
+                        int index = intoNewCol ? lastCol : i;
+                        if (float.TryParse(row.ItemArray[i].ToString(), out float result))
                         {
-                            int index = intoNewCol ? lastCol : i;
-                            row.SetField(index, row.ItemArray[i].ToString().Replace(rep.ItemArray[0].ToString(), rep.ItemArray[1].ToString()));
+                            row.SetField(index, Math.Round( result, Decimals,MidpointRounding.AwayFromZero));
                         }
                     }
                 }

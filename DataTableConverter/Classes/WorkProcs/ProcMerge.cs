@@ -32,7 +32,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 headers[i] = matches[i].Value.Substring(1, matches[i].Value.Length - 2);
             }
-            return WorkflowHelper.removeEmptyHeaders(headers);
+            return WorkflowHelper.RemoveEmptyHeaders(headers);
         }
 
         public override void renameHeaders(string oldName, string newName)

@@ -47,17 +47,7 @@ namespace DataTableConverter.View
 
         internal string[] getSelectedHeaders()
         {
-            string[] columns = new string[cbHeaders.CheckedItems.Count];
-            int counter = 0;
-            for(int i = 0; i<cbHeaders.Items.Count; i++)
-            {
-                if (cbHeaders.GetItemChecked(i))
-                {
-                    columns[counter] = cbHeaders.Items[i].ToString();
-                    counter++;
-                }
-            }
-            return columns;
+            return ViewHelper.GetSelectedHeaders(cbHeaders);
         }
 
         private void adjustForm()
@@ -166,20 +156,13 @@ namespace DataTableConverter.View
 
         private void btnCheckAll_Click(object sender, EventArgs e)
         {
-            setAllCheck(true);
+            ViewHelper.CheckAllItemsOfCheckedCombobox(cbHeaders, true);
         }
 
-        private void setAllCheck(bool status)
-        {
-            for (int i = 0; i < cbHeaders.Items.Count; i++)
-            {
-                cbHeaders.SetItemChecked(i, status);
-            }
-        }
 
         private void btnUncheckAll_Click(object sender, EventArgs e)
         {
-            setAllCheck(false);
+            ViewHelper.CheckAllItemsOfCheckedCombobox(cbHeaders, false);
         }
     }
 }

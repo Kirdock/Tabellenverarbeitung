@@ -26,7 +26,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.removeEmptyHeaders(DuplicateColumns);
+            return WorkflowHelper.RemoveEmptyHeaders(DuplicateColumns);
         }
 
         public override void renameHeaders(string oldName, string newName)
@@ -62,7 +62,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             for (int index = 0; index < table.Rows.Count; index++)
             {
-                string identifier = WorkflowHelper.getColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
+                string identifier = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
 
                 if (hTable.Contains(identifier))
                 {

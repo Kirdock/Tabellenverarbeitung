@@ -191,25 +191,6 @@ namespace DataTableConverter
             
             int[] max = getMaxLengthOfColumns(dataTable);
             createTable(dataTable, max, path, fileName);
-            
-            #region oldInsert
-            //DataRow row = dataTable.Rows[0];
-            //cmd.Parameters.Clear();
-            //StringBuilder query = new StringBuilder($"insert into {fileName} values(");
-
-            //for (int i = 0; i < row.ItemArray.Length; i++)
-            //{
-            //    string id = "@" + i;
-            //    query.Append(id + ",");
-            //    cmd.Parameters.AddWithValue(id, row.ItemArray[i].ToString());
-            //}
-
-            //query[query.Length - 1] = ')';
-            //cmd.CommandText = query.ToString();
-
-            //cmd.ExecuteNonQuery();
-            #endregion
-
 
             try
             {
@@ -217,14 +198,13 @@ namespace DataTableConverter
 
                 FileStream stream = new FileStream(fullpath, FileMode.Open);
                 byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
-                byte[] bytes = new byte[1];
-                bytes[0] = 0x1A;
+                byte[] bytes = new byte[1] { 0x1A };
 
                 string text = joinTable(dataTable, max);
                 stream.Position = 4;
                 stream.Write(records, 0, records.Length);
 
-                stream.Position = stream.Length;
+                stream.Position = stream.Length - 1;
                 
                 if(stream.ReadByte() == bytes[0])
                 {

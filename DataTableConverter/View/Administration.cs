@@ -40,8 +40,8 @@ namespace DataTableConverter.View
         {
             InitializeComponent();
 
-            setHeaders(headers);
-            setOrderList();
+            SetHeaders(headers);
+            SetOrderList();
             assignGroupBoxToEnum();
             cmbProcedureType.SelectedIndex = 0;
 
@@ -66,11 +66,11 @@ namespace DataTableConverter.View
             lbUsedProcedures_SelectedIndexChanged(null, null);
 
             
-            addContextMenu();
-            restoreSplitterDistance();
+            AddContextMenu();
+            RestoreSplitterDistance();
         }
 
-        private void restoreSplitterDistance()
+        private void RestoreSplitterDistance()
         {
             splitCases.SplitterDistance = Properties.Settings.Default.splitCases;
             splitTolerances.SplitterDistance = Properties.Settings.Default.splitTolerances;
@@ -81,53 +81,60 @@ namespace DataTableConverter.View
             splitWorkflowProperties.SplitterDistance = Properties.Settings.Default.splitWorkflowProperties;
         }
 
-        private void addContextMenu()
+        private void AddContextMenu()
         {
-            viewHelper.addContextMenuToDataGridView(dgTolerance, true);
-            viewHelper.addContextMenuToDataGridView(dgCaseColumns, true);
-            viewHelper.addContextMenuToDataGridView(dgvColumns, true);
-            viewHelper.addContextMenuToDataGridView(dgvReplaces, true);
-            viewHelper.addContextMenuToDataGridView(dgUpLow, true);
-            viewHelper.addContextMenuToDataGridView(dgOrderColumns, false);
+            viewHelper.AddContextMenuToDataGridView(dgTolerance, true);
+            viewHelper.AddContextMenuToDataGridView(dgCaseColumns, true);
+            viewHelper.AddContextMenuToDataGridView(dgvColumns, true);
+            viewHelper.AddContextMenuToDataGridView(dgvReplaces, true);
+            viewHelper.AddContextMenuToDataGridView(dgvRound, true);
+            viewHelper.AddContextMenuToDataGridView(dgUpLow, true);
+            viewHelper.AddContextMenuToDataGridView(dgOrderColumns, false);
         }
 
-        private void setOrderList()
+        private void SetOrderList()
         {
-            OrderList = new List<KeyValuePair<string, bool>>();
-            OrderList.Add(new KeyValuePair<string, bool>("Aufsteigend", false));
-            OrderList.Add(new KeyValuePair<string, bool>("Absteigend", true));
+            OrderList = new List<KeyValuePair<string, bool>>
+            {
+                new KeyValuePair<string, bool>("Aufsteigend", false),
+                new KeyValuePair<string, bool>("Absteigend", true)
+            };
         }
 
-        private void setHeaders(object[] headers)
+        private void SetHeaders(object[] headers)
         {
             cbHeaders.Items.AddRange(headers);
             clbHeaderProcedure.Items.AddRange(headers);
             clbHeaderOrder.Items.AddRange(headers);
+            clbHeadersRound.Items.AddRange(headers);
         }
 
         private void assignGroupBoxToEnum()
         {
-            gbState = new Dictionary<GroupBox, Type>();
-            gbState.Add(gbDefDuplicate, typeof(ProcDuplicate));
-            gbState.Add(gbMerge, typeof(ProcMerge));
-            //gbState.Add(gbTrim, ProcedureState.Trim);
-            gbState.Add(gbProcedure, typeof(ProcUser));
-            gbState.Add(gbOrder, typeof(ProcOrder));
-            gbState.Add(gbUpLowCase, typeof(ProcUpLowCase));
+            gbState = new Dictionary<GroupBox, Type>
+            {
+                { gbDefDuplicate, typeof(ProcDuplicate) },
+                { gbMerge, typeof(ProcMerge) },
+                { gbProcedure, typeof(ProcUser) },
+                { gbOrder, typeof(ProcOrder) },
+                { gbUpLowCase, typeof(ProcUpLowCase) },
+                { gbRound, typeof(ProcRound) }
+            };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
-                { typeof(ProcUser), setUserControls},
-                { typeof(ProcDuplicate), setDuplicateControls },
-                { typeof(ProcMerge), setMergeControls },
-                { typeof(ProcOrder), setOrderControls },
-                { typeof(ProcUpLowCase), setUpLowCaseControls },
-                { typeof(ProcTrim), setTrimControls }
+                { typeof(ProcUser), SetUserControls},
+                { typeof(ProcDuplicate), SetDuplicateControls },
+                { typeof(ProcMerge), SetMergeControls },
+                { typeof(ProcOrder), SetOrderControls },
+                { typeof(ProcUpLowCase), SetUpLowCaseControls },
+                { typeof(ProcRound), SetRoundControls },
+                { typeof(ProcTrim), SetTrimControls }
             };
         }
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
         {
-            viewHelper.clear();
+            viewHelper.Clear();
             saveSplitterDistance();
             
             if (ExportHelper.saveWorkflows(Workflows) || ExportHelper.saveProcedures(Procedures) || ExportHelper.saveTolerances(Tolerances) || ExportHelper.saveCases(Cases))
@@ -335,11 +342,14 @@ namespace DataTableConverter.View
 
         private void generateProceduresForWorkflow()
         {
-            SystemProc = new List<Proc>();
-            SystemProc.Add(new Proc(ProcTrim.ClassName, null, 1));
-            SystemProc.Add(new Proc(ProcMerge.ClassName, null, 2));
-            SystemProc.Add(new Proc(ProcOrder.ClassName, null, 3));
-            SystemProc.Add(new Proc(ProcUpLowCase.ClassName, null, 4));
+            SystemProc = new List<Proc>
+            {
+                new Proc(ProcTrim.ClassName, null, 1),
+                new Proc(ProcMerge.ClassName, null, 2),
+                new Proc(ProcOrder.ClassName, null, 3),
+                new Proc(ProcUpLowCase.ClassName, null, 4),
+                new Proc(ProcRound.ClassName, null, 5)
+            };
 
             generateDuplicateProc();
         }
@@ -403,14 +413,14 @@ namespace DataTableConverter.View
 
         private int getWorkProcedureIndexThroughId(int selectedId)
         {
-            return getSelectedWorkflow().Procedures.FindIndex(proc => proc.ProcedureId == selectedId);
+            return GetSelectedWorkflow().Procedures.FindIndex(proc => proc.ProcedureId == selectedId);
         }
 
         private void lbWorkflows_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (gbProcedure.Enabled = gbWorkflow.Enabled = (lbWorkflows.SelectedIndex != -1))
             {
-                Work workflow = getSelectedWorkflow();
+                Work workflow = GetSelectedWorkflow();
                 setWorkflowProcedures(workflow.Procedures);
                 
                 txtWorkflow.Text = workflow.Name;
@@ -437,49 +447,49 @@ namespace DataTableConverter.View
 
         private void sortWorkProcList(int ordinal)
         {
-            getSelectedWorkflow().Procedures.Sort();
-            setWorkflowProcedures(getSelectedWorkflow().Procedures);
-            lbUsedProcedures.SelectedIndex = getWorkProcedureIndexThroughOrdinal(ordinal);
+            GetSelectedWorkflow().Procedures.Sort();
+            setWorkflowProcedures(GetSelectedWorkflow().Procedures);
+            lbUsedProcedures.SelectedIndex = GetWorkProcedureIndexThroughOrdinal(ordinal);
         }
 
-        private int getWorkProcedureIndexThroughOrdinal(int ordinal)
+        private int GetWorkProcedureIndexThroughOrdinal(int ordinal)
         {
-            return getSelectedWorkflow().Procedures.FindIndex(proc => proc.Ordinal == ordinal);
+            return GetSelectedWorkflow().Procedures.FindIndex(proc => proc.Ordinal == ordinal);
         }
 
-        private List<Proc> getProceduresWithId(List<WorkProc> proc)
+        private List<Proc> GetProceduresWithId(List<WorkProc> proc)
         {
             List<Proc> procs = new List<Proc>();
             foreach(WorkProc wp in proc)
             {
-                procs.Add(getMergeProcedureIndexThroughId(wp.ProcedureId, wp.GetType()));
+                procs.Add(GetMergeProcedureIndexThroughId(wp.ProcedureId, wp.GetType()));
             }
             return procs;
         }
 
-        private Proc getMergeProcedureIndexThroughId(int selectedId, Type type)
+        private Proc GetMergeProcedureIndexThroughId(int selectedId, Type type)
         {
             List <Proc> procs = type == typeof(ProcUser)? Procedures : type == typeof(ProcDuplicate) ? DuplicateProc : SystemProc;
             return procs[procs.FindIndex(proc => proc.Id == selectedId)];
         }
 
-        private Work getSelectedWorkflow()
+        private Work GetSelectedWorkflow()
         {
             return ((Work)lbWorkflows.SelectedItem);
         }
 
-        private void setMergeControls( WorkProc selectedProc)
+        private void SetMergeControls( WorkProc selectedProc)
         {
             setCmbHeader(selectedProc.Formula);
             lblOriginalNameText.Text = ProcMerge.ClassName;
         }
 
-        private void setTrimControls(WorkProc selectedProc)
+        private void SetTrimControls(WorkProc selectedProc)
         {
             lblOriginalNameText.Text = ProcTrim.ClassName;
         }
 
-        private void setUserControls(WorkProc selectedProc)
+        private void SetUserControls(WorkProc selectedProc)
         {
             lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
@@ -487,7 +497,15 @@ namespace DataTableConverter.View
             setHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
 
-        private void setDuplicateControls(WorkProc selectedProc)
+        private void SetRoundControls(WorkProc selectedProc)
+        {
+            lblOriginalNameText.Text = ProcRound.ClassName;
+            cbNewColumnRound.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
+            dgvRound.DataSource = selectedProc.Columns;
+            SetHeaderRound(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+        }
+
+        private void SetDuplicateControls(WorkProc selectedProc)
         {
             Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
             lblOriginalNameText.Text = myCase.Name;
@@ -511,7 +529,7 @@ namespace DataTableConverter.View
             dgColumnDefDuplicate.Columns[0].ReadOnly = true;
         }
 
-        private void setUpLowCaseControls(WorkProc proc)
+        private void SetUpLowCaseControls(WorkProc proc)
         {
             ProcUpLowCase selectedProc = ((ProcUpLowCase)proc);
             lblOriginalNameText.Text = ProcUpLowCase.ClassName;
@@ -523,7 +541,7 @@ namespace DataTableConverter.View
 
         }
 
-        private void setOrderControls(WorkProc selectedProc)
+        private void SetOrderControls(WorkProc selectedProc)
         {
             setHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcOrder.ClassName;
@@ -620,6 +638,13 @@ namespace DataTableConverter.View
             clbHeaderProcedure.ItemCheck += clbHeaderProcedure_ItemCheck;
         }
 
+        private void SetHeaderRound(string[] headers)
+        {
+            clbHeadersRound.ItemCheck -= clbHeadersRound_ItemCheck;
+            setChecked(clbHeadersRound, headers);
+            clbHeadersRound.ItemCheck += clbHeadersRound_ItemCheck;
+        }
+
         private void setChecked(CheckedComboBox box, string[] headers)
         {
             for (int i = 0; i < box.Items.Count; i++)
@@ -637,7 +662,7 @@ namespace DataTableConverter.View
 
         private WorkProc getSelectedWorkProcedure()
         {
-            return getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex];
+            return GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex];
         }
 
         private void btnDeleteWorkflow_Click(object sender, EventArgs e)
@@ -650,8 +675,8 @@ namespace DataTableConverter.View
         {
             if (lbProcedures.SelectedIndex != -1)
             {
-                Work workflow = getSelectedWorkflow();
-                workflow.Procedures.Add(WorkflowHelper.createWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
+                Work workflow = GetSelectedWorkflow();
+                workflow.Procedures.Add(WorkflowHelper.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
 
                 setWorkflowProcedures(workflow.Procedures);
             }
@@ -661,7 +686,7 @@ namespace DataTableConverter.View
         {
             if (lbUsedProcedures.SelectedIndex != -1)
             {
-                Work workflow = getSelectedWorkflow();
+                Work workflow = GetSelectedWorkflow();
                 workflow.Procedures.RemoveAt(lbUsedProcedures.SelectedIndex);
                 for(int i = lbUsedProcedures.SelectedIndex; i < workflow.Procedures.Count; i++)
                 {
@@ -675,7 +700,7 @@ namespace DataTableConverter.View
         {
             if(lbUsedProcedures.SelectedIndex != -1)
             {
-                Work workflow = getSelectedWorkflow();
+                Work workflow = GetSelectedWorkflow();
                 WorkProc wp = workflow.Procedures[lbUsedProcedures.SelectedIndex];
                 if(wp.Ordinal > 0)
                 {
@@ -690,7 +715,7 @@ namespace DataTableConverter.View
         {
             if (lbUsedProcedures.SelectedIndex != -1)
             {
-                Work workflow = getSelectedWorkflow();
+                Work workflow = GetSelectedWorkflow();
                 WorkProc wp = workflow.Procedures[lbUsedProcedures.SelectedIndex];
                 if (wp.Ordinal < workflow.Procedures.Count -1)
                 {
@@ -713,12 +738,12 @@ namespace DataTableConverter.View
 
         private void txtNewColumn_TextChanged(object sender, EventArgs e)
         {
-            getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].NewColumn = ((TextBox)sender).Text;
+            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].NewColumn = ((TextBox)sender).Text;
         }
 
         private void txtFormula_TextChanged(object sender, EventArgs e)
         {
-            getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Formula = txtFormula.Text;
+            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Formula = txtFormula.Text;
         }
 
         private void addColumnToFormula(string column)
@@ -745,14 +770,16 @@ namespace DataTableConverter.View
             {
                 removeColumnOfFormula(cbHeaders.Items[e.Index].ToString());
             }
-            getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Formula = txtFormula.Text;
+            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Formula = txtFormula.Text;
         }
 
         private void txtWorkflow_TextChanged(object sender, EventArgs e)
         {
             if (lbWorkflows.SelectedIndex != -1)
             {
-                getSelectedWorkflow().Name = txtWorkflow.Text;
+                GetSelectedWorkflow().Name = txtWorkflow.Text;
+                bindingWorkflow.ResetBindings();
+
             }
         }
 
@@ -933,7 +960,7 @@ namespace DataTableConverter.View
                 dgCaseColumns.DataSource = selectedCase.Columns;
                 if (viewHelper != null)
                 {
-                    viewHelper.selectedCase = selectedCase.Id;
+                    viewHelper.SelectedCase = selectedCase.Id;
                 }
             }
         }
@@ -985,7 +1012,7 @@ namespace DataTableConverter.View
 
         private void dgCaseColumns_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
-            ViewHelper.handleDataGridViewNumber(sender, e);
+            ViewHelper.HandleDataGridViewNumber(sender, e);
         }
         #endregion
 
@@ -994,7 +1021,7 @@ namespace DataTableConverter.View
             lbUsedProcedures.SelectedIndexChanged -= lbUsedProcedures_SelectedIndexChanged;
             int index = lbUsedProcedures.SelectedIndex;
 
-            getSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Name = txtWorkProcName.Text;
+            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Name = txtWorkProcName.Text;
             bindingWorkProc[lbUsedProcedures.SelectedIndex].Name = txtWorkProcName.Text;
 
             setWorkflowProcedures(null, bindingWorkProc);
@@ -1006,13 +1033,13 @@ namespace DataTableConverter.View
         private void dgCaseColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             dgCaseColumns.BindingContext[dgCaseColumns.DataSource].EndCurrentEdit();
-            WorkflowHelper.adjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
+            WorkflowHelper.AdjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 
         private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.insertClipboardToDataGridView((DataGridView)sender, selectedRow);
+            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow);
         }
 
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -1029,7 +1056,12 @@ namespace DataTableConverter.View
 
         private void clbHeaderProcedure_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            ViewHelper.addRemoveHeaderThroughCheckedListBox(dgvColumns, e, (CheckedListBox)sender);
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvColumns, e, (CheckedListBox)sender);
+        }
+
+        private void clbHeadersRound_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvColumns, e, (CheckedListBox)sender);
         }
 
         private void clbHeaderOrder_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -1105,7 +1137,27 @@ namespace DataTableConverter.View
 
         private void clbUpLowHeader_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            ViewHelper.addRemoveHeaderThroughCheckedListBox(dgUpLow, e, (CheckedListBox)sender);
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgUpLow, e, (CheckedListBox)sender);
+        }
+
+        private void txtNewColumnRound_TextChanged(object sender, EventArgs e)
+        {
+            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].NewColumn = ((TextBox)sender).Text;
+        }
+
+        private void cbNewColumnRound_CheckedChanged(object sender, EventArgs e)
+        {
+            lblNewColumnRound.Visible = txtNewColumnRound.Visible = cbNewColumnRound.Checked;
+            if (!txtNewColumnRound.Visible)
+            {
+                txtNewColumnRound.Text = string.Empty;
+                txtNewColumnRound_TextChanged(txtNewColumnRound, e);
+            }
+        }
+
+        private void numDec_ValueChanged(object sender, EventArgs e)
+        {
+            ((ProcRound)getSelectedWorkProcedure()).Decimals = (int)((NumericUpDown)sender).Value;
         }
     }
 }

@@ -139,7 +139,7 @@ namespace DataTableConverter.View
 
         void dgvSetting_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
-            ViewHelper.handleDataGridViewNumber(sender, e);
+            ViewHelper.HandleDataGridViewNumber(sender, e);
         }
 
         private void radioButton_CheckedChanged(object sender, EventArgs e)
@@ -331,7 +331,7 @@ namespace DataTableConverter.View
 
         private void dgvSetting_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
-            ViewHelper.addNumerationToDataGridView(sender, e, Font);
+            ViewHelper.AddNumerationToDataGridView(sender, e, Font);
         }
 
         private void getDataGridViewItems(out List<int> values, out List<string> headers)
@@ -489,7 +489,7 @@ namespace DataTableConverter.View
 
         private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.insertClipboardToDataGridView((DataGridView)sender, selectedRow, dgvSetting_CellValueChanged);
+            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, dgvSetting_CellValueChanged);
         }
 
         private void txtBegin_TextChanged(object sender, EventArgs e)
