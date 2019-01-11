@@ -77,6 +77,7 @@
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.speichernToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -95,7 +96,8 @@
             this.funktionenToolStripMenuItem,
             this.arbeitsablaufToolStripMenuItem,
             this.duplikateToolStripMenuItem,
-            this.sortierenToolStripMenuItem});
+            this.sortierenToolStripMenuItem,
+            this.updateToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
@@ -159,14 +161,14 @@
             // postwurfToolStripMenuItem
             // 
             this.postwurfToolStripMenuItem.Name = "postwurfToolStripMenuItem";
-            this.postwurfToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.postwurfToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.postwurfToolStripMenuItem.Text = "Postwurf";
             this.postwurfToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
             // 
             // nachWertInSpalteToolStripMenuItem
             // 
             this.nachWertInSpalteToolStripMenuItem.Name = "nachWertInSpalteToolStripMenuItem";
-            this.nachWertInSpalteToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.nachWertInSpalteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.nachWertInSpalteToolStripMenuItem.Text = "Nach Wert in Spalte";
             this.nachWertInSpalteToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 
@@ -469,6 +471,13 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // updateToolStripMenuItem
+            // 
+            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
+            this.updateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.updateToolStripMenuItem.Text = "Update";
+            this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -547,6 +556,7 @@
         private System.Windows.Forms.ToolStripMenuItem großKleinschreibungToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rundenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem speichernToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem updateToolStripMenuItem;
     }
 }
 

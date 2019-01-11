@@ -386,12 +386,12 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbUpLowCase);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbOrder);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbDefDuplicate);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbProcedure);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbOrder);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbUpLowCase);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbDefDuplicate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
             this.splitWorkflowProcProperties.Size = new System.Drawing.Size(882, 512);
             this.splitWorkflowProcProperties.SplitterDistance = 596;
@@ -569,9 +569,9 @@
             this.gbRound.Controls.Add(this.cbNewColumnRound);
             this.gbRound.Controls.Add(this.dgvRound);
             this.gbRound.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbRound.Location = new System.Drawing.Point(0, 79);
+            this.gbRound.Location = new System.Drawing.Point(0, 92);
             this.gbRound.Name = "gbRound";
-            this.gbRound.Size = new System.Drawing.Size(282, 433);
+            this.gbRound.Size = new System.Drawing.Size(282, 420);
             this.gbRound.TabIndex = 10;
             this.gbRound.TabStop = false;
             this.gbRound.Text = "Spaltenangabe";
@@ -596,7 +596,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 133);
+            this.label9.Location = new System.Drawing.Point(6, 137);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(209, 13);
             this.label9.TabIndex = 9;
@@ -621,7 +621,7 @@
             // lblNewColumnRound
             // 
             this.lblNewColumnRound.AutoSize = true;
-            this.lblNewColumnRound.Location = new System.Drawing.Point(3, 90);
+            this.lblNewColumnRound.Location = new System.Drawing.Point(3, 89);
             this.lblNewColumnRound.Name = "lblNewColumnRound";
             this.lblNewColumnRound.Size = new System.Drawing.Size(89, 13);
             this.lblNewColumnRound.TabIndex = 7;
@@ -631,7 +631,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(3, 188);
+            this.label13.Location = new System.Drawing.Point(3, 186);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(121, 13);
             this.label13.TabIndex = 5;
@@ -669,7 +669,7 @@
             this.dgvRound.Location = new System.Drawing.Point(6, 204);
             this.dgvRound.Name = "dgvRound";
             this.dgvRound.RowHeadersVisible = false;
-            this.dgvRound.Size = new System.Drawing.Size(270, 224);
+            this.dgvRound.Size = new System.Drawing.Size(270, 211);
             this.dgvRound.TabIndex = 0;
             // 
             // gbUpLowCase
@@ -681,9 +681,9 @@
             this.gbUpLowCase.Controls.Add(this.label12);
             this.gbUpLowCase.Controls.Add(this.dgUpLow);
             this.gbUpLowCase.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbUpLowCase.Location = new System.Drawing.Point(0, 79);
+            this.gbUpLowCase.Location = new System.Drawing.Point(0, 92);
             this.gbUpLowCase.Name = "gbUpLowCase";
-            this.gbUpLowCase.Size = new System.Drawing.Size(282, 433);
+            this.gbUpLowCase.Size = new System.Drawing.Size(282, 420);
             this.gbUpLowCase.TabIndex = 10;
             this.gbUpLowCase.TabStop = false;
             this.gbUpLowCase.Text = "Spaltenangabe";
@@ -760,7 +760,7 @@
             this.dgUpLow.Location = new System.Drawing.Point(6, 150);
             this.dgUpLow.Name = "dgUpLow";
             this.dgUpLow.RowHeadersVisible = false;
-            this.dgUpLow.Size = new System.Drawing.Size(270, 278);
+            this.dgUpLow.Size = new System.Drawing.Size(270, 265);
             this.dgUpLow.TabIndex = 0;
             // 
             // gbOrder
@@ -769,9 +769,9 @@
             this.gbOrder.Controls.Add(this.clbHeaderOrder);
             this.gbOrder.Controls.Add(this.dgOrderColumns);
             this.gbOrder.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbOrder.Location = new System.Drawing.Point(0, 79);
+            this.gbOrder.Location = new System.Drawing.Point(0, 92);
             this.gbOrder.Name = "gbOrder";
-            this.gbOrder.Size = new System.Drawing.Size(282, 433);
+            this.gbOrder.Size = new System.Drawing.Size(282, 420);
             this.gbOrder.TabIndex = 17;
             this.gbOrder.TabStop = false;
             this.gbOrder.Text = "Spaltenangabe";
@@ -779,7 +779,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 20);
+            this.label8.Location = new System.Drawing.Point(6, 18);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(209, 13);
             this.label8.TabIndex = 18;
@@ -812,7 +812,7 @@
             this.dgOrderColumns.Location = new System.Drawing.Point(6, 86);
             this.dgOrderColumns.Name = "dgOrderColumns";
             this.dgOrderColumns.RowHeadersVisible = false;
-            this.dgOrderColumns.Size = new System.Drawing.Size(267, 342);
+            this.dgOrderColumns.Size = new System.Drawing.Size(267, 329);
             this.dgOrderColumns.TabIndex = 16;
             this.dgOrderColumns.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgOrderColumns_CellFormatting);
             this.dgOrderColumns.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgOrderColumns_EditingControlShowing);
@@ -821,9 +821,9 @@
             // 
             this.gbDefDuplicate.Controls.Add(this.dgColumnDefDuplicate);
             this.gbDefDuplicate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbDefDuplicate.Location = new System.Drawing.Point(0, 79);
+            this.gbDefDuplicate.Location = new System.Drawing.Point(0, 92);
             this.gbDefDuplicate.Name = "gbDefDuplicate";
-            this.gbDefDuplicate.Size = new System.Drawing.Size(282, 433);
+            this.gbDefDuplicate.Size = new System.Drawing.Size(282, 420);
             this.gbDefDuplicate.TabIndex = 12;
             this.gbDefDuplicate.TabStop = false;
             this.gbDefDuplicate.Text = "Spaltenangabe";
@@ -840,7 +840,7 @@
             this.dgColumnDefDuplicate.Location = new System.Drawing.Point(6, 19);
             this.dgColumnDefDuplicate.Name = "dgColumnDefDuplicate";
             this.dgColumnDefDuplicate.RowHeadersVisible = false;
-            this.dgColumnDefDuplicate.Size = new System.Drawing.Size(267, 409);
+            this.dgColumnDefDuplicate.Size = new System.Drawing.Size(267, 396);
             this.dgColumnDefDuplicate.TabIndex = 16;
             this.dgColumnDefDuplicate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgColumnDefDuplicate_CellEndEdit);
             // 
@@ -853,9 +853,9 @@
             this.gbMerge.Controls.Add(this.label16);
             this.gbMerge.Controls.Add(this.txtNewColumnMerge);
             this.gbMerge.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbMerge.Location = new System.Drawing.Point(0, 79);
+            this.gbMerge.Location = new System.Drawing.Point(0, 92);
             this.gbMerge.Name = "gbMerge";
-            this.gbMerge.Size = new System.Drawing.Size(282, 433);
+            this.gbMerge.Size = new System.Drawing.Size(282, 420);
             this.gbMerge.TabIndex = 12;
             this.gbMerge.TabStop = false;
             this.gbMerge.Text = "Spaltenangabe";
@@ -863,7 +863,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(6, 22);
+            this.label14.Location = new System.Drawing.Point(6, 19);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(89, 13);
             this.label14.TabIndex = 7;
@@ -888,7 +888,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(3, 62);
+            this.label15.Location = new System.Drawing.Point(3, 60);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(107, 13);
             this.label15.TabIndex = 5;
@@ -907,7 +907,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(3, 108);
+            this.label16.Location = new System.Drawing.Point(3, 107);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(42, 13);
             this.label16.TabIndex = 3;
@@ -934,9 +934,9 @@
             this.gbProcedure.Controls.Add(this.cbNewColumn);
             this.gbProcedure.Controls.Add(this.dgvColumns);
             this.gbProcedure.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbProcedure.Location = new System.Drawing.Point(0, 79);
+            this.gbProcedure.Location = new System.Drawing.Point(0, 92);
             this.gbProcedure.Name = "gbProcedure";
-            this.gbProcedure.Size = new System.Drawing.Size(282, 433);
+            this.gbProcedure.Size = new System.Drawing.Size(282, 420);
             this.gbProcedure.TabIndex = 9;
             this.gbProcedure.TabStop = false;
             this.gbProcedure.Text = "Spaltenangabe";
@@ -944,7 +944,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 78);
+            this.label7.Location = new System.Drawing.Point(6, 80);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(209, 13);
             this.label7.TabIndex = 9;
@@ -979,7 +979,7 @@
             // lblHeaders
             // 
             this.lblHeaders.AutoSize = true;
-            this.lblHeaders.Location = new System.Drawing.Point(3, 134);
+            this.lblHeaders.Location = new System.Drawing.Point(3, 133);
             this.lblHeaders.Name = "lblHeaders";
             this.lblHeaders.Size = new System.Drawing.Size(121, 13);
             this.lblHeaders.TabIndex = 5;
@@ -989,7 +989,7 @@
             // 
             this.txtNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtNewColumn.Location = new System.Drawing.Point(6, 49);
+            this.txtNewColumn.Location = new System.Drawing.Point(6, 52);
             this.txtNewColumn.Name = "txtNewColumn";
             this.txtNewColumn.Size = new System.Drawing.Size(270, 20);
             this.txtNewColumn.TabIndex = 2;
@@ -1017,7 +1017,7 @@
             this.dgvColumns.Location = new System.Drawing.Point(6, 150);
             this.dgvColumns.Name = "dgvColumns";
             this.dgvColumns.RowHeadersVisible = false;
-            this.dgvColumns.Size = new System.Drawing.Size(270, 278);
+            this.dgvColumns.Size = new System.Drawing.Size(270, 265);
             this.dgvColumns.TabIndex = 0;
             // 
             // gbTrim
@@ -1029,7 +1029,7 @@
             this.gbTrim.Dock = System.Windows.Forms.DockStyle.Top;
             this.gbTrim.Location = new System.Drawing.Point(0, 0);
             this.gbTrim.Name = "gbTrim";
-            this.gbTrim.Size = new System.Drawing.Size(282, 79);
+            this.gbTrim.Size = new System.Drawing.Size(282, 92);
             this.gbTrim.TabIndex = 12;
             this.gbTrim.TabStop = false;
             this.gbTrim.Text = "Eigenschaften der Funktion";
@@ -1037,7 +1037,7 @@
             // lblOriginalName
             // 
             this.lblOriginalName.AutoSize = true;
-            this.lblOriginalName.Location = new System.Drawing.Point(6, 15);
+            this.lblOriginalName.Location = new System.Drawing.Point(3, 16);
             this.lblOriginalName.Name = "lblOriginalName";
             this.lblOriginalName.Size = new System.Drawing.Size(129, 13);
             this.lblOriginalName.TabIndex = 11;
@@ -1046,7 +1046,8 @@
             // lblOriginalNameText
             // 
             this.lblOriginalNameText.AutoSize = true;
-            this.lblOriginalNameText.Location = new System.Drawing.Point(141, 15);
+            this.lblOriginalNameText.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblOriginalNameText.Location = new System.Drawing.Point(6, 32);
             this.lblOriginalNameText.Name = "lblOriginalNameText";
             this.lblOriginalNameText.Size = new System.Drawing.Size(0, 13);
             this.lblOriginalNameText.TabIndex = 10;
@@ -1054,7 +1055,7 @@
             // lblWorkProcName
             // 
             this.lblWorkProcName.AutoSize = true;
-            this.lblWorkProcName.Location = new System.Drawing.Point(3, 32);
+            this.lblWorkProcName.Location = new System.Drawing.Point(3, 48);
             this.lblWorkProcName.Name = "lblWorkProcName";
             this.lblWorkProcName.Size = new System.Drawing.Size(100, 13);
             this.lblWorkProcName.TabIndex = 9;
@@ -1064,7 +1065,7 @@
             // 
             this.txtWorkProcName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtWorkProcName.Location = new System.Drawing.Point(6, 48);
+            this.txtWorkProcName.Location = new System.Drawing.Point(6, 65);
             this.txtWorkProcName.Name = "txtWorkProcName";
             this.txtWorkProcName.Size = new System.Drawing.Size(270, 20);
             this.txtWorkProcName.TabIndex = 8;
@@ -1340,8 +1341,7 @@
             // 
             // Administration
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1140, 544);
             this.Controls.Add(this.tabControl1);
             this.Name = "Administration";

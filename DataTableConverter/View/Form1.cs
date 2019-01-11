@@ -57,6 +57,7 @@ namespace DataTableConverter
             {
                 assignDataSource(table);
             }
+            //UpdateHelper.CheckUpdate();
         }
 
         private void setSorting(string order)
@@ -336,13 +337,22 @@ namespace DataTableConverter
             pgbLoading.Style = ProgressBarStyle.Marquee;
             new Thread(() =>
             {
-                foreach (WorkProc t in temp)
+                try
                 {
-                    replaceProcedure(table, null, null, t);
+                    foreach (WorkProc t in temp)
+                    {
+                        replaceProcedure(table, null, null, t);
+                    }
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        addDataSourceValueChange(getDataSource(), table);
+                    }));
+                    throw new System.NotImplementedException("asdlfkj");
                 }
-                dgTable.Invoke(new MethodInvoker(() => {
-                    addDataSourceValueChange(getDataSource(), table);
-                }));
+                catch(Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex.ToString());
+                }
                 pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
             }).Start();
         }
@@ -376,10 +386,15 @@ namespace DataTableConverter
                     pgbLoading.Style = ProgressBarStyle.Marquee;
                     new Thread(() =>
                     {
-                        Thread.CurrentThread.IsBackground = true;
-                        DataTable dt = ImportHelper.openDBF(dialog.FileName);
-                        finishImport(dt, state, oldTable);
-                        
+                        try {
+                            Thread.CurrentThread.IsBackground = true;
+                            DataTable dt = ImportHelper.openDBF(dialog.FileName);
+                            finishImport(dt, state, oldTable);
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex.ToString());
+                        }
                     }).Start();
                 }
                 else if (extension != string.Empty && excelExt.Contains(extension))
@@ -387,9 +402,15 @@ namespace DataTableConverter
                     pgbLoading.Style = ProgressBarStyle.Marquee;
                     new Thread(() =>
                     {
-                        Thread.CurrentThread.IsBackground = true;
-                        DataTable dt = ImportHelper.openExcel(dialog.FileName, this);
-                        finishImport(dt, state, oldTable);
+                        try {
+                            Thread.CurrentThread.IsBackground = true;
+                            DataTable dt = ImportHelper.openExcel(dialog.FileName, this);
+                            finishImport(dt, state, oldTable);
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex.ToString());
+                        }
                     }).Start();
                 }
                 else
@@ -443,78 +464,84 @@ namespace DataTableConverter
             {
                 new Thread(() =>
                 {
-                    DataTable OldTable = sourceTable.Copy();
-                    string[] ImportColumns = form.getSelectedColumns();
-                    int SourceMergeIndex = form.getSelectedOriginal();
-                    int ImportMergeIndex = form.getSelectedMerge();
-                    bool SortColumn = form.OrderColumnName() != string.Empty;
+                    try {
+                        DataTable OldTable = sourceTable.Copy();
+                        string[] ImportColumns = form.getSelectedColumns();
+                        int SourceMergeIndex = form.getSelectedOriginal();
+                        int ImportMergeIndex = form.getSelectedMerge();
+                        bool SortColumn = form.OrderColumnName() != string.Empty;
 
-                    #region Compare Everything
-                    int oldCount = sourceTable.Columns.Count;
-                    int newColumnIndex = oldCount + ImportColumns.Length -1; //-1: without identifier
+                        #region Compare Everything
+                        int oldCount = sourceTable.Columns.Count;
+                        int newColumnIndex = oldCount + ImportColumns.Length -1; //-1: without identifier
 
-                    for (int i = 0; i < ImportColumns.Length; i++)
-                    {
-                        if (i == ImportMergeIndex) continue;
-
-                        DataHelper.addColumn(ImportColumns[i], sourceTable);
-                    }
-                    if (SortColumn)
-                    {
-                        string SortColumnName = "[Sortierung]";
-                        DataHelper.addColumn(form.OrderColumnName(), sourceTable);
-                        int LastIndex = importTable.Columns.Count;
-                        DataHelper.addColumn(SortColumnName, importTable);
-                        for(int i = 0; i < importTable.Rows.Count; i++)
+                        for (int i = 0; i < ImportColumns.Length; i++)
                         {
-                            importTable.Rows[i][LastIndex] = i.ToString();
+                            if (i == ImportMergeIndex) continue;
+
+                            DataHelper.addColumn(ImportColumns[i], sourceTable);
                         }
-                        ImportColumns = new List<string>(ImportColumns)
+                        if (SortColumn)
                         {
-                            SortColumnName
-                        }.ToArray();
-                    }
+                            string SortColumnName = "[Sortierung]";
+                            DataHelper.addColumn(form.OrderColumnName(), sourceTable);
+                            int LastIndex = importTable.Columns.Count;
+                            DataHelper.addColumn(SortColumnName, importTable);
+                            for(int i = 0; i < importTable.Rows.Count; i++)
+                            {
+                                importTable.Rows[i][LastIndex] = i.ToString();
+                            }
+                            ImportColumns = new List<string>(ImportColumns)
+                            {
+                                SortColumnName
+                            }.ToArray();
+                        }
 
-                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = importTable.Rows.Count; }));
+                        pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = importTable.Rows.Count; }));
 
 
-                    HashSet<int> hs = new HashSet<int>();
+                        HashSet<int> hs = new HashSet<int>();
                     
 
-                    for (int y = 0; y < sourceTable.Rows.Count; y++)
-                    {
-                        DataRow source = sourceTable.Rows[y];
-                        
-                        for (int rowIndex = 0; rowIndex < importTable.Rows.Count; rowIndex++)
+                        for (int y = 0; y < sourceTable.Rows.Count; y++)
                         {
-
-                            DataRow row = importTable.Rows[rowIndex];
-                            if (source.ItemArray[SourceMergeIndex].ToString() == row.ItemArray[ImportMergeIndex].ToString())
+                            DataRow source = sourceTable.Rows[y];
+                        
+                            for (int rowIndex = 0; rowIndex < importTable.Rows.Count; rowIndex++)
                             {
-                                int Offset = 0;
-                                for (int i = 0; i < ImportColumns.Length; i++)
+
+                                DataRow row = importTable.Rows[rowIndex];
+                                if (source.ItemArray[SourceMergeIndex].ToString() == row.ItemArray[ImportMergeIndex].ToString())
                                 {
-                                    if (i == ImportMergeIndex)
+                                    int Offset = 0;
+                                    for (int i = 0; i < ImportColumns.Length; i++)
                                     {
-                                        Offset++;
+                                        if (i == ImportMergeIndex)
+                                        {
+                                            Offset++;
+                                        }
+                                        else
+                                        {
+                                            source.SetField(oldCount + i - Offset, row.ItemArray[i]);
+                                        }
                                     }
-                                    else
-                                    {
-                                        source.SetField(oldCount + i - Offset, row.ItemArray[i]);
-                                    }
-                                }
-                                importTable.Rows.RemoveAt(rowIndex);
-                                break;
+                                    importTable.Rows.RemoveAt(rowIndex);
+                                    break;
                                 
+                                }
                             }
+
+                            pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
                         }
+                        #endregion
 
-                        pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
+                        dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(OldTable, sourceTable); }));
+                        pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
                     }
-                    #endregion
-
-                    dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(OldTable, sourceTable); }));
-                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
+                    catch (Exception ex)
+                    {
+                        ErrorHelper.LogMessage(ex.ToString());
+                    }
                 }).Start();
             }
         }
@@ -534,7 +561,17 @@ namespace DataTableConverter
             if (dgTable.DataSource != null)
             {
                 pgbLoading.Style = ProgressBarStyle.Marquee;
-                new Thread(() => trimDataTable(getDataSource())).Start();
+                new Thread(() =>
+                {
+                    try
+                    {
+                        trimDataTable(getDataSource());
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorHelper.LogMessage(ex.ToString());
+                    }
+                }).Start();
             }
         }
 
@@ -584,8 +621,15 @@ namespace DataTableConverter
                     DataTable newTable = getDataSource();
                     new Thread(() =>
                     {
-                        replaceProcedure(newTable, procedure, ((Formula)sender).getHeaderName(), user);
-                        dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(getDataSource(), newTable); }));
+                        try
+                        {
+                            replaceProcedure(newTable, procedure, ((Formula)sender).getHeaderName(), user);
+                            dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(getDataSource(), newTable); }));
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex.ToString());
+                        }
                     }).Start();
                 }
             }
@@ -621,9 +665,16 @@ namespace DataTableConverter
                     DataTable table = getDataSource(true);
                     new Thread(() =>
                     {
-                        Thread.CurrentThread.IsBackground = true;
-                        ExportHelper.exportExcel(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
-                        pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                        try
+                        {
+                            Thread.CurrentThread.IsBackground = true;
+                            ExportHelper.exportExcel(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                            pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex.ToString());
+                        }
                     }).Start();
                 }
             }
@@ -735,9 +786,16 @@ namespace DataTableConverter
                     pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Marquee; }));
                     new Thread(() =>
                     {
-                        Thread.CurrentThread.IsBackground = true;
-                        ExportHelper.exportDbase(Path.GetFileNameWithoutExtension(path), getDataSource(true), Path.GetDirectoryName(path));
-                        pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                        try
+                        {
+                            Thread.CurrentThread.IsBackground = true;
+                            ExportHelper.exportDbase(Path.GetFileNameWithoutExtension(path), getDataSource(true), Path.GetDirectoryName(path));
+                            pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex.ToString());
+                        }
                     }).Start();
                 }
             }
@@ -755,12 +813,18 @@ namespace DataTableConverter
 
             new Thread(() =>
             {
-                DataTable newTable = historyHelper.goBack(oldTable, getSorting());
-                dgTable.Invoke(new MethodInvoker(() =>
+                try {
+                    DataTable newTable = historyHelper.goBack(oldTable, getSorting());
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        takeOverHistory(newTable, historyHelper.OrderString);
+                    }));
+                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                }
+                catch (Exception ex)
                 {
-                    takeOverHistory(newTable, historyHelper.OrderString);
-                }));
-                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                    ErrorHelper.LogMessage(ex.ToString());
+                }
             }).Start();
             
             
@@ -780,12 +844,19 @@ namespace DataTableConverter
 
             new Thread(() =>
             {
-                DataTable newTable = historyHelper.repeat(getDataSource(), getSorting());
-                dgTable.Invoke(new MethodInvoker(() =>
+                try
                 {
-                    takeOverHistory(newTable, historyHelper.OrderString);
-                }));
-                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                    DataTable newTable = historyHelper.repeat(getDataSource(), getSorting());
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        takeOverHistory(newTable, historyHelper.OrderString);
+                    }));
+                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                }
+                catch (Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex.ToString());
+                }
             }).Start();
         }
 
@@ -844,9 +915,16 @@ namespace DataTableConverter
                     path = path ?? saveFileDialog1.FileName;
                     new Thread(() =>
                     {
-                        Thread.CurrentThread.IsBackground = true;
-                        ExportHelper.exportCsv(table, Path.GetDirectoryName(path),  Path.GetFileNameWithoutExtension(path));
-                        pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                        try
+                        {
+                            Thread.CurrentThread.IsBackground = true;
+                            ExportHelper.exportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                            pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex.ToString());
+                        }
                     }).Start();
                 }
             }
@@ -1085,6 +1163,11 @@ namespace DataTableConverter
         private void einstellungenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new SettingForm().Show();
+        }
+
+        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UpdateHelper.CheckUpdate(this);
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
