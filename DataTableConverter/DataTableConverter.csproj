@@ -114,6 +114,12 @@
     <Compile Include="View\ExcelSheets.Designer.cs">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\ExportCount.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\ExportCount.Designer.cs">
+      <DependentUpon>ExportCount.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\ExportCustom.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -152,6 +158,12 @@
     <Compile Include="View\SelectDuplicateColumns.Designer.cs">
       <DependentUpon>SelectDuplicateColumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\SettingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\SettingForm.Designer.cs">
+      <DependentUpon>SettingForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\SortForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +196,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\ExcelSheets.resx">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\ExportCount.resx">
+      <DependentUpon>ExportCount.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\ExportCustom.resx">
       <DependentUpon>ExportCustom.cs</DependentUpon>

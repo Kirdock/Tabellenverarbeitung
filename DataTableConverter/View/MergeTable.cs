@@ -61,7 +61,7 @@ namespace DataTableConverter.View
         {
             return clbColumns.CheckedItems.Cast<object>()
                                  .Select(x => x.ToString())
-                                 .Where(x => x != cmbIdentifierMerge.SelectedItem.ToString())
+                                 //.Where(x => x != cmbIdentifierMerge.SelectedItem.ToString())
                                  .ToArray();
         }
 
@@ -123,7 +123,7 @@ namespace DataTableConverter.View
             }
         }
 
-        internal string getOrderColumnName()
+        internal string OrderColumnName()
         {
             return txtOrder.Text;
         }

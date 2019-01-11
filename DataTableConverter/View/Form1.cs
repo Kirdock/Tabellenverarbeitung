@@ -35,6 +35,7 @@ namespace DataTableConverter
         private int rowBefore; //Wenn eine Zelle im DataGridView geändert wird, kann ich mit dgTable[col, row] den geänderten Wert nicht holen, da die DataGridView zu diesem Zeitpunkt wieder sortiert wurde
         private List<string> dictKeys;
         private readonly int SystemProcedureCount = 4;
+        private string FilePath = string.Empty;
 
         internal Form1(DataTable table = null)
         {
@@ -50,6 +51,8 @@ namespace DataTableConverter
             öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click(sender, e);
             trimToolStripMenuItem.Click += (sender, e) => trimToolStripMenuItem_Click(sender, e);
             cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click(sender, e);
+            dBASEToolStripMenuItem1.Click += (sender, e) => dBASEToolStripMenuItem_Click(sender, e);
+            excelToolStripMenuItem1.Click += (sender, e) => excelToolStripMenuItem_Click(sender, e);
             if (table != null)
             {
                 assignDataSource(table);
@@ -149,6 +152,7 @@ namespace DataTableConverter
         private void addDataSourceNewTable(DataTable table)
         {
             historyHelper.resetHistory();
+            setSorting(string.Empty);
             assignDataSource(table);
         }
 
@@ -364,7 +368,7 @@ namespace DataTableConverter
             DataTable oldTable = getDataSource();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                lblFilename.Text = Path.GetFileName(dialog.FileName);
+                SetFileName(dialog.FileName);
                 string extension = Path.GetExtension(dialog.FileName).ToLower();
 
                 if (extension == ".dbf")
@@ -378,7 +382,7 @@ namespace DataTableConverter
                         
                     }).Start();
                 }
-                else if (excelExt.Contains(extension))
+                else if (extension != string.Empty && excelExt.Contains(extension))
                 {
                     pgbLoading.Style = ProgressBarStyle.Marquee;
                     new Thread(() =>
@@ -399,21 +403,26 @@ namespace DataTableConverter
             }
         }
 
+        private void SetFileName(string path)
+        {
+            lblFilename.Text = Path.GetFileName(path);
+            FilePath = path;
+        }
+
         private void finishImport(DataTable table, ImportState state, DataTable oldTable)
         {
             pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
             switch (state)
             {
-                case ImportState.Append:
+                case ImportState.Merge:
                     showMergeForm(table, oldTable);
                     break;
 
-                case ImportState.Merge:
+                case ImportState.Append:
                     dgTable.Invoke(new MethodInvoker(() => { mergeTables(table); }));
                     break;
 
                 case ImportState.Header:
-
                     object[] headers = DataHelper.getHeadersOfDataTable(oldTable);
                     DataHelper.setHeaders(table, oldTable);
                     dgTable.Invoke(new MethodInvoker(() => { assignDataSource(oldTable); }));
@@ -434,55 +443,78 @@ namespace DataTableConverter
             {
                 new Thread(() =>
                 {
-                    DataTable tableOld = sourceTable.Copy();
-                    string[] columns = form.getSelectedColumns();
-                    int oldIndex = form.getSelectedOriginal();
-                    int mergeIndex = form.getSelectedMerge();
-                    bool newColumn = form.getOrderColumnName() != string.Empty;
+                    DataTable OldTable = sourceTable.Copy();
+                    string[] ImportColumns = form.getSelectedColumns();
+                    int SourceMergeIndex = form.getSelectedOriginal();
+                    int ImportMergeIndex = form.getSelectedMerge();
+                    bool SortColumn = form.OrderColumnName() != string.Empty;
 
                     #region Compare Everything
                     int oldCount = sourceTable.Columns.Count;
-                    int newColumnIndex = oldCount + columns.Length;
+                    int newColumnIndex = oldCount + ImportColumns.Length -1; //-1: without identifier
 
-                    for (int i = 0; i < columns.Length; i++)
+                    for (int i = 0; i < ImportColumns.Length; i++)
                     {
-                        DataHelper.addColumn(columns[i], sourceTable);
+                        if (i == ImportMergeIndex) continue;
+
+                        DataHelper.addColumn(ImportColumns[i], sourceTable);
                     }
-                    if (newColumn)
+                    if (SortColumn)
                     {
-                        DataHelper.addColumn(form.getOrderColumnName(), sourceTable);
+                        string SortColumnName = "[Sortierung]";
+                        DataHelper.addColumn(form.OrderColumnName(), sourceTable);
+                        int LastIndex = importTable.Columns.Count;
+                        DataHelper.addColumn(SortColumnName, importTable);
+                        for(int i = 0; i < importTable.Rows.Count; i++)
+                        {
+                            importTable.Rows[i][LastIndex] = i.ToString();
+                        }
+                        ImportColumns = new List<string>(ImportColumns)
+                        {
+                            SortColumnName
+                        }.ToArray();
                     }
-                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Marquee; }));
+
+                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = importTable.Rows.Count; }));
 
 
                     HashSet<int> hs = new HashSet<int>();
-                    for (int y = 0; y < importTable.Rows.Count; y++)
-                    {
-                        DataRow row = importTable.Rows[y];
-                        for (int rowIndex = 0; rowIndex < sourceTable.Rows.Count; rowIndex++)
-                        {
-                            if (hs.Contains(rowIndex)) continue;
+                    
 
-                            DataRow source = sourceTable.Rows[rowIndex];
-                            if (source.ItemArray[oldIndex].ToString() == row.ItemArray[mergeIndex].ToString())
+                    for (int y = 0; y < sourceTable.Rows.Count; y++)
+                    {
+                        DataRow source = sourceTable.Rows[y];
+                        
+                        for (int rowIndex = 0; rowIndex < importTable.Rows.Count; rowIndex++)
+                        {
+
+                            DataRow row = importTable.Rows[rowIndex];
+                            if (source.ItemArray[SourceMergeIndex].ToString() == row.ItemArray[ImportMergeIndex].ToString())
                             {
-                                for (int i = 0; i < columns.Length; i++)
+                                int Offset = 0;
+                                for (int i = 0; i < ImportColumns.Length; i++)
                                 {
-                                    source.SetField(oldCount + i, row.ItemArray[i]);
+                                    if (i == ImportMergeIndex)
+                                    {
+                                        Offset++;
+                                    }
+                                    else
+                                    {
+                                        source.SetField(oldCount + i - Offset, row.ItemArray[i]);
+                                    }
                                 }
-                                if (newColumn)
-                                {
-                                    source.SetField(newColumnIndex, (y + 1).ToString());
-                                }
-                                hs.Add(rowIndex);
+                                importTable.Rows.RemoveAt(rowIndex);
                                 break;
+                                
                             }
                         }
+
+                        pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
                     }
                     #endregion
 
-                    dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(tableOld, sourceTable); }));
-                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                    dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(OldTable, sourceTable); }));
+                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
                 }).Start();
             }
         }
@@ -571,24 +603,26 @@ namespace DataTableConverter
             pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
         }
 
-        private void speichernToolStripMenuItem_Click(object sender, EventArgs e)
+        private void excelToolStripMenuItem_Click(object sender, EventArgs e, string path = null)
         {
             if (dgTable.DataSource != null)
             {
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-                saveFileDialog1.Filter = $"Excel Dateien|{excelExt}|Alle Dateien (*.*)|*.*";
-                saveFileDialog1.FilterIndex = 1;
-                saveFileDialog1.RestoreDirectory = true;
-
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                SaveFileDialog saveFileDialog1 = new SaveFileDialog
                 {
+                    Filter = $"Excel Dateien|{excelExt}|Alle Dateien (*.*)|*.*",
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
+
+                if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    path = path ?? saveFileDialog1.FileName;
                     pgbLoading.Style = ProgressBarStyle.Marquee;
                     DataTable table = getDataSource(true);
                     new Thread(() =>
                     {
                         Thread.CurrentThread.IsBackground = true;
-                        ExportHelper.exportExcel(table, Path.GetDirectoryName(saveFileDialog1.FileName), Path.GetFileNameWithoutExtension(saveFileDialog1.FileName));
+                        ExportHelper.exportExcel(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
                     }).Start();
                 }
@@ -684,23 +718,25 @@ namespace DataTableConverter
         }
 
 
-        private void dBASEToolStripMenuItem_Click(object sender, EventArgs e)
+        private void dBASEToolStripMenuItem_Click(object sender, EventArgs e, string path = null)
         {
             if (dgTable.DataSource != null)
             {
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-                saveFileDialog1.Filter = $"DBASE Dateien ({dbfExt})|{dbfExt}|Alle Dateien (*.*)|*.*";
-                saveFileDialog1.FilterIndex = 1;
-                saveFileDialog1.RestoreDirectory = true;
-
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                SaveFileDialog saveFileDialog1 = new SaveFileDialog
                 {
+                    Filter = $"DBASE Dateien ({dbfExt})|{dbfExt}|Alle Dateien (*.*)|*.*",
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
+
+                if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    path = path ?? saveFileDialog1.FileName;
                     pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Marquee; }));
                     new Thread(() =>
                     {
                         Thread.CurrentThread.IsBackground = true;
-                        ExportHelper.exportDbase(Path.GetFileNameWithoutExtension(saveFileDialog1.FileName), getDataSource(true), Path.GetDirectoryName(saveFileDialog1.FileName));
+                        ExportHelper.exportDbase(Path.GetFileNameWithoutExtension(path), getDataSource(true), Path.GetDirectoryName(path));
                         pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
                     }).Start();
                 }
@@ -771,7 +807,7 @@ namespace DataTableConverter
 
         private void tabellenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            importToolStripMenuItem_Click(null, null, ImportState.Append);
+            importToolStripMenuItem_Click(null, null, ImportState.Merge);
         }
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
@@ -790,24 +826,26 @@ namespace DataTableConverter
             loadCases(admin.Cases);
         }
 
-        private void cSVToolStripMenuItem_Click(object sender, EventArgs e, DataTable dt = null)
+        private void cSVToolStripMenuItem_Click(object sender, EventArgs e, DataTable dt = null, string path = null)
         {
             if (dgTable.DataSource != null)
             {
                 DataTable table = dt ?? getDataSource(true);
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-                saveFileDialog1.Filter = $"CSV Dateien ({csvExt})|{csvExt}|Alle Dateien (*.*)|*.*";
-                saveFileDialog1.FilterIndex = 1;
-                saveFileDialog1.RestoreDirectory = true;
-
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                SaveFileDialog saveFileDialog1 = new SaveFileDialog
+                {
+                    Filter = $"CSV Dateien ({csvExt})|{csvExt}|Alle Dateien (*.*)|*.*",
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
+                
+                if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     pgbLoading.Style = ProgressBarStyle.Marquee;
+                    path = path ?? saveFileDialog1.FileName;
                     new Thread(() =>
                     {
                         Thread.CurrentThread.IsBackground = true;
-                        ExportHelper.exportCsv(table, Path.GetDirectoryName(saveFileDialog1.FileName),  Path.GetFileNameWithoutExtension(saveFileDialog1.FileName));
+                        ExportHelper.exportCsv(table, Path.GetDirectoryName(path),  Path.GetFileNameWithoutExtension(path));
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
                     }).Start();
                 }
@@ -846,7 +884,7 @@ namespace DataTableConverter
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCustom formula = new ExportCustom(DataHelper.getHeadersOfDataTable(getDataSource()), true);
+            ExportCustom formula = new ExportCustom(DataHelper.getHeadersOfDataTable(getDataSource()));
             formula.FormClosed += new FormClosedEventHandler(saveExportClosed);
             formula.Show();
         }
@@ -871,14 +909,14 @@ namespace DataTableConverter
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCustom form = new ExportCustom(DataHelper.getHeadersOfDataTable(getDataSource()), false);
+            ExportCount form = new ExportCount(DataHelper.getHeadersOfDataTable(getDataSource()));
             form.FormClosed += new FormClosedEventHandler(CountContendClosed);
             form.Show();
         }
 
         private void CountContendClosed(object sender, FormClosedEventArgs e)
         {
-            ExportCustom export = (ExportCustom)sender;
+            ExportCount export = (ExportCount)sender;
             if (export.DialogResult == DialogResult.OK)
             {
                 DataTable table = ViewHelper.GetSortedView($"[{export.getSelectedValue()}] asc", getDataSource()).ToTable();
@@ -1023,6 +1061,30 @@ namespace DataTableConverter
             {
                 workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { new ProcRound(form.GetSelectedHeaders(), form.GetDecimals(), form.NewColumn()) }, 0));
             }
+        }
+
+        private void speichernToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            string FileName = FilePath;
+            string extension = Path.GetExtension(FileName).ToLower();
+
+            if (extension == ".dbf")
+            {
+                dBASEToolStripMenuItem_Click(null, null, FileName);
+            }
+            else if (extension != string.Empty && excelExt.Contains(extension))
+            {
+                excelToolStripMenuItem_Click(null, null, FileName);
+            }
+            else
+            {
+                cSVToolStripMenuItem_Click(null, null, null, FileName);
+            }
+        }
+
+        private void einstellungenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new SettingForm().Show();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

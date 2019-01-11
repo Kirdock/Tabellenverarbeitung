@@ -72,7 +72,7 @@
             // 
             // btnConfirm
             // 
-            this.btnConfirm.Location = new System.Drawing.Point(184, 33);
+            this.btnConfirm.Location = new System.Drawing.Point(108, 69);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(93, 23);
             this.btnConfirm.TabIndex = 4;
@@ -84,7 +84,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(337, 66);
+            this.ClientSize = new System.Drawing.Size(337, 104);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.label1);

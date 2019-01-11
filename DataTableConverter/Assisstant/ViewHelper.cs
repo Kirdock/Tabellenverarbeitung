@@ -245,18 +245,19 @@ namespace DataTableConverter
 
         internal static void AddRemoveHeaderThroughCheckedListBox(DataGridView sender, ItemCheckEventArgs e, CheckedListBox headers)
         {
+            DataTable Table = (DataTable)sender.DataSource;
             if (e.NewValue == CheckState.Checked)
             {
-                sender.Rows.Add(headers.Items[e.Index]);
+                Table.Rows.Add(headers.Items[e.Index]);
             }
             else
             {
                 bool found = false;
-                for (int i = sender.Rows.Count - 1; i >= 0 && !found; i--)
+                for (int i = Table.Rows.Count - 1; i >= 0 && !found; i--)
                 {
-                    if (sender.Rows[i].Cells[0] == headers.Items[e.Index])
+                    if (Table.Rows[i][0] == headers.Items[e.Index])
                     {
-                        sender.Rows.RemoveAt(i);
+                        Table.Rows.RemoveAt(i);
                         found = true;
                     }
                 }

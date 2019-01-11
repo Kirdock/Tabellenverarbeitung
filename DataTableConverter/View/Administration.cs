@@ -107,6 +107,7 @@ namespace DataTableConverter.View
             clbHeaderProcedure.Items.AddRange(headers);
             clbHeaderOrder.Items.AddRange(headers);
             clbHeadersRound.Items.AddRange(headers);
+            clbUpLowHeader.Items.AddRange(headers);
         }
 
         private void assignGroupBoxToEnum()
@@ -309,6 +310,7 @@ namespace DataTableConverter.View
             {
                 selectedProc.Name = txtName.Text;
                 sortProcedureList(selectedProc.Id);
+                loadProceduresWorkflow(false);
             }
         }
 

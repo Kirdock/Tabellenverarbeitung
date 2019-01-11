@@ -12,13 +12,11 @@ namespace DataTableConverter.View
 {
     public partial class ExportCustom : Form
     {
-        internal ExportCustom(object[] headers, bool isExport)
+        internal ExportCustom(object[] headers)
         {
             InitializeComponent();
             cmbColumn.Items.AddRange(headers);
             cmbColumn.SelectedIndex = 0;
-            lblSearch.Visible = txtSearch.Visible = isExport;
-            btnConfirm.Visible = !isExport;
         }
 
         internal int getColumnIndex()
@@ -29,11 +27,6 @@ namespace DataTableConverter.View
         internal string getValue()
         {
             return txtSearch.Text;
-        }
-
-        internal string getSelectedValue()
-        {
-            return cmbColumn.SelectedItem.ToString();
         }
 
         private void txtSearch_KeyDown(object sender, KeyEventArgs e)
