@@ -57,7 +57,7 @@ namespace DataTableConverter
             {
                 assignDataSource(table);
             }
-            //UpdateHelper.CheckUpdate();
+            UpdateHelper.CheckUpdate(true);
         }
 
         private void setSorting(string order)
@@ -1167,7 +1167,7 @@ namespace DataTableConverter
 
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UpdateHelper.CheckUpdate(this);
+            UpdateHelper.CheckUpdate(false);
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

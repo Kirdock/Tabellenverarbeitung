@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,43 +16,57 @@ namespace DataTableConverter.Assisstant
     {
         private readonly static string Repository = "https://github.com/Kirdock/Tabellenverarbeitung/releases";
         private readonly static string Tags = $"{Repository}/latest";
-        private readonly static string FileName = "Anwendung.zip";
+        private readonly static string FileNameWithoutExtension = "Anwendung";
+        private readonly static string FileName = FileNameWithoutExtension+".zip";
         private readonly static string Download = Repository+"/download/{0}/"+FileName;
-        internal static void CheckUpdate(Form1 Form)
+        
+        internal static void CheckUpdate(bool Prompt)
         {
             try
             {
-                WebRequest request = WebRequest.Create(Tags);
-                WebResponse response = request.GetResponse();
-
-                string version = response.ResponseUri.ToString().Split(new char[] { '/' }).Last();
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-
-                Console.WriteLine(version);
-                Console.WriteLine(fvi.FileVersion);
-                if (version != fvi.FileVersion.Substring(0, version.Length))
+                new Thread(() =>
                 {
-                    DownloadFile(version, Form);
-                }
-                else
-                {
-                    MessageHandler.MessagesOK(System.Windows.Forms.MessageBoxIcon.Information, "Sie besitzen bereits die aktuelle Version");
-                }
-}
-            catch(Exception ex)
+                    WebRequest request = WebRequest.Create(Tags);
+                    WebResponse response = request.GetResponse();
+
+                    string version = response.ResponseUri.ToString().Split(new char[] { '/' }).Last();
+                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                    FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+
+                    if (version != fvi.FileVersion.Substring(0, version.Length))
+                    {
+                        if (Prompt)
+                        {
+                            DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Information, "Eine neue Version steht zur Verfügung. Möchten Sie sie runterladen?");
+                            if(result == DialogResult.Yes)
+                            {
+                                DownloadFile(version);
+                            }
+                        }
+                        else
+                        {
+                            DownloadFile(version);
+                        }
+                    }
+                    else if(!Prompt)
+                    {
+                        MessageHandler.MessagesOK(MessageBoxIcon.Information, "Sie besitzen bereits die aktuellste Version");
+                    }
+                }).Start();
+            }
+            catch (Exception ex)
             {
                 ErrorHelper.LogMessage(ex.ToString());
             }
         }
 
-        private static void DownloadFile(string version, Form1 Form)
+        private static void DownloadFile(string version)
         {
             using (var client = new WebClient())
             {
                 client.DownloadFile(string.Format(Download,version), FileName);
 
-                string path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string path = GetCurrentDirectory();
                 string ZipPath = Path.Combine(path, FileName);
                 ZipArchive archive = ZipFile.OpenRead(ZipPath);
 
@@ -67,15 +82,36 @@ namespace DataTableConverter.Assisstant
                 }
                 archive.Dispose();
                 File.Delete(ZipPath);
-                RestartApp(Form);
+                RestartApp();
                 
             }
         }
 
-        private static void RestartApp(Form1 Form)
+        private static string GetCurrentDirectory()
         {
-            Process.Start(Application.ExecutablePath); // to start new instance of application
-            Form.Close();
+            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        }
+
+        private static void RestartApp()
+        {
+            string directory = GetCurrentDirectory();
+            string BatchPath = Path.Combine(directory, "Updater.bat");
+            string ZipFolder = Path.Combine(directory, FileNameWithoutExtension);
+            StreamWriter writer = new StreamWriter(BatchPath);
+
+            writer.WriteLine($"move \"{Path.Combine(ZipFolder, "*")}\" \"{directory}\"");
+            writer.WriteLine($"start \"\" \"{Path.Combine(directory, AppDomain.CurrentDomain.FriendlyName)}\"");
+            writer.WriteLine($"rmdir \"{ZipFolder}\"");
+            writer.WriteLine($"del /Q \"{BatchPath}\"");
+            
+            writer.Close();
+            Process process = new Process();
+            process.StartInfo.FileName = BatchPath;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.Start();
+            Application.Exit();
+
         }
     }
 }
