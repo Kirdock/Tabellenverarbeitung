@@ -20,39 +20,47 @@ namespace DataTableConverter.Assisstant
         private readonly static string FileName = FileNameWithoutExtension+".zip";
         private readonly static string Download = Repository+"/download/{0}/"+FileName;
         
-        internal static void CheckUpdate(bool Prompt)
+        internal static void CheckUpdate(bool Prompt, ProgressBar progressBar)
         {
             try
             {
-                new Thread(() =>
+                if (!Prompt || !Properties.Settings.Default.UpdateDialogShowed)
                 {
-                    WebRequest request = WebRequest.Create(Tags);
-                    WebResponse response = request.GetResponse();
-
-                    string version = response.ResponseUri.ToString().Split(new char[] { '/' }).Last();
-                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                    FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-
-                    if (version != fvi.FileVersion.Substring(0, version.Length))
+                    new Thread(() =>
                     {
-                        if (Prompt)
+                        WebRequest request = WebRequest.Create(Tags);
+                        WebResponse response = request.GetResponse();
+
+                        string version = response.ResponseUri.ToString().Split(new char[] { '/' }).Last();
+                        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+
+                        if (version != fvi.FileVersion.Substring(0, version.Length))
                         {
-                            DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Information, "Eine neue Version steht zur Verfügung. Möchten Sie sie runterladen?");
-                            if(result == DialogResult.Yes)
+                            if (Prompt)
                             {
-                                DownloadFile(version);
+                                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Information, "Eine neue Version steht zur Verfügung. Möchten Sie sie runterladen?");
+                                if (result == DialogResult.Yes)
+                                {
+                                    SetUpdateShowed(false);
+                                    DownloadFile(version, progressBar);
+                                }
+                                else
+                                {
+                                    SetUpdateShowed(true);
+                                }
+                            }
+                            else
+                            {
+                                DownloadFile(version, progressBar);
                             }
                         }
-                        else
+                        else if (!Prompt)
                         {
-                            DownloadFile(version);
+                            MessageHandler.MessagesOK(MessageBoxIcon.Information, "Sie besitzen bereits die aktuellste Version");
                         }
-                    }
-                    else if(!Prompt)
-                    {
-                        MessageHandler.MessagesOK(MessageBoxIcon.Information, "Sie besitzen bereits die aktuellste Version");
-                    }
-                }).Start();
+                    }).Start();
+                }
             }
             catch (Exception ex)
             {
@@ -60,8 +68,18 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static void DownloadFile(string version)
+        private static void SetUpdateShowed(bool status)
         {
+            Properties.Settings.Default.UpdateDialogShowed = status;
+            Properties.Settings.Default.Save();
+        }
+
+        private static void DownloadFile(string version, ProgressBar progressBar)
+        {
+            progressBar.Invoke(new MethodInvoker(() =>
+            {
+                progressBar.Style = ProgressBarStyle.Marquee;
+            }));
             using (var client = new WebClient())
             {
                 client.DownloadFile(string.Format(Download,version), FileName);

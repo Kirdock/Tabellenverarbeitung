@@ -213,5 +213,17 @@ namespace DataTableConverter.Properties {
                 this["splitWorkflowProperties"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UpdateDialogShowed {
+            get {
+                return ((bool)(this["UpdateDialogShowed"]));
+            }
+            set {
+                this["UpdateDialogShowed"] = value;
+            }
+        }
     }
 }
