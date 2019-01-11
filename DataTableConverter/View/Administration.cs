@@ -540,7 +540,7 @@ namespace DataTableConverter.View
             dgUpLow.DataSource = null;
             dgUpLow.DataSource = selectedProc.Columns;
             setUpLowEnabled(!selectedProc.AllColumns);
-
+            SetHeaderUpLowCase(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
 
         private void SetOrderControls(WorkProc selectedProc)
@@ -645,6 +645,13 @@ namespace DataTableConverter.View
             clbHeadersRound.ItemCheck -= clbHeadersRound_ItemCheck;
             setChecked(clbHeadersRound, headers);
             clbHeadersRound.ItemCheck += clbHeadersRound_ItemCheck;
+        }
+
+        private void SetHeaderUpLowCase(string[] headers)
+        {
+            clbUpLowHeader.ItemCheck -= clbUpLowHeader_ItemCheck;
+            setChecked(clbUpLowHeader, headers);
+            clbUpLowHeader.ItemCheck += clbUpLowHeader_ItemCheck;
         }
 
         private void setChecked(CheckedComboBox box, string[] headers)

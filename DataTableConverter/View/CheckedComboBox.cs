@@ -10,6 +10,8 @@ namespace CheckComboBoxTest {
         /// <summary>
         /// Internal class to represent the dropdown list of the CheckedComboBox
         /// </summary>
+        /// 
+        
         internal class Dropdown : Form {
             // ---------------------------------- internal class CCBoxEventArgs --------------------------------------------
             /// <summary>
@@ -190,8 +192,7 @@ namespace CheckComboBoxTest {
                 // this method once again after hiding this window.
                 dropdownClosed = true;
                 // Set the focus to our parent CheckedComboBox and hide the dropdown check list.
-                ccbParent.Focus();
-                this.Hide();
+                ccbParent.BeginInvoke(new MethodInvoker(() => Hide()));
                 // Notify CheckedComboBox that its dropdown is closed. (NOTE: it does not matter which parameters we pass to
                 // OnDropDownClosed() as long as the argument is CCBoxEventArgs so that the method knows the notification has
                 // come from our code and not from the framework).
@@ -212,11 +213,13 @@ namespace CheckComboBoxTest {
 
             protected override void OnDeactivate(EventArgs e) {
                 base.OnDeactivate(e);
-                CCBoxEventArgs ce = e as CCBoxEventArgs;
-                if (ce != null) {
+                if (e is CCBoxEventArgs ce)
+                {
                     CloseDropdown(ce.AssignValues);
 
-                } else {
+                }
+                else
+                {
                     // If not custom event arguments passed, means that this method was called from the
                     // framework. We assume that the checked values should be registered regardless.
                     CloseDropdown(true);
@@ -224,9 +227,7 @@ namespace CheckComboBoxTest {
             }
 
             private void cclb_ItemCheck(object sender, ItemCheckEventArgs e) {
-                if (ccbParent.ItemCheck != null) {
-                    ccbParent.ItemCheck(sender, e);
-                }
+                ccbParent.ItemCheck?.Invoke(sender, e);
             }
 
         } // end internal class Dropdown
@@ -393,6 +394,12 @@ namespace CheckComboBoxTest {
                 // Need to update the Text.
                 this.Text = dropdown.GetCheckedItemsStringValue();
             }
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            DroppedDown = false;
         }
 
     } // end public class CheckedComboBox
