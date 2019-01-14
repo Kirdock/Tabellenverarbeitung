@@ -13,6 +13,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "Runden";
         internal int Decimals;
+        internal int Type;
 
         public override string[] GetHeaders()
         {
@@ -21,12 +22,13 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public ProcRound(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public ProcRound(string[] columns, int decimals, string newColumn)
+        public ProcRound(string[] columns, int decimals, string newColumn, int type)
         {
             Decimals = decimals;
             NewColumn = newColumn;
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
+            Type = type;
             foreach (string col in columns)
             {
                 Columns.Rows.Add(col);
@@ -67,11 +69,51 @@ namespace DataTableConverter.Classes.WorkProcs
                         int index = intoNewCol ? lastCol : i;
                         if (float.TryParse(row.ItemArray[i].ToString(), out float result))
                         {
-                            row.SetField(index, Math.Round( result, Decimals,MidpointRounding.AwayFromZero));
+                            row.SetField(index, Round(result));
                         }
                     }
                 }
             }
+        }
+
+        private string Round(float number)
+        {
+            string result;
+            switch (Type)
+            {
+                //normal round
+                case 0:
+                    {
+                        result = Math.Round(number, Decimals, MidpointRounding.AwayFromZero).ToString();
+                    }
+                    break;
+
+                //ceiling
+                case 1:
+                    {
+                        result = RoundUp(number).ToString();
+                    }
+                    break;
+                //floor
+                default:
+                    {
+                        result = RoundDown(number).ToString();
+                    }
+                    break;
+            }
+            return result;
+        }
+
+        private double RoundUp(float input)
+        {
+            double multiplier = Math.Pow(10, Convert.ToDouble(Decimals));
+            return Math.Ceiling(input * multiplier) / multiplier;
+        }
+
+        private double RoundDown(float input)
+        {
+            double multiplier = Math.Pow(10, Convert.ToDouble(Decimals));
+            return Math.Floor(input * multiplier) / multiplier;
         }
     }
 }

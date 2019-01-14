@@ -38,6 +38,8 @@
             this.cbNewColumn = new System.Windows.Forms.CheckBox();
             this.lblHeader = new System.Windows.Forms.Label();
             this.txtHeader = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.CmBRound = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.numDec)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,7 +47,7 @@
             // 
             this.numDec.Location = new System.Drawing.Point(12, 30);
             this.numDec.Name = "numDec";
-            this.numDec.Size = new System.Drawing.Size(153, 20);
+            this.numDec.Size = new System.Drawing.Size(107, 20);
             this.numDec.TabIndex = 0;
             // 
             // label1
@@ -136,11 +138,35 @@
             this.txtHeader.Size = new System.Drawing.Size(249, 20);
             this.txtHeader.TabIndex = 13;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(187, 9);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(23, 13);
+            this.label3.TabIndex = 21;
+            this.label3.Text = "Art:";
+            // 
+            // CmBRound
+            // 
+            this.CmBRound.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CmBRound.FormattingEnabled = true;
+            this.CmBRound.Items.AddRange(new object[] {
+            "Runden",
+            "Aufrunden",
+            "Abrunden"});
+            this.CmBRound.Location = new System.Drawing.Point(190, 29);
+            this.CmBRound.Name = "CmBRound";
+            this.CmBRound.Size = new System.Drawing.Size(166, 21);
+            this.CmBRound.TabIndex = 22;
+            // 
             // RoundForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(376, 245);
+            this.Controls.Add(this.CmBRound);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.btnUncheckAll);
             this.Controls.Add(this.btnCheckAll);
             this.Controls.Add(this.label2);
@@ -172,5 +198,7 @@
         private System.Windows.Forms.CheckBox cbNewColumn;
         private System.Windows.Forms.Label lblHeader;
         private System.Windows.Forms.TextBox txtHeader;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox CmBRound;
     }
 }

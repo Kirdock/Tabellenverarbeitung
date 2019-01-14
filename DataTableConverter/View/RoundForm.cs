@@ -12,11 +12,14 @@ namespace DataTableConverter.View
 {
     public partial class RoundForm : Form
     {
+        internal int Type { get { return CmBRound.SelectedIndex; } }
+
         internal RoundForm(object[] headers)
         {
             InitializeComponent();
             cbHeaders.Items.AddRange(headers);
             SetNewColumnVisibility();
+            CmBRound.SelectedIndex = 0;
         }
 
         internal string[] GetSelectedHeaders()

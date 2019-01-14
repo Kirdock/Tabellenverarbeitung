@@ -43,6 +43,8 @@ namespace DataTableConverter.View
             SetHeaders(headers);
             SetOrderList();
             assignGroupBoxToEnum();
+            CmBRound.SelectedIndex = 0;
+            CmBRound.SelectedIndexChanged += CmBRound_SelectedIndexChanged;
             cmbProcedureType.SelectedIndex = 0;
 
             loadProcedures();
@@ -1167,6 +1169,11 @@ namespace DataTableConverter.View
         private void numDec_ValueChanged(object sender, EventArgs e)
         {
             ((ProcRound)getSelectedWorkProcedure()).Decimals = (int)((NumericUpDown)sender).Value;
+        }
+
+        private void CmBRound_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ((ProcRound)getSelectedWorkProcedure()).Type = CmBRound.SelectedIndex;
         }
     }
 }

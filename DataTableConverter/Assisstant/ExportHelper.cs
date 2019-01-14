@@ -195,18 +195,6 @@ namespace DataTableConverter
             }
         }
 
-        private static void copyAlltoClipboard(out IDataObject clipboardBefore, DataGridView dgTable)
-        {
-            clipboardBefore = Clipboard.GetDataObject();
-            dgTable.SelectAll();
-            DataObject dataObj = dgTable.GetClipboardContent();
-            if (dataObj != null)
-            {
-                Clipboard.SetDataObject(dataObj);
-            }
-            dgTable.ClearSelection();
-        }
-
         internal static void exportDbase(string fileName, DataTable dataTable, string path)
         {
             fileName = fileName.ToUpper();

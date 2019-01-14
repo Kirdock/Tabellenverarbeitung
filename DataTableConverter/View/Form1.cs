@@ -347,7 +347,6 @@ namespace DataTableConverter
                     {
                         addDataSourceValueChange(getDataSource(), table);
                     }));
-                    throw new System.NotImplementedException("asdlfkj");
                 }
                 catch(Exception ex)
                 {
@@ -1224,7 +1223,7 @@ namespace DataTableConverter
             RoundForm form = new RoundForm(DataHelper.getHeadersOfDataTable(getDataSource()));
             if(form.ShowDialog() == DialogResult.OK)
             {
-                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { new ProcRound(form.GetSelectedHeaders(), form.GetDecimals(), form.NewColumn()) }, 0));
+                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { new ProcRound(form.GetSelectedHeaders(), form.GetDecimals(), form.NewColumn(), form.Type) }, 0));
             }
         }
 
