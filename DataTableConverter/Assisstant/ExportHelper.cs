@@ -1,4 +1,5 @@
-﻿using DataTableConverter.Classes;
+﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,12 +18,12 @@ namespace DataTableConverter
     class ExportHelper : MessageHandler
     {
         internal static readonly string ProjectName = "Tabellenkonvertierung";
-        internal static readonly string ProjectPath = $@"{ Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) }\{ProjectName}";
-        internal static readonly string ProjectPresets = $@"{ProjectPath}\Vorlagen";
-        internal static readonly string ProjectProcedures = $@"{ProjectPath}\Funktionen.bin";
-        internal static readonly string ProjectTolerance = $@"{ProjectPath}\Toleranzen.bin";
-        internal static readonly string ProjectCases = $@"{ProjectPath}\Fälle.bin";
-        internal static readonly string ProjectWorkflows = $@"{ProjectPath}\Arbeitsabläufe.bin";
+        internal static readonly string ProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),ProjectName);
+        internal static readonly string ProjectPresets = Path.Combine(ProjectPath,"Vorlagen");
+        internal static readonly string ProjectProcedures = Path.Combine(ProjectPath,"Funktionen.bin");
+        internal static readonly string ProjectTolerance = Path.Combine(ProjectPath,"Toleranzen.bin");
+        internal static readonly string ProjectCases = Path.Combine(ProjectPath,"Fälle.bin");
+        internal static readonly string ProjectWorkflows = Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(858);
         internal static readonly int DbaseMaxFileLength = 8;
@@ -121,7 +122,7 @@ namespace DataTableConverter
                 IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
                 sb.AppendLine(string.Join(CSVSeparator, fields));
             }
-            File.WriteAllText($@"{directory}\{filename}.csv", sb.ToString());
+            File.WriteAllText(Path.Combine(directory,filename+".csv"), sb.ToString());
         }
 
         internal static void exportExcel(DataTable dt, string directory, string filename)
@@ -179,7 +180,7 @@ namespace DataTableConverter
                                                    Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
                                                    System.Type.Missing).Name = workSheetName;
 
-                workbook.SaveAs($@"{Path.Combine(directory, filename)}.xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                workbook.SaveAs(Path.Combine(directory, filename + ".xls"), Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                 workbook.Close(false, Type.Missing, Type.Missing);
                 excel.Quit();
 
@@ -191,26 +192,29 @@ namespace DataTableConverter
             }
             catch (Exception ex)
             {
-                MessagesOK(MessageBoxIcon.Error, "Es ist ein Fehler beim Speichern aufgetreten\nFehler:" + ex.Message);
+                ErrorHelper.LogMessage(ex);
             }
         }
 
-        internal static void exportDbase(string fileName, DataTable dataTable, string path)
+        internal static void exportDbase(string originalFileName, DataTable dataTable, string originalPath)
         {
-            fileName = fileName.ToUpper();
-            if(fileName.Length > DbaseMaxFileLength)
+
+            string fileName = originalFileName.ToUpper();
+            if (fileName.Length > DbaseMaxFileLength)
             {
                 fileName = fileName.Substring(0, DbaseMaxFileLength);
             }
+            string path = Path.Combine(originalPath, "temp");
+            Directory.CreateDirectory(path);
+            string fullpath = Path.Combine(path,fileName+".DBF");
+            string fullPathOriginal = Path.Combine(originalPath, originalFileName + ".DBF");
 
-            string fullpath = $@"{path}\{fileName}.DBF";
-
-            if (File.Exists(fullpath))
+            if (File.Exists(fullPathOriginal))
             {
-                File.Delete(fullpath);
+                File.Delete(fullPathOriginal);
             }
 
-            
+
             int[] max = getMaxLengthOfColumns(dataTable);
             createTable(dataTable, max, path, fileName);
 
@@ -236,12 +240,13 @@ namespace DataTableConverter
                 stream.Write(DbaseEncoding.GetBytes(text), 0, text.Length);
                 stream.Write(bytes, 0, bytes.Length);
                 stream.Close();
-
+                File.Move(fullpath, fullPathOriginal);
+                Directory.Delete(path);
                 #endregion
             }
             catch (Exception ex)
             {
-                MessagesOK(MessageBoxIcon.Error, ex.Message);
+                ErrorHelper.LogMessage(ex);
             }
 
         }
@@ -308,7 +313,6 @@ namespace DataTableConverter
         private static string GetConnection(string path)
         {
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
-            //return $"Provider=vfpoledb.1;Data Source={path};Collating Sequence = machine; ";
         }
     }
 }

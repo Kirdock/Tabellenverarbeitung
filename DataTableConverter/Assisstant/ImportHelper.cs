@@ -172,11 +172,12 @@ namespace DataTableConverter.Assisstant
         internal static DataTable openDBF(string path)
         {
             DataTable data = new DataTable();
-
-            string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={Path.GetDirectoryName(path)};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
+            string directory = Path.GetDirectoryName(path);
+            string shortPath = GetShortFileName(path);
+            string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={directory};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
             OleDbConnection con = new OleDbConnection(constr);
 
-            var sql = $@"select * from [{ Path.GetFileNameWithoutExtension(path)}]";
+            var sql = $@"select * from [{ shortPath}]";
             OleDbCommand cmd = new OleDbCommand(sql, con);
             con.Open();
             OleDbDataAdapter da = new OleDbDataAdapter(cmd);
@@ -499,6 +500,27 @@ namespace DataTableConverter.Assisstant
                 return checkedSheets;
             }
         }
+
+        internal static string GetShortFileName(string path)
+        {
+            StringBuilder temp = new StringBuilder(255);
+
+            int n = GetShortPathName(path, temp, 255);
+
+            return ((temp.ToString().Split('\\')).Last()).ToLower();
+        }
+        private string LongFileName(string shortName)
+        {
+            return new FileInfo(shortName).FullName;
+        }
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern int GetShortPathName(
+            [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)]
+        string path,
+            [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)]
+        StringBuilder shortPath,
+            int shortPathLength);
 
     }
 }

@@ -1032,12 +1032,7 @@ namespace DataTableConverter
                                 //Dbase
                                 case 1:
                                     {
-                                        //if(FileName.Length > ExportHelper.DbaseMaxFileLength)
-                                        //{
-                                        //    FileName = FileName.Substring(FileName.Length - ExportHelper.DbaseMaxFileLength);
-                                        //    path = Path.Combine(Path.GetDirectoryName(FilePath), FileName + "{0}");
-                                        //}
-                                        //dBASEToolStripMenuItem_Click(null, null, Table, string.Format(path, ".DBF"));
+                                        ExportHelper.exportDbase(FileName, Table,path);
                                     }
                                     break;
 

@@ -9,7 +9,7 @@ namespace DataTableConverter.Assisstant
 {
     class ErrorHelper
     {
-        private static readonly string path = $@"{ExportHelper.ProjectPath}\Logs.log";
+        private static readonly string path = Path.Combine(ExportHelper.ProjectPath,"Logs.log");
         private static readonly string ErrorMessage = "Es ist ein Fehler aufgetreten!\nBitte kontaktieren Sie Ihren Administrator.";
 
         internal static void LogMessage(Exception exception)
