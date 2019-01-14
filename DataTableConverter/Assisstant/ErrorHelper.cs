@@ -12,11 +12,11 @@ namespace DataTableConverter.Assisstant
         private static readonly string path = $@"{ExportHelper.ProjectPath}\Logs.log";
         private static readonly string ErrorMessage = "Es ist ein Fehler aufgetreten!\nBitte kontaktieren Sie Ihren Administrator.";
 
-        internal static void LogMessage(string Message)
+        internal static void LogMessage(Exception exception)
         {
             try
             {
-                File.AppendAllText(path, Message + Environment.NewLine);
+                File.AppendAllText(path, exception.ToString() + Environment.NewLine);
                 ShowError(ErrorMessage);
             }
             catch (Exception ex)

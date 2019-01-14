@@ -64,7 +64,7 @@ namespace DataTableConverter.Assisstant
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex.ToString());
+                ErrorHelper.LogMessage(ex);
             }
         }
 

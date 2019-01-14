@@ -225,5 +225,41 @@ namespace DataTableConverter.Properties {
                 this["UpdateDialogShowed"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ExportCustomFormat {
+            get {
+                return ((int)(this["ExportCustomFormat"]));
+            }
+            set {
+                this["ExportCustomFormat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExportCustomText {
+            get {
+                return ((string)(this["ExportCustomText"]));
+            }
+            set {
+                this["ExportCustomText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExportCustomCheck {
+            get {
+                return ((bool)(this["ExportCustomCheck"]));
+            }
+            set {
+                this["ExportCustomCheck"] = value;
+            }
+        }
     }
 }

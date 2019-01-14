@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using DataTableConverter.Classes;
+﻿using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,6 +7,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
@@ -25,6 +25,7 @@ namespace DataTableConverter
         internal static readonly string ProjectWorkflows = $@"{ProjectPath}\Arbeitsabläufe.bin";
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(858);
+        internal static readonly int DbaseMaxFileLength = 8;
 
 
         internal static void checkFolders()
@@ -123,38 +124,72 @@ namespace DataTableConverter
             File.WriteAllText($@"{directory}\{filename}.csv", sb.ToString());
         }
 
-        internal static void exportExcel(DataGridView dgTable)
-        {
-            if (dgTable.DataSource != null)
-            {
-                copyAlltoClipboard(out IDataObject clipboardBefore, dgTable);
-                Microsoft.Office.Interop.Excel.Application xlexcel;
-                Microsoft.Office.Interop.Excel.Workbook xlWorkBook;
-                Microsoft.Office.Interop.Excel.Worksheet xlWorkSheet;
-                object misValue = Missing.Value;
-
-                xlexcel = new Microsoft.Office.Interop.Excel.Application();
-                xlexcel.Visible = true;
-                xlWorkBook = xlexcel.Workbooks.Add(misValue);
-                xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
-                Microsoft.Office.Interop.Excel.Range CR = (Microsoft.Office.Interop.Excel.Range)xlWorkSheet.Cells[1, 1];
-                CR.Select();
-                xlWorkSheet.PasteSpecial(CR, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
-
-                Clipboard.Clear();
-                Clipboard.SetDataObject(clipboardBefore, true);
-            }
-        }
-
         internal static void exportExcel(DataTable dt, string directory, string filename)
         {
             try
             {
-                XLWorkbook wb = new XLWorkbook();
-                wb.Worksheets.Add(dt, "Tabelle1");
-                wb.SaveAs($@"{directory}\{filename}.xlsx");
+                string workSheetName = "Tabelle 1";
+
+                Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application
+                {
+                    DisplayAlerts = false,
+                    Visible = false,
+                    ScreenUpdating = false
+                };
+
+                Microsoft.Office.Interop.Excel.Workbooks workbooks = excel.Workbooks;
+                Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Type.Missing);
+
+                Microsoft.Office.Interop.Excel.Sheets worksheets = workbook.Sheets;
+                Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)worksheets[1];
+
+                excel.Calculation = Microsoft.Office.Interop.Excel.XlCalculation.xlCalculationManual;
+                worksheet.Name = workSheetName;
+
+                int rows = dt.Rows.Count;
+                int columns = dt.Columns.Count;
+                // Add the +1 to allow room for column headers.
+                var data = new object[rows + 1, columns];
+
+                // Insert column headers.
+                for (var column = 0; column < columns; column++)
+                {
+                    data[0, column] = dt.Columns[column].ColumnName;
+                }
+
+                // Insert the provided records.
+                for (var row = 0; row < rows; row++)
+                {
+                    for (var column = 0; column < columns; column++)
+                    {
+                        data[row + 1, column] = dt.Rows[row][column];
+                    }
+                }
+
+                // Write this data to the excel worksheet.
+                Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, 1];
+                Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rows + 1, columns];
+                Microsoft.Office.Interop.Excel.Range sheetData = worksheet.Range[beginWrite, endWrite];
+                sheetData.Value2 = data;
+
+                worksheet.Select();
+                sheetData.Worksheet.ListObjects.Add(Microsoft.Office.Interop.Excel.XlListObjectSourceType.xlSrcRange,
+                                                   sheetData,
+                                                   System.Type.Missing,
+                                                   Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
+                                                   System.Type.Missing).Name = workSheetName;
+
+                workbook.SaveAs($@"{Path.Combine(directory, filename)}.xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                workbook.Close(false, Type.Missing, Type.Missing);
+                excel.Quit();
+
+                // Release our resources.
+                Marshal.ReleaseComObject(workbook);
+                Marshal.ReleaseComObject(workbooks);
+                Marshal.ReleaseComObject(excel);
+                Marshal.FinalReleaseComObject(excel);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessagesOK(MessageBoxIcon.Error, "Es ist ein Fehler beim Speichern aufgetreten\nFehler:" + ex.Message);
             }
@@ -174,11 +209,10 @@ namespace DataTableConverter
 
         internal static void exportDbase(string fileName, DataTable dataTable, string path)
         {
-            int maxFileLength = 8;
             fileName = fileName.ToUpper();
-            if(fileName.Length > maxFileLength)
+            if(fileName.Length > DbaseMaxFileLength)
             {
-                fileName = fileName.Substring(0, maxFileLength);
+                fileName = fileName.Substring(0, DbaseMaxFileLength);
             }
 
             string fullpath = $@"{path}\{fileName}.DBF";

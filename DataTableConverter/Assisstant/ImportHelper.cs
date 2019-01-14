@@ -184,6 +184,39 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
+        internal static DataTable OpenMSAccess(string path)
+        {
+            OleDbConnection Con = new OleDbConnection {
+                ConnectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={path};"
+            };
+            
+            DataTable Table = new DataTable();
+
+            try
+            {
+                Con.Open();
+                DataTable Tables = Con.GetSchema("Tables");
+                foreach (DataRow row in Tables.Rows)
+                {
+                    if (row["TABLE_TYPE"].ToString() == "TABLE")
+                    {
+                        using (OleDbDataAdapter dbAdapter = new OleDbDataAdapter($"Select * from [{row["TABLE_NAME"].ToString()}]", Con))
+                        {
+                            DataTable temp = new DataTable();
+                            dbAdapter.Fill(temp);
+                            DataHelper.concatTables(Table, temp);
+                        }
+                    }
+                }
+                Con.Close();
+            }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage(ex);
+            }
+            return Table;
+        }
+
         internal static DataTable openExcel(string path, Form1 mainform)
         {
             DataTable data = new DataTable();

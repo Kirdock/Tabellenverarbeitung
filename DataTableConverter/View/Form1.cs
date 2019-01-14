@@ -334,7 +334,7 @@ namespace DataTableConverter
         private void replaceThroughTemp(List<WorkProc> temp)
         {
             DataTable table = getDataSource();
-            pgbLoading.Style = ProgressBarStyle.Marquee;
+            StartLoadingBar();
             new Thread(() =>
             {
                 try
@@ -351,9 +351,9 @@ namespace DataTableConverter
                 }
                 catch(Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex.ToString());
+                    ErrorHelper.LogMessage(ex);
                 }
-                pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                StopLoadingBar();
             }).Start();
         }
 
@@ -366,10 +366,12 @@ namespace DataTableConverter
         {
             OpenFileDialog dialog = new OpenFileDialog();
             string textExt = "*.txt";
+            string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
             
 
-            dialog.Filter = $"Text-, CSV-, DBASE und Excel-Dateien ({csvExt}, {textExt}, {dbfExt}*.xl*)|{csvExt};{textExt}; {excelExt}; {dbfExt}"
+            dialog.Filter = $"Text-, CSV-, DBASE und Excel-Dateien ({csvExt}, {textExt}, {AccessExt}, {dbfExt}*.xl*)|{csvExt};{textExt}; {excelExt}; {dbfExt}; {AccessExt}"
                             + $"|Textdateien ({textExt})|{textExt}"
+                            + $"|Access-Dateien ({AccessExt})|{AccessExt}"
                             + $"|CSV-Dateien ({csvExt})|{csvExt}"
                             + $"|dBase-Dateien ({dbfExt})|{dbfExt}"
                             + $"|Excel-Dateien (*.xl*)|{excelExt}"
@@ -383,7 +385,7 @@ namespace DataTableConverter
 
                 if (extension == ".dbf")
                 {
-                    pgbLoading.Style = ProgressBarStyle.Marquee;
+                    StartLoadingBar();
                     new Thread(() =>
                     {
                         try {
@@ -393,13 +395,30 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex.ToString());
+                            ErrorHelper.LogMessage(ex);
+                        }
+                    }).Start();
+                }
+                else if(extension != string.Empty && AccessExt.Contains(extension))
+                {
+                    StartLoadingBar();
+                    new Thread(() =>
+                    {
+                        try
+                        {
+                            Thread.CurrentThread.IsBackground = true;
+                            DataTable dt = ImportHelper.OpenMSAccess(dialog.FileName);
+                            finishImport(dt, state, oldTable);
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex);
                         }
                     }).Start();
                 }
                 else if (extension != string.Empty && excelExt.Contains(extension))
                 {
-                    pgbLoading.Style = ProgressBarStyle.Marquee;
+                    StartLoadingBar();
                     new Thread(() =>
                     {
                         try {
@@ -409,7 +428,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex.ToString());
+                            ErrorHelper.LogMessage(ex);
                         }
                     }).Start();
                 }
@@ -432,7 +451,7 @@ namespace DataTableConverter
 
         private void finishImport(DataTable table, ImportState state, DataTable oldTable)
         {
-            pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+            StopLoadingBar();
             switch (state)
             {
                 case ImportState.Merge:
@@ -540,7 +559,7 @@ namespace DataTableConverter
                     }
                     catch (Exception ex)
                     {
-                        ErrorHelper.LogMessage(ex.ToString());
+                        ErrorHelper.LogMessage(ex);
                     }
                 }).Start();
             }
@@ -560,7 +579,7 @@ namespace DataTableConverter
         {
             if (dgTable.DataSource != null)
             {
-                pgbLoading.Style = ProgressBarStyle.Marquee;
+                StartLoadingBar();
                 new Thread(() =>
                 {
                     try
@@ -569,7 +588,7 @@ namespace DataTableConverter
                     }
                     catch (Exception ex)
                     {
-                        ErrorHelper.LogMessage(ex.ToString());
+                        ErrorHelper.LogMessage(ex);
                     }
                 }).Start();
             }
@@ -628,7 +647,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex.ToString());
+                            ErrorHelper.LogMessage(ex);
                         }
                     }).Start();
                 }
@@ -644,7 +663,7 @@ namespace DataTableConverter
             {
                 addDataSourceValueChange(getDataSource(), dt);
             }));
-            pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+            StopLoadingBar();
         }
 
         private void excelToolStripMenuItem_Click(object sender, EventArgs e, string path = null)
@@ -661,7 +680,7 @@ namespace DataTableConverter
                 if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
-                    pgbLoading.Style = ProgressBarStyle.Marquee;
+                    StartLoadingBar();
                     DataTable table = getDataSource(true);
                     new Thread(() =>
                     {
@@ -669,11 +688,11 @@ namespace DataTableConverter
                         {
                             Thread.CurrentThread.IsBackground = true;
                             ExportHelper.exportExcel(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
-                            pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                            StopLoadingBar();
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex.ToString());
+                            ErrorHelper.LogMessage(ex);
                         }
                     }).Start();
                 }
@@ -783,18 +802,19 @@ namespace DataTableConverter
                 if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
-                    pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Marquee; }));
+                    StartLoadingBar();
+                    DataTable table = getDataSource(true);
                     new Thread(() =>
                     {
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.exportDbase(Path.GetFileNameWithoutExtension(path), getDataSource(true), Path.GetDirectoryName(path));
-                            pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                            ExportHelper.exportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path));
+                            StopLoadingBar();
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex.ToString());
+                            ErrorHelper.LogMessage(ex);
                         }
                     }).Start();
                 }
@@ -809,7 +829,7 @@ namespace DataTableConverter
         private void rückgängigToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DataTable oldTable = getDataSource();
-            pgbLoading.Style = ProgressBarStyle.Marquee;
+            StartLoadingBar();
 
             new Thread(() =>
             {
@@ -819,11 +839,11 @@ namespace DataTableConverter
                     {
                         takeOverHistory(newTable, historyHelper.OrderString);
                     }));
-                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                    StopLoadingBar();
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex.ToString());
+                    ErrorHelper.LogMessage(ex);
                 }
             }).Start();
             
@@ -840,7 +860,7 @@ namespace DataTableConverter
         private void wiederholenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DataTable oldTable = getDataSource();
-            pgbLoading.Style = ProgressBarStyle.Marquee;
+            StartLoadingBar();
 
             new Thread(() =>
             {
@@ -851,11 +871,11 @@ namespace DataTableConverter
                     {
                         takeOverHistory(newTable, historyHelper.OrderString);
                     }));
-                    pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                    StopLoadingBar();
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex.ToString());
+                    ErrorHelper.LogMessage(ex);
                 }
             }).Start();
         }
@@ -911,7 +931,7 @@ namespace DataTableConverter
                 
                 if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
-                    pgbLoading.Style = ProgressBarStyle.Marquee;
+                    StartLoadingBar();
                     path = path ?? saveFileDialog1.FileName;
                     new Thread(() =>
                     {
@@ -919,11 +939,11 @@ namespace DataTableConverter
                         {
                             Thread.CurrentThread.IsBackground = true;
                             ExportHelper.exportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
-                            pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Style = ProgressBarStyle.Blocks; }));
+                            StopLoadingBar();
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex.ToString());
+                            ErrorHelper.LogMessage(ex);
                         }
                     }).Start();
                 }
@@ -969,20 +989,87 @@ namespace DataTableConverter
 
         private void saveExportClosed(object sender, FormClosedEventArgs e)
         {
-            DataTable table = getDataSource(true);
+            DataTable originalTable = getDataSource(true);
             ExportCustom export = (ExportCustom)sender;
             if (export.DialogResult == DialogResult.OK)
             {
-                for (int i = 0; i < table.Rows.Count; i++)
+                Dictionary<string, DataTable> Dict = new Dictionary<string, DataTable>();
+                DataTable Temp = new DataTable();
+                originalTable.Columns.Cast<DataColumn>().Select(Column => Column.ColumnName).ToList().ForEach(Header => Temp.Columns.Add(Header));
+                if (export.AllValues())
                 {
-                    if (!table.Rows[i].ItemArray[export.getColumnIndex()].ToString().Equals(export.getValue()))
+                    originalTable.Rows.Cast<DataRow>().Select(Row => Row[export.getColumnIndex()].ToString()).Distinct().ToList().ForEach(Value => Dict.Add(Value, Temp.Copy()));
+                }
+                else
+                {
+                    Dict.Add(export.getValue(), new DataTable());
+                }
+                for (int i = 0; i < originalTable.Rows.Count; i++)
+                {
+                    if(Dict.TryGetValue(originalTable.Rows[i][export.getColumnIndex()].ToString(),out DataTable Table))
                     {
-                        table.Rows.RemoveAt(i);
-                        i--;
+                        Table.ImportRow(originalTable.Rows[i]);
                     }
                 }
-                cSVToolStripMenuItem_Click(null, null, table);
+                StartLoadingBar();
+                int Format = export.SelectedFormat;
+                new Thread(() =>
+                {
+                    foreach (string Key in Dict.Keys)
+                    {
+                        if (Dict.TryGetValue(Key, out DataTable Table))
+                        {
+                            string FileName = $"{Path.GetFileNameWithoutExtension(FilePath)} {Key}";
+                            string path = Path.GetDirectoryName(FilePath);
+                            switch (Format)
+                            {
+                                //CSV
+                                case 0:
+                                    {
+                                        ExportHelper.exportCsv(Table, path, FileName);
+                                    }
+                                    break;
+
+                                //Dbase
+                                case 1:
+                                    {
+                                        //if(FileName.Length > ExportHelper.DbaseMaxFileLength)
+                                        //{
+                                        //    FileName = FileName.Substring(FileName.Length - ExportHelper.DbaseMaxFileLength);
+                                        //    path = Path.Combine(Path.GetDirectoryName(FilePath), FileName + "{0}");
+                                        //}
+                                        //dBASEToolStripMenuItem_Click(null, null, Table, string.Format(path, ".DBF"));
+                                    }
+                                    break;
+
+                                //Excel
+                                case 2:
+                                    {
+                                        ExportHelper.exportExcel(Table, path, FileName);
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    StopLoadingBar();
+                }).Start();
             }
+        }
+
+        private void StartLoadingBar()
+        {
+            pgbLoading.BeginInvoke(new MethodInvoker(() =>
+            {
+                pgbLoading.Style = ProgressBarStyle.Marquee;
+            }));
+        }
+
+        private void StopLoadingBar()
+        {
+            pgbLoading.BeginInvoke(new MethodInvoker(() =>
+            {
+                pgbLoading.Style = ProgressBarStyle.Blocks;
+            }));
         }
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
