@@ -1353,10 +1353,11 @@ namespace DataTableConverter
                     int newColumns = dict.Values.Max(dataRowArray => dataRowArray.Values.Count);
 
                     SetStatusLabel("Neue Spalten werden hinzugefügt");
-                    foreach (string additionalColumn in additionalColumns)
+                    for (int i = 1; i <= newColumns; i++)
                     {
-                        for (int i = 1; i <= newColumns; i++)
+                        foreach (string additionalColumn in additionalColumns)
                         {
+                        
                             DataHelper.addColumn(additionalColumn + i, table);
                         }
                     }
