@@ -32,6 +32,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.öffnenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.öffnenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.speichernToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.speichernToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.cSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dBASEToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,6 +56,7 @@
             this.arbeitsablaufToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.duplikateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sortierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pgbLoading = new System.Windows.Forms.ProgressBar();
             this.ctxBody = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.spalteHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,9 +77,9 @@
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.speichernToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zeilenZusammenfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -121,6 +123,13 @@
             this.öffnenToolStripMenuItem1.Size = new System.Drawing.Size(230, 22);
             this.öffnenToolStripMenuItem1.Text = "Öffnen";
             // 
+            // speichernToolStripMenuItem
+            // 
+            this.speichernToolStripMenuItem.Name = "speichernToolStripMenuItem";
+            this.speichernToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.speichernToolStripMenuItem.Text = "Speichern";
+            this.speichernToolStripMenuItem.Click += new System.EventHandler(this.speichernToolStripMenuItem_Click_1);
+            // 
             // speichernToolStripMenuItem1
             // 
             this.speichernToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -161,14 +170,14 @@
             // postwurfToolStripMenuItem
             // 
             this.postwurfToolStripMenuItem.Name = "postwurfToolStripMenuItem";
-            this.postwurfToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.postwurfToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
             this.postwurfToolStripMenuItem.Text = "Postwurf";
             this.postwurfToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
             // 
             // nachWertInSpalteToolStripMenuItem
             // 
             this.nachWertInSpalteToolStripMenuItem.Name = "nachWertInSpalteToolStripMenuItem";
-            this.nachWertInSpalteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.nachWertInSpalteToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
             this.nachWertInSpalteToolStripMenuItem.Text = "Nach Wert in Spalte";
             this.nachWertInSpalteToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 
@@ -180,7 +189,8 @@
             this.tabellenZusammenfügenToolStripMenuItem,
             this.tabelleHinzufügenToolStripMenuItem,
             this.überschriftEinlesenToolStripMenuItem,
-            this.zählenToolStripMenuItem});
+            this.zählenToolStripMenuItem,
+            this.zeilenZusammenfügenToolStripMenuItem});
             this.bearbeitenToolStripMenuItem.Name = "bearbeitenToolStripMenuItem";
             this.bearbeitenToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
             this.bearbeitenToolStripMenuItem.Text = "Bearbeiten";
@@ -293,6 +303,13 @@
             this.sortierenToolStripMenuItem.Text = "Sortieren";
             this.sortierenToolStripMenuItem.Click += new System.EventHandler(this.sortierenToolStripMenuItem_Click);
             // 
+            // updateToolStripMenuItem
+            // 
+            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
+            this.updateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.updateToolStripMenuItem.Text = "Update";
+            this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
+            // 
             // pgbLoading
             // 
             this.pgbLoading.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -382,7 +399,8 @@
             this.toolStripStatusLabel1,
             this.lblFilename,
             this.toolStripStatusLabel3,
-            this.lblRows});
+            this.lblRows,
+            this.StatusLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 426);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(800, 24);
@@ -443,12 +461,12 @@
             this.clipboardItem.Size = new System.Drawing.Size(209, 22);
             this.clipboardItem.Text = "Zwischenablage einfügen";
             // 
-            // speichernToolStripMenuItem
+            // zeilenZusammenfügenToolStripMenuItem
             // 
-            this.speichernToolStripMenuItem.Name = "speichernToolStripMenuItem";
-            this.speichernToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.speichernToolStripMenuItem.Text = "Speichern";
-            this.speichernToolStripMenuItem.Click += new System.EventHandler(this.speichernToolStripMenuItem_Click_1);
+            this.zeilenZusammenfügenToolStripMenuItem.Name = "zeilenZusammenfügenToolStripMenuItem";
+            this.zeilenZusammenfügenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.zeilenZusammenfügenToolStripMenuItem.Text = "Zeilen zusammenfügen";
+            this.zeilenZusammenfügenToolStripMenuItem.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click_1);
             // 
             // dgTable
             // 
@@ -471,12 +489,10 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
-            // updateToolStripMenuItem
+            // StatusLabel
             // 
-            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
-            this.updateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
-            this.updateToolStripMenuItem.Text = "Update";
-            this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
+            this.StatusLabel.Name = "StatusLabel";
+            this.StatusLabel.Size = new System.Drawing.Size(0, 19);
             // 
             // Form1
             // 
@@ -557,6 +573,8 @@
         private System.Windows.Forms.ToolStripMenuItem rundenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem speichernToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem updateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem zeilenZusammenfügenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
     }
 }
 

@@ -74,10 +74,12 @@
     <Compile Include="Assisstant\ErrorHelper.cs" />
     <Compile Include="Assisstant\HistoryHelper.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
+    <Compile Include="Assisstant\ThreadHelper.cs" />
     <Compile Include="Assisstant\UpdateHelper.cs" />
     <Compile Include="Assisstant\WorkflowHelper.cs" />
     <Compile Include="Classes\CellMatrix.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
+    <Compile Include="Classes\DataRowArray.cs" />
     <Compile Include="Classes\History.cs" />
     <Compile Include="Classes\HistoryStates.cs" />
     <Compile Include="Classes\NotFoundHeaders.cs" />
@@ -146,6 +148,12 @@
     </Compile>
     <Compile Include="View\Formula.Designer.cs">
       <DependentUpon>Formula.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\MergeColumns.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\MergeColumns.Designer.cs">
+      <DependentUpon>MergeColumns.cs</DependentUpon>
     </Compile>
     <Compile Include="View\MergeTable.cs">
       <SubType>Form</SubType>
@@ -224,6 +232,9 @@
     </Compile>
     <EmbeddedResource Include="View\Formula.resx">
       <DependentUpon>Formula.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\MergeColumns.resx">
+      <DependentUpon>MergeColumns.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\MergeTable.resx">
       <DependentUpon>MergeTable.cs</DependentUpon>

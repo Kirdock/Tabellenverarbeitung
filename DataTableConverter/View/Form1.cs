@@ -36,12 +36,14 @@ namespace DataTableConverter
         private List<string> dictKeys;
         private readonly int SystemProcedureCount = 4;
         private string FilePath = string.Empty;
+        private ThreadHelper ThreadHelper;
 
         internal Form1(DataTable table = null)
         {
             dictSorting = new Dictionary<string, SortOrder>();
             dictKeys = new List<string>();
             InitializeComponent();
+            ThreadHelper = new ThreadHelper(StartLoadingBar, StopLoadingBar);
             ExportHelper.checkFolders();
             loadProcedures();
             loadWorkflows();
@@ -400,12 +402,13 @@ namespace DataTableConverter
                 }
                 else if(extension != string.Empty && AccessExt.Contains(extension))
                 {
-                    StartLoadingBar();
                     new Thread(() =>
                     {
                         try
                         {
+                            StartLoadingBar();
                             Thread.CurrentThread.IsBackground = true;
+
                             DataTable dt = ImportHelper.OpenMSAccess(dialog.FileName);
                             finishImport(dt, state, oldTable);
                         }
@@ -413,7 +416,16 @@ namespace DataTableConverter
                         {
                             ErrorHelper.LogMessage(ex);
                         }
-                    }).Start();
+                        finally
+                        {
+                            StopLoadingBar();
+                        }
+                    });
+                    //ThreadHelper.StartThread(delegate()
+                    //{
+                    //        DataTable dt = ImportHelper.OpenMSAccess(dialog.FileName);
+                    //        finishImport(dt, state, oldTable);
+                    //});
                 }
                 else if (extension != string.Empty && excelExt.Contains(extension))
                 {
@@ -1249,6 +1261,142 @@ namespace DataTableConverter
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UpdateHelper.CheckUpdate(false, pgbLoading);
+        }
+
+        private void zeilenZusammenfügenToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            DataTable table = getDataSource();
+            table.AcceptChanges();
+            MergeColumns form = new MergeColumns(DataHelper.getHeadersOfDataTable(table));
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                new Thread(() =>
+                {
+                    StartLoadingBar();
+
+                    SetStatusLabel("Daten werden geladen");
+
+                    string identifier = form.Identifier;
+                    int identifierIndex = form.IdentifierIndex;
+                    List<string> additionalColumns = form.AdditionalColumns;
+
+                    DataView view = ViewHelper.GetSortedView($"[{identifier}] asc", table);
+                    DataGridView dataGridView = new DataGridView();
+                    dataGridView.Visible = false;
+
+                    Invoke(new MethodInvoker(() =>
+                    {
+                        Controls.Add(dataGridView);
+                        dataGridView.DataSource = view;
+                    }));
+
+                    SetStatusLabel("Daten werden überprüft");
+                    Dictionary<string, DataRowArray> dict = new Dictionary<string, DataRowArray>();
+                    List<DataRow> deleteRows = new List<DataRow>();
+                    //RowIdentifier, Values
+                    string oldIdenfifier = dataGridView[identifierIndex, 0].ToString();
+                    int counter = 0;
+                    foreach (DataGridViewRow row in dataGridView.Rows)
+                    {
+
+
+                        DataRow oldRow;
+                        if ((oldRow = ((DataRowView)row.DataBoundItem)?.Row) != null)
+                        {
+                            string newIdenfifier = oldRow[identifier].ToString();
+
+                            counter = newIdenfifier == oldIdenfifier ? counter + 1 : 1;
+
+
+                            List<string> values = new List<string>();
+                            foreach (string additionalColumn in additionalColumns)
+                            {
+                                values.Add(oldRow[additionalColumn].ToString());
+                            }
+
+
+                            if (dict.ContainsKey(newIdenfifier) && dict.TryGetValue(newIdenfifier, out DataRowArray dataRowArray))
+                            {
+                                dataRowArray.Add(values);
+                            }
+                            else
+                            {
+                                dict.Add(newIdenfifier, new DataRowArray(oldRow, values));
+                            }
+
+
+                            if (counter > 1)
+                            {
+                                deleteRows.Add(oldRow);
+                            }
+
+                            oldIdenfifier = newIdenfifier;
+                        }
+                    }
+                    Invoke(new MethodInvoker(() =>
+                    {
+                        Controls.Remove(dataGridView);
+                        dataGridView.DataSource = null;
+                        dataGridView = null;
+                    }));
+
+
+                    SetStatusLabel("Überflüssige Zeilen werden gelöscht");
+                    foreach (DataRow row in deleteRows)
+                    {
+                        row.Delete();
+                    }
+                    
+                    //dataRowArray.Values.Count == Duplicate Rows
+                    //dataRowArray.Values[i].Count == additionalColumns
+
+                    int newColumns = dict.Values.Max(dataRowArray => dataRowArray.Values.Count);
+
+                    SetStatusLabel("Neue Spalten werden hinzugefügt");
+                    foreach (string additionalColumn in additionalColumns)
+                    {
+                        for (int i = 1; i <= newColumns; i++)
+                        {
+                            DataHelper.addColumn(additionalColumn + i, table);
+                        }
+                    }
+
+                    int itemCount = dict.Values.Count;
+                    counter = 0;
+                    foreach (DataRowArray dataRowArray in dict.Values)
+                    {
+                        if (dataRowArray.Values.Count > 1)
+                        {
+                            SetStatusLabel($"Daten werden geschrieben {counter}/{itemCount}");
+                            for (int i = 1; i < dataRowArray.Values.Count; i++) //except first one
+                            {
+                                for (int y = 0; y < dataRowArray.Values[i].Count; y++)
+                                {
+                                    dataRowArray.DataRow[additionalColumns[y]+i] = dataRowArray.Values[i][y];
+                                }
+                            }
+                        }
+                        counter++;
+
+                    }
+                    
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        assignDataSource(table);
+                    }));
+                    SetStatusLabel(string.Empty);
+                    StopLoadingBar();
+
+                }).Start();
+            }
+        }
+
+        private void SetStatusLabel(string text)
+        {
+            StatusLabel.GetCurrentParent().Invoke(new MethodInvoker(() =>
+            {
+                StatusLabel.Text = text;
+            }));
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
