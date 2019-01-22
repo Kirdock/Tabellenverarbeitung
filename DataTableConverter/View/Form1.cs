@@ -492,14 +492,16 @@ namespace DataTableConverter
             MergeTable form = new MergeTable(DataHelper.getHeadersOfDataTable(sourceTable), DataHelper.getHeadersOfDataTable(importTable));
             if (form.ShowDialog() == DialogResult.OK)
             {
+                string[] ImportColumns = form.getSelectedColumns();
+                int SourceMergeIndex = form.getSelectedOriginal();
+                int ImportMergeIndex = form.getSelectedMerge();
+                bool SortColumn = form.OrderColumnName() != string.Empty;
+                string orderColumnName = form.OrderColumnName();
                 new Thread(() =>
                 {
                     try {
                         DataTable OldTable = sourceTable.Copy();
-                        string[] ImportColumns = form.getSelectedColumns();
-                        int SourceMergeIndex = form.getSelectedOriginal();
-                        int ImportMergeIndex = form.getSelectedMerge();
-                        bool SortColumn = form.OrderColumnName() != string.Empty;
+                        
 
                         #region Compare Everything
                         int oldCount = sourceTable.Columns.Count;
@@ -514,7 +516,7 @@ namespace DataTableConverter
                         if (SortColumn)
                         {
                             string SortColumnName = "[Sortierung]";
-                            DataHelper.addColumn(form.OrderColumnName(), sourceTable);
+                            DataHelper.addColumn(orderColumnName, sourceTable);
                             int LastIndex = importTable.Columns.Count;
                             DataHelper.addColumn(SortColumnName, importTable);
                             for(int i = 0; i < importTable.Rows.Count; i++)
@@ -649,11 +651,12 @@ namespace DataTableConverter
                     ProcUser user = new ProcUser(columns);
 
                     DataTable newTable = getDataSource();
+                    string header = ((Formula)sender).getHeaderName();
                     new Thread(() =>
                     {
                         try
                         {
-                            replaceProcedure(newTable, procedure, ((Formula)sender).getHeaderName(), user);
+                            replaceProcedure(newTable, procedure, header, user);
                             dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(getDataSource(), newTable); }));
                         }
                         catch (Exception ex)
