@@ -66,7 +66,7 @@ namespace DataTableConverter
         internal static void InsertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, Action<object, DataGridViewCellEventArgs> myfunc = null)
         {
             myDataGridView.BindingContext[myDataGridView.DataSource].EndCurrentEdit();
-            DataTable table = ((DataTable)myDataGridView.DataSource).Copy();
+            DataTable table = ((DataTable)myDataGridView.DataSource);
 
             DataObject o = (DataObject)Clipboard.GetDataObject();
             int columnCount = table.Columns.Count;
