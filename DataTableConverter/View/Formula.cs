@@ -63,6 +63,7 @@ namespace DataTableConverter.View
                 adjustControlHeight(cbNewColumn, height);
                 adjustControlHeight(lblHeader, height);
                 adjustControlHeight(txtHeader, height);
+                adjustControlHeight(btnConfirm, height);
                 Height -= height;
             }
             setNewColumnVisibility();
@@ -101,19 +102,24 @@ namespace DataTableConverter.View
         {
             if(e.KeyCode == Keys.Enter)
             {
-                if (cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtHeader.Text))
-                {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
-                }
-                else if(cbNewColumn.Checked && isDuplicate(txtHeader.Text))
-                {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit diesem Namen.\nBitte geben Sie einen anderen an");
-                }
-                else
-                {
-                    this.DialogResult = DialogResult.OK;
-                    Close();
-                }
+                CloseForm();
+            }
+        }
+
+        private void CloseForm()
+        {
+            if (cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtHeader.Text))
+            {
+                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
+            }
+            else if (cbNewColumn.Checked && isDuplicate(txtHeader.Text))
+            {
+                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit diesem Namen.\nBitte geben Sie einen anderen an");
+            }
+            else
+            {
+                this.DialogResult = DialogResult.OK;
+                Close();
             }
         }
 
@@ -163,6 +169,11 @@ namespace DataTableConverter.View
         private void btnUncheckAll_Click(object sender, EventArgs e)
         {
             ViewHelper.CheckAllItemsOfCheckedCombobox(cbHeaders, false);
+        }
+
+        private void btnConfirm_Click(object sender, EventArgs e)
+        {
+            CloseForm();
         }
     }
 }

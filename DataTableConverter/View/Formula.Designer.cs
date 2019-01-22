@@ -35,8 +35,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.lblFormula = new System.Windows.Forms.Label();
             this.btnCheckAll = new System.Windows.Forms.Button();
-            this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.btnUncheckAll = new System.Windows.Forms.Button();
+            this.btnConfirm = new System.Windows.Forms.Button();
+            this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.SuspendLayout();
             // 
             // txtFormula
@@ -103,6 +104,26 @@
             this.btnCheckAll.UseVisualStyleBackColor = true;
             this.btnCheckAll.Click += new System.EventHandler(this.btnCheckAll_Click);
             // 
+            // btnUncheckAll
+            // 
+            this.btnUncheckAll.Location = new System.Drawing.Point(202, 61);
+            this.btnUncheckAll.Name = "btnUncheckAll";
+            this.btnUncheckAll.Size = new System.Drawing.Size(101, 23);
+            this.btnUncheckAll.TabIndex = 11;
+            this.btnUncheckAll.Text = "Alle abwählen";
+            this.btnUncheckAll.UseVisualStyleBackColor = true;
+            this.btnUncheckAll.Click += new System.EventHandler(this.btnUncheckAll_Click);
+            // 
+            // btnConfirm
+            // 
+            this.btnConfirm.Location = new System.Drawing.Point(139, 183);
+            this.btnConfirm.Name = "btnConfirm";
+            this.btnConfirm.Size = new System.Drawing.Size(101, 23);
+            this.btnConfirm.TabIndex = 12;
+            this.btnConfirm.Text = "Übernehmen";
+            this.btnConfirm.UseVisualStyleBackColor = true;
+            this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
+            // 
             // cbHeaders
             // 
             this.cbHeaders.CheckOnClick = true;
@@ -118,21 +139,12 @@
             this.cbHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeaders_ItemCheck);
             this.cbHeaders.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtFormula_KeyDown);
             // 
-            // btnUncheckAll
-            // 
-            this.btnUncheckAll.Location = new System.Drawing.Point(202, 61);
-            this.btnUncheckAll.Name = "btnUncheckAll";
-            this.btnUncheckAll.Size = new System.Drawing.Size(101, 23);
-            this.btnUncheckAll.TabIndex = 11;
-            this.btnUncheckAll.Text = "Alle abwählen";
-            this.btnUncheckAll.UseVisualStyleBackColor = true;
-            this.btnUncheckAll.Click += new System.EventHandler(this.btnUncheckAll_Click);
-            // 
             // Formula
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(408, 203);
+            this.ClientSize = new System.Drawing.Size(408, 220);
+            this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.btnUncheckAll);
             this.Controls.Add(this.btnCheckAll);
             this.Controls.Add(this.lblFormula);
@@ -163,5 +175,6 @@
         private System.Windows.Forms.Label lblFormula;
         private System.Windows.Forms.Button btnCheckAll;
         private System.Windows.Forms.Button btnUncheckAll;
+        private System.Windows.Forms.Button btnConfirm;
     }
 }

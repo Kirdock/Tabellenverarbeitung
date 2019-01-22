@@ -19,7 +19,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public ProcUser(int ordinal, int id,string name) : base(ordinal, id, name) { }
 
-        public ProcUser(string[] columns)
+        public ProcUser(string[] columns, string header)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
@@ -27,6 +27,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 Columns.Rows.Add(col);
             }
+            NewColumn = header;
         }
 
         public override void renameHeaders(string oldName, string newName)
@@ -53,17 +54,17 @@ namespace DataTableConverter.Classes.WorkProcs
                 intoNewCol = true;
             }
             List<int> headerIndices = DataHelper.getHeaderIndices(table, columns);
-            foreach (DataRow rep in replaces.Rows)
+            foreach (DataRow row in table.Rows)
             {
-                foreach (DataRow row in table.Rows)
+                foreach (int i in headerIndices)
                 {
-                    for (int i = 0; i < row.ItemArray.Length; i++)
+                    foreach (DataRow rep in replaces.Rows)
                     {
-
-                        if ((columns == null || headerIndices.Contains(i)) && rep.ItemArray[0].ToString().Length > 0)
+                        int index = intoNewCol ? lastCol : i;
+                        string replace;
+                        if (row[i].ToString() == (replace = rep[0].ToString()))
                         {
-                            int index = intoNewCol ? lastCol : i;
-                            row.SetField(index, row.ItemArray[i].ToString().Replace(rep.ItemArray[0].ToString(), rep.ItemArray[1].ToString()));
+                            row[index] = rep[1].ToString();
                         }
                     }
                 }

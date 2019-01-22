@@ -343,7 +343,7 @@ namespace DataTableConverter
                 {
                     foreach (WorkProc t in temp)
                     {
-                        replaceProcedure(table, null, null, t);
+                        replaceProcedure(table, null, t);
                     }
                     dgTable.Invoke(new MethodInvoker(() =>
                     {
@@ -615,7 +615,7 @@ namespace DataTableConverter
             formula.Show();
         }
 
-        private void replaceProcedure(DataTable table, Proc procedure, string columnHeader, WorkProc wp)
+        private void replaceProcedure(DataTable table, Proc procedure, WorkProc wp)
         {
             wp.doWork(table, out string newOrder, getCaseThroughId(wp.ProcedureId), tolerances, procedure ?? getProcedure(wp.ProcedureId));
             if (newOrder != string.Empty)
@@ -648,15 +648,16 @@ namespace DataTableConverter
                 
                 if (columns.Length > 0)
                 {
-                    ProcUser user = new ProcUser(columns);
+                    ProcUser user = new ProcUser(columns, ((Formula)sender).getHeaderName());
 
                     DataTable newTable = getDataSource();
-                    string header = ((Formula)sender).getHeaderName();
+                    
+                    
                     new Thread(() =>
                     {
                         try
                         {
-                            replaceProcedure(newTable, procedure, header, user);
+                            replaceProcedure(newTable, procedure, user);
                             dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(getDataSource(), newTable); }));
                         }
                         catch (Exception ex)
