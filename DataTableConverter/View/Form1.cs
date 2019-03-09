@@ -381,7 +381,11 @@ namespace DataTableConverter
             DataTable oldTable = getDataSource();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                SetFileName(dialog.FileName);
+                if (state == ImportState.None)
+                {
+                    SetFileName(dialog.FileName);
+                }
+                string filename = Path.GetFileName(dialog.FileName);
                 string extension = Path.GetExtension(dialog.FileName).ToLower();
 
                 if (extension == ".dbf")
@@ -392,7 +396,7 @@ namespace DataTableConverter
                         try {
                             Thread.CurrentThread.IsBackground = true;
                             DataTable dt = ImportHelper.openDBF(dialog.FileName);
-                            finishImport(dt, state, oldTable);
+                            finishImport(dt, state, oldTable, filename);
                         }
                         catch (Exception ex)
                         {
@@ -410,17 +414,13 @@ namespace DataTableConverter
                             Thread.CurrentThread.IsBackground = true;
 
                             DataTable dt = ImportHelper.OpenMSAccess(dialog.FileName);
-                            finishImport(dt, state, oldTable);
+                            finishImport(dt, state, oldTable, filename);
                         }
                         catch (Exception ex)
                         {
                             ErrorHelper.LogMessage(ex);
                         }
-                        finally
-                        {
-                            StopLoadingBar();
-                        }
-                    });
+                    }).Start();
                     //ThreadHelper.StartThread(delegate()
                     //{
                     //        DataTable dt = ImportHelper.OpenMSAccess(dialog.FileName);
@@ -435,7 +435,7 @@ namespace DataTableConverter
                         try {
                             Thread.CurrentThread.IsBackground = true;
                             DataTable dt = ImportHelper.openExcel(dialog.FileName, this);
-                            finishImport(dt, state, oldTable);
+                            finishImport(dt, state, oldTable, filename);
                         }
                         catch (Exception ex)
                         {
@@ -448,7 +448,7 @@ namespace DataTableConverter
                     TextFormat form = new TextFormat(dialog.FileName);
                     if (form.ShowDialog() == DialogResult.OK)
                     {
-                        finishImport(form.DataTable, state, oldTable);
+                        finishImport(form.DataTable, state, oldTable, filename);
                     }
                 }
             }
@@ -460,7 +460,7 @@ namespace DataTableConverter
             FilePath = path;
         }
 
-        private void finishImport(DataTable table, ImportState state, DataTable oldTable)
+        private void finishImport(DataTable table, ImportState state, DataTable oldTable, string filename)
         {
             StopLoadingBar();
             switch (state)
@@ -470,7 +470,7 @@ namespace DataTableConverter
                     break;
 
                 case ImportState.Append:
-                    dgTable.Invoke(new MethodInvoker(() => { mergeTables(table); }));
+                    dgTable.Invoke(new MethodInvoker(() => { mergeTables(table, filename); }));
                     break;
 
                 case ImportState.Header:
@@ -785,23 +785,13 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Formula formula = new Formula(FormulaState.Merge, DataHelper.getHeadersOfDataTable(getDataSource()));
-            formula.FormClosed += new FormClosedEventHandler(formulaClosed);
-            formula.Show();
-
-        }
-
-        private void formulaClosed(object sender, FormClosedEventArgs e)
-        {
-            Formula formula = (Formula)sender;
-            if (formula.DialogResult == DialogResult.OK)
+            Merge formula = new Merge(DataHelper.getHeadersOfDataTable(getDataSource()));
+            if (formula.ShowDialog() == DialogResult.OK)
             {
-                ProcMerge proc = new ProcMerge(formula.getFormula());
-                proc.NewColumn = formula.getHeaderName();
-                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc>() { proc }, 0));
+                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc>() { formula.Proc }, 0));
             }
-        }
 
+        }
 
         private void dBASEToolStripMenuItem_Click(object sender, EventArgs e, string path = null)
         {
@@ -1086,7 +1076,7 @@ namespace DataTableConverter
         {
             ExportCount form = new ExportCount(DataHelper.getHeadersOfDataTable(getDataSource()));
             form.FormClosed += new FormClosedEventHandler(CountContendClosed);
-            form.Show();
+            form.ShowDialog();
         }
 
         private void CountContendClosed(object sender, FormClosedEventArgs e)
@@ -1094,24 +1084,36 @@ namespace DataTableConverter
             ExportCount export = (ExportCount)sender;
             if (export.DialogResult == DialogResult.OK)
             {
-                DataTable table = ViewHelper.GetSortedView($"[{export.getSelectedValue()}] asc", getDataSource()).ToTable();
+                string selectedValue = export.getSelectedValue();
+                int columnIndex = export.getColumnIndex();
+                DataTable oldTable = getDataSource();
 
-                Dictionary<string, int> pair = new Dictionary<string, int>();
-                foreach (DataRow row in table.Rows)
+                new Thread(() =>
                 {
-                    string item = row.ItemArray[export.getColumnIndex()].ToString();
-                    if (pair.ContainsKey(item))
-                    {
-                        pair[item] = pair[item] + 1;
-                    }
-                    else
-                    {
-                        pair.Add(item, 1);
-                    }
-                }
+                    StartLoadingBar();
+                    DataTable table = ViewHelper.GetSortedView($"[{selectedValue}] asc", oldTable).ToTable();
 
-                Form1 form = new Form1(DataHelper.DictionaryToDataTable(pair, export.getSelectedValue()));
-                form.Show();
+                    Dictionary<string, int> pair = new Dictionary<string, int>();
+                    foreach (DataRow row in table.Rows)
+                    {
+                        string item = row.ItemArray[columnIndex].ToString();
+                        if (pair.ContainsKey(item))
+                        {
+                            pair[item] = pair[item] + 1;
+                        }
+                        else
+                        {
+                            pair.Add(item, 1);
+                        }
+                    }
+
+                    BeginInvoke(new MethodInvoker(() =>
+                    {
+                        Form1 form = new Form1(DataHelper.DictionaryToDataTable(pair, selectedValue));
+                        form.Show();
+                    }));
+                    StopLoadingBar();
+                }).Start();
             }
         }
 
@@ -1174,12 +1176,12 @@ namespace DataTableConverter
             importToolStripMenuItem_Click(null, null, ImportState.Append);
         }
 
-        private void mergeTables(DataTable table)
+        private void mergeTables(DataTable table, string filename)
         {
             DataTable originalTable = getDataSource();
             int ColumnIndexNew = originalTable.Columns.Count;
             int RowIndexNew = originalTable.Rows.Count;
-            DataHelper.concatTables(originalTable, table);
+            DataHelper.concatTables(originalTable, table, Path.GetFileName(FilePath), filename);
 
             assignDataSource(originalTable);
             addDataSourceAddColumnAndRows(ColumnIndexNew, RowIndexNew);

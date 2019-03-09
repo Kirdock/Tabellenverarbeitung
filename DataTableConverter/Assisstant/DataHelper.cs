@@ -80,7 +80,7 @@ namespace DataTableConverter.Assisstant
             return table.Columns.Cast<DataColumn>().Select(dt => dt.ColumnName.ToLower()).ToList();
         }
 
-        internal static void concatTables(DataTable originalTable, DataTable table)
+        internal static void concatTables(DataTable originalTable, DataTable table, string originalFilename, string secondFilename)
         {
             List<int> ColumnIndizes = new List<int>();
 
@@ -93,6 +93,16 @@ namespace DataTableConverter.Assisstant
                 }
                 ColumnIndizes.Add(index);
             });
+            int filenameColumnIndex;
+            if ((filenameColumnIndex = originalTable.Columns.IndexOf("Dateiname")) == -1)
+            {
+                addColumn("Dateiname", originalTable);
+                int colIndex = filenameColumnIndex = originalTable.Columns.Count - 1;
+                foreach (DataRow row in originalTable.Rows)
+                {
+                    row[colIndex] = originalFilename;
+                }
+            }
 
             foreach (DataRow row in table.Rows)
             {
@@ -103,6 +113,7 @@ namespace DataTableConverter.Assisstant
                     itemArray[index] = row.ItemArray[count];
                     count++;
                 }
+                itemArray[filenameColumnIndex] = secondFilename;
                 originalTable.Rows.Add(itemArray);
             }
         }

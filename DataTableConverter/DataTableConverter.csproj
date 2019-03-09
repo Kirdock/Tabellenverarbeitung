@@ -143,6 +143,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\Merge.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\Merge.Designer.cs">
+      <DependentUpon>Merge.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\Formula.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -230,6 +236,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="View\Merge.resx">
+      <DependentUpon>Merge.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="View\Formula.resx">
       <DependentUpon>Formula.cs</DependentUpon>
     </EmbeddedResource>

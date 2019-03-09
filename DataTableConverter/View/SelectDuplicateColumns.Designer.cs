@@ -37,18 +37,22 @@
             // 
             this.dgDuplicate.AllowUserToAddRows = false;
             this.dgDuplicate.AllowUserToDeleteRows = false;
+            this.dgDuplicate.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgDuplicate.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgDuplicate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgDuplicate.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.dgDuplicate.Location = new System.Drawing.Point(12, 12);
             this.dgDuplicate.Name = "dgDuplicate";
             this.dgDuplicate.RowHeadersVisible = false;
-            this.dgDuplicate.Size = new System.Drawing.Size(404, 307);
+            this.dgDuplicate.Size = new System.Drawing.Size(408, 426);
             this.dgDuplicate.TabIndex = 0;
             this.dgDuplicate.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgDuplicate_MouseDown);
             // 
             // btnConfirm
             // 
+            this.btnConfirm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnConfirm.Location = new System.Drawing.Point(435, 12);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(91, 23);
@@ -61,7 +65,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(551, 450);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.dgDuplicate);
             this.Name = "SelectDuplicateColumns";

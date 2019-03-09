@@ -22,14 +22,20 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void renameHeaders(string oldName, string newName)
         {
-            return;
+            foreach (DataRow row in Columns.Rows)
+            {
+                if (row.ItemArray[0].ToString() == oldName)
+                {
+                    row.SetField(0, newName);
+                }
+            }
         }
 
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach (DataRow row in table.Rows)
+            foreach (DataRow row in Columns.Rows)
             {
                 object col = row[0];
                 bool orderDESC = string.IsNullOrWhiteSpace(row[1]?.ToString()) ? false : (bool)row[1];

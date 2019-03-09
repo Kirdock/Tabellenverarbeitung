@@ -201,11 +201,13 @@ namespace DataTableConverter.Assisstant
                 {
                     if (row["TABLE_TYPE"].ToString() == "TABLE")
                     {
-                        using (OleDbDataAdapter dbAdapter = new OleDbDataAdapter($"Select * from [{row["TABLE_NAME"].ToString()}]", Con))
+                        string tableName = row["TABLE_NAME"].ToString();
+                        using (OleDbDataAdapter dbAdapter = new OleDbDataAdapter($"Select * from [{tableName}]", Con))
                         {
+                            string fileName = Path.GetFileName(path) + "; " + tableName;
                             DataTable temp = new DataTable();
                             dbAdapter.Fill(temp);
-                            DataHelper.concatTables(Table, temp);
+                            DataHelper.concatTables(Table, temp, fileName, fileName);
                         }
                     }
                 }

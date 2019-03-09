@@ -58,7 +58,9 @@
             this.ClientSize = new System.Drawing.Size(291, 50);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.cmbColumn);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "ExportCount";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ExportCount";
             this.ResumeLayout(false);
 

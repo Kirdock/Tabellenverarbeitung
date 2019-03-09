@@ -13,85 +13,130 @@ namespace DataTableConverter.Classes.WorkProcs
     internal class ProcMerge : WorkProc
     {
         internal static readonly string ClassName = "Spalten zusammenfügen";
-        internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name) { }
+        internal enum ConditionColumn : int { Spalte = 0, Wert = 1, Format = 2 };
+        internal DataTable Conditions;
 
-        internal ProcMerge(string formula)
+        internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name) {
+            InitConditions();
+        }
+
+        internal ProcMerge()
+        {
+            InitConditions();
+        }
+
+        private void InitConditions()
+        {
+            Conditions = new DataTable();
+            Conditions.Columns.Add("Spalte");
+            Conditions.Columns.Add("Wert");
+            Conditions.Columns.Add("Format");
+        }
+
+        internal ProcMerge(string formula, DataTable conditions)
         {
             Formula = formula;
+            Conditions = conditions;
         }
 
         public override string[] GetHeaders()
         {
+            HashSet<string> headers = new HashSet<string>();
+            GetHeaderOfFormula(Formula, headers);
+            foreach(DataRow row in Conditions.Rows)
+            {
+                GetHeaderOfFormula(row[(int)ConditionColumn.Format].ToString(), headers);
+                headers.Add(row[(int)ConditionColumn.Spalte].ToString());
+            }
+            return WorkflowHelper.RemoveEmptyHeaders(headers.ToArray());
+        }
+
+        private void GetHeaderOfFormula(string formula, HashSet<string> headers)
+        {
             string regularExpressionPattern = @"\[(.*?)\]";
             Regex re = new Regex(regularExpressionPattern);
 
-            MatchCollection matches = re.Matches(Formula);
-            
-            string[] headers = new string[matches.Count];
+            MatchCollection matches = re.Matches(formula);
+
             for (int i = 0; i < matches.Count; i++)
             {
-                headers[i] = matches[i].Value.Substring(1, matches[i].Value.Length - 2);
+                headers.Add(matches[i].Value.Substring(1, matches[i].Value.Length - 2));
             }
-            return WorkflowHelper.RemoveEmptyHeaders(headers);
         }
 
         public override void renameHeaders(string oldName, string newName)
         {
-            Formula = Formula.Replace($"[{oldName}]", $"[{newName}]");
+            Formula = ReplaceHeader(Formula,oldName, newName);
+            foreach(DataRow row in Conditions.Rows)
+            {
+                row[(int)ConditionColumn.Format] = ReplaceHeader(row[(int)ConditionColumn.Format].ToString(),oldName, newName);
+                row[(int)ConditionColumn.Spalte] = row[(int)ConditionColumn.Spalte].ToString() == oldName ? newName : row[(int)ConditionColumn.Spalte];
+            }
+        }
+
+        private string ReplaceHeader(string source, string oldName, string newName)
+        {
+            return source.Replace($"[{oldName}]", $"[{newName}]");
         }
 
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
         {
             sortingOrder = string.Empty; //base(table, sortingOrder, columns)
-            string[] columns = GetHeaders();
             int column = table.Columns.Count;
             DataHelper.addColumn(NewColumn, table);
 
-            columns = columns.Select(h => h.ToLower()).ToArray();
-
-            List<string> tableHeaders = DataHelper.getHeadersToLower(table);
-
-
-            for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
+            foreach (DataRow row in table.Rows)
             {
-                DataRow row = table.Rows[rowIndex];
-                string format = "";
-
-                int counter = columns.Length - 1;
-
-                bool skipWhenEmpty = false;
-                for (int i = Formula.Length - 1; i >= 0; i--)
+                string formula = Formula;
+                foreach(DataRow condition in Conditions.Rows)
                 {
-                    string header = columns[counter];
-                    int index = tableHeaders.IndexOf(header.ToLower());
-                    char c = Formula[i];
-
-                    if (c != ']')
+                    if(row[condition[(int)ConditionColumn.Spalte].ToString()].ToString() == condition[(int)ConditionColumn.Wert].ToString())
                     {
-                        if (skipWhenEmpty)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            format = c + format;
-                        }
+                        formula = condition[(int)ConditionColumn.Format].ToString();
+                    }
+                }
+                row[column] = GetFormat(row, formula);
+            }
+        }
+
+        private string GetFormat(DataRow row, string formula)
+        {
+            HashSet<string> headers = new HashSet<string>();
+            GetHeaderOfFormula(formula, headers);
+            string[] columns = headers.ToArray();
+            string format = string.Empty;
+            int counter = columns.Length - 1;
+            bool skipWhenEmpty = false;
+            for (int i = formula.Length - 1; i >= 0; i--)
+            {
+                
+                char c = formula[i];
+
+                if (c != ']')
+                {
+                    if (skipWhenEmpty)
+                    {
+                        continue;
                     }
                     else
                     {
-                        skipWhenEmpty = string.IsNullOrWhiteSpace(row[index]?.ToString());
-                        if (!skipWhenEmpty)
-                        {
-                            format = row[index] + format;
-                        }
-
-                        i -= (header.Length + 1);
-                        counter--;
+                        format = c + format;
                     }
                 }
+                else
+                {
+                    string header = columns[counter];
+                    skipWhenEmpty = string.IsNullOrWhiteSpace(row[header]?.ToString());
+                    if (!skipWhenEmpty)
+                    {
+                        format = row[header] + format;
+                    }
 
-                table.Rows[rowIndex].SetField(column, format);
+                    i -= (header.Length + 1);
+                    counter--;
+                }
             }
+            return format;
         }
 
     }

@@ -61,10 +61,13 @@ namespace DataTableConverter.Classes.WorkProcs
                     foreach (DataRow rep in replaces.Rows)
                     {
                         int index = intoNewCol ? lastCol : i;
-                        string replace;
-                        if (row[i].ToString() == (replace = rep[0].ToString()))
+                        if (row[i].ToString() == rep[0].ToString())
                         {
                             row[index] = rep[1].ToString();
+                        }
+                        else if (intoNewCol)
+                        {
+                            row[index] = row[i];
                         }
                     }
                 }

@@ -92,6 +92,7 @@ namespace DataTableConverter.View
             viewHelper.AddContextMenuToDataGridView(dgvRound, true);
             viewHelper.AddContextMenuToDataGridView(dgUpLow, true);
             viewHelper.AddContextMenuToDataGridView(dgOrderColumns, false);
+            viewHelper.AddContextMenuToDataGridView(dgvMerge, false);
         }
 
         private void SetOrderList()
@@ -486,6 +487,8 @@ namespace DataTableConverter.View
         {
             setCmbHeader(selectedProc.Formula);
             lblOriginalNameText.Text = ProcMerge.ClassName;
+            dgvMerge.DataSource = null;
+            dgvMerge.DataSource = ((ProcMerge)selectedProc).Conditions;
         }
 
         private void SetTrimControls(WorkProc selectedProc)
@@ -1174,6 +1177,11 @@ namespace DataTableConverter.View
         private void CmBRound_SelectedIndexChanged(object sender, EventArgs e)
         {
             ((ProcRound)getSelectedWorkProcedure()).Type = CmBRound.SelectedIndex;
+        }
+
+        private void dgvMerge_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            dgvMerge.BindingContext[dgvMerge.DataSource].EndCurrentEdit();
         }
     }
 }

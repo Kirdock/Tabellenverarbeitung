@@ -27,10 +27,12 @@ namespace DataTableConverter.View
 
             dgDuplicate.DataSource = table;
 
-            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn();
-            cmb.DataSource = headers;
-            
-            cmb.DataPropertyName = "Zuweisung";
+            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
+            {
+                DataSource = headers,
+                DataPropertyName = "Zuweisung",
+                HeaderText = "Zuweisung "
+            };
 
             dgDuplicate.Columns.Add(cmb);
 
@@ -38,7 +40,8 @@ namespace DataTableConverter.View
             {
                 table.Rows.Add(header);
             }
-            dgDuplicate.Columns[0].ReadOnly = dgDuplicate.Columns[1].ReadOnly = true;
+            dgDuplicate.Columns[0].ReadOnly = true;
+            dgDuplicate.Columns[1].Visible = false;
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
