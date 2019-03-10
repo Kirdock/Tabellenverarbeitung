@@ -799,7 +799,7 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Merge formula = new Merge(DataHelper.getHeadersOfDataTable(getDataSource()), ctxRow);
+            Merge formula = new Merge(DataHelper.getHeadersOfDataTable(getDataSource()), contextGlobal);
             if (formula.ShowDialog() == DialogResult.OK)
             {
                 workflow_Click(null, null, new Work(string.Empty, new List<WorkProc>() { formula.Proc }, 0));
