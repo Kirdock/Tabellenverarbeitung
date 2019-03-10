@@ -82,6 +82,7 @@
     <Compile Include="Classes\DataRowArray.cs" />
     <Compile Include="Classes\History.cs" />
     <Compile Include="Classes\HistoryStates.cs" />
+    <Compile Include="Classes\ImportSettings.cs" />
     <Compile Include="Classes\NotFoundHeaders.cs" />
     <Compile Include="Classes\Proc.cs" />
     <Compile Include="Classes\TempReplaceProcedure.cs" />

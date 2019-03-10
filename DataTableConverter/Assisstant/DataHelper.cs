@@ -83,7 +83,7 @@ namespace DataTableConverter.Assisstant
         internal static void concatTables(DataTable originalTable, DataTable table, string originalFilename, string secondFilename)
         {
             List<int> ColumnIndizes = new List<int>();
-
+            string fileName = "Dateiname";
             table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToList().ForEach(x => {
                 int index = originalTable.Columns.IndexOf(x);
                 if (index == -1)
@@ -94,9 +94,9 @@ namespace DataTableConverter.Assisstant
                 ColumnIndizes.Add(index);
             });
             int filenameColumnIndex;
-            if ((filenameColumnIndex = originalTable.Columns.IndexOf("Dateiname")) == -1)
+            if ((filenameColumnIndex = originalTable.Columns.IndexOf(fileName)) == -1)
             {
-                addColumn("Dateiname", originalTable);
+                addColumn(fileName, originalTable);
                 int colIndex = filenameColumnIndex = originalTable.Columns.Count - 1;
                 foreach (DataRow row in originalTable.Rows)
                 {
@@ -108,12 +108,18 @@ namespace DataTableConverter.Assisstant
             {
                 object[] itemArray = new object[originalTable.Columns.Count];
                 int count = 0;
+                string secondName = secondFilename;
+                try
+                {
+                    secondName = row[fileName]?.ToString() ?? secondFilename;
+                }
+                catch { }
                 foreach (int index in ColumnIndizes)
                 {
                     itemArray[index] = row.ItemArray[count];
                     count++;
                 }
-                itemArray[filenameColumnIndex] = secondFilename;
+                itemArray[filenameColumnIndex] = secondName;
                 originalTable.Rows.Add(itemArray);
             }
         }

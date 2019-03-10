@@ -59,6 +59,7 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cbTakeOver = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             this.gbFixed.SuspendLayout();
@@ -97,6 +98,7 @@
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.cbTakeOver);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.cmbEncoding);
             this.groupBox1.Controls.Add(this.rbSeparated);
@@ -396,6 +398,16 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
+            // cbTakeOver
+            // 
+            this.cbTakeOver.AutoSize = true;
+            this.cbTakeOver.Location = new System.Drawing.Point(523, 47);
+            this.cbTakeOver.Name = "cbTakeOver";
+            this.cbTakeOver.Size = new System.Drawing.Size(265, 17);
+            this.cbTakeOver.TabIndex = 4;
+            this.cbTakeOver.Text = "Auf alle Dateien mit derselben Endung anwenden?";
+            this.cbTakeOver.UseVisualStyleBackColor = true;
+            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -457,5 +469,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtBegin;
         private System.Windows.Forms.RadioButton rbBetween;
+        private System.Windows.Forms.CheckBox cbTakeOver;
     }
 }

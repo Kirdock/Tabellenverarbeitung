@@ -80,8 +80,8 @@
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
             this.zeichenAuffüllenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -202,7 +202,7 @@
             // 
             this.rückgängigToolStripMenuItem.Name = "rückgängigToolStripMenuItem";
             this.rückgängigToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.rückgängigToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.rückgängigToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
             this.rückgängigToolStripMenuItem.Text = "Rückgängig";
             this.rückgängigToolStripMenuItem.Click += new System.EventHandler(this.rückgängigToolStripMenuItem_Click);
             // 
@@ -210,43 +210,43 @@
             // 
             this.wiederholenToolStripMenuItem.Name = "wiederholenToolStripMenuItem";
             this.wiederholenToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.wiederholenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.wiederholenToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
             this.wiederholenToolStripMenuItem.Text = "Wiederholen";
             this.wiederholenToolStripMenuItem.Click += new System.EventHandler(this.wiederholenToolStripMenuItem_Click);
             // 
             // tabellenZusammenfügenToolStripMenuItem
             // 
             this.tabellenZusammenfügenToolStripMenuItem.Name = "tabellenZusammenfügenToolStripMenuItem";
-            this.tabellenZusammenfügenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.tabellenZusammenfügenToolStripMenuItem.Text = "Tabellen zusammenfügen";
+            this.tabellenZusammenfügenToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
+            this.tabellenZusammenfügenToolStripMenuItem.Text = "Spaten aus Tabelle hinzufügen";
             this.tabellenZusammenfügenToolStripMenuItem.Click += new System.EventHandler(this.tabellenZusammenfügenToolStripMenuItem_Click);
             // 
             // tabelleHinzufügenToolStripMenuItem
             // 
             this.tabelleHinzufügenToolStripMenuItem.Name = "tabelleHinzufügenToolStripMenuItem";
-            this.tabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.tabelleHinzufügenToolStripMenuItem.Text = "Tabelle hinzufügen";
+            this.tabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
+            this.tabelleHinzufügenToolStripMenuItem.Text = "Zeilen aus Tabelle hinzufügen";
             this.tabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabelleHinzufügenToolStripMenuItem_Click);
             // 
             // überschriftEinlesenToolStripMenuItem
             // 
             this.überschriftEinlesenToolStripMenuItem.Name = "überschriftEinlesenToolStripMenuItem";
-            this.überschriftEinlesenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.überschriftEinlesenToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
             this.überschriftEinlesenToolStripMenuItem.Text = "Überschrift einlesen";
             this.überschriftEinlesenToolStripMenuItem.Click += new System.EventHandler(this.überschriftenEinlesenToolStripMenuItem_Click);
             // 
             // zählenToolStripMenuItem
             // 
             this.zählenToolStripMenuItem.Name = "zählenToolStripMenuItem";
-            this.zählenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.zählenToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
             this.zählenToolStripMenuItem.Text = "Zählen";
             this.zählenToolStripMenuItem.Click += new System.EventHandler(this.zählenToolStripMenuItem_Click);
             // 
             // zeilenZusammenfügenToolStripMenuItem
             // 
             this.zeilenZusammenfügenToolStripMenuItem.Name = "zeilenZusammenfügenToolStripMenuItem";
-            this.zeilenZusammenfügenToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.zeilenZusammenfügenToolStripMenuItem.Text = "Zeilen zusammenfügen";
+            this.zeilenZusammenfügenToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
+            this.zeilenZusammenfügenToolStripMenuItem.Text = "Zeilen zusammenfassen";
             this.zeilenZusammenfügenToolStripMenuItem.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click_1);
             // 
             // verwaltungToolStripMenuItem
@@ -483,6 +483,13 @@
             this.clipboardItem.Size = new System.Drawing.Size(209, 22);
             this.clipboardItem.Text = "Zwischenablage einfügen";
             // 
+            // zeichenAuffüllenToolStripMenuItem
+            // 
+            this.zeichenAuffüllenToolStripMenuItem.Name = "zeichenAuffüllenToolStripMenuItem";
+            this.zeichenAuffüllenToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.zeichenAuffüllenToolStripMenuItem.Text = "Zeichen auffüllen";
+            this.zeichenAuffüllenToolStripMenuItem.Click += new System.EventHandler(this.zeichenAuffüllenToolStripMenuItem_Click);
+            // 
             // dgTable
             // 
             this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -503,13 +510,6 @@
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
-            // 
-            // zeichenAuffüllenToolStripMenuItem
-            // 
-            this.zeichenAuffüllenToolStripMenuItem.Name = "zeichenAuffüllenToolStripMenuItem";
-            this.zeichenAuffüllenToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
-            this.zeichenAuffüllenToolStripMenuItem.Text = "Zeichen auffüllen";
-            this.zeichenAuffüllenToolStripMenuItem.Click += new System.EventHandler(this.zeichenAuffüllenToolStripMenuItem_Click);
             // 
             // Form1
             // 

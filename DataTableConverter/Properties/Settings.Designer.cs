@@ -261,5 +261,17 @@ namespace DataTableConverter.Properties {
                 this["ExportCustomCheck"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TakeOverAllFiles {
+            get {
+                return ((bool)(this["TakeOverAllFiles"]));
+            }
+            set {
+                this["TakeOverAllFiles"] = value;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,15 +17,18 @@ namespace DataTableConverter.View
         private string path, data;
         private EventHandler ctxRowDeleteRowHandler;
         private EventHandler ctxRowClipboard;
+        private bool MultipleFiles;
+        internal bool TakeOver { get { return cbTakeOver.Checked; } }
+        internal ImportSettings ImportSettings;
 
         internal DataTable DataTable { get; set; }
-        internal TextFormat(string path)
+        internal TextFormat(string path, bool multipleFiles)
         {
             InitializeComponent();
             this.path = path;
             setEncodingCmb();
-
-            
+            MultipleFiles = multipleFiles;
+            cbTakeOver.Visible = multipleFiles;
         }
 
         private void TextFormat_Load(object sender, EventArgs e)
@@ -86,6 +90,7 @@ namespace DataTableConverter.View
             txtSeparator.Text = Properties.Settings.Default.Separator;
             txtBegin.Text = Properties.Settings.Default.TextBegin;
             txtEnd.Text = Properties.Settings.Default.TextEnd;
+            cbTakeOver.Checked = Properties.Settings.Default.TakeOverAllFiles;
             rbTab.Checked = radioSelected == 0;
             rbSep.Checked = radioSelected == 1;
             rbBetween.Checked = radioSelected == 2;
@@ -164,22 +169,31 @@ namespace DataTableConverter.View
             Properties.Settings.Default.Encoding = ((EncodingInfo)cmbEncoding.SelectedItem).CodePage;
             Properties.Settings.Default.TextBegin = txtBegin.Text;
             Properties.Settings.Default.TextEnd = txtEnd.Text;
+            Properties.Settings.Default.TakeOverAllFiles = cbTakeOver.Checked;
             Properties.Settings.Default.Save();
         }
 
         private void btnAcceptSeparate_Click(object sender, EventArgs e)
         {
+            string separator = null;
             if(rbSep.Checked && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
-                DataTable = ImportHelper.openText(path, txtSeparator.Text, getCodePage());
+                separator = txtSeparator.Text;
             }
             else if (rbTab.Checked)
             {
-                DataTable = ImportHelper.openText(path, "\t", getCodePage());
+                separator = "\t";
             }
             else if (rbBetween.Checked && checkBetweenText())
             {
+                ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text);
                 DataTable = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text);
+            }
+
+            if(separator != null)
+            {
+                ImportSettings = new ImportSettings(separator, getCodePage());
+                DataTable = ImportHelper.openText(path, separator, getCodePage());
             }
 
             if(DataTable != null)
@@ -191,6 +205,7 @@ namespace DataTableConverter.View
         private void btnAcceptFixed_Click(object sender, EventArgs e)
         {
             getDataGridViewItems(out List<int> values, out List<string> headers);
+            ImportSettings = new ImportSettings(values, headers, getCodePage());
             DataTable = ImportHelper.openTextFixed(data, path, values, headers);
         }
 

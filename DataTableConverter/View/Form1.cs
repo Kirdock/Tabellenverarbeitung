@@ -363,92 +363,108 @@ namespace DataTableConverter
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e, ImportState state = ImportState.None)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
             string textExt = "*.txt";
             string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
-            
 
-            dialog.Filter = $"Text-, CSV-, DBASE und Excel-Dateien ({csvExt}, {textExt}, {AccessExt}, {dbfExt}*.xl*)|{csvExt};{textExt}; {excelExt}; {dbfExt}; {AccessExt}"
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = $"Text-, CSV-, DBASE und Excel-Dateien ({csvExt}, {textExt}, {AccessExt}, {dbfExt}*.xl*)|{csvExt};{textExt}; {excelExt}; {dbfExt}; {AccessExt}"
                             + $"|Textdateien ({textExt})|{textExt}"
                             + $"|Access-Dateien ({AccessExt})|{AccessExt}"
                             + $"|CSV-Dateien ({csvExt})|{csvExt}"
                             + $"|dBase-Dateien ({dbfExt})|{dbfExt}"
                             + $"|Excel-Dateien (*.xl*)|{excelExt}"
-                            + "|Alle Dateien (*.*)|*.*";
-            dialog.RestoreDirectory = true;
+                            + "|Alle Dateien (*.*)|*.*",
+                RestoreDirectory = true,
+                Multiselect = state == ImportState.None || state == ImportState.Append
+            };
             DataTable oldTable = getDataSource();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 if (state == ImportState.None)
                 {
-                    SetFileName(dialog.FileName);
+                    SetFileName(dialog.FileNames[0]);
                 }
-                string filename = Path.GetFileName(dialog.FileName);
-                string extension = Path.GetExtension(dialog.FileName).ToLower();
-
-                if (extension == ".dbf")
+                new Thread(() =>
                 {
+                    Thread.CurrentThread.IsBackground = true;
                     StartLoadingBar();
-                    new Thread(() =>
-                    {
-                        try {
-                            Thread.CurrentThread.IsBackground = true;
-                            DataTable dt = ImportHelper.openDBF(dialog.FileName);
-                            finishImport(dt, state, oldTable, filename);
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorHelper.LogMessage(ex);
-                        }
-                    }).Start();
-                }
-                else if(extension != string.Empty && AccessExt.Contains(extension))
-                {
-                    new Thread(() =>
+                    bool multipleFiles = dialog.FileNames.Length > 1;
+                    Dictionary<string, ImportSettings> takeOver = new Dictionary<string, ImportSettings>();
+                    DataTable newTable = null;
+                    string fileNameBefore = Path.GetFileName(dialog.FileNames[0]);
+                    foreach (string file in dialog.FileNames)
                     {
                         try
                         {
-                            StartLoadingBar();
-                            Thread.CurrentThread.IsBackground = true;
+                            string filename = Path.GetFileName(file);
+                            string extension = Path.GetExtension(file).ToLower();
+                            DataTable table = null;
 
-                            DataTable dt = ImportHelper.OpenMSAccess(dialog.FileName);
-                            finishImport(dt, state, oldTable, filename);
+                            if (extension == ".dbf")
+                            {
+                                table = ImportHelper.openDBF(file);
+                            }
+                            else if (extension != string.Empty && AccessExt.Contains(extension))
+                            {
+                                table = ImportHelper.OpenMSAccess(file);
+                            }
+                            else if (extension != string.Empty && excelExt.Contains(extension))
+                            {
+                                table = ImportHelper.openExcel(file, this);
+                            }
+                            else
+                            {
+                                if (takeOver.TryGetValue(extension, out ImportSettings settings))
+                                {
+                                    if (settings.Values != null)
+                                    {
+                                        string data = File.ReadAllText(file, Encoding.GetEncoding(settings.CodePage));
+                                        table = ImportHelper.openTextFixed(data, file, settings.Values, settings.Headers);
+                                    }
+                                    else if(settings.Separator != null)
+                                    {
+                                        table = ImportHelper.openText(file, settings.Separator, settings.CodePage);
+                                    }
+                                    else
+                                    {
+                                        table = ImportHelper.openTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd);
+                                    }
+
+                                }
+                                else
+                                {
+                                    TextFormat form = new TextFormat(file, multipleFiles);
+                                    //BeginInvoke(new MethodInvoker(() =>
+                                    //{
+                                        if (form.ShowDialog() == DialogResult.OK)
+                                        {
+                                            if (form.TakeOver)
+                                            {
+                                                takeOver.Add(extension, form.ImportSettings);
+                                            }
+                                            table = form.DataTable;
+                                        }
+                                    //}));
+                                }
+                            }
+                            if (newTable != null)
+                            {
+                                DataHelper.concatTables(newTable, table, fileNameBefore, filename);
+                            }
+                            else
+                            {
+                                newTable = table;
+                            }
+                            fileNameBefore = filename;
                         }
                         catch (Exception ex)
                         {
                             ErrorHelper.LogMessage(ex);
                         }
-                    }).Start();
-                    //ThreadHelper.StartThread(delegate()
-                    //{
-                    //        DataTable dt = ImportHelper.OpenMSAccess(dialog.FileName);
-                    //        finishImport(dt, state, oldTable);
-                    //});
-                }
-                else if (extension != string.Empty && excelExt.Contains(extension))
-                {
-                    StartLoadingBar();
-                    new Thread(() =>
-                    {
-                        try {
-                            Thread.CurrentThread.IsBackground = true;
-                            DataTable dt = ImportHelper.openExcel(dialog.FileName, this);
-                            finishImport(dt, state, oldTable, filename);
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorHelper.LogMessage(ex);
-                        }
-                    }).Start();
-                }
-                else
-                {
-                    TextFormat form = new TextFormat(dialog.FileName);
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        finishImport(form.DataTable, state, oldTable, filename);
                     }
-                }
+                    finishImport(newTable, state, oldTable, Path.GetFileName(dialog.FileNames[0]));
+                }).Start();
             }
         }
 
