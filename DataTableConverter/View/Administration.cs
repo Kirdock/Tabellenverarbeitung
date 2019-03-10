@@ -42,7 +42,7 @@ namespace DataTableConverter.View
 
             SetHeaders(headers);
             SetOrderList();
-            assignGroupBoxToEnum();
+            
             CmBRound.SelectedIndex = 0;
             CmBRound.SelectedIndexChanged += CmBRound_SelectedIndexChanged;
             cmbProcedureType.SelectedIndex = 0;
@@ -53,7 +53,7 @@ namespace DataTableConverter.View
             loadWorkflows();
 
             viewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
-
+            assignGroupBoxToEnum();
             ltbProcedures_SelectedIndexChanged(null, null);
             generateProceduresForWorkflow();
             loadProceduresWorkflow(false);
@@ -92,7 +92,9 @@ namespace DataTableConverter.View
             viewHelper.AddContextMenuToDataGridView(dgvRound, true);
             viewHelper.AddContextMenuToDataGridView(dgUpLow, true);
             viewHelper.AddContextMenuToDataGridView(dgOrderColumns, false);
-            viewHelper.AddContextMenuToDataGridView(dgvMerge, false);
+            viewHelper.AddContextMenuToDataGridView(dgvMerge, true);
+            viewHelper.AddContextMenuToDataGridView(dgvPadColumns, true);
+            viewHelper.AddContextMenuToDataGridView(dgvPadConditions, true);
         }
 
         private void SetOrderList()
@@ -111,6 +113,7 @@ namespace DataTableConverter.View
             clbHeaderOrder.Items.AddRange(headers);
             clbHeadersRound.Items.AddRange(headers);
             clbUpLowHeader.Items.AddRange(headers);
+            cbHeadersPad.Items.AddRange(headers);
         }
 
         private void assignGroupBoxToEnum()
@@ -122,7 +125,8 @@ namespace DataTableConverter.View
                 { gbProcedure, typeof(ProcUser) },
                 { gbOrder, typeof(ProcOrder) },
                 { gbUpLowCase, typeof(ProcUpLowCase) },
-                { gbRound, typeof(ProcRound) }
+                { gbRound, typeof(ProcRound) },
+                { gbPadding, typeof(ProcPadding) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -132,7 +136,8 @@ namespace DataTableConverter.View
                 { typeof(ProcOrder), SetOrderControls },
                 { typeof(ProcUpLowCase), SetUpLowCaseControls },
                 { typeof(ProcRound), SetRoundControls },
-                { typeof(ProcTrim), SetTrimControls }
+                { typeof(ProcTrim), SetTrimControls },
+                { typeof(ProcPadding), SetPaddingControls }
             };
         }
 
@@ -353,7 +358,8 @@ namespace DataTableConverter.View
                 new Proc(ProcMerge.ClassName, null, 2),
                 new Proc(ProcOrder.ClassName, null, 3),
                 new Proc(ProcUpLowCase.ClassName, null, 4),
-                new Proc(ProcRound.ClassName, null, 5)
+                new Proc(ProcRound.ClassName, null, 5),
+                new Proc(ProcPadding.ClassName, null, 6)
             };
 
             generateDuplicateProc();
@@ -491,6 +497,21 @@ namespace DataTableConverter.View
             dgvMerge.DataSource = ((ProcMerge)selectedProc).Conditions;
         }
 
+        private void SetPaddingControls(WorkProc selectedProc)
+        {
+            ProcPadding proc = (ProcPadding)selectedProc;
+            lblOriginalNameText.Text = ProcPadding.ClassName;
+            txtNewColumnPad.Text = proc.NewColumn;
+            dgvPadColumns.DataSource = proc.Columns;
+            dgvPadConditions.DataSource = proc.Conditions;
+            setHeaderProcedure(proc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            bool status = proc.OperationSide == ProcPadding.Side.Left;
+            RbLeft.Checked = status;
+            RbRight.Checked = !status;
+            TxtCharacter.Text = proc.Character?.ToString() ?? string.Empty;
+            cbPadNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
+        }
+
         private void SetTrimControls(WorkProc selectedProc)
         {
             lblOriginalNameText.Text = ProcTrim.ClassName;
@@ -594,17 +615,20 @@ namespace DataTableConverter.View
             {
                 WorkProc selectedProc = getSelectedWorkProcedure();
                 setProcValues(selectedProc);
-                assignControls[selectedProc.GetType()](selectedProc);
+                assignControls?[selectedProc.GetType()](selectedProc);
             }
         }
 
         private void setGroupBoxVisibility(Type type)
         {
-            foreach (GroupBox box in gbState.Keys)
+            if (gbState != null)
             {
-                box.Visible = gbState[box] == type;
+                foreach (GroupBox box in gbState.Keys)
+                {
+                    box.Visible = gbState[box] == type;
+                }
+                gbTrim.Visible = type != null;
             }
-            gbTrim.Visible = type != null;
         }
 
         private void setNewColumnText(string text)
@@ -643,6 +667,13 @@ namespace DataTableConverter.View
             clbHeaderProcedure.ItemCheck -= clbHeaderProcedure_ItemCheck;
             setChecked(clbHeaderProcedure, headers);
             clbHeaderProcedure.ItemCheck += clbHeaderProcedure_ItemCheck;
+        }
+
+        private void SetHeaderPadding(string[] headers)
+        {
+            cbHeadersPad.ItemCheck -= clbHeaderPad_ItemCheck;
+            setChecked(cbHeadersPad, headers);
+            cbHeadersPad.ItemCheck += clbHeaderPad_ItemCheck;
         }
 
         private void SetHeaderRound(string[] headers)
@@ -743,10 +774,9 @@ namespace DataTableConverter.View
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
             lblNewColumn.Visible = txtNewColumn.Visible = cbNewColumn.Checked;
-            if (!txtNewColumn.Visible)
+            if (!cbNewColumn.Checked)
             {
                 txtNewColumn.Text = string.Empty;
-                txtNewColumn_TextChanged(txtNewColumn, e);
             }
         }
 
@@ -1073,6 +1103,11 @@ namespace DataTableConverter.View
             ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvColumns, e, (CheckedListBox)sender);
         }
 
+        private void clbHeaderPad_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvPadColumns, e, (CheckedListBox)sender);
+        }
+
         private void clbHeadersRound_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvColumns, e, (CheckedListBox)sender);
@@ -1162,10 +1197,9 @@ namespace DataTableConverter.View
         private void cbNewColumnRound_CheckedChanged(object sender, EventArgs e)
         {
             lblNewColumnRound.Visible = txtNewColumnRound.Visible = cbNewColumnRound.Checked;
-            if (!txtNewColumnRound.Visible)
+            if (!cbNewColumnRound.Checked)
             {
                 txtNewColumnRound.Text = string.Empty;
-                txtNewColumnRound_TextChanged(txtNewColumnRound, e);
             }
         }
 
@@ -1182,6 +1216,45 @@ namespace DataTableConverter.View
         private void dgvMerge_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             dgvMerge.BindingContext[dgvMerge.DataSource].EndCurrentEdit();
+        }
+
+        private void dgvPadColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            ((DataGridView)sender).BindingContext[((DataGridView)sender).DataSource].EndCurrentEdit();
+        }
+
+        private void txtNewColumnPad_TextChanged(object sender, EventArgs e)
+        {
+            getSelectedWorkProcedure().NewColumn = ((TextBox)sender).Text;
+        }
+
+        private void cbPadNewColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            lblPadNewColumn.Visible = txtNewColumnPad.Visible = ((CheckBox)sender).Checked;
+            if (!((CheckBox)sender).Checked)
+            {
+                txtNewColumnPad.Text = string.Empty;
+            }
+        }
+
+        private void RbLeft_CheckedChanged(object sender, EventArgs e)
+        {
+            SetPadOperationSide(((RadioButton)sender).Checked ? ProcPadding.Side.Left : ProcPadding.Side.Right);
+        }
+
+        private void SetPadOperationSide(ProcPadding.Side side)
+        {
+            ((ProcPadding)getSelectedWorkProcedure()).OperationSide = side;
+        }
+
+        private void TxtCharacter_TextChanged(object sender, EventArgs e)
+        {
+            ((ProcPadding)getSelectedWorkProcedure()).Character = ((TextBox)sender).Text.Length > 0 ? ((TextBox)sender).Text[0] : (char?)null;
+        }
+
+        private void nbPadCount_ValueChanged(object sender, EventArgs e)
+        {
+            ((ProcPadding)getSelectedWorkProcedure()).Counter = (int)((NumericUpDown)sender).Value;
         }
     }
 }

@@ -180,7 +180,7 @@ namespace DataTableConverter
                                                    Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
                                                    System.Type.Missing).Name = workSheetName;
 
-                workbook.SaveAs(Path.Combine(directory, filename + ".xls"), Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                workbook.SaveAs(Path.Combine(directory, filename + ".xlsx"), Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                 workbook.Close(false, Type.Missing, Type.Missing);
                 excel.Quit();
 

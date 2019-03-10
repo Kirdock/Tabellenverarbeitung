@@ -17,13 +17,16 @@ namespace DataTableConverter.View
     {
         internal string Formula { get { return txtFormula.Text; } }
         internal ProcMerge Proc;
+        internal ViewHelper ViewHelper;
 
-        internal Merge(object[] headers)
+        internal Merge(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
             cbHeaders.Items.AddRange(headers);
             Proc = new ProcMerge();
             InitDataGridView(headers);
+            ViewHelper = new ViewHelper(ctxRow, null, null);
+            ViewHelper.AddContextMenuToDataGridView(dgvMerge, false);
         }
 
         private void InitDataGridView(object[] headers)

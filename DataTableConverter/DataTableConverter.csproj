@@ -91,6 +91,7 @@
     <Compile Include="Classes\WorkProc.cs" />
     <Compile Include="Assisstant\ViewHelper.cs" />
     <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
+    <Compile Include="Classes\WorkProcs\ProcPadding.cs" />
     <Compile Include="Classes\WorkProcs\ProcRound.cs" />
     <Compile Include="Classes\WorkProcs\ProcTrim.cs" />
     <Compile Include="Classes\WorkProcs\ProcMerge.cs" />
@@ -166,6 +167,12 @@
     </Compile>
     <Compile Include="View\MergeTable.Designer.cs">
       <DependentUpon>MergeTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\PaddingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\PaddingForm.Designer.cs">
+      <DependentUpon>PaddingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="View\RoundForm.cs">
       <SubType>Form</SubType>
@@ -247,6 +254,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\MergeTable.resx">
       <DependentUpon>MergeTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\PaddingForm.resx">
+      <DependentUpon>PaddingForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\RoundForm.resx">
       <DependentUpon>RoundForm.cs</DependentUpon>

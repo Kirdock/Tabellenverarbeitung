@@ -98,6 +98,10 @@ namespace DataTableConverter.Assisstant
                             newProc = new ProcRound(ordinal, id, name);
                             break;
 
+                        case 6:
+                            newProc = new ProcPadding(ordinal, id, name);
+                            break;
+
                         case 1:
                         default:
                             newProc = new ProcTrim(ordinal, id, name);

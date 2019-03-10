@@ -216,17 +216,15 @@ namespace DataTableConverter
 
         private void loadProcedures(List<Proc> proc = null)
         {
-            for (int i = SystemProcedureCount; i < funktionenToolStripMenuItem.DropDownItems.Count;)
-            {
-                funktionenToolStripMenuItem.DropDownItems.RemoveAt(i);
-            }
+            ersetzenToolStripMenuItem.DropDownItems.Clear();
+            
             procedures = proc ?? ImportHelper.loadProcedures();
             for (int i = 0; i < procedures.Count; i++)
             {
                 int index = i;
                 ToolStripMenuItem item = new ToolStripMenuItem(procedures[i].Name);
                 item.Click += (sender, e) => procedure_Click(sender, e, procedures[index]);
-                funktionenToolStripMenuItem.DropDownItems.Add(item);
+                ersetzenToolStripMenuItem.DropDownItems.Add(item);
             }   
         }
 
@@ -470,19 +468,19 @@ namespace DataTableConverter
                     break;
 
                 case ImportState.Append:
-                    dgTable.Invoke(new MethodInvoker(() => { mergeTables(table, filename); }));
+                    dgTable.BeginInvoke(new MethodInvoker(() => { mergeTables(table, filename); }));
                     break;
 
                 case ImportState.Header:
                     object[] headers = DataHelper.getHeadersOfDataTable(oldTable);
                     DataHelper.setHeaders(table, oldTable);
-                    dgTable.Invoke(new MethodInvoker(() => { assignDataSource(oldTable); }));
+                    dgTable.BeginInvoke(new MethodInvoker(() => { assignDataSource(oldTable); }));
                     addDataSourceHeadersChange(headers);
                     break;
 
                 default:
-                    dgTable.Invoke(new MethodInvoker(() => { addDataSourceNewTable(table); }));
-                    lblRows.GetCurrentParent().Invoke(new MethodInvoker(() => { setRowCount(table.Rows.Count); }));
+                    dgTable.BeginInvoke(new MethodInvoker(() => { addDataSourceNewTable(table); }));
+                    lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { setRowCount(table.Rows.Count); }));
                     break;
         }
         }
@@ -785,7 +783,7 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Merge formula = new Merge(DataHelper.getHeadersOfDataTable(getDataSource()));
+            Merge formula = new Merge(DataHelper.getHeadersOfDataTable(getDataSource()), ctxRow);
             if (formula.ShowDialog() == DialogResult.OK)
             {
                 workflow_Click(null, null, new Work(string.Empty, new List<WorkProc>() { formula.Proc }, 0));
@@ -1404,6 +1402,15 @@ namespace DataTableConverter
             {
                 StatusLabel.Text = text;
             }));
+        }
+
+        private void zeichenAuffüllenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PaddingForm form = new PaddingForm(DataHelper.getHeadersOfDataTable(getDataSource()));
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { form.Proc }, 0));
+            }
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

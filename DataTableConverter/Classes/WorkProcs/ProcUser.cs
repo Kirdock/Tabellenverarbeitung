@@ -50,7 +50,7 @@ namespace DataTableConverter.Classes.WorkProcs
             DataTable replaces = procedure.Replace;
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                table.Columns.Add(NewColumn);
+                DataHelper.addColumn(NewColumn, table);
                 intoNewCol = true;
             }
             List<int> headerIndices = DataHelper.getHeaderIndices(table, columns);
