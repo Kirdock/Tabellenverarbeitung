@@ -11,7 +11,6 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     internal class ProcUser : WorkProc
     {
-
         public override string[] GetHeaders()
         {
             return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
@@ -61,9 +60,20 @@ namespace DataTableConverter.Classes.WorkProcs
                     foreach (DataRow rep in replaces.Rows)
                     {
                         int index = intoNewCol ? lastCol : i;
-                        if (row[i].ToString() == rep[0].ToString())
+                        string value = row[i].ToString();
+                        string replace = rep[0].ToString();
+                        bool condition = procedure.CheckTotal ? value == replace : value.Contains(replace);
+
+
+
+
+                        if (procedure.CheckTotal && value == replace)
                         {
                             row[index] = rep[1].ToString();
+                        }
+                        else if (!procedure.CheckTotal && value.Contains(replace))
+                        {
+                            row[index] = value.Replace(replace, rep[1].ToString());
                         }
                         else if (intoNewCol)
                         {

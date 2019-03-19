@@ -13,6 +13,7 @@ namespace DataTableConverter.Classes
         public string Name { get; set; }
         public int Id { get; set; }
         public DataTable Replace { get; set; }
+        internal bool CheckTotal { get; set; }
 
         public Proc(string name, DataTable replace, int id)
         {

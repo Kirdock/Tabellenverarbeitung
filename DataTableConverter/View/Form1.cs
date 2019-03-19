@@ -34,7 +34,6 @@ namespace DataTableConverter
         private Dictionary<string, SortOrder> dictSorting;
         private int rowBefore; //Wenn eine Zelle im DataGridView geändert wird, kann ich mit dgTable[col, row] den geänderten Wert nicht holen, da die DataGridView zu diesem Zeitpunkt wieder sortiert wurde
         private List<string> dictKeys;
-        private readonly int SystemProcedureCount = 4;
         private string FilePath = string.Empty;
         private ThreadHelper ThreadHelper;
 

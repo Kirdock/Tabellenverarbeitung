@@ -10,6 +10,7 @@ namespace DataTableConverter.Assisstant
 {
     class DataHelper
     {
+        internal static readonly string FileName = "Dateiname";
         internal static object[] getHeadersOfDataTable(DataTable table)
         {
             return table != null ? table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray() : new object[0];
@@ -83,7 +84,6 @@ namespace DataTableConverter.Assisstant
         internal static void concatTables(DataTable originalTable, DataTable table, string originalFilename, string secondFilename)
         {
             List<int> ColumnIndizes = new List<int>();
-            string fileName = "Dateiname";
             table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToList().ForEach(x => {
                 int index = originalTable.Columns.IndexOf(x);
                 if (index == -1)
@@ -94,9 +94,9 @@ namespace DataTableConverter.Assisstant
                 ColumnIndizes.Add(index);
             });
             int filenameColumnIndex;
-            if ((filenameColumnIndex = originalTable.Columns.IndexOf(fileName)) == -1)
+            if ((filenameColumnIndex = originalTable.Columns.IndexOf(FileName)) == -1)
             {
-                addColumn(fileName, originalTable);
+                addColumn(FileName, originalTable);
                 int colIndex = filenameColumnIndex = originalTable.Columns.Count - 1;
                 foreach (DataRow row in originalTable.Rows)
                 {
@@ -111,7 +111,7 @@ namespace DataTableConverter.Assisstant
                 string secondName = secondFilename;
                 try
                 {
-                    secondName = row[fileName]?.ToString() ?? secondFilename;
+                    secondName = row[FileName]?.ToString() ?? secondFilename;
                 }
                 catch { }
                 foreach (int index in ColumnIndizes)

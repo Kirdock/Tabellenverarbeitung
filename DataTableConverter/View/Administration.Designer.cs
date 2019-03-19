@@ -144,6 +144,7 @@
             this.txtShortcut = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.cbCheckTotal = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -288,6 +289,7 @@
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.cbCheckTotal);
             this.groupBox1.Controls.Add(this.dgvReplaces);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.txtName);
@@ -326,7 +328,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtName.Location = new System.Drawing.Point(22, 53);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(667, 20);
+            this.txtName.Size = new System.Drawing.Size(462, 20);
             this.txtName.TabIndex = 1;
             this.txtName.TextChanged += new System.EventHandler(this.txtName_TextChanged);
             // 
@@ -1625,6 +1627,18 @@
             this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTip1.ToolTipTitle = "Info";
             // 
+            // cbCheckTotal
+            // 
+            this.cbCheckTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbCheckTotal.AutoSize = true;
+            this.cbCheckTotal.Location = new System.Drawing.Point(535, 55);
+            this.cbCheckTotal.Name = "cbCheckTotal";
+            this.cbCheckTotal.Size = new System.Drawing.Size(154, 17);
+            this.cbCheckTotal.TabIndex = 10;
+            this.cbCheckTotal.Text = "Genaue Übereinstimmung?";
+            this.cbCheckTotal.UseVisualStyleBackColor = true;
+            this.cbCheckTotal.CheckedChanged += new System.EventHandler(this.cbCheckTotal_CheckedChanged);
+            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1825,5 +1839,6 @@
         private System.Windows.Forms.NumericUpDown nbPadCount;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.TextBox TxtCharacter;
+        private System.Windows.Forms.CheckBox cbCheckTotal;
     }
 }

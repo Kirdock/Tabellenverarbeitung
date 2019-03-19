@@ -25,7 +25,7 @@ namespace DataTableConverter
         internal static readonly string ProjectCases = Path.Combine(ProjectPath,"Fälle.bin");
         internal static readonly string ProjectWorkflows = Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
         private static readonly string CSVSeparator = ";";
-        private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(858);
+        private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
 
 
@@ -180,7 +180,7 @@ namespace DataTableConverter
                                                    Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
                                                    System.Type.Missing).Name = workSheetName;
 
-                workbook.SaveAs(Path.Combine(directory, filename + ".xlsx"), Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                workbook.SaveAs(Path.Combine(directory, filename + ".xls"), Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                 workbook.Close(false, Type.Missing, Type.Missing);
                 excel.Quit();
 

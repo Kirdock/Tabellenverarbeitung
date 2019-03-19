@@ -296,6 +296,11 @@ namespace DataTableConverter.Assisstant
                                 return data;
                             }
                         }
+                        else
+                        {
+                            hasPassword = false;
+                            throw ex;
+                        }
                     }
                 } while (hasPassword);
                 
@@ -304,6 +309,11 @@ namespace DataTableConverter.Assisstant
                     selectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray())
                     )
                 );
+                bool fileNameColumn;
+                if(fileNameColumn = (data.Columns.IndexOf(DataHelper.FileName) == -1 && selectedSheets.Length > 1))
+                {
+                    data.Columns.Add(DataHelper.FileName);
+                }
                 
                 foreach (string sheetName in selectedSheets)
                 {
@@ -350,17 +360,25 @@ namespace DataTableConverter.Assisstant
                         {
                             dr[columns[j - 1]] = values[i, j];
                         }
+                        if(selectedSheets.Length > 1)
+                        {
+                            dr[DataHelper.FileName] = Path.GetFileName(path) + "; " + sheetName;
+                        }
                         data.Rows.Add(dr);
                     }
+                }
+                if (fileNameColumn)
+                {
+                    data.Columns[DataHelper.FileName].SetOrdinal(data.Columns.Count - 1);
                 }
                 objWB.Close();
                 objXL.Quit();
             }
             catch (Exception ex)
             {
-                objWB.Close();
-                objXL.Quit();
-                MessagesOK(MessageBoxIcon.Error, $"Es ist ein Fehler aufgetreten!\nMöglicherweise Falsches Passwort?\nFehler:{ex.Message}");
+                objWB?.Close();
+                objXL?.Quit();
+                ErrorHelper.LogMessage(ex);
             }
 
             return data;

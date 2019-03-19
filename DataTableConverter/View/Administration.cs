@@ -295,6 +295,7 @@ namespace DataTableConverter.View
                 selectedProc = (Proc)ltbProcedures.SelectedItem;
                 txtName.Text = selectedProc.Name;
                 dgvReplaces.DataSource = selectedProc.Replace;
+                cbCheckTotal.Checked = selectedProc.CheckTotal;
             }
         }
 
@@ -302,6 +303,7 @@ namespace DataTableConverter.View
         {
             txtName.Text = string.Empty;
             dgvReplaces.DataSource = null;
+            cbCheckTotal.Checked = false;
         }
 
 
@@ -501,6 +503,7 @@ namespace DataTableConverter.View
         {
             ProcPadding proc = (ProcPadding)selectedProc;
             lblOriginalNameText.Text = ProcPadding.ClassName;
+            nbPadCount.Value = proc.Counter;
             txtNewColumnPad.Text = proc.NewColumn;
             dgvPadColumns.DataSource = proc.Columns;
             dgvPadConditions.DataSource = proc.Conditions;
@@ -522,6 +525,7 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             dgvColumns.DataSource = selectedProc.Columns;
+
             setHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
 
@@ -1255,6 +1259,14 @@ namespace DataTableConverter.View
         private void nbPadCount_ValueChanged(object sender, EventArgs e)
         {
             ((ProcPadding)getSelectedWorkProcedure()).Counter = (int)((NumericUpDown)sender).Value;
+        }
+
+        private void cbCheckTotal_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lbProcedures.SelectedIndex != -1)
+            {
+                selectedProc.CheckTotal = cbCheckTotal.Checked;
+            }
         }
     }
 }
