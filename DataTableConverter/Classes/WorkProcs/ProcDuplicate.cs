@@ -44,6 +44,7 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             sortingOrder = string.Empty;
             Hashtable hTable = new Hashtable();
+            Hashtable totalTable = new Hashtable();
             ArrayList duplicateList = new ArrayList();
 
             int[] subStringBegin = duplicateCase.getBeginSubstring();
@@ -62,16 +63,29 @@ namespace DataTableConverter.Classes.WorkProcs
 
             for (int index = 0; index < table.Rows.Count; index++)
             {
-                string identifier = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
-
-                if (hTable.Contains(identifier))
+                string identifierTotal = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, null, null, null);
+                bool isTotal;
+                if (isTotal = totalTable.Contains(identifierTotal))
                 {
-                    table.Rows[(int)hTable[identifier]].SetField(lastIndex, duplicateCase.Shortcut);
-                    table.Rows[index].SetField(lastIndex, duplicateCase.Shortcut);
+                    table.Rows[(int)totalTable[identifierTotal]].SetField(lastIndex, duplicateCase.ShortcutTotal);
+                    table.Rows[index].SetField(lastIndex, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
                 }
                 else
                 {
-                    hTable.Add(identifier, index);
+                    totalTable.Add(identifierTotal, index);
+                }
+                if (!isTotal)
+                {
+                    string identifier = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
+                    if (hTable.Contains(identifier))
+                    {
+                        table.Rows[(int)hTable[identifier]].SetField(lastIndex, duplicateCase.Shortcut);
+                        table.Rows[index].SetField(lastIndex, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                    }
+                    else
+                    {
+                        hTable.Add(identifier, index);
+                    }
                 }
             }
         }

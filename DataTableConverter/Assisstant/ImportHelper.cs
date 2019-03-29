@@ -358,7 +358,40 @@ namespace DataTableConverter.Assisstant
                         DataRow dr = data.NewRow();
                         for (int j = 1; j <= values.GetLength(1); j++)
                         {
-                            dr[columns[j - 1]] = values[i, j];
+                            
+                            string[] subValues = values[i, j].ToString().Split('\n');
+                            if (subValues.Length < 2)
+                            {
+                                dr[columns[j - 1]] = values[i, j];
+                            }
+                            else
+                            {
+                                #region split \n into several columns
+
+                                int[] newColIndizes = new int[subValues.Length];
+                                string colName = data.Columns[columns[j - 1]].ColumnName;
+
+                                newColIndizes[0] = columns[j - 1];
+                                for(int col = 1; col < subValues.Length; col++)
+                                {
+                                    string newColName = colName + col;
+                                    int index = data.Columns.IndexOf(newColName);
+                                    if(index == -1)
+                                    {
+                                        newColIndizes[col] = data.Columns.Count;
+                                        data.Columns.Add(newColName);
+                                    }
+                                    else
+                                    {
+                                        newColIndizes[col] = index;
+                                    }
+                                }
+                                for(int index = 0; index < subValues.Length; index++)
+                                {
+                                    dr[newColIndizes[index]] = subValues[index];
+                                }
+                                #endregion
+                            }
                         }
                         if(selectedSheets.Length > 1)
                         {

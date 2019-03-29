@@ -998,6 +998,7 @@ namespace DataTableConverter.View
             {
                 txtCaseName.Text = string.Empty;
                 txtShortcut.Text = string.Empty;
+                txtShortcutTotal.Text = string.Empty;
                 dgCaseColumns.DataSource = null;
             }
             else
@@ -1005,6 +1006,7 @@ namespace DataTableConverter.View
                 Case selectedCase = (Case)lbCases.SelectedItem;
                 txtCaseName.Text = selectedCase.Name;
                 txtShortcut.Text = selectedCase.Shortcut;
+                txtShortcutTotal.Text = selectedCase.ShortcutTotal;
                 dgCaseColumns.DataSource = selectedCase.Columns;
                 if (viewHelper != null)
                 {
@@ -1266,6 +1268,14 @@ namespace DataTableConverter.View
             if (lbProcedures.SelectedIndex != -1)
             {
                 selectedProc.CheckTotal = cbCheckTotal.Checked;
+            }
+        }
+
+        private void txtShortcutTotal_TextChanged(object sender, EventArgs e)
+        {
+            if (lbCases.SelectedIndex != -1)
+            {
+                ((Case)lbCases.SelectedItem).ShortcutTotal = txtShortcutTotal.Text;
             }
         }
     }

@@ -19,11 +19,14 @@ namespace DataTableConverter.Assisstant
             {
                 #region Set Tolerances
                 StringBuilder result = new StringBuilder(row[columns[i]].ToString().ToLower());
-                foreach (Tolerance tol in tolerances)
+                if (tolerances != null)
                 {
-                    foreach (string t in tol.getColumnsAsArrayToLower())
+                    foreach (Tolerance tol in tolerances)
                     {
-                        result.Replace(t, tol.Name);
+                        foreach (string t in tol.getColumnsAsArrayToLower())
+                        {
+                            result.Replace(t, tol.Name);
+                        }
                     }
                 }
                 #endregion
@@ -31,22 +34,25 @@ namespace DataTableConverter.Assisstant
                 string resultString = result.ToString();
 
                 #region Set Substring
-                int begin = subStringBegin[i];
-                int end = subStringEnd[i];
-                if (begin != 0 && end != 0 && end >= begin)
+                if (subStringBegin != null)
                 {
-                    if (begin - 1 > resultString.Length)
+                    int begin = subStringBegin[i];
+                    int end = subStringEnd[i];
+                    if (begin != 0 && end != 0 && end >= begin)
                     {
-                        resultString = string.Empty;
-                    }
-                    else
-                    {
-                        int count = end - begin + 1;
-                        if (begin + count > resultString.Length)
+                        if (begin - 1 > resultString.Length)
                         {
-                            count = resultString.Length - begin + 1;
+                            resultString = string.Empty;
                         }
-                        resultString = resultString.Substring(begin - 1, count);
+                        else
+                        {
+                            int count = end - begin + 1;
+                            if (begin + count > resultString.Length)
+                            {
+                                count = resultString.Length - begin + 1;
+                            }
+                            resultString = resultString.Substring(begin - 1, count);
+                        }
                     }
                 }
                 #endregion

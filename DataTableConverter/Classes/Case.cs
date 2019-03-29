@@ -11,6 +11,7 @@ namespace DataTableConverter.Classes
         public string Name { get; set; }
         public string Shortcut { get; set; }
         public DataTable Columns { get; set; }
+        internal string ShortcutTotal { get; set; }
 
         public int Id { get; set; }
 

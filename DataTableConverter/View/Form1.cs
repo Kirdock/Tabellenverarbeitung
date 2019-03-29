@@ -1439,7 +1439,6 @@ namespace DataTableConverter
             if (!string.IsNullOrWhiteSpace(newText))
             {
                 DataTable table = getDataSource();
-                DataColumn col = table.Columns[selectedColumn];
                 DataTable newTable = table.Copy();
 
                 foreach (DataRow row in newTable.Rows)
