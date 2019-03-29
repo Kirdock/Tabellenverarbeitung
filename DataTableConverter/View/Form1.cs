@@ -423,11 +423,11 @@ namespace DataTableConverter
                                     }
                                     else if(settings.Separator != null)
                                     {
-                                        table = ImportHelper.openText(file, settings.Separator, settings.CodePage);
+                                        table = ImportHelper.openText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders);
                                     }
                                     else
                                     {
-                                        table = ImportHelper.openTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd);
+                                        table = ImportHelper.openTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders);
                                     }
 
                                 }

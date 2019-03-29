@@ -61,6 +61,7 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cbContainsHeaders = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             this.gbFixed.SuspendLayout();
@@ -144,6 +145,7 @@
             this.gbSeparated.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbSeparated.Controls.Add(this.cbContainsHeaders);
             this.gbSeparated.Controls.Add(this.label4);
             this.gbSeparated.Controls.Add(this.txtEnd);
             this.gbSeparated.Controls.Add(this.label3);
@@ -422,13 +424,24 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
+            // cbContainsHeaders
+            // 
+            this.cbContainsHeaders.AutoSize = true;
+            this.cbContainsHeaders.Location = new System.Drawing.Point(84, 148);
+            this.cbContainsHeaders.Name = "cbContainsHeaders";
+            this.cbContainsHeaders.Size = new System.Drawing.Size(143, 17);
+            this.cbContainsHeaders.TabIndex = 10;
+            this.cbContainsHeaders.Text = "Überschrift in erster Zeile";
+            this.cbContainsHeaders.UseVisualStyleBackColor = true;
+            this.cbContainsHeaders.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 576);
-            this.Controls.Add(this.gbFixed);
             this.Controls.Add(this.gbSeparated);
+            this.Controls.Add(this.gbFixed);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.Name = "TextFormat";
@@ -485,5 +498,6 @@
         private System.Windows.Forms.RadioButton rbBetween;
         private System.Windows.Forms.CheckBox cbTakeOver;
         private System.Windows.Forms.Button BtnRenamePreset;
+        private System.Windows.Forms.CheckBox cbContainsHeaders;
     }
 }

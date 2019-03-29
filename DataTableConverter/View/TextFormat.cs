@@ -186,14 +186,14 @@ namespace DataTableConverter.View
             }
             else if (rbBetween.Checked && checkBetweenText())
             {
-                ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text);
-                DataTable = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text);
+                ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked);
+                DataTable = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked);
             }
 
             if(separator != null)
             {
-                ImportSettings = new ImportSettings(separator, getCodePage());
-                DataTable = ImportHelper.openText(path, separator, getCodePage());
+                ImportSettings = new ImportSettings(separator, getCodePage(), cbContainsHeaders.Checked);
+                DataTable = ImportHelper.openText(path, separator, getCodePage(), cbContainsHeaders.Checked);
             }
 
             if(DataTable != null)
@@ -260,7 +260,7 @@ namespace DataTableConverter.View
         {
             if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
-                dgvPreview.DataSource = ImportHelper.openText(path, txtSeparator.Text, getCodePage(), true);
+                dgvPreview.DataSource = ImportHelper.openText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, true);
             }
         }
 
@@ -442,7 +442,7 @@ namespace DataTableConverter.View
             dgvPreview.DataSource = null;
             if (txtSeparator.ReadOnly = txtBegin.ReadOnly = txtEnd.ReadOnly = rbTab.Checked)
             {
-                dgvPreview.DataSource = ImportHelper.openText(path, "\t", getCodePage(), true);
+                dgvPreview.DataSource = ImportHelper.openText(path, "\t", getCodePage(), cbContainsHeaders.Checked, true);
             }
             
             else if ((txtBegin.ReadOnly = txtEnd.ReadOnly = rbSep.Checked))
@@ -450,7 +450,7 @@ namespace DataTableConverter.View
                 txtSeparator.ReadOnly = false;
                 if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
                 {
-                    dgvPreview.DataSource = ImportHelper.openText(path, txtSeparator.Text, getCodePage(), true);
+                    dgvPreview.DataSource = ImportHelper.openText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, true);
                 }
             }
             else if (txtSeparator.ReadOnly = rbBetween.Checked)
@@ -458,7 +458,7 @@ namespace DataTableConverter.View
                 txtBegin.ReadOnly = txtEnd.ReadOnly = false;
                 if (checkBetweenText())
                 {
-                    dgvPreview.DataSource = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, true);
+                    dgvPreview.DataSource = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, true);
                 }
             }
         }
@@ -515,7 +515,7 @@ namespace DataTableConverter.View
         {
             if (checkBetweenText())
             {
-                dgvPreview.DataSource = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, true);
+                dgvPreview.DataSource = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, true);
             }
             else
             {

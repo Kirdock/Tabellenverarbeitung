@@ -23,7 +23,7 @@ namespace DataTableConverter.Assisstant
         internal static readonly string ProjectTolerances = ExportHelper.ProjectTolerance;
         internal static readonly string ProjectCases = ExportHelper.ProjectCases;
 
-        internal static DataTable openText(string path, string separator, int codePage, bool isPreview = false)
+        internal static DataTable openText(string path, string separator, int codePage, bool containsHeaders, bool isPreview = false)
         {
             DataTable dt = new DataTable();
 
@@ -33,30 +33,28 @@ namespace DataTableConverter.Assisstant
                 //.SelectMany(x => x.Split(separator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
                 //.ToList()
                 //.ForEach(x => dt.Columns.Add(x.Trim()));
-
-                List<string> list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
-                .SelectMany(x => x.Split(new string[] { separator }, StringSplitOptions.None))
-                .Select(ln => ln.Trim()).ToList();
-
-                foreach (string column in list)
+                int skip = 0;
+                if (containsHeaders)
                 {
-                    DataHelper.addColumn(column.Trim(), dt);
+                    skip = 1;
+                    List<string> list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
+                    .SelectMany(x => x.Split(new string[] { separator }, StringSplitOptions.None))
+                    .Select(ln => ln.Trim()).ToList();
+
+                    foreach (string column in list)
+                    {
+                        DataHelper.addColumn(column.Trim(), dt);
+                    }
                 }
 
 
                 if (isPreview)
                 {
-                    File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4).Skip(1)
-                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None))
-                    .ToList()
-                    .ForEach(line => dt.Rows.Add(line.Select(ln => ln.ToString().Trim()).ToArray()));
+                    insertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator);
                 }
                 else
                 {
-                    File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(1)
-                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None))
-                    .ToList()
-                    .ForEach(line => dt.Rows.Add(line.Select(ln => ln.ToString().Trim()).ToArray()));
+                    insertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator);
                 }
 
                 //File.ReadLines doesn't read all lines, it returns a IEnumerable, and lines are lazy evaluated,
@@ -74,38 +72,57 @@ namespace DataTableConverter.Assisstant
             return dt;
         }
 
-        internal static DataTable openTextBetween(string path, int codePage, string begin, string end, bool isPreview = false)
+        private static void insertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator)
+        {
+            enumerable.Skip(skip)
+                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None))
+                    .ToList()
+                    .ForEach(line =>
+                    {
+                        var temp = line.Select(ln => ln.ToString().Trim()).ToArray();
+                        int count = temp.Count();
+                        while (count > dt.Columns.Count)
+                        {
+                            DataHelper.addColumn("Spalte" + dt.Columns.Count, dt);
+                        }
+                        dt.Rows.Add(temp);
+                    });
+        }
+
+        internal static DataTable openTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, bool isPreview = false)
         {
             DataTable dt = new DataTable();
-            //bool moreColumnsInRow = false;
             try
             {
-                string headerLine = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1).ToArray()[0].ToString();
-                string[] headerRow = createRow(headerLine, begin, end);
-                int columnCount = headerRow.Length;
-
-                foreach (string field in headerRow)
+                int skip = 0;
+                if (containsHeaders)
                 {
-                    DataHelper.addColumn(field, dt);
+                    skip = 1;
+                    string headerLine = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1).ToArray()[0].ToString();
+                    string[] headerRow = createRow(headerLine, begin, end);
+
+                    foreach (string field in headerRow)
+                    {
+                        DataHelper.addColumn(field, dt);
+                    }
                 }
 
                 string[] lines = new string[0];
                 if (isPreview)
                 {
-                    lines = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4).Skip(1).ToArray();
+                    lines = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4).Skip(skip).ToArray();
                 }
                 else
                 {
-                    lines = File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(1).ToArray();
+                    lines = File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(skip).ToArray();
                 }
 
                 foreach(string line in lines)
                 {
                     string[] row = createRow(line, begin, end);
-                    if(row.Length > columnCount)
+                    while(row.Length > dt.Columns.Count)
                     {
-                        row = row.Take(columnCount).ToArray();
-                        //moreColumnsInRow = true;
+                        DataHelper.addColumn("Spalte" + dt.Columns.Count, dt);
                     }
                     dt.Rows.Add(row);
                 }
