@@ -67,6 +67,7 @@
             this.spalteUmbenennenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spalteLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spalteHinzufügenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.textErsetzenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeileEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,7 +83,6 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.textErsetzenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -367,7 +367,7 @@
             this.spalteHinzufügenToolStripMenuItem1,
             this.textErsetzenToolStripMenuItem});
             this.ctxHeader.Name = "ctxHeader";
-            this.ctxHeader.Size = new System.Drawing.Size(181, 114);
+            this.ctxHeader.Size = new System.Drawing.Size(181, 92);
             // 
             // spalteUmbenennenToolStripMenuItem
             // 
@@ -389,6 +389,13 @@
             this.spalteHinzufügenToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.spalteHinzufügenToolStripMenuItem1.Text = "Spalte hinzufügen";
             this.spalteHinzufügenToolStripMenuItem1.Click += new System.EventHandler(this.spalteHinzufügenToolStripMenuItem_Click);
+            // 
+            // textErsetzenToolStripMenuItem
+            // 
+            this.textErsetzenToolStripMenuItem.Name = "textErsetzenToolStripMenuItem";
+            this.textErsetzenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.textErsetzenToolStripMenuItem.Text = "Text ersetzen";
+            this.textErsetzenToolStripMenuItem.Click += new System.EventHandler(this.textErsetzenToolStripMenuItem_Click);
             // 
             // ctxRow
             // 
@@ -512,13 +519,6 @@
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
-            // 
-            // textErsetzenToolStripMenuItem
-            // 
-            this.textErsetzenToolStripMenuItem.Name = "textErsetzenToolStripMenuItem";
-            this.textErsetzenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.textErsetzenToolStripMenuItem.Text = "Text ersetzen";
-            this.textErsetzenToolStripMenuItem.Click += new System.EventHandler(this.textErsetzenToolStripMenuItem_Click);
             // 
             // Form1
             // 

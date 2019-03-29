@@ -376,7 +376,7 @@ namespace DataTableConverter.Assisstant
                         for (int j = 1; j <= values.GetLength(1); j++)
                         {
                             
-                            string[] subValues = values[i, j].ToString().Split('\n');
+                            string[] subValues = values[i, j]?.ToString()?.Split('\n') ?? new string[0];
                             if (subValues.Length < 2)
                             {
                                 dr[columns[j - 1]] = values[i, j];

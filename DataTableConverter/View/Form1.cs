@@ -144,9 +144,9 @@ namespace DataTableConverter
 
         #region Add History Entry
 
-        private void addDataSourceValueChange(DataTable tableOld, DataTable tableNew)
+        private void addDataSourceValueChange(DataTable tableNew)
         {
-            List<CellMatrix> oldValues = DataHelper.getChangesOfDataTable(tableOld, tableNew, -1);
+            List<CellMatrix> oldValues = DataHelper.getChangesOfDataTable(tableNew);
             historyHelper.addHistory(new History { State = State.ValueChange, Table = oldValues}, getSorting());
             assignDataSource(tableNew);
         }
@@ -192,11 +192,6 @@ namespace DataTableConverter
             object[][] newValues = new object[1][];
             newValues[0] = columnValues;
             historyHelper.addHistory(new History { State = State.DeleteColumn, ColumnIndex = index, Column = newItem, ColumnValues = newValues }, getSorting());
-        }
-
-        private void addDataSourceColumnValuesChanged(DataTable oldTable, DataTable newTable, int selectedColumn)
-        {
-            historyHelper.addHistory(new History { State = State.ValueChange, Table = DataHelper.getChangesOfDataTable(oldTable, newTable, selectedColumn)}, getSorting());
         }
 
         private void addDataSourceDeleteRow(object[] itemArray, int rowIndex)
@@ -338,13 +333,15 @@ namespace DataTableConverter
             {
                 try
                 {
+                    table.AcceptChanges();
                     foreach (WorkProc t in temp)
                     {
                         replaceProcedure(table, null, t);
                     }
+
                     dgTable.Invoke(new MethodInvoker(() =>
                     {
-                        addDataSourceValueChange(getDataSource(), table);
+                        addDataSourceValueChange(table);
                     }));
                 }
                 catch(Exception ex)
@@ -480,6 +477,7 @@ namespace DataTableConverter
         {
             StopLoadingBar();
             if(table != null) {
+                DataHelper.RemoveNull(table);
                 switch (state)
                 {
                     case ImportState.Merge:
@@ -518,9 +516,7 @@ namespace DataTableConverter
                 new Thread(() =>
                 {
                     try {
-                        DataTable OldTable = sourceTable.Copy();
                         
-
                         #region Compare Everything
                         int oldCount = sourceTable.Columns.Count;
                         int newColumnIndex = oldCount + ImportColumns.Length -1; //-1: without identifier
@@ -585,7 +581,7 @@ namespace DataTableConverter
                         }
                         #endregion
 
-                        dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(OldTable, sourceTable); }));
+                        dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(sourceTable); }));
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
                     }
                     catch (Exception ex)
@@ -676,7 +672,7 @@ namespace DataTableConverter
                         try
                         {
                             replaceProcedure(newTable, procedure, user);
-                            dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(getDataSource(), newTable); }));
+                            dgTable.Invoke(new MethodInvoker(() => { addDataSourceValueChange(newTable); }));
                         }
                         catch (Exception ex)
                         {
@@ -694,7 +690,7 @@ namespace DataTableConverter
             proc.doWork(dt, out string sortingOrder, null, null, null);
             dgTable.Invoke(new MethodInvoker(() =>
             {
-                addDataSourceValueChange(getDataSource(), dt);
+                addDataSourceValueChange(dt);
             }));
             StopLoadingBar();
         }
@@ -1318,98 +1314,76 @@ namespace DataTableConverter
         private void zeilenZusammenfügenToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
             DataTable table = getDataSource();
-            table.AcceptChanges();
+            
             MergeColumns form = new MergeColumns(DataHelper.getHeadersOfDataTable(table));
             if(form.ShowDialog() == DialogResult.OK)
             {
+                string identifier = form.Identifier;
+                int identifierIndex = form.IdentifierIndex;
+                List<string> additionalColumns = form.AdditionalColumns;
+
                 new Thread(() =>
                 {
                     StartLoadingBar();
 
                     SetStatusLabel("Daten werden geladen");
 
-                    string identifier = form.Identifier;
-                    int identifierIndex = form.IdentifierIndex;
-                    List<string> additionalColumns = form.AdditionalColumns;
-
-                    DataView view = ViewHelper.GetSortedView($"[{identifier}] asc", table);
-                    DataGridView dataGridView = new DataGridView();
-                    dataGridView.Visible = false;
-
-                    Invoke(new MethodInvoker(() =>
+                    int lastIndex = table.Columns.Count;
+                    table.Columns.Add(DataHelper.TempSort);
+                    for (int i = 0; i < table.Rows.Count; i++)
                     {
-                        Controls.Add(dataGridView);
-                        dataGridView.DataSource = view;
-                    }));
+                        table.Rows[i][lastIndex] = i;
+                    }
+                    int rowCount = table.Rows.Count;
+                    table = ViewHelper.GetSortedView($"[{identifier}] asc", table).ToTable();
+                    while(rowCount < table.Rows.Count)
+                    {
+                        table.Rows.RemoveAt(table.Rows.Count - 1);
+                    }
+                    table.AcceptChanges();
 
                     SetStatusLabel("Daten werden überprüft");
                     Dictionary<string, DataRowArray> dict = new Dictionary<string, DataRowArray>();
-                    List<DataRow> deleteRows = new List<DataRow>();
                     //RowIdentifier, Values
-                    string oldIdenfifier = dataGridView[identifierIndex, 0].ToString();
+                    string oldIdenfifier = table.Rows[0][identifierIndex].ToString();
                     int counter = 0;
-                    foreach (DataGridViewRow row in dataGridView.Rows)
+                    for (int i = 0; i < table.Rows.Count; i++)
                     {
+                        DataRow oldRow = table.Rows[i];
+                        string newIdenfifier = oldRow[identifier].ToString();
 
+                        counter = newIdenfifier == oldIdenfifier ? counter + 1 : 1;
 
-                        DataRow oldRow;
-                        if ((oldRow = ((DataRowView)row.DataBoundItem)?.Row) != null)
+                        if (dict.ContainsKey(newIdenfifier) && dict.TryGetValue(newIdenfifier, out DataRowArray dataRowArray))
                         {
-                            string newIdenfifier = oldRow[identifier].ToString();
-
-                            counter = newIdenfifier == oldIdenfifier ? counter + 1 : 1;
-
-
                             List<string> values = new List<string>();
                             foreach (string additionalColumn in additionalColumns)
                             {
                                 values.Add(oldRow[additionalColumn].ToString());
                             }
-
-
-                            if (dict.ContainsKey(newIdenfifier) && dict.TryGetValue(newIdenfifier, out DataRowArray dataRowArray))
-                            {
-                                dataRowArray.Add(values);
-                            }
-                            else
-                            {
-                                dict.Add(newIdenfifier, new DataRowArray(oldRow, values));
-                            }
-
-
-                            if (counter > 1)
-                            {
-                                deleteRows.Add(oldRow);
-                            }
-
-                            oldIdenfifier = newIdenfifier;
+                            dataRowArray.Add(values);
                         }
+                        else
+                        {
+                            dict.Add(newIdenfifier, new DataRowArray(oldRow, new List<string>()));
+                        }
+
+
+                        if (counter > 1)
+                        {
+                            table.Rows[i].Delete();
+                        }
+
+                        oldIdenfifier = newIdenfifier;
                     }
-                    Invoke(new MethodInvoker(() =>
-                    {
-                        Controls.Remove(dataGridView);
-                        dataGridView.DataSource = null;
-                        dataGridView = null;
-                    }));
 
-
-                    SetStatusLabel("Überflüssige Zeilen werden gelöscht");
-                    foreach (DataRow row in deleteRows)
-                    {
-                        row.Delete();
-                    }
-                    
-                    //dataRowArray.Values.Count == Duplicate Rows
-                    //dataRowArray.Values[i].Count == additionalColumns
-
-                    int newColumns = dict.Values.Max(dataRowArray => dataRowArray.Values.Count);
+                    int newColumns = dict.Values.Max(dataRowArray => dataRowArray.Values.Count)-1;
 
                     SetStatusLabel("Neue Spalten werden hinzugefügt");
                     for (int i = 1; i <= newColumns; i++)
                     {
                         foreach (string additionalColumn in additionalColumns)
                         {
-                        
                             DataHelper.addColumn(additionalColumn + i, table);
                         }
                     }
@@ -1430,12 +1404,18 @@ namespace DataTableConverter
                             }
                         }
                         counter++;
-
                     }
-                    
+
+
                     dgTable.Invoke(new MethodInvoker(() =>
                     {
-                        assignDataSource(table);
+                        DataTable originalSortTable = ViewHelper.GetSortedView($"[{DataHelper.TempSort}] asc", table.Copy()).ToTable();
+                        
+                        List<CellMatrix> oldValues = DataHelper.getChangesOfDataTable(table);
+                        historyHelper.addHistory(new History { State = State.ValueChange, Table = oldValues }, getSorting());
+                        originalSortTable.Columns.Remove(DataHelper.TempSort);
+
+                        assignDataSource(originalSortTable);
                     }));
                     SetStatusLabel(string.Empty);
                     StopLoadingBar();
@@ -1466,8 +1446,7 @@ namespace DataTableConverter
             string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte Text eingeben", "Spalte mit Text befüllen", string.Empty);
             if (!string.IsNullOrWhiteSpace(newText))
             {
-                DataTable table = getDataSource();
-                DataTable newTable = table.Copy();
+                DataTable newTable = getDataSource();
 
                 foreach (DataRow row in newTable.Rows)
                 {
@@ -1475,7 +1454,7 @@ namespace DataTableConverter
                 }
 
 
-                addDataSourceColumnValuesChanged(table, newTable, selectedColumn);
+                addDataSourceValueChange(newTable);
                 assignDataSource(newTable);
             }
         }

@@ -11,6 +11,7 @@ namespace DataTableConverter.Assisstant
     class DataHelper
     {
         internal static readonly string FileName = "Dateiname";
+        internal static readonly string TempSort = "[TEMP_SORT]";
         internal static object[] getHeadersOfDataTable(DataTable table)
         {
             return table != null ? table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray() : new object[0];
@@ -25,6 +26,20 @@ namespace DataTableConverter.Assisstant
                 columnValues[i] = table.Rows[i][column];
             }
             return columnValues;
+        }
+
+        internal static void RemoveNull(DataTable table)
+        {
+            foreach(DataRow row in table.Rows)
+            {
+                for(int i = 0; i < row.ItemArray.Length; i++)
+                {
+                    if(row[i] == DBNull.Value)
+                    {
+                        row[i] = string.Empty;
+                    }
+                }
+            }
         }
 
         internal static void addColumn(string headerName, DataTable data, int counter = 0)
@@ -124,51 +139,65 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static List<CellMatrix> getChangesOfDataTable(DataTable tableOld, DataTable tableNew, int columnIndex)
+        internal static List<CellMatrix> getChangesOfDataTable(DataTable tableNew)
         {
-            //Löschen und Hinzufügen von Zeilen und Löschen von Spalten nicht berücksichtigt
-
             List<CellMatrix> result = new List<CellMatrix>();
-            int beginIndex = 0;
-            int endIndex = tableOld.Columns.Count - 1;
-            if (columnIndex != -1)
+
+            //getModified
+            int tempIndex;
+            if ((tempIndex = tableNew.Columns.IndexOf(TempSort)) != -1)
             {
-                beginIndex = columnIndex;
-                endIndex = columnIndex + 1;
+                tableNew.Columns[tempIndex].SetOrdinal(tableNew.Columns.Count - 1);
             }
-
-            object[] oldHeaders = getHeadersOfDataTable(tableOld);
-            object[] newHeaders = getHeadersOfDataTable(tableNew);
-
-            for (int colIndexOld = beginIndex; colIndexOld < endIndex; colIndexOld++)
+            DataTable changes = tableNew.GetChanges(DataRowState.Modified);
+            HashSet<int> newColumns = new HashSet<int>();
+            for (int rowIndex = 0; changes != null && rowIndex < changes.Rows.Count; rowIndex++)
             {
-                string oldColName = tableOld.Columns[colIndexOld].ColumnName;
-                int colIndexNew = tableNew.Columns.IndexOf(oldColName);
 
-                if (colIndexNew != -1)
+                for(int colIndex = 0; colIndex < changes.Rows[rowIndex].ItemArray.Length; colIndex++)
                 {
-                    for (int rowIndex = 0; rowIndex < tableOld.Rows.Count; rowIndex++)
+                    object value;
+                    if( (value = changes.Rows[rowIndex][colIndex,DataRowVersion.Original]) != changes.Rows[rowIndex][colIndex, DataRowVersion.Current])
                     {
-                        if (tableOld.Rows[rowIndex].ItemArray[colIndexOld]?.ToString() != tableNew.Rows[rowIndex].ItemArray[colIndexNew]?.ToString())
+                        if (value == DBNull.Value)
                         {
-                            result.Add(new CellMatrix(rowIndex, colIndexOld, tableOld.Rows[rowIndex].ItemArray[colIndexOld]?.ToString()));
+                            newColumns.Add(colIndex);
+                        }
+                        else
+                        {
+                            result.Add(new CellMatrix(rowIndex, colIndex, value.ToString()));
                         }
                     }
                 }
             }
 
-            if (oldHeaders.Length < newHeaders.Length)
+            //deleted rows
+            changes = tableNew.GetChanges(DataRowState.Deleted);
+            if (changes != null && tempIndex != -1)
             {
-                for (int i = newHeaders.Length - 1; i >= 0; i--)
+                foreach (DataRow row in changes.Rows)
                 {
-                    //Spalte wurde hinzugefügt
-                    if (!oldHeaders.Contains(newHeaders[i]))
+                    object[][] newItem = new object[1][];
+                    List<object> newList = new List<object>();
+                    for (int i = 0; i < changes.Columns.Count - 1; i++) //we don't look at TempSort
                     {
-
-                        result.Add(new CellMatrix(new History { State = State.InsertColumn, ColumnIndex = i }));
+                        object value;
+                        if ((value = row[i, DataRowVersion.Original]) != DBNull.Value)
+                        {
+                            newList.Add(value);
+                        }
                     }
+                    newItem[0] = newList.ToArray();
+                    result.Add(new CellMatrix(new History { State = State.DeleteRow, Row = newItem, RowIndex = int.Parse(row[TempSort,DataRowVersion.Original].ToString()) }));
                 }
             }
+
+            //added columns
+            foreach (int index in newColumns)
+            {
+                result.Add(new CellMatrix(new History { State = State.InsertColumn, ColumnIndex = index }));
+            }
+
             return result;
         }
 
