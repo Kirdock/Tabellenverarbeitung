@@ -1104,30 +1104,58 @@ namespace DataTableConverter
             {
                 string selectedValue = export.getSelectedValue();
                 int columnIndex = export.getColumnIndex();
+                int count = export.CountChecked ? export.Count : 0;
                 DataTable oldTable = getDataSource();
 
                 new Thread(() =>
                 {
                     StartLoadingBar();
                     DataTable table = ViewHelper.GetSortedView($"[{selectedValue}] asc", oldTable).ToTable();
+                    DataTable newTable = new DataTable();
 
-                    Dictionary<string, int> pair = new Dictionary<string, int>();
-                    foreach (DataRow row in table.Rows)
+                    if (count == 0)
                     {
-                        string item = row.ItemArray[columnIndex].ToString();
-                        if (pair.ContainsKey(item))
+                        Dictionary<string, int> pair = new Dictionary<string, int>();
+                        foreach (DataRow row in table.Rows)
                         {
-                            pair[item] = pair[item] + 1;
+                            string item = row[columnIndex].ToString();
+                            if (pair.ContainsKey(item))
+                            {
+                                pair[item] = pair[item] + 1;
+                            }
+                            else
+                            {
+                                pair.Add(item, 1);
+                            }
                         }
-                        else
+                        newTable = DataHelper.DictionaryToDataTable(pair, selectedValue);
+                    }
+                    else
+                    {
+                        Dictionary<string, int> pair = new Dictionary<string, int>();
+                        foreach(string col in DataHelper.getHeadersOfDataTable(table))
                         {
-                            pair.Add(item, 1);
+                            newTable.Columns.Add(col);
+                        }
+                        foreach (DataRow row in table.Rows)
+                        {
+                            string item = row[columnIndex].ToString();
+                            bool contains;
+                            if ((contains = pair.ContainsKey(item)) && pair[item] < count)
+                            {
+                                newTable.Rows.Add(row.ItemArray);
+                                pair[item] = pair[item] + 1;
+                            }
+                            else if(!contains)
+                            {
+                                pair.Add(item, 1);
+                                newTable.Rows.Add(row.ItemArray);
+                            }
                         }
                     }
-
                     BeginInvoke(new MethodInvoker(() =>
                     {
-                        Form1 form = new Form1(DataHelper.DictionaryToDataTable(pair, selectedValue));
+                        Form1 form = new Form1(newTable);
                         form.Show();
                     }));
                     StopLoadingBar();

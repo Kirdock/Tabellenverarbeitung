@@ -273,5 +273,17 @@ namespace DataTableConverter.Properties {
                 this["TakeOverAllFiles"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool HeaderInFirstRow {
+            get {
+                return ((bool)(this["HeaderInFirstRow"]));
+            }
+            set {
+                this["HeaderInFirstRow"] = value;
+            }
+        }
     }
 }

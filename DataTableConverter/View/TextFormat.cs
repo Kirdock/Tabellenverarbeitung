@@ -91,6 +91,7 @@ namespace DataTableConverter.View
             txtBegin.Text = Properties.Settings.Default.TextBegin;
             txtEnd.Text = Properties.Settings.Default.TextEnd;
             cbTakeOver.Checked = Properties.Settings.Default.TakeOverAllFiles;
+            cbContainsHeaders.Checked = Properties.Settings.Default.HeaderInFirstRow;
             rbTab.Checked = radioSelected == 0;
             rbSep.Checked = radioSelected == 1;
             rbBetween.Checked = radioSelected == 2;
@@ -170,6 +171,7 @@ namespace DataTableConverter.View
             Properties.Settings.Default.TextBegin = txtBegin.Text;
             Properties.Settings.Default.TextEnd = txtEnd.Text;
             Properties.Settings.Default.TakeOverAllFiles = cbTakeOver.Checked;
+            Properties.Settings.Default.HeaderInFirstRow = cbContainsHeaders.Checked;
             Properties.Settings.Default.Save();
         }
 

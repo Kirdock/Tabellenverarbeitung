@@ -12,6 +12,9 @@ namespace DataTableConverter.View
 {
     public partial class ExportCount : Form
     {
+        internal bool CountChecked => cbCount.Checked;
+        internal int Count => (int)nbCount.Value;
+
         public ExportCount(object[] headers)
         {
             InitializeComponent();
@@ -27,6 +30,11 @@ namespace DataTableConverter.View
         internal int getColumnIndex()
         {
             return cmbColumn.SelectedIndex;
+        }
+
+        private void cbCount_CheckedChanged(object sender, EventArgs e)
+        {
+            nbCount.Visible = cbCount.Checked;
         }
     }
 }
