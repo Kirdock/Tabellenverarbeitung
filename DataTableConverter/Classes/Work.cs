@@ -9,6 +9,7 @@ namespace DataTableConverter.Classes
         public string Name { get; set; }
         public List<WorkProc> Procedures { get; set; }
         public int Id { get; set; }
+        public bool Locked { get; set; }
 
         public Work(string name, List<WorkProc> procedures, int id)
         {

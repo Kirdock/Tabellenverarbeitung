@@ -14,6 +14,7 @@ namespace DataTableConverter.Classes
         internal string ShortcutTotal { get; set; }
 
         public int Id { get; set; }
+        internal bool Locked { get; set; }
 
         public Case(string name, string shortcut, DataTable columns, int id)
         {
@@ -56,6 +57,11 @@ namespace DataTableConverter.Classes
             hashCode = hashCode * -1521134295 + EqualityComparer<DataTable>.Default.GetHashCode(Columns);
             hashCode = hashCode * -1521134295 + Id.GetHashCode();
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

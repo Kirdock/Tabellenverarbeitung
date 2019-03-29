@@ -16,7 +16,7 @@ namespace DataTableConverter.View
         public string SortString;
         private readonly string DescString = "↓";
         private readonly string AscString = "↑";
-        Dictionary<string, string> Orders;
+        private Dictionary<string, string> Orders;
 
         internal SortForm(object[] items, string orderBefore)
         {

@@ -12,6 +12,7 @@ namespace DataTableConverter.Classes
         public DataTable Columns { get; set; }
 
         public int Id { get; set; }
+        internal bool Locked { get; set; }
 
         public Tolerance(string name, DataTable columns, int id = 0)
         {
@@ -42,6 +43,11 @@ namespace DataTableConverter.Classes
             hashCode = hashCode * -1521134295 + EqualityComparer<DataTable>.Default.GetHashCode(Columns);
             hashCode = hashCode * -1521134295 + Id.GetHashCode();
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

@@ -35,7 +35,6 @@ namespace DataTableConverter.View
         private ViewHelper viewHelper;
         private Dictionary<Type, Action<WorkProc>> assignControls;
 
-
         internal Administration(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
@@ -287,15 +286,15 @@ namespace DataTableConverter.View
             if (ltbProcedures.SelectedIndex == -1)
             {
                 resetForm();
-                groupBox1.Enabled = false;
+                gbSearchAndReplace.Enabled = false;
             }
             else
             {
-                groupBox1.Enabled = true;
                 selectedProc = (Proc)ltbProcedures.SelectedItem;
                 txtName.Text = selectedProc.Name;
                 dgvReplaces.DataSource = selectedProc.Replace;
                 cbCheckTotal.Checked = selectedProc.CheckTotal;
+                SetProcedureLock(selectedProc);
             }
         }
 
@@ -438,11 +437,32 @@ namespace DataTableConverter.View
                 
                 txtWorkflow.Text = workflow.Name;
                 lbUsedProcedures_SelectedIndexChanged(null, null);
+                SetWorkflowLock(workflow);
             }
             else
             {
                 txtWorkflow.Text = string.Empty;
             }
+        }
+
+        private void SetWorkflowLock(Work workflow = null)
+        {
+            splitWorkflowProcProperties.Enabled = btnDeleteWorkflow.Enabled = !(workflow ?? GetSelectedWorkflow()).Locked;
+        }
+
+        private void SetProcedureLock(Proc procedure = null)
+        {
+            gbSearchAndReplace.Enabled = btnDeleteProcedure.Enabled = !(procedure ?? selectedProc).Locked;
+        }
+
+        private void SetToleranceLock(Tolerance procedure = null)
+        {
+            dgTolerance.Enabled = txtToleranceName.Enabled = btnDeleteTolerance.Enabled = !(procedure ?? Tolerances[lbTolerances.SelectedIndex]).Locked;
+        }
+
+        private void SetCaseLock(Case procedure = null)
+        {
+            txtCaseName.Enabled = gbCaseShortcuts.Enabled = gbCaseColumns.Enabled = btnDeleteCase.Enabled = !(procedure ?? Cases[lbCases.SelectedIndex]).Locked;
         }
 
         private void setWorkflowProcedures(List<WorkProc> proc, BindingList<WorkProc> newList = null)
@@ -615,11 +635,18 @@ namespace DataTableConverter.View
 
         private void lbUsedProcedures_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (gbProcedure.Enabled = (lbUsedProcedures.SelectedIndex != -1))
+            if (gbTrim.Enabled = (lbUsedProcedures.SelectedIndex != -1))
             {
                 WorkProc selectedProc = getSelectedWorkProcedure();
                 setProcValues(selectedProc);
                 assignControls?[selectedProc.GetType()](selectedProc);
+            }
+            else
+            {
+                setGroupBoxVisibility(typeof(ProcTrim));
+                txtWorkProcName.TextChanged -= txtWorkProcName_TextChanged;
+                txtWorkProcName.Text = lblOriginalNameText.Text = string.Empty;
+                txtWorkProcName.TextChanged += txtWorkProcName_TextChanged;
             }
         }
 
@@ -908,6 +935,7 @@ namespace DataTableConverter.View
                 Tolerance selectedTolerance = (Tolerance)lbTolerances.SelectedItem;
                 txtToleranceName.Text = selectedTolerance.Name;
                 dgTolerance.DataSource = selectedTolerance.Columns;
+                SetToleranceLock();
             }
         }
 
@@ -1012,6 +1040,7 @@ namespace DataTableConverter.View
                 {
                     viewHelper.SelectedCase = selectedCase.Id;
                 }
+                SetCaseLock();
             }
         }
 
@@ -1278,5 +1307,47 @@ namespace DataTableConverter.View
                 ((Case)lbCases.SelectedItem).ShortcutTotal = txtShortcutTotal.Text;
             }
         }
+
+        private void lbWorkflows_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            ViewHelper.DrawLock((ListBox)sender, e, Workflows[e.Index].Locked);
+        }
+
+        private void lbWorkflows_MouseDown(object sender, MouseEventArgs e)
+        {
+            ViewHelper.SetLock(e, Workflows, (ListBox)sender, delegate { lbWorkflows_SelectedIndexChanged(null, null); });
+        }
+
+        private void ltbProcedures_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            ViewHelper.DrawLock((ListBox)sender, e, Procedures[e.Index].Locked);
+        }
+
+        private void ltbProcedures_MouseDown(object sender, MouseEventArgs e)
+        {
+            ViewHelper.SetLock(e, Procedures, (ListBox)sender, delegate { ltbProcedures_SelectedIndexChanged(null, null); });
+        }
+
+        private void lbTolerances_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            ViewHelper.DrawLock((ListBox)sender, e, Tolerances[e.Index].Locked);
+        }
+
+        private void lbTolerances_MouseDown(object sender, MouseEventArgs e)
+        {
+            ViewHelper.SetLock(e, Tolerances, (ListBox)sender, delegate { lbTolerances_SelectedIndexChanged(null, null); });
+        }
+
+        private void lbCases_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            ViewHelper.DrawLock((ListBox)sender, e, Cases[e.Index].Locked);
+        }
+
+        private void lbCases_MouseDown(object sender, MouseEventArgs e)
+        {
+            ViewHelper.SetLock(e, Cases, (ListBox)sender, delegate { lbCases_SelectedIndexChanged(null, null); });
+        }
+
+
     }
 }

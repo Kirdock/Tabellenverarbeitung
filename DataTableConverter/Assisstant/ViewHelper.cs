@@ -21,6 +21,7 @@ namespace DataTableConverter
         private Action<object, EventArgs> MyFunction;
         private List<Work> Workflows;
         internal int SelectedCase { get; set; }
+        private static string LockIcon = "\uD83D\uDD12";
 
         public ViewHelper(ContextMenuStrip ctxrow, Action<object,EventArgs> myfunction, List<Work> workflows)
         {
@@ -325,6 +326,35 @@ namespace DataTableConverter
                 }
             }
             return columns;
+        }
+
+        internal static void DrawLock(ListBox listBox, DrawItemEventArgs e, bool lockStatus)
+        {
+            if (e.Index != -1)
+            {
+                // Draw the background of the ListBox control for each item.
+                e.DrawBackground();
+                // Define the default color of the brush as black.
+                Brush myBrush = Brushes.Black;
+
+                string value = listBox.Items[e.Index].ToString();
+                e.Graphics.DrawString($"{value} {(lockStatus ? LockIcon : string.Empty)}",
+                    e.Font, myBrush, e.Bounds, StringFormat.GenericDefault);
+                // If the ListBox has focus, draw a focus rectangle around the selected item.
+                e.DrawFocusRectangle();
+            }
+        }
+
+        internal static void SetLock(MouseEventArgs e, dynamic list, ListBox sender, Action selectedIndexChanged)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                int index = sender.IndexFromPoint(e.Location);
+                list[index].Locked = !list[index].Locked;
+                sender.SelectedIndex = index;
+                sender.Refresh();
+                selectedIndexChanged.Invoke();
+            }
         }
     }
 }

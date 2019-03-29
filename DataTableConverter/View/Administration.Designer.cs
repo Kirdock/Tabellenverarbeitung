@@ -34,8 +34,8 @@
             this.splitProcedures = new System.Windows.Forms.SplitContainer();
             this.btnNew = new System.Windows.Forms.Button();
             this.ltbProcedures = new System.Windows.Forms.ListBox();
-            this.btnDelete = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnDeleteProcedure = new System.Windows.Forms.Button();
+            this.gbSearchAndReplace = new System.Windows.Forms.GroupBox();
             this.cbCheckTotal = new System.Windows.Forms.CheckBox();
             this.dgvReplaces = new System.Windows.Forms.DataGridView();
             this.label3 = new System.Windows.Forms.Label();
@@ -44,7 +44,7 @@
             this.splitWorkflow = new System.Windows.Forms.SplitContainer();
             this.lbWorkflows = new System.Windows.Forms.ListBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnDeleteWorkflow = new System.Windows.Forms.Button();
             this.splitWorkflowProcProperties = new System.Windows.Forms.SplitContainer();
             this.gbWorkflow = new System.Windows.Forms.GroupBox();
             this.splitWorkflowProperties = new System.Windows.Forms.SplitContainer();
@@ -132,16 +132,16 @@
             this.btnNewCase = new System.Windows.Forms.Button();
             this.lbCases = new System.Windows.Forms.ListBox();
             this.btnDeleteCase = new System.Windows.Forms.Button();
+            this.gbCaseShortcuts = new System.Windows.Forms.GroupBox();
+            this.txtShortcutTotal = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.txtShortcut = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.gbCaseColumns = new System.Windows.Forms.GroupBox();
             this.dgCaseColumns = new System.Windows.Forms.DataGridView();
             this.txtCaseName = new System.Windows.Forms.TextBox();
-            this.txtShortcut = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.label20 = new System.Windows.Forms.Label();
-            this.txtShortcutTotal = new System.Windows.Forms.TextBox();
             this.cbHeadersPad = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.clbHeaderProcedure = new CheckComboBoxTest.CheckedComboBox();
@@ -154,7 +154,7 @@
             this.splitProcedures.Panel1.SuspendLayout();
             this.splitProcedures.Panel2.SuspendLayout();
             this.splitProcedures.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.gbSearchAndReplace.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReplaces)).BeginInit();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflow)).BeginInit();
@@ -204,9 +204,9 @@
             this.splitCases.Panel1.SuspendLayout();
             this.splitCases.Panel2.SuspendLayout();
             this.splitCases.SuspendLayout();
-            this.groupBox4.SuspendLayout();
+            this.gbCaseShortcuts.SuspendLayout();
+            this.gbCaseColumns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).BeginInit();
-            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -245,12 +245,12 @@
             this.splitProcedures.Panel1.BackColor = System.Drawing.Color.White;
             this.splitProcedures.Panel1.Controls.Add(this.btnNew);
             this.splitProcedures.Panel1.Controls.Add(this.ltbProcedures);
-            this.splitProcedures.Panel1.Controls.Add(this.btnDelete);
+            this.splitProcedures.Panel1.Controls.Add(this.btnDeleteProcedure);
             // 
             // splitProcedures.Panel2
             // 
             this.splitProcedures.Panel2.BackColor = System.Drawing.Color.White;
-            this.splitProcedures.Panel2.Controls.Add(this.groupBox1);
+            this.splitProcedures.Panel2.Controls.Add(this.gbSearchAndReplace);
             this.splitProcedures.Size = new System.Drawing.Size(1126, 765);
             this.splitProcedures.SplitterDistance = 375;
             this.splitProcedures.TabIndex = 12;
@@ -270,45 +270,47 @@
             this.ltbProcedures.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.ltbProcedures.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.ltbProcedures.Font = new System.Drawing.Font("Segoe UI Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ltbProcedures.FormattingEnabled = true;
             this.ltbProcedures.Location = new System.Drawing.Point(16, 51);
             this.ltbProcedures.Name = "ltbProcedures";
             this.ltbProcedures.Size = new System.Drawing.Size(341, 693);
             this.ltbProcedures.Sorted = true;
             this.ltbProcedures.TabIndex = 8;
+            this.ltbProcedures.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.ltbProcedures_DrawItem);
             this.ltbProcedures.SelectedIndexChanged += new System.EventHandler(this.ltbProcedures_SelectedIndexChanged);
+            this.ltbProcedures.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ltbProcedures_MouseDown);
             // 
-            // btnDelete
+            // btnDeleteProcedure
             // 
-            this.btnDelete.Location = new System.Drawing.Point(97, 22);
-            this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(75, 23);
-            this.btnDelete.TabIndex = 11;
-            this.btnDelete.Text = "Löschen";
-            this.btnDelete.UseVisualStyleBackColor = true;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            this.btnDeleteProcedure.Location = new System.Drawing.Point(97, 22);
+            this.btnDeleteProcedure.Name = "btnDeleteProcedure";
+            this.btnDeleteProcedure.Size = new System.Drawing.Size(75, 23);
+            this.btnDeleteProcedure.TabIndex = 11;
+            this.btnDeleteProcedure.Text = "Löschen";
+            this.btnDeleteProcedure.UseVisualStyleBackColor = true;
+            this.btnDeleteProcedure.Click += new System.EventHandler(this.btnDelete_Click);
             // 
-            // groupBox1
+            // gbSearchAndReplace
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.cbCheckTotal);
-            this.groupBox1.Controls.Add(this.dgvReplaces);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.txtName);
-            this.groupBox1.Location = new System.Drawing.Point(19, 51);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(710, 701);
-            this.groupBox1.TabIndex = 9;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Bearbeiten";
+            this.gbSearchAndReplace.Controls.Add(this.cbCheckTotal);
+            this.gbSearchAndReplace.Controls.Add(this.dgvReplaces);
+            this.gbSearchAndReplace.Controls.Add(this.label3);
+            this.gbSearchAndReplace.Controls.Add(this.txtName);
+            this.gbSearchAndReplace.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbSearchAndReplace.Location = new System.Drawing.Point(0, 0);
+            this.gbSearchAndReplace.Name = "gbSearchAndReplace";
+            this.gbSearchAndReplace.Size = new System.Drawing.Size(747, 765);
+            this.gbSearchAndReplace.TabIndex = 9;
+            this.gbSearchAndReplace.TabStop = false;
+            this.gbSearchAndReplace.Text = "Bearbeiten";
             // 
             // cbCheckTotal
             // 
             this.cbCheckTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbCheckTotal.AutoSize = true;
-            this.cbCheckTotal.Location = new System.Drawing.Point(535, 55);
+            this.cbCheckTotal.Location = new System.Drawing.Point(572, 55);
             this.cbCheckTotal.Name = "cbCheckTotal";
             this.cbCheckTotal.Size = new System.Drawing.Size(154, 17);
             this.cbCheckTotal.TabIndex = 10;
@@ -326,7 +328,7 @@
             this.dgvReplaces.Location = new System.Drawing.Point(22, 88);
             this.dgvReplaces.Name = "dgvReplaces";
             this.dgvReplaces.RowHeadersVisible = false;
-            this.dgvReplaces.Size = new System.Drawing.Size(667, 599);
+            this.dgvReplaces.Size = new System.Drawing.Size(704, 663);
             this.dgvReplaces.TabIndex = 9;
             // 
             // label3
@@ -344,7 +346,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtName.Location = new System.Drawing.Point(22, 53);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(462, 20);
+            this.txtName.Size = new System.Drawing.Size(499, 20);
             this.txtName.TabIndex = 1;
             this.txtName.TextChanged += new System.EventHandler(this.txtName_TextChanged);
             // 
@@ -372,7 +374,7 @@
             this.splitWorkflow.Panel1.BackColor = System.Drawing.Color.White;
             this.splitWorkflow.Panel1.Controls.Add(this.lbWorkflows);
             this.splitWorkflow.Panel1.Controls.Add(this.button2);
-            this.splitWorkflow.Panel1.Controls.Add(this.button1);
+            this.splitWorkflow.Panel1.Controls.Add(this.btnDeleteWorkflow);
             // 
             // splitWorkflow.Panel2
             // 
@@ -386,12 +388,16 @@
             this.lbWorkflows.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbWorkflows.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.lbWorkflows.Font = new System.Drawing.Font("Segoe UI Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbWorkflows.FormattingEnabled = true;
             this.lbWorkflows.Location = new System.Drawing.Point(5, 35);
             this.lbWorkflows.Name = "lbWorkflows";
             this.lbWorkflows.Size = new System.Drawing.Size(221, 719);
             this.lbWorkflows.TabIndex = 8;
+            this.lbWorkflows.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbWorkflows_DrawItem);
             this.lbWorkflows.SelectedIndexChanged += new System.EventHandler(this.lbWorkflows_SelectedIndexChanged);
+            this.lbWorkflows.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbWorkflows_MouseDown);
             // 
             // button2
             // 
@@ -403,16 +409,16 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.btnNewWorkflow_Click);
             // 
-            // button1
+            // btnDeleteWorkflow
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(151, 6);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "Löschen";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.btnDeleteWorkflow_Click);
+            this.btnDeleteWorkflow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDeleteWorkflow.Location = new System.Drawing.Point(151, 6);
+            this.btnDeleteWorkflow.Name = "btnDeleteWorkflow";
+            this.btnDeleteWorkflow.Size = new System.Drawing.Size(75, 23);
+            this.btnDeleteWorkflow.TabIndex = 11;
+            this.btnDeleteWorkflow.Text = "Löschen";
+            this.btnDeleteWorkflow.UseVisualStyleBackColor = true;
+            this.btnDeleteWorkflow.Click += new System.EventHandler(this.btnDeleteWorkflow_Click);
             // 
             // splitWorkflowProcProperties
             // 
@@ -1373,12 +1379,16 @@
             this.lbTolerances.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbTolerances.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.lbTolerances.Font = new System.Drawing.Font("Segoe UI Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbTolerances.FormattingEnabled = true;
             this.lbTolerances.Location = new System.Drawing.Point(3, 31);
             this.lbTolerances.Name = "lbTolerances";
             this.lbTolerances.Size = new System.Drawing.Size(196, 693);
             this.lbTolerances.TabIndex = 0;
+            this.lbTolerances.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbTolerances_DrawItem);
             this.lbTolerances.SelectedIndexChanged += new System.EventHandler(this.lbTolerances_SelectedIndexChanged);
+            this.lbTolerances.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbTolerances_MouseDown);
             // 
             // label5
             // 
@@ -1441,9 +1451,9 @@
             // splitCases.Panel2
             // 
             this.splitCases.Panel2.BackColor = System.Drawing.Color.White;
-            this.splitCases.Panel2.Controls.Add(this.groupBox5);
+            this.splitCases.Panel2.Controls.Add(this.gbCaseShortcuts);
             this.splitCases.Panel2.Controls.Add(this.label6);
-            this.splitCases.Panel2.Controls.Add(this.groupBox4);
+            this.splitCases.Panel2.Controls.Add(this.gbCaseColumns);
             this.splitCases.Panel2.Controls.Add(this.txtCaseName);
             this.splitCases.Size = new System.Drawing.Size(660, 746);
             this.splitCases.SplitterDistance = 220;
@@ -1464,12 +1474,16 @@
             this.lbCases.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbCases.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.lbCases.Font = new System.Drawing.Font("Segoe UI Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbCases.FormattingEnabled = true;
             this.lbCases.Location = new System.Drawing.Point(12, 31);
             this.lbCases.Name = "lbCases";
             this.lbCases.Size = new System.Drawing.Size(199, 693);
             this.lbCases.TabIndex = 3;
+            this.lbCases.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbCases_DrawItem);
             this.lbCases.SelectedIndexChanged += new System.EventHandler(this.lbCases_SelectedIndexChanged);
+            this.lbCases.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbCases_MouseDown);
             // 
             // btnDeleteCase
             // 
@@ -1482,6 +1496,55 @@
             this.btnDeleteCase.UseVisualStyleBackColor = true;
             this.btnDeleteCase.Click += new System.EventHandler(this.btnDeleteCase_Click);
             // 
+            // gbCaseShortcuts
+            // 
+            this.gbCaseShortcuts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbCaseShortcuts.Controls.Add(this.txtShortcutTotal);
+            this.gbCaseShortcuts.Controls.Add(this.label20);
+            this.gbCaseShortcuts.Controls.Add(this.label10);
+            this.gbCaseShortcuts.Controls.Add(this.txtShortcut);
+            this.gbCaseShortcuts.Location = new System.Drawing.Point(3, 61);
+            this.gbCaseShortcuts.Name = "gbCaseShortcuts";
+            this.gbCaseShortcuts.Size = new System.Drawing.Size(427, 70);
+            this.gbCaseShortcuts.TabIndex = 21;
+            this.gbCaseShortcuts.TabStop = false;
+            this.gbCaseShortcuts.Text = "Kürzel";
+            // 
+            // txtShortcutTotal
+            // 
+            this.txtShortcutTotal.Location = new System.Drawing.Point(9, 40);
+            this.txtShortcutTotal.Name = "txtShortcutTotal";
+            this.txtShortcutTotal.Size = new System.Drawing.Size(57, 20);
+            this.txtShortcutTotal.TabIndex = 18;
+            this.txtShortcutTotal.TextChanged += new System.EventHandler(this.txtShortcutTotal_TextChanged);
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(201, 22);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(138, 13);
+            this.label20.TabIndex = 17;
+            this.label20.Text = "Teilweise Übereinstimmung:";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(6, 22);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(124, 13);
+            this.label10.TabIndex = 15;
+            this.label10.Text = "Totale Übereinstimmung:";
+            // 
+            // txtShortcut
+            // 
+            this.txtShortcut.Location = new System.Drawing.Point(204, 38);
+            this.txtShortcut.Name = "txtShortcut";
+            this.txtShortcut.Size = new System.Drawing.Size(57, 20);
+            this.txtShortcut.TabIndex = 16;
+            this.txtShortcut.TextChanged += new System.EventHandler(this.txtShortcut_TextChanged);
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -1491,18 +1554,18 @@
             this.label6.TabIndex = 7;
             this.label6.Text = "Bezeichnung:";
             // 
-            // groupBox4
+            // gbCaseColumns
             // 
-            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.gbCaseColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox4.Controls.Add(this.dgCaseColumns);
-            this.groupBox4.Location = new System.Drawing.Point(3, 137);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(430, 603);
-            this.groupBox4.TabIndex = 20;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Spalten";
+            this.gbCaseColumns.Controls.Add(this.dgCaseColumns);
+            this.gbCaseColumns.Location = new System.Drawing.Point(3, 137);
+            this.gbCaseColumns.Name = "gbCaseColumns";
+            this.gbCaseColumns.Size = new System.Drawing.Size(430, 603);
+            this.gbCaseColumns.TabIndex = 20;
+            this.gbCaseColumns.TabStop = false;
+            this.gbCaseColumns.Text = "Spalten";
             // 
             // dgCaseColumns
             // 
@@ -1524,59 +1587,10 @@
             this.txtCaseName.TabIndex = 6;
             this.txtCaseName.TextChanged += new System.EventHandler(this.txtCaseName_TextChanged);
             // 
-            // txtShortcut
-            // 
-            this.txtShortcut.Location = new System.Drawing.Point(204, 38);
-            this.txtShortcut.Name = "txtShortcut";
-            this.txtShortcut.Size = new System.Drawing.Size(57, 20);
-            this.txtShortcut.TabIndex = 16;
-            this.txtShortcut.TextChanged += new System.EventHandler(this.txtShortcut_TextChanged);
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(6, 22);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(124, 13);
-            this.label10.TabIndex = 15;
-            this.label10.Text = "Totale Übereinstimmung:";
-            // 
             // toolTip1
             // 
             this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTip1.ToolTipTitle = "Info";
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox5.Controls.Add(this.txtShortcutTotal);
-            this.groupBox5.Controls.Add(this.label20);
-            this.groupBox5.Controls.Add(this.label10);
-            this.groupBox5.Controls.Add(this.txtShortcut);
-            this.groupBox5.Location = new System.Drawing.Point(3, 61);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(427, 70);
-            this.groupBox5.TabIndex = 21;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Kürzel";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(201, 22);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(138, 13);
-            this.label20.TabIndex = 17;
-            this.label20.Text = "Teilweise Übereinstimmung:";
-            // 
-            // txtShortcutTotal
-            // 
-            this.txtShortcutTotal.Location = new System.Drawing.Point(9, 40);
-            this.txtShortcutTotal.Name = "txtShortcutTotal";
-            this.txtShortcutTotal.Size = new System.Drawing.Size(57, 20);
-            this.txtShortcutTotal.TabIndex = 18;
-            this.txtShortcutTotal.TextChanged += new System.EventHandler(this.txtShortcutTotal_TextChanged);
             // 
             // cbHeadersPad
             // 
@@ -1689,8 +1703,8 @@
             this.splitProcedures.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).EndInit();
             this.splitProcedures.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.gbSearchAndReplace.ResumeLayout(false);
+            this.gbSearchAndReplace.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReplaces)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.splitWorkflow.Panel1.ResumeLayout(false);
@@ -1751,10 +1765,10 @@
             this.splitCases.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitCases)).EndInit();
             this.splitCases.ResumeLayout(false);
-            this.groupBox4.ResumeLayout(false);
+            this.gbCaseShortcuts.ResumeLayout(false);
+            this.gbCaseShortcuts.PerformLayout();
+            this.gbCaseColumns.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).EndInit();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1764,9 +1778,9 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.Button btnDeleteProcedure;
         private System.Windows.Forms.Button btnNew;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox gbSearchAndReplace;
         private System.Windows.Forms.DataGridView dgvReplaces;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtName;
@@ -1774,7 +1788,7 @@
         private System.Windows.Forms.GroupBox gbWorkflow;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtWorkflow;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnDeleteWorkflow;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.GroupBox gbProcedure;
         private System.Windows.Forms.DataGridView dgvColumns;
@@ -1793,7 +1807,7 @@
         private System.Windows.Forms.Label lblNewColumn;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.GroupBox gbCaseColumns;
         private System.Windows.Forms.TextBox txtShortcut;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label6;
@@ -1877,7 +1891,7 @@
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.TextBox TxtCharacter;
         private System.Windows.Forms.CheckBox cbCheckTotal;
-        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.GroupBox gbCaseShortcuts;
         private System.Windows.Forms.TextBox txtShortcutTotal;
         private System.Windows.Forms.Label label20;
     }
