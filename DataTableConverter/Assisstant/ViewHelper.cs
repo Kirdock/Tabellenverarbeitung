@@ -8,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace DataTableConverter
@@ -65,45 +66,62 @@ namespace DataTableConverter
 
         internal static void InsertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, Action<object, DataGridViewCellEventArgs> myfunc = null)
         {
-            myDataGridView.BindingContext[myDataGridView.DataSource].EndCurrentEdit();
-            DataTable table = ((DataTable)myDataGridView.DataSource);
-
-            DataObject o = (DataObject)Clipboard.GetDataObject();
-            int columnCount = table.Columns.Count;
-            DataTable clipboardTable = new DataTable();
-            if (o.GetDataPresent(DataFormats.Text))
+            Thread thread = new Thread(() =>
             {
-                string[] pastedRows = Regex.Split(o.GetData(DataFormats.Text).ToString().TrimEnd("\r\n".ToCharArray()), "\r\n");
-                foreach (string pastedRow in pastedRows)
-                {
-                    string[] pastedRowCells = pastedRow.Split(new char[] { '\t' });
-                    for(int i = clipboardTable.Columns.Count; i < pastedRowCells.Length; i++)
-                    {
-                        clipboardTable.Columns.Add($"Spalte{i+1}");
-                    }
-                    clipboardTable.Rows.Add(pastedRowCells);
-                }
+                bool errorMessageShown = false;
+                myDataGridView.BindingContext[myDataGridView.DataSource].EndCurrentEdit();
+                DataTable table = ((DataTable)myDataGridView.DataSource);
 
-                ClipboardForm form = new ClipboardForm(clipboardTable);
-                if (form.ShowDialog() == DialogResult.OK)
+                DataObject o = (DataObject)Clipboard.GetDataObject();
+                int columnCount = table.Columns.Count;
+                DataTable clipboardTable = new DataTable();
+                if (o.GetDataPresent(DataFormats.Text))
                 {
-                    foreach(DataRow row in form.getTable().Rows)
+                    string[] pastedRows = Regex.Split(o.GetData(DataFormats.Text).ToString().TrimEnd("\r\n".ToCharArray()), "\r\n");
+                    foreach (string pastedRow in pastedRows)
                     {
-                        try
+                        string[] pastedRowCells = pastedRow.Split(new char[] { '\t' });
+                        for (int i = clipboardTable.Columns.Count; i < pastedRowCells.Length; i++)
                         {
-                            DataRow newRow = table.NewRow();
-                            object[] itemArray = row.ItemArray.Clone() as object[];
-                            newRow.ItemArray = itemArray.Length > table.Columns.Count ? itemArray.Take(table.Columns.Count).ToArray() : itemArray;
-                            table.Rows.InsertAt(newRow, rowIndex);
-                            rowIndex++;
+                            clipboardTable.Columns.Add($"Spalte{i + 1}");
                         }
-                        catch { } //Error, wenn Typen wie int nicht übereinstimmen
+                        clipboardTable.Rows.Add(pastedRowCells);
                     }
-                    myDataGridView.DataSource = null;
-                    myDataGridView.DataSource = table;
+
+                    ClipboardForm form = new ClipboardForm(clipboardTable);
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        foreach (DataRow row in form.getTable().Rows)
+                        {
+                            try
+                            {
+                                DataRow newRow = table.NewRow();
+                                object[] itemArray = row.ItemArray.Clone() as object[];
+                                newRow.ItemArray = itemArray.Length > table.Columns.Count ? itemArray.Take(table.Columns.Count).ToArray() : itemArray;
+                                table.Rows.InsertAt(newRow, rowIndex);
+                                rowIndex++;
+                            }
+                            catch
+                            {
+                                if (!errorMessageShown)
+                                {
+                                    MessageHandler.MessagesOK(MessageBoxIcon.Error, "Typen stimmen nicht überein! Es kann kein Text in ein Nummernfeld eingegeben werden!");
+                                    errorMessageShown = true;
+                                }
+                            } //Error, wenn Typen wie int nicht übereinstimmen
+                        }
+                        myDataGridView.BeginInvoke(new MethodInvoker(() =>
+                        {
+                            myDataGridView.DataSource = null;
+                            myDataGridView.DataSource = table;
+                            myfunc?.Invoke(null, null);
+                        }));
+                    }
                 }
-            }
-            myfunc?.Invoke(null, null);
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            
         }
 
         internal static DataView GetSortedView(string order, DataTable table)

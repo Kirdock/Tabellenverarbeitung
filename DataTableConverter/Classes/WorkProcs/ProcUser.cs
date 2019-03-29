@@ -57,15 +57,12 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 foreach (int i in headerIndices)
                 {
+                    int index = intoNewCol ? lastCol : i;
                     foreach (DataRow rep in replaces.Rows)
                     {
-                        int index = intoNewCol ? lastCol : i;
                         string value = row[i].ToString();
                         string replace = rep[0].ToString();
                         bool condition = procedure.CheckTotal ? value == replace : value.Contains(replace);
-
-
-
 
                         if (procedure.CheckTotal && value == replace)
                         {

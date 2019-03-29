@@ -75,7 +75,12 @@ namespace DataTableConverter.Classes.WorkProcs
                     bool result = !valid;
                     foreach (DataRow rep in Conditions.Rows)
                     {
-                        result = result && row[rep[(int)ConditionColumn.Spalte].ToString()].ToString() == rep[(int)ConditionColumn.Wert].ToString();
+                        string column = rep[(int)ConditionColumn.Spalte].ToString();
+                        string value = rep[(int)ConditionColumn.Wert].ToString();
+                        if (!string.IsNullOrWhiteSpace(column))
+                        {
+                            result = result && row[column].ToString() == value;
+                        }
                     }
                     if (valid || result)
                     {

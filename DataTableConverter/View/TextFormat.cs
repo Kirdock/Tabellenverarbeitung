@@ -335,11 +335,15 @@ namespace DataTableConverter.View
         {
             if (cmbPresets.SelectedIndex != -1)
             {
-                string path = $@"{ ExportHelper.ProjectPresets }\{cmbPresets.SelectedItem.ToString()}.xml";
-                if (File.Exists(path))
+                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
+                if (result == DialogResult.Yes)
                 {
-                    File.Delete(path);
-                    loadPresets();
+                    string path = $@"{ ExportHelper.ProjectPresets }\{cmbPresets.SelectedItem.ToString()}.xml";
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                        loadPresets();
+                    }
                 }
             }
         }
@@ -522,6 +526,32 @@ namespace DataTableConverter.View
         private bool checkBetweenText()
         {
             return txtBegin.Text.Length > 0 && txtEnd.Text.Length > 0;
+        }
+
+        private void BtnRenamePreset_Click(object sender, EventArgs e)
+        {
+            int index;
+            if ((index = cmbPresets.SelectedIndex) != -1)
+            {
+                string oldName = cmbPresets.SelectedItem.ToString();
+                string newName = Microsoft.VisualBasic.Interaction.InputBox("Bitte Vorlagenname eingeben", "Vorlage umbenennen", oldName);
+                if (!string.IsNullOrWhiteSpace(newName) && oldName != newName)
+                {
+                    if (cmbPresets.Items.Contains(newName))
+                    {
+                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Vorlage mit demselben Namen\nBitte wählen Sie einen anderen");
+                        BtnRenamePreset_Click(sender, e);
+                    }
+                    else
+                    {
+                        string path = Path.Combine(ExportHelper.ProjectPresets, $"{oldName}.xml");
+                        string newPath = Path.Combine(ExportHelper.ProjectPresets,$"{newName}.xml");
+
+                        File.Move(path, newPath);
+                        loadPresets();
+                    }
+                }
+            }
         }
 
 

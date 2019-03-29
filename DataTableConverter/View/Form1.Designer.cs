@@ -54,6 +54,7 @@
             this.zeilenZusammenfügenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rundenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zeichenAuffüllenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ersetzenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.arbeitsablaufToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.duplikateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -80,8 +81,8 @@
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.zeichenAuffüllenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.textErsetzenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -295,6 +296,13 @@
             this.rundenToolStripMenuItem.Text = "Runden";
             this.rundenToolStripMenuItem.Click += new System.EventHandler(this.rundenToolStripMenuItem_Click);
             // 
+            // zeichenAuffüllenToolStripMenuItem
+            // 
+            this.zeichenAuffüllenToolStripMenuItem.Name = "zeichenAuffüllenToolStripMenuItem";
+            this.zeichenAuffüllenToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.zeichenAuffüllenToolStripMenuItem.Text = "Zeichen auffüllen";
+            this.zeichenAuffüllenToolStripMenuItem.Click += new System.EventHandler(this.zeichenAuffüllenToolStripMenuItem_Click);
+            // 
             // ersetzenToolStripMenuItem
             // 
             this.ersetzenToolStripMenuItem.Name = "ersetzenToolStripMenuItem";
@@ -356,9 +364,10 @@
             this.ctxHeader.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.spalteUmbenennenToolStripMenuItem,
             this.spalteLöschenToolStripMenuItem,
-            this.spalteHinzufügenToolStripMenuItem1});
+            this.spalteHinzufügenToolStripMenuItem1,
+            this.textErsetzenToolStripMenuItem});
             this.ctxHeader.Name = "ctxHeader";
-            this.ctxHeader.Size = new System.Drawing.Size(181, 70);
+            this.ctxHeader.Size = new System.Drawing.Size(181, 114);
             // 
             // spalteUmbenennenToolStripMenuItem
             // 
@@ -483,13 +492,6 @@
             this.clipboardItem.Size = new System.Drawing.Size(209, 22);
             this.clipboardItem.Text = "Zwischenablage einfügen";
             // 
-            // zeichenAuffüllenToolStripMenuItem
-            // 
-            this.zeichenAuffüllenToolStripMenuItem.Name = "zeichenAuffüllenToolStripMenuItem";
-            this.zeichenAuffüllenToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
-            this.zeichenAuffüllenToolStripMenuItem.Text = "Zeichen auffüllen";
-            this.zeichenAuffüllenToolStripMenuItem.Click += new System.EventHandler(this.zeichenAuffüllenToolStripMenuItem_Click);
-            // 
             // dgTable
             // 
             this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -510,6 +512,13 @@
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
+            // 
+            // textErsetzenToolStripMenuItem
+            // 
+            this.textErsetzenToolStripMenuItem.Name = "textErsetzenToolStripMenuItem";
+            this.textErsetzenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.textErsetzenToolStripMenuItem.Text = "Text ersetzen";
+            this.textErsetzenToolStripMenuItem.Click += new System.EventHandler(this.textErsetzenToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -594,6 +603,7 @@
         private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
         private System.Windows.Forms.ToolStripMenuItem ersetzenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem zeichenAuffüllenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem textErsetzenToolStripMenuItem;
     }
 }
 

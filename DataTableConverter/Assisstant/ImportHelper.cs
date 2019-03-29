@@ -402,7 +402,8 @@ namespace DataTableConverter.Assisstant
 
                     foreach (int line in config)
                     {
-                        row.Add(data.Substring(startindex, line));
+                        int temp = line + startindex > data.Length ? data.Length - startindex : line;
+                        row.Add(data.Substring(startindex, temp));
                         startindex += line;
                     }
                     dt.Rows.Add(row.ToArray());

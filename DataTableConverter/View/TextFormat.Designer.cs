@@ -32,6 +32,7 @@
             this.rbSeparated = new System.Windows.Forms.RadioButton();
             this.rbFixed = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbTakeOver = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cmbEncoding = new System.Windows.Forms.ComboBox();
             this.gbSeparated = new System.Windows.Forms.GroupBox();
@@ -46,6 +47,7 @@
             this.txtSeparator = new System.Windows.Forms.TextBox();
             this.gbFixed = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.BtnRenamePreset = new System.Windows.Forms.Button();
             this.cmbPresets = new System.Windows.Forms.ComboBox();
             this.btnDeletePreset = new System.Windows.Forms.Button();
             this.btnSavePreset = new System.Windows.Forms.Button();
@@ -59,7 +61,6 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cbTakeOver = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             this.gbFixed.SuspendLayout();
@@ -109,6 +110,16 @@
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Art";
+            // 
+            // cbTakeOver
+            // 
+            this.cbTakeOver.AutoSize = true;
+            this.cbTakeOver.Location = new System.Drawing.Point(523, 47);
+            this.cbTakeOver.Name = "cbTakeOver";
+            this.cbTakeOver.Size = new System.Drawing.Size(265, 17);
+            this.cbTakeOver.TabIndex = 4;
+            this.cbTakeOver.Text = "Auf alle Dateien mit derselben Endung anwenden?";
+            this.cbTakeOver.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
@@ -257,16 +268,27 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.BtnRenamePreset);
             this.groupBox3.Controls.Add(this.cmbPresets);
             this.groupBox3.Controls.Add(this.btnDeletePreset);
             this.groupBox3.Controls.Add(this.btnSavePreset);
             this.groupBox3.Controls.Add(this.btnLoadPreset);
             this.groupBox3.Location = new System.Drawing.Point(424, 47);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(361, 115);
+            this.groupBox3.Size = new System.Drawing.Size(361, 148);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Vorlagen";
+            // 
+            // BtnRenamePreset
+            // 
+            this.BtnRenamePreset.Location = new System.Drawing.Point(29, 110);
+            this.BtnRenamePreset.Name = "BtnRenamePreset";
+            this.BtnRenamePreset.Size = new System.Drawing.Size(97, 23);
+            this.BtnRenamePreset.TabIndex = 8;
+            this.BtnRenamePreset.Text = "Umbenennen";
+            this.BtnRenamePreset.UseVisualStyleBackColor = true;
+            this.BtnRenamePreset.Click += new System.EventHandler(this.BtnRenamePreset_Click);
             // 
             // cmbPresets
             // 
@@ -342,6 +364,7 @@
             // 
             // dgvSetting
             // 
+            this.dgvSetting.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvSetting.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvSetting.Location = new System.Drawing.Point(6, 47);
             this.dgvSetting.Name = "dgvSetting";
@@ -354,8 +377,7 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.dgvPreview);
             this.groupBox2.Location = new System.Drawing.Point(0, 398);
@@ -369,8 +391,10 @@
             // 
             this.dgvPreview.AllowUserToAddRows = false;
             this.dgvPreview.AllowUserToDeleteRows = false;
+            this.dgvPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPreview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvPreview.Location = new System.Drawing.Point(3, 16);
             this.dgvPreview.Name = "dgvPreview";
             this.dgvPreview.ReadOnly = true;
@@ -398,23 +422,13 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
-            // cbTakeOver
-            // 
-            this.cbTakeOver.AutoSize = true;
-            this.cbTakeOver.Location = new System.Drawing.Point(523, 47);
-            this.cbTakeOver.Name = "cbTakeOver";
-            this.cbTakeOver.Size = new System.Drawing.Size(265, 17);
-            this.cbTakeOver.TabIndex = 4;
-            this.cbTakeOver.Text = "Auf alle Dateien mit derselben Endung anwenden?";
-            this.cbTakeOver.UseVisualStyleBackColor = true;
-            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 576);
-            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.gbFixed);
+            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.Name = "TextFormat";
@@ -470,5 +484,6 @@
         private System.Windows.Forms.TextBox txtBegin;
         private System.Windows.Forms.RadioButton rbBetween;
         private System.Windows.Forms.CheckBox cbTakeOver;
+        private System.Windows.Forms.Button BtnRenamePreset;
     }
 }

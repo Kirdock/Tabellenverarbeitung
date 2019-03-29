@@ -447,15 +447,18 @@ namespace DataTableConverter
                                     //}));
                                 }
                             }
-                            if (newTable != null)
+                            if (table != null)
                             {
-                                DataHelper.concatTables(newTable, table, fileNameBefore, filename);
+                                if (newTable != null)
+                                {
+                                    DataHelper.concatTables(newTable, table, fileNameBefore, filename);
+                                }
+                                else
+                                {
+                                    newTable = table;
+                                }
+                                fileNameBefore = filename;
                             }
-                            else
-                            {
-                                newTable = table;
-                            }
-                            fileNameBefore = filename;
                         }
                         catch (Exception ex)
                         {
@@ -476,28 +479,30 @@ namespace DataTableConverter
         private void finishImport(DataTable table, ImportState state, DataTable oldTable, string filename)
         {
             StopLoadingBar();
-            switch (state)
-            {
-                case ImportState.Merge:
-                    showMergeForm(table, oldTable);
-                    break;
+            if(table != null) {
+                switch (state)
+                {
+                    case ImportState.Merge:
+                        showMergeForm(table, oldTable);
+                        break;
 
-                case ImportState.Append:
-                    dgTable.BeginInvoke(new MethodInvoker(() => { mergeTables(table, filename); }));
-                    break;
+                    case ImportState.Append:
+                        dgTable.BeginInvoke(new MethodInvoker(() => { mergeTables(table, filename); }));
+                        break;
 
-                case ImportState.Header:
-                    object[] headers = DataHelper.getHeadersOfDataTable(oldTable);
-                    DataHelper.setHeaders(table, oldTable);
-                    dgTable.BeginInvoke(new MethodInvoker(() => { assignDataSource(oldTable); }));
-                    addDataSourceHeadersChange(headers);
-                    break;
+                    case ImportState.Header:
+                        object[] headers = DataHelper.getHeadersOfDataTable(oldTable);
+                        DataHelper.setHeaders(table, oldTable);
+                        dgTable.BeginInvoke(new MethodInvoker(() => { assignDataSource(oldTable); }));
+                        addDataSourceHeadersChange(headers);
+                        break;
 
-                default:
-                    dgTable.BeginInvoke(new MethodInvoker(() => { addDataSourceNewTable(table); }));
-                    lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { setRowCount(table.Rows.Count); }));
-                    break;
-        }
+                    default:
+                        dgTable.BeginInvoke(new MethodInvoker(() => { addDataSourceNewTable(table); }));
+                        lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { setRowCount(table.Rows.Count); }));
+                        break;
+                }
+            }
         }
 
         private void showMergeForm(DataTable importTable, DataTable sourceTable)
@@ -1425,6 +1430,26 @@ namespace DataTableConverter
             if(form.ShowDialog() == DialogResult.OK)
             {
                 workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { form.Proc }, 0));
+            }
+        }
+
+        private void textErsetzenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte Text eingeben", "Spalte mit Text befüllen", string.Empty);
+            if (!string.IsNullOrWhiteSpace(newText))
+            {
+                DataTable table = getDataSource();
+                DataColumn col = table.Columns[selectedColumn];
+                DataTable newTable = table.Copy();
+
+                foreach (DataRow row in newTable.Rows)
+                {
+                    row[selectedColumn] = newText;
+                }
+
+
+                addDataSourceColumnValuesChanged(table, newTable, selectedColumn);
+                assignDataSource(newTable);
             }
         }
 
