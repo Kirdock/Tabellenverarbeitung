@@ -21,13 +21,13 @@ namespace DataTableConverter.Assisstant
             OrderString = string.Empty;
         }
 
-        internal void resetHistory()
+        internal void ResetHistory()
         {
             history.Clear();
             historyPointer = -1;
         }
 
-        internal void addHistory(History his, string order)
+        internal void AddHistory(History his, string order)
         {
             historyPointer++;
             his.Order = order;
@@ -40,10 +40,10 @@ namespace DataTableConverter.Assisstant
                 history[historyPointer] = his;
             }
 
-            adjustHistory();
+            AdjustHistory();
         }
 
-        private void adjustHistory()
+        private void AdjustHistory()
         {
             for (int i = historyPointer + 1; i < history.Count;)
             {
@@ -51,7 +51,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal DataTable goBack(DataTable table, string orderBefore)
+        internal DataTable GoBack(DataTable table, string orderBefore)
         {
             DataTable result = table;
             if (historyPointer >= 0)
@@ -63,24 +63,24 @@ namespace DataTableConverter.Assisstant
                 //Value = "meinText" in der History
                 //tableCell = "meinText" und Value in der History = alter Wert von tableCell
                 //NUR alte Werte in der History. Die neuen sind eh in der Tabelle und werden bei "rückgängig" richtig getauscht
-                result = takeOverHistory(table, orderBefore);
+                result = TakeOverHistory(table, orderBefore);
                 historyPointer--;
             }
             return result;
         }
-        internal DataTable repeat(DataTable table, string orderBefore)
+        internal DataTable Repeat(DataTable table, string orderBefore)
         {
             DataTable result = table;
             int maxIndex = history.Count - 1;
             if (historyPointer < maxIndex)
             {
                 historyPointer++;
-                result = takeOverHistory(table, orderBefore);
+                result = TakeOverHistory(table, orderBefore);
             }
             return result;
         }
 
-        private DataTable takeOverHistory(DataTable table, string orderBefore, History His = null)
+        private DataTable TakeOverHistory(DataTable table, string orderBefore, History His = null)
         {
             bool isIteration;
             History his;
@@ -100,7 +100,6 @@ namespace DataTableConverter.Assisstant
                     table.Rows[his.RowIndex].SetField(his.ColumnIndex, textOld);
                     break;
 
-                case State.ColumnValuesChange:
                 case State.ValueChange:
                     List<CellMatrix> oldValues = his.Table;
                     foreach (CellMatrix matrix in oldValues.Where(cm => cm.bigChange == null))
@@ -119,7 +118,7 @@ namespace DataTableConverter.Assisstant
 
                         foreach (CellMatrix matrix in rowDelete.Concat(columnInsert).Concat(columnDelete).Concat(rowInsert))
                         {
-                            table = takeOverHistory(table, orderBefore, matrix.bigChange);
+                            table = TakeOverHistory(table, orderBefore, matrix.bigChange);
                         }
                     }
                     
@@ -168,7 +167,7 @@ namespace DataTableConverter.Assisstant
 
                 case State.HeadersChange:
                     object[] oldHeaders = his.Row[0];
-                    object[] newHeaders = DataHelper.getHeadersOfDataTable(table);
+                    object[] newHeaders = DataHelper.HeadersOfDataTable(table);
                     for (int i = 0; i < oldHeaders.Length; i++)
                     {
                         int index;
@@ -187,7 +186,7 @@ namespace DataTableConverter.Assisstant
                     col[0] = table.Columns[his.ColumnIndex];
                     his.Column = col;
                     object[][] newValues = new object[1][];
-                    newValues[0] = DataHelper.getColumnValues(table, his.ColumnIndex);
+                    newValues[0] = DataHelper.ColumnValues(table, his.ColumnIndex);
                     his.ColumnValues = newValues;
                     table.Columns.RemoveAt(his.ColumnIndex);
                     his.State = State.DeleteColumn;

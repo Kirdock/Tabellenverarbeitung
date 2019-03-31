@@ -83,7 +83,7 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             sortingOrder = string.Empty; //base(table, sortingOrder, columns)
             int column = table.Columns.Count;
-            DataHelper.addColumn(NewColumn, table);
+            DataHelper.AddColumn(NewColumn, table);
 
             foreach (DataRow row in table.Rows)
             {

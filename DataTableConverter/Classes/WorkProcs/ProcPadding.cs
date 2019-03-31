@@ -62,10 +62,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                DataHelper.addColumn(NewColumn, table);
+                DataHelper.AddColumn(NewColumn, table);
                 intoNewCol = true;
             }
-            List<int> headerIndices = DataHelper.getHeaderIndices(table, columns);
+            List<int> headerIndices = DataHelper.HeaderIndices(table, columns);
             foreach (DataRow row in table.Rows)
             {
                 foreach (int i in headerIndices)

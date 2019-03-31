@@ -137,7 +137,7 @@ namespace DataTableConverter.View
 
         private void spalteAufteilenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SplitForm form = new SplitForm(DataHelper.getHeadersOfDataTable(getTable()));
+            SplitForm form = new SplitForm(DataHelper.HeadersOfDataTable(getTable()));
             if(form.ShowDialog() == DialogResult.OK)
             {
                 DataTable table = getDataView().Table;
@@ -156,7 +156,7 @@ namespace DataTableConverter.View
                     while(cols.Length > counter)
                     {
                         counter++;
-                        DataHelper.addColumn(header + counter, table);
+                        DataHelper.AddColumn(header + counter, table);
                     }
                     for(int i = 0; i <cols.Length; i++)
                     {

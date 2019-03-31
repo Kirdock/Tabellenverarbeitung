@@ -12,12 +12,12 @@ namespace DataTableConverter.Assisstant
     {
         internal static readonly string FileName = "Dateiname";
         internal static readonly string TempSort = "[TEMP_SORT]";
-        internal static object[] getHeadersOfDataTable(DataTable table)
+        internal static object[] HeadersOfDataTable(DataTable table)
         {
             return table != null ? table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray() : new object[0];
         }
 
-        internal static object[] getColumnValues(DataTable table, int column)
+        internal static object[] ColumnValues(DataTable table, int column)
         {
             object[] columnValues = new object[table.Rows.Count];
 
@@ -42,13 +42,13 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void addColumn(string headerName, DataTable data, int counter = 0)
+        internal static void AddColumn(string headerName, DataTable data, int counter = 0)
         {
             string name = counter == 0 ? headerName : headerName + counter;
             if (data.Columns.Contains(name))
             {
                 counter++;
-                addColumn(headerName, data, counter);
+                AddColumn(headerName, data, counter);
             }
             else
             {
@@ -77,7 +77,7 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        internal static void setHeaders(DataTable table, DataTable oldTable)
+        internal static void SetHeaders(DataTable table, DataTable oldTable)
         {
             string[] newHeaders = table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToArray();
             for (int i = 0; i < newHeaders.Length && i < oldTable.Columns.Count; i++)
@@ -91,12 +91,12 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static List<string> getHeadersToLower(DataTable table)
+        internal static List<string> HeadersToLower(DataTable table)
         {
             return table.Columns.Cast<DataColumn>().Select(dt => dt.ColumnName.ToLower()).ToList();
         }
 
-        internal static void concatTables(DataTable originalTable, DataTable table, string originalFilename, string secondFilename)
+        internal static void ConcatTables(DataTable originalTable, DataTable table, string originalFilename, string secondFilename)
         {
             List<int> ColumnIndizes = new List<int>();
             table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToList().ForEach(x => {
@@ -111,7 +111,7 @@ namespace DataTableConverter.Assisstant
             int filenameColumnIndex;
             if ((filenameColumnIndex = originalTable.Columns.IndexOf(FileName)) == -1)
             {
-                addColumn(FileName, originalTable);
+                AddColumn(FileName, originalTable);
                 int colIndex = filenameColumnIndex = originalTable.Columns.Count - 1;
                 foreach (DataRow row in originalTable.Rows)
                 {
@@ -139,7 +139,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static List<CellMatrix> getChangesOfDataTable(DataTable tableNew)
+        internal static List<CellMatrix> ChangesOfDataTable(DataTable tableNew)
         {
             List<CellMatrix> result = new List<CellMatrix>();
 
@@ -201,7 +201,7 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        internal static List<int> getHeaderIndices(DataTable table, string[] columns)
+        internal static List<int> HeaderIndices(DataTable table, string[] columns)
         {
             List<int> indices = new List<int>();
             foreach (string col in columns)

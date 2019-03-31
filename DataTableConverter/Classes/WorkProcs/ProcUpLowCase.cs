@@ -54,7 +54,7 @@ namespace DataTableConverter.Classes.WorkProcs
             
             
             
-            List<int> headerIndices = DataHelper.getHeaderIndices(table, columns);
+            List<int> headerIndices = DataHelper.HeaderIndices(table, columns);
             foreach (DataRow row in table.Rows)
             {
                 for (int i = 0; i < row.ItemArray.Length; i++)

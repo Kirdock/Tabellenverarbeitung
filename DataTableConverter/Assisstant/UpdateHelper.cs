@@ -20,11 +20,11 @@ namespace DataTableConverter.Assisstant
         private readonly static string FileName = FileNameWithoutExtension+".zip";
         private readonly static string Download = Repository+"/download/{0}/"+FileName;
         
-        internal static void CheckUpdate(bool Prompt, ProgressBar progressBar)
+        internal static void CheckUpdate(bool prompt, ProgressBar progressBar)
         {
             try
             {
-                if (!Prompt || !Properties.Settings.Default.UpdateDialogShowed)
+                if (!prompt || !Properties.Settings.Default.UpdateDialogShowed)
                 {
                     new Thread(() =>
                     {
@@ -37,7 +37,7 @@ namespace DataTableConverter.Assisstant
 
                         if (version != fvi.FileVersion.Substring(0, version.Length))
                         {
-                            if (Prompt)
+                            if (prompt)
                             {
                                 DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Information, "Eine neue Version steht zur Verfügung. Möchten Sie sie runterladen?");
                                 if (result == DialogResult.Yes)
@@ -55,7 +55,7 @@ namespace DataTableConverter.Assisstant
                                 DownloadFile(version, progressBar);
                             }
                         }
-                        else if (!Prompt)
+                        else if (!prompt)
                         {
                             MessageHandler.MessagesOK(MessageBoxIcon.Information, "Sie besitzen bereits die aktuellste Version");
                         }

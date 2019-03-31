@@ -23,7 +23,7 @@ namespace DataTableConverter.Assisstant
         internal static readonly string ProjectTolerances = ExportHelper.ProjectTolerance;
         internal static readonly string ProjectCases = ExportHelper.ProjectCases;
 
-        internal static DataTable openText(string path, string separator, int codePage, bool containsHeaders, bool isPreview = false)
+        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, bool isPreview = false)
         {
             DataTable dt = new DataTable();
 
@@ -39,18 +39,18 @@ namespace DataTableConverter.Assisstant
 
                     foreach (string column in list)
                     {
-                        DataHelper.addColumn(column.Trim(), dt);
+                        DataHelper.AddColumn(column.Trim(), dt);
                     }
                 }
 
 
                 if (isPreview)
                 {
-                    insertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator);
                 }
                 else
                 {
-                    insertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator);
                 }
 
                 //File.ReadLines doesn't read all lines, it returns a IEnumerable, and lines are lazy evaluated,
@@ -68,7 +68,7 @@ namespace DataTableConverter.Assisstant
             return dt;
         }
 
-        private static void insertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator)
+        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator)
         {
             enumerable.Skip(skip)
                     .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None))
@@ -79,13 +79,13 @@ namespace DataTableConverter.Assisstant
                         int count = temp.Count();
                         while (count > dt.Columns.Count)
                         {
-                            DataHelper.addColumn("Spalte" + dt.Columns.Count, dt);
+                            DataHelper.AddColumn("Spalte" + dt.Columns.Count, dt);
                         }
                         dt.Rows.Add(temp);
                     });
         }
 
-        internal static DataTable openTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, bool isPreview = false)
+        internal static DataTable OpenTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, bool isPreview = false)
         {
             DataTable dt = new DataTable();
             try
@@ -99,7 +99,7 @@ namespace DataTableConverter.Assisstant
 
                     foreach (string field in headerRow)
                     {
-                        DataHelper.addColumn(field, dt);
+                        DataHelper.AddColumn(field, dt);
                     }
                 }
 
@@ -118,7 +118,7 @@ namespace DataTableConverter.Assisstant
                     string[] row = createRow(line, begin, end);
                     while(row.Length > dt.Columns.Count)
                     {
-                        DataHelper.addColumn("Spalte" + dt.Columns.Count, dt);
+                        DataHelper.AddColumn("Spalte" + dt.Columns.Count, dt);
                     }
                     dt.Rows.Add(row);
                 }
@@ -168,7 +168,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static int renameColumn(DataTable dt, string column, int counter)
+        private static int RenameColumn(DataTable dt, string column, int counter)
         {
             try
             {
@@ -178,11 +178,11 @@ namespace DataTableConverter.Assisstant
             catch (DuplicateNameException)
             {
                 counter++;
-                return renameColumn(dt, column, counter);
+                return RenameColumn(dt, column, counter);
             }
         }
 
-        internal static DataTable openDBF(string path)
+        internal static DataTable OpenDBF(string path)
         {
             DataTable data = new DataTable();
             string directory = Path.GetDirectoryName(path);
@@ -220,7 +220,7 @@ namespace DataTableConverter.Assisstant
                             string fileName = Path.GetFileName(path) + "; " + tableName;
                             DataTable temp = new DataTable();
                             dbAdapter.Fill(temp);
-                            DataHelper.concatTables(Table, temp, fileName, fileName);
+                            DataHelper.ConcatTables(Table, temp, fileName, fileName);
                         }
                     }
                 }
@@ -233,7 +233,7 @@ namespace DataTableConverter.Assisstant
             return Table;
         }
 
-        internal static DataTable openExcel(string path, Form1 mainform)
+        internal static DataTable OpenExcel(string path, Form1 mainform)
         {
             DataTable data = new DataTable();
             
@@ -268,7 +268,7 @@ namespace DataTableConverter.Assisstant
                 
                 string[] selectedSheets = (string[])mainform.Invoke(
                     new Func<string[]>(() =>
-                    selectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray())
+                    SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray())
                     )
                 );
                 bool fileNameColumn;
@@ -379,7 +379,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static DataTable openTextFixed(string data, string path, List<int> config, List<string> header, bool isPreview = false)
+        internal static DataTable OpenTextFixed(string data, string path, List<int> config, List<string> header, bool isPreview = false)
         {
             DataTable dt = new DataTable();
             if (header == null || config == null || header.Count == 0 || config.Count == 0)
@@ -415,7 +415,7 @@ namespace DataTableConverter.Assisstant
             return dt;
         }
 
-        internal static List<Proc> loadProcedures()
+        internal static List<Proc> LoadProcedures()
         {
             List<Proc> data = new List<Proc>();
             if (File.Exists(ProjectProcedures))
@@ -436,7 +436,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static List<Work> loadWorkflows()
+        internal static List<Work> LoadWorkflows()
         {
             List<Work> data = new List<Work>();
             if (File.Exists(ProjectWorkflows))
@@ -457,7 +457,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static List<Tolerance> loadTolerances()
+        internal static List<Tolerance> LoadTolerances()
         {
             List<Tolerance> data = new List<Tolerance>();
             if (File.Exists(ProjectTolerances))
@@ -478,7 +478,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static List<Case> loadCases()
+        internal static List<Case> LoadCases()
         {
             List<Case> data = new List<Case>();
             if (File.Exists(ProjectTolerances))
@@ -499,7 +499,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        private static string[] selectExcelSheets(string[] sheets)
+        private static string[] SelectExcelSheets(string[] sheets)
         {
             string[] checkedSheets = new string[0];
             if (sheets.Length == 1)

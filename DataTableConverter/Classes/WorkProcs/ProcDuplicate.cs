@@ -55,7 +55,7 @@ namespace DataTableConverter.Classes.WorkProcs
             if (columnAdded = lastIndex == -1)
             {
                 lastIndex = table.Columns.Count;
-                DataHelper.addColumn("Duplikat", table);
+                DataHelper.AddColumn("Duplikat", table);
 
             }
 

@@ -46,16 +46,16 @@ namespace DataTableConverter.View
             CmBRound.SelectedIndexChanged += CmBRound_SelectedIndexChanged;
             cmbProcedureType.SelectedIndex = 0;
 
-            loadProcedures();
-            loadTolerances();
-            loadCases();
-            loadWorkflows();
+            LoadProcedures();
+            LoadTolerances();
+            LoadCases();
+            LoadWorkflows();
 
             viewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
-            assignGroupBoxToEnum();
+            AssignGroupBoxToEnum();
             ltbProcedures_SelectedIndexChanged(null, null);
-            generateProceduresForWorkflow();
-            loadProceduresWorkflow(false);
+            GenerateProceduresForWorkflow();
+            LoadProceduresWorkflow(false);
 
             lbWorkflows_SelectedIndexChanged(null, null);
 
@@ -63,7 +63,7 @@ namespace DataTableConverter.View
 
 
             lbCases_SelectedIndexChanged(null, null);
-            setGroupBoxVisibility(null);
+            SetGroupBoxVisibility(null);
             lbUsedProcedures_SelectedIndexChanged(null, null);
 
             
@@ -115,7 +115,7 @@ namespace DataTableConverter.View
             cbHeadersPad.Items.AddRange(headers);
         }
 
-        private void assignGroupBoxToEnum()
+        private void AssignGroupBoxToEnum()
         {
             gbState = new Dictionary<GroupBox, Type>
             {
@@ -143,7 +143,7 @@ namespace DataTableConverter.View
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
         {
             viewHelper.Clear();
-            saveSplitterDistance();
+            SaveSplitterDistance();
             
             if (ExportHelper.saveWorkflows(Workflows) || ExportHelper.saveProcedures(Procedures) || ExportHelper.saveTolerances(Tolerances) || ExportHelper.saveCases(Cases))
             {
@@ -152,7 +152,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private void saveSplitterDistance()
+        private void SaveSplitterDistance()
         {
             Properties.Settings.Default.splitCases = splitCases.SplitterDistance;
             Properties.Settings.Default.splitTolerances = splitTolerances.SplitterDistance;
@@ -168,9 +168,9 @@ namespace DataTableConverter.View
 
         #region Procedures
 
-        private void loadProcedures()
+        private void LoadProcedures()
         {
-            Procedures = ImportHelper.loadProcedures();
+            Procedures = ImportHelper.LoadProcedures();
             bindingProcedure = new BindingList<Proc>(Procedures);
             ltbProcedures.DataSource = bindingProcedure;
             ltbProcedures.DisplayMember = "Name";
@@ -184,7 +184,7 @@ namespace DataTableConverter.View
             DataTable table = new DataTable { TableName = "Setting" };
             table.Columns.Add("Ersetze", typeof(string));
             table.Columns.Add("Durch", typeof(string));
-            int id = maxIdProcedure() + 1;
+            int id = MaxIdProcedure() + 1;
             Proc proc = new Proc(name + number, table, id);
             while (bindingProcedure.Contains(proc))
             {
@@ -193,11 +193,11 @@ namespace DataTableConverter.View
             }
             bindingProcedure.Add(proc);
             ltbProcedures_SelectedIndexChanged(null, null);
-            sortProcedureList(id);
-            loadProceduresWorkflow();
+            SortProcedureList(id);
+            LoadProceduresWorkflow();
         }
 
-        private int maxIdProcedure()
+        private int MaxIdProcedure()
         {
             int max = Procedures.Count == 0 ? 1 : Procedures[0].Id;
             foreach (Proc proc in Procedures)
@@ -216,25 +216,25 @@ namespace DataTableConverter.View
             {
                 DialogResult? result = null;
                 int id = Procedures[ltbProcedures.SelectedIndex].Id;
-                if (isProcedureUsed(id, out string usedWorkflows, typeof(ProcUser)))
+                if (IsProcedureUsed(id, out string usedWorkflows, typeof(ProcUser)))
                 {
                     result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Diese Funktion wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
                 }
                 if (result == null || result == DialogResult.Yes)
                 {
                     bindingProcedure.RemoveAt(ltbProcedures.SelectedIndex);
-                    resetForm();
+                    ResetForm();
                     ltbProcedures_SelectedIndexChanged(null, null);
                     if (result == DialogResult.Yes)
                     {
-                        deleteProcedureOfWorkflows(id, typeof(ProcUser));
+                        DeleteProcedureOfWorkflows(id, typeof(ProcUser));
                     }
                 }
-                loadProceduresWorkflow();
+                LoadProceduresWorkflow();
             }
         }
 
-        private void deleteProcedureOfWorkflows(int id, Type type)
+        private void DeleteProcedureOfWorkflows(int id, Type type)
         {
             foreach (Work w in Workflows)
             {
@@ -246,11 +246,11 @@ namespace DataTableConverter.View
                         i--;
                     }
                 }
-                setWorkflowOrdinal(w);
+                SetWorkflowOrdinal(w);
             }
         }
 
-        private void setWorkflowOrdinal(Work work)
+        private void SetWorkflowOrdinal(Work work)
         {
             for(int ordinal = 0; ordinal < work.Procedures.Count; ordinal++)
             {
@@ -258,7 +258,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private bool isProcedureUsed(int id, out string usedWorkflows, Type type)
+        private bool IsProcedureUsed(int id, out string usedWorkflows, Type type)
         {
             bool status = false;
             StringBuilder builder = new StringBuilder();
@@ -285,7 +285,7 @@ namespace DataTableConverter.View
         {
             if (ltbProcedures.SelectedIndex == -1)
             {
-                resetForm();
+                ResetForm();
                 gbSearchAndReplace.Enabled = false;
             }
             else
@@ -298,7 +298,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private void resetForm()
+        private void ResetForm()
         {
             txtName.Text = string.Empty;
             dgvReplaces.DataSource = null;
@@ -306,11 +306,11 @@ namespace DataTableConverter.View
         }
 
 
-        private void sortProcedureList(int selectedId)
+        private void SortProcedureList(int selectedId)
         {
             Procedures.Sort();
             bindingProcedure.ResetBindings();
-            ltbProcedures.SelectedIndex = getProcedureIndexThroughId(selectedId);
+            ltbProcedures.SelectedIndex = GetProcedureIndexThroughId(selectedId);
         }
 
         private void txtName_TextChanged(object sender, EventArgs e)
@@ -318,31 +318,31 @@ namespace DataTableConverter.View
             if (lbProcedures.SelectedIndex != -1)
             {
                 selectedProc.Name = txtName.Text;
-                sortProcedureList(selectedProc.Id);
-                loadProceduresWorkflow(false);
+                SortProcedureList(selectedProc.Id);
+                LoadProceduresWorkflow(false);
             }
         }
 
-        private int getProcedureIndexThroughId(int selectedId)
+        private int GetProcedureIndexThroughId(int selectedId)
         {
             return Procedures.FindIndex(proc => proc.Id == selectedId);
         }
         #endregion
 
         #region Workflows
-        private void loadWorkflows()
+        private void LoadWorkflows()
         {
-            Workflows = ImportHelper.loadWorkflows();
+            Workflows = ImportHelper.LoadWorkflows();
             bindingWorkflow = new BindingList<Work>(Workflows);
             lbWorkflows.DataSource = bindingWorkflow;
             lbWorkflows.DisplayMember = "Name";
             lbWorkflows.ValueMember = "Id";
         }
 
-        private void loadProceduresWorkflow(bool status = true)
+        private void LoadProceduresWorkflow(bool status = true)
         {
             lbProcedures.DataSource = null;
-            lbProcedures.DataSource = getSelectedProcedureType();
+            lbProcedures.DataSource = GetSelectedProcedureType();
             lbProcedures.DisplayMember = "Name";
             lbProcedures.ValueMember = "Id";
             if (status)
@@ -351,7 +351,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private void generateProceduresForWorkflow()
+        private void GenerateProceduresForWorkflow()
         {
             SystemProc = new List<Proc>
             {
@@ -363,10 +363,10 @@ namespace DataTableConverter.View
                 new Proc(ProcPadding.ClassName, null, 6)
             };
 
-            generateDuplicateProc();
+            GenerateDuplicateProc();
         }
 
-        private void generateDuplicateProc()
+        private void GenerateDuplicateProc()
         {
             DuplicateProc = new List<Proc>();
             foreach (Case cas in Cases)
@@ -375,7 +375,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private List<Proc> getSelectedProcedureType()
+        private List<Proc> GetSelectedProcedureType()
         {
             return cmbProcedureType.SelectedIndex == 1 ? SystemProc : cmbProcedureType.SelectedIndex == 2 ? DuplicateProc : Procedures;
         }
@@ -384,7 +384,7 @@ namespace DataTableConverter.View
         {
             string name = "Neuer Arbeitsablauf";
             int number = 1;
-            int id = maxIdWorkflow() + 1;
+            int id = MaxIdWorkflow() + 1;
             Work work = new Work(name + number, new List<WorkProc>(), id);
             while (bindingWorkflow.Contains(work))
             {
@@ -392,11 +392,11 @@ namespace DataTableConverter.View
                 work.Name = name + number;
             }
             bindingWorkflow.Add(work);
-            sortWorkflowList(id);
+            SortWorkflowList(id);
             lbWorkflows_SelectedIndexChanged(null, null);
         }
 
-        private int maxIdWorkflow()
+        private int MaxIdWorkflow()
         {
             int max = Workflows.Count == 0 ? 1 : Workflows[0].Id;
             foreach (Work work in Workflows)
@@ -410,20 +410,20 @@ namespace DataTableConverter.View
         }
 
 
-        private void sortWorkflowList(int selectedId)
+        private void SortWorkflowList(int selectedId)
         {
             Workflows.Sort();
             bindingWorkflow.ResetBindings();
-            lbWorkflows.SelectedIndex = getWorkflowIndexThroughId(selectedId);
+            lbWorkflows.SelectedIndex = GetWorkflowIndexThroughId(selectedId);
         }
 
-        private int getWorkflowIndexThroughId(int selectedId)
+        private int GetWorkflowIndexThroughId(int selectedId)
         {
             return Workflows.FindIndex(work => work.Id == selectedId);
         }
 
 
-        private int getWorkProcedureIndexThroughId(int selectedId)
+        private int GetWorkProcedureIndexThroughId(int selectedId)
         {
             return GetSelectedWorkflow().Procedures.FindIndex(proc => proc.ProcedureId == selectedId);
         }
@@ -433,7 +433,7 @@ namespace DataTableConverter.View
             if (gbProcedure.Enabled = gbWorkflow.Enabled = (lbWorkflows.SelectedIndex != -1))
             {
                 Work workflow = GetSelectedWorkflow();
-                setWorkflowProcedures(workflow.Procedures);
+                SetWorkflowProcedures(workflow.Procedures);
                 
                 txtWorkflow.Text = workflow.Name;
                 lbUsedProcedures_SelectedIndexChanged(null, null);
@@ -465,7 +465,7 @@ namespace DataTableConverter.View
             txtCaseName.Enabled = gbCaseShortcuts.Enabled = gbCaseColumns.Enabled = btnDeleteCase.Enabled = !(procedure ?? Cases[lbCases.SelectedIndex]).Locked;
         }
 
-        private void setWorkflowProcedures(List<WorkProc> proc, BindingList<WorkProc> newList = null)
+        private void SetWorkflowProcedures(List<WorkProc> proc, BindingList<WorkProc> newList = null)
         {
             //bindingWorkProc = new BindingList<Proc>(getProceduresWithId(proc));
             bindingWorkProc = newList ?? new BindingList<WorkProc>(proc);
@@ -478,10 +478,10 @@ namespace DataTableConverter.View
             }
         }
 
-        private void sortWorkProcList(int ordinal)
+        private void SortWorkProcList(int ordinal)
         {
             GetSelectedWorkflow().Procedures.Sort();
-            setWorkflowProcedures(GetSelectedWorkflow().Procedures);
+            SetWorkflowProcedures(GetSelectedWorkflow().Procedures);
             lbUsedProcedures.SelectedIndex = GetWorkProcedureIndexThroughOrdinal(ordinal);
         }
 
@@ -513,7 +513,7 @@ namespace DataTableConverter.View
 
         private void SetMergeControls( WorkProc selectedProc)
         {
-            setCmbHeader(selectedProc.Formula);
+            SetCmbHeader(selectedProc.Formula);
             lblOriginalNameText.Text = ProcMerge.ClassName;
             dgvMerge.DataSource = null;
             dgvMerge.DataSource = ((ProcMerge)selectedProc).Conditions;
@@ -527,7 +527,7 @@ namespace DataTableConverter.View
             txtNewColumnPad.Text = proc.NewColumn;
             dgvPadColumns.DataSource = proc.Columns;
             dgvPadConditions.DataSource = proc.Conditions;
-            setHeaderProcedure(proc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderProcedure(proc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
             bool status = proc.OperationSide == ProcPadding.Side.Left;
             RbLeft.Checked = status;
             RbRight.Checked = !status;
@@ -542,11 +542,11 @@ namespace DataTableConverter.View
 
         private void SetUserControls(WorkProc selectedProc)
         {
-            lblOriginalNameText.Text = getProcedureName(selectedProc.ProcedureId);
+            lblOriginalNameText.Text = GetProcedureName(selectedProc.ProcedureId);
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             dgvColumns.DataSource = selectedProc.Columns;
 
-            setHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
 
         private void SetRoundControls(WorkProc selectedProc)
@@ -589,13 +589,13 @@ namespace DataTableConverter.View
             cmbUpLow.SelectedIndex = selectedProc.Option;
             dgUpLow.DataSource = null;
             dgUpLow.DataSource = selectedProc.Columns;
-            setUpLowEnabled(!selectedProc.AllColumns);
+            SetUpLowEnabled(!selectedProc.AllColumns);
             SetHeaderUpLowCase(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
 
         private void SetOrderControls(WorkProc selectedProc)
         {
-            setHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcOrder.ClassName;
 
             if (selectedProc.Columns.Columns.Count <= 1)
@@ -611,25 +611,25 @@ namespace DataTableConverter.View
 
             dgOrderColumns.Columns[1].Visible = false;
 
-            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn();
-
-
-            cmb.DataSource = OrderList;
-            cmb.HeaderText = "Sortierung";
-            cmb.DisplayMember = "key";
-            cmb.ValueMember = "value";
-            cmb.DataPropertyName = "Sortierung";
+            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
+            {
+                DataSource = OrderList,
+                HeaderText = "Sortierung",
+                DisplayMember = "key",
+                ValueMember = "value",
+                DataPropertyName = "Sortierung"
+            };
 
 
             dgOrderColumns.Columns.Add(cmb);
         }
 
-        private void setProcValues(WorkProc selectedProc)
+        private void SetProcValues(WorkProc selectedProc)
         {
             txtWorkProcName.Text = selectedProc.Name;
             txtFormula.Text = selectedProc.Formula;
-            setNewColumnText(selectedProc.NewColumn);
-            setGroupBoxVisibility(selectedProc.GetType());
+            SetNewColumnText(selectedProc.NewColumn);
+            SetGroupBoxVisibility(selectedProc.GetType());
         }
 
 
@@ -637,20 +637,20 @@ namespace DataTableConverter.View
         {
             if (gbTrim.Enabled = (lbUsedProcedures.SelectedIndex != -1))
             {
-                WorkProc selectedProc = getSelectedWorkProcedure();
-                setProcValues(selectedProc);
+                WorkProc selectedProc = GetSelectedWorkProcedure();
+                SetProcValues(selectedProc);
                 assignControls?[selectedProc.GetType()](selectedProc);
             }
             else
             {
-                setGroupBoxVisibility(typeof(ProcTrim));
+                SetGroupBoxVisibility(typeof(ProcTrim));
                 txtWorkProcName.TextChanged -= txtWorkProcName_TextChanged;
                 txtWorkProcName.Text = lblOriginalNameText.Text = string.Empty;
                 txtWorkProcName.TextChanged += txtWorkProcName_TextChanged;
             }
         }
 
-        private void setGroupBoxVisibility(Type type)
+        private void SetGroupBoxVisibility(Type type)
         {
             if (gbState != null)
             {
@@ -662,17 +662,17 @@ namespace DataTableConverter.View
             }
         }
 
-        private void setNewColumnText(string text)
+        private void SetNewColumnText(string text)
         {
             txtNewColumn.Text = txtNewColumnMerge.Text = text;
         }
 
-        private string getProcedureName(int id)
+        private string GetProcedureName(int id)
         {
-            return Procedures[getProcedureIndexThroughId(id)].Name;
+            return Procedures[GetProcedureIndexThroughId(id)].Name;
         }
 
-        private void setCmbHeader(string formula)
+        private void SetCmbHeader(string formula)
         {
             if (formula != null)
             {
@@ -693,35 +693,35 @@ namespace DataTableConverter.View
             }
         }
 
-        private void setHeaderProcedure(string[] headers)
+        private void SetHeaderProcedure(string[] headers)
         {
             clbHeaderProcedure.ItemCheck -= clbHeaderProcedure_ItemCheck;
-            setChecked(clbHeaderProcedure, headers);
+            SetChecked(clbHeaderProcedure, headers);
             clbHeaderProcedure.ItemCheck += clbHeaderProcedure_ItemCheck;
         }
 
         private void SetHeaderPadding(string[] headers)
         {
             cbHeadersPad.ItemCheck -= clbHeaderPad_ItemCheck;
-            setChecked(cbHeadersPad, headers);
+            SetChecked(cbHeadersPad, headers);
             cbHeadersPad.ItemCheck += clbHeaderPad_ItemCheck;
         }
 
         private void SetHeaderRound(string[] headers)
         {
             clbHeadersRound.ItemCheck -= clbHeadersRound_ItemCheck;
-            setChecked(clbHeadersRound, headers);
+            SetChecked(clbHeadersRound, headers);
             clbHeadersRound.ItemCheck += clbHeadersRound_ItemCheck;
         }
 
         private void SetHeaderUpLowCase(string[] headers)
         {
             clbUpLowHeader.ItemCheck -= clbUpLowHeader_ItemCheck;
-            setChecked(clbUpLowHeader, headers);
+            SetChecked(clbUpLowHeader, headers);
             clbUpLowHeader.ItemCheck += clbUpLowHeader_ItemCheck;
         }
 
-        private void setChecked(CheckedComboBox box, string[] headers)
+        private void SetChecked(CheckedComboBox box, string[] headers)
         {
             for (int i = 0; i < box.Items.Count; i++)
             {
@@ -729,14 +729,14 @@ namespace DataTableConverter.View
             }
         }
 
-        private void setHeaderOrder(string[] headers)
+        private void SetHeaderOrder(string[] headers)
         {
             clbHeaderOrder.ItemCheck -= clbHeaderOrder_ItemCheck;
-            setChecked(clbHeaderOrder, headers);
+            SetChecked(clbHeaderOrder, headers);
             clbHeaderOrder.ItemCheck += clbHeaderOrder_ItemCheck;
         }
 
-        private WorkProc getSelectedWorkProcedure()
+        private WorkProc GetSelectedWorkProcedure()
         {
             return GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex];
         }
@@ -754,7 +754,7 @@ namespace DataTableConverter.View
                 Work workflow = GetSelectedWorkflow();
                 workflow.Procedures.Add(WorkflowHelper.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
 
-                setWorkflowProcedures(workflow.Procedures);
+                SetWorkflowProcedures(workflow.Procedures);
             }
         }
 
@@ -768,7 +768,7 @@ namespace DataTableConverter.View
                 {
                     workflow.Procedures[i].Ordinal--;
                 }
-                setWorkflowProcedures(workflow.Procedures);
+                SetWorkflowProcedures(workflow.Procedures);
             }
         }
 
@@ -782,7 +782,7 @@ namespace DataTableConverter.View
                 {
                     workflow.Procedures[lbUsedProcedures.SelectedIndex - 1].Ordinal++;
                     wp.Ordinal--;
-                    sortWorkProcList(wp.Ordinal);
+                    SortWorkProcList(wp.Ordinal);
                 }
             }            
         }
@@ -797,7 +797,7 @@ namespace DataTableConverter.View
                 {
                     workflow.Procedures[lbUsedProcedures.SelectedIndex + 1].Ordinal--;
                     wp.Ordinal++;
-                    sortWorkProcList(wp.Ordinal);
+                    SortWorkProcList(wp.Ordinal);
                 }
             }
         }
@@ -830,7 +830,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private void removeColumnOfFormula(string column)
+        private void RemoveColumnOfFormula(string column)
         {
             txtFormula.Text = txtFormula.Text.Replace($" [{column}]", "");
         }
@@ -843,7 +843,7 @@ namespace DataTableConverter.View
             }
             else
             {
-                removeColumnOfFormula(cbHeaders.Items[e.Index].ToString());
+                RemoveColumnOfFormula(cbHeaders.Items[e.Index].ToString());
             }
             GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Formula = txtFormula.Text;
         }
@@ -860,7 +860,7 @@ namespace DataTableConverter.View
 
         private void cmbProcedureType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            loadProceduresWorkflow();
+            LoadProceduresWorkflow();
         }
 
         #endregion
@@ -869,9 +869,9 @@ namespace DataTableConverter.View
         #region Tolerances
 
 
-        private void loadTolerances()
+        private void LoadTolerances()
         {
-            Tolerances = ImportHelper.loadTolerances();
+            Tolerances = ImportHelper.LoadTolerances();
             bindingTolerance = new BindingList<Tolerance>(Tolerances);
             lbTolerances.DataSource = bindingTolerance;
             lbTolerances.DisplayMember = "Name";
@@ -879,14 +879,14 @@ namespace DataTableConverter.View
         }
 
 
-        private void sortToleranceList(int selectedId)
+        private void SortToleranceList(int selectedId)
         {
             Tolerances.Sort();
             bindingTolerance.ResetBindings();
-            lbTolerances.SelectedIndex = getToleranceIndexThroughId(selectedId);
+            lbTolerances.SelectedIndex = GetToleranceIndexThroughId(selectedId);
         }
 
-        private int getToleranceIndexThroughId(int selectedId)
+        private int GetToleranceIndexThroughId(int selectedId)
         {
             return Tolerances.FindIndex(tol => tol.Id == selectedId);
         }
@@ -898,7 +898,7 @@ namespace DataTableConverter.View
             DataTable table = new DataTable { TableName = "Tolerance" };
             table.Columns.Add("Bezeichnung", typeof(string));
 
-            int id = maxIdTolerance() + 1;
+            int id = MaxIdTolerance() + 1;
             Tolerance proc = new Tolerance(name + number, table, id);
             while (bindingTolerance.Contains(proc))
             {
@@ -906,11 +906,11 @@ namespace DataTableConverter.View
                 proc.Name = name + number;
             }
             bindingTolerance.Add(proc);
-            sortToleranceList(id);
+            SortToleranceList(id);
             lbTolerances_SelectedIndexChanged(null, null);
         }
 
-        private int maxIdTolerance()
+        private int MaxIdTolerance()
         {
             int max = Tolerances.Count == 0 ? 1 : Tolerances[0].Id;
             foreach (Tolerance proc in Tolerances)
@@ -945,7 +945,7 @@ namespace DataTableConverter.View
             {
                 Tolerance selectedTolerance = (Tolerance)lbTolerances.SelectedItem;
                 selectedTolerance.Name = txtToleranceName.Text;
-                sortToleranceList(selectedTolerance.Id);
+                SortToleranceList(selectedTolerance.Id);
             }
         }
 
@@ -971,7 +971,7 @@ namespace DataTableConverter.View
             table.Columns.Add("Von", typeof(int));
             table.Columns.Add("Bis", typeof(int));
 
-            int id = maxIdCase() + 1;
+            int id = MaxIdCase() + 1;
             Case proc = new Case(name + number, string.Empty, table, id);
             while (bindingCase.Contains(proc))
             {
@@ -979,15 +979,15 @@ namespace DataTableConverter.View
                 proc.Name = name + number;
             }
             bindingCase.Add(proc);
-            sortCaseList(id);
+            SortCaseList(id);
             lbCases_SelectedIndexChanged(null, null);
-            generateDuplicateProc();
-            loadProceduresWorkflow();
+            GenerateDuplicateProc();
+            LoadProceduresWorkflow();
         }
 
-        private void loadCases()
+        private void LoadCases()
         {
-            Cases = ImportHelper.loadCases();
+            Cases = ImportHelper.LoadCases();
             bindingCase = new BindingList<Case>(Cases);
             lbCases.DataSource = bindingCase;
             lbCases.DisplayMember = "Name";
@@ -995,7 +995,7 @@ namespace DataTableConverter.View
         }
 
 
-        private void sortCaseList(int selectedId)
+        private void SortCaseList(int selectedId)
         {
             Cases.Sort();
             bindingCase.ResetBindings();
@@ -1007,7 +1007,7 @@ namespace DataTableConverter.View
             return Cases.FindIndex(tol => tol.Id == selectedId);
         }
 
-        private int maxIdCase()
+        private int MaxIdCase()
         {
             int max = Cases.Count == 0 ? 1 : Cases[0].Id;
             foreach (Case proc in Cases)
@@ -1050,10 +1050,10 @@ namespace DataTableConverter.View
             {
                 Case selectedCase = (Case)lbCases.SelectedItem;
                 selectedCase.Name = txtCaseName.Text;
-                sortCaseList(selectedCase.Id);
+                SortCaseList(selectedCase.Id);
 
-                generateDuplicateProc();
-                loadProceduresWorkflow();
+                GenerateDuplicateProc();
+                LoadProceduresWorkflow();
             }
         }
 
@@ -1071,7 +1071,7 @@ namespace DataTableConverter.View
             {
                 DialogResult? result = null;
                 int id = ((Case)lbCases.SelectedItem).Id;
-                if (isProcedureUsed(id, out string usedWorkflows, typeof(ProcDuplicate)))
+                if (IsProcedureUsed(id, out string usedWorkflows, typeof(ProcDuplicate)))
                 {
                     result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Dieser Fall wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
                 }
@@ -1081,11 +1081,11 @@ namespace DataTableConverter.View
                     lbCases_SelectedIndexChanged(null, null);
                     if (result == DialogResult.Yes)
                     {
-                        deleteProcedureOfWorkflows(id, typeof(ProcDuplicate));
+                        DeleteProcedureOfWorkflows(id, typeof(ProcDuplicate));
                     }
                 }
-                generateDuplicateProc();
-                loadProceduresWorkflow();
+                GenerateDuplicateProc();
+                LoadProceduresWorkflow();
             }
         }
 
@@ -1103,7 +1103,7 @@ namespace DataTableConverter.View
             GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Name = txtWorkProcName.Text;
             bindingWorkProc[lbUsedProcedures.SelectedIndex].Name = txtWorkProcName.Text;
 
-            setWorkflowProcedures(null, bindingWorkProc);
+            SetWorkflowProcedures(null, bindingWorkProc);
             lbUsedProcedures.SelectedIndex = index;
 
             lbUsedProcedures.SelectedIndexChanged += lbUsedProcedures_SelectedIndexChanged;
@@ -1123,11 +1123,11 @@ namespace DataTableConverter.View
 
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            WorkProc selecteWorkProc = getSelectedWorkProcedure();
-            selecteWorkProc.DuplicateColumns = getDataSource(dgColumnDefDuplicate).Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
+            WorkProc selecteWorkProc = GetSelectedWorkProcedure();
+            selecteWorkProc.DuplicateColumns = GetDataSource(dgColumnDefDuplicate).Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
         }
 
-        private DataTable getDataSource(DataGridView dgv)
+        private DataTable GetDataSource(DataGridView dgv)
         {
             dgv.BindingContext[dgv.DataSource].EndCurrentEdit();
             return ((DataTable)dgv.DataSource).Copy();
@@ -1150,8 +1150,8 @@ namespace DataTableConverter.View
 
         private void clbHeaderOrder_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            WorkProc selectedProc = getSelectedWorkProcedure();
-            DataTable table = getDataSource(dgOrderColumns);
+            WorkProc selectedProc = GetSelectedWorkProcedure();
+            DataTable table = GetDataSource(dgOrderColumns);
             string value = clbHeaderOrder.Items[e.Index].ToString();
             if (e.NewValue == CheckState.Checked)
             {
@@ -1170,10 +1170,10 @@ namespace DataTableConverter.View
                 }
             }
             selectedProc.Columns = table;
-            assignDataSource(table, dgOrderColumns);
+            AssignDataSource(table, dgOrderColumns);
         }
 
-        private void assignDataSource(DataTable table, DataGridView sender)
+        private void AssignDataSource(DataTable table, DataGridView sender)
         {
             sender.DataSource = table;
         }
@@ -1204,17 +1204,17 @@ namespace DataTableConverter.View
 
         private void cmbUpLow_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ((ProcUpLowCase)getSelectedWorkProcedure()).Option = cmbUpLow.SelectedIndex;
+            ((ProcUpLowCase)GetSelectedWorkProcedure()).Option = cmbUpLow.SelectedIndex;
         }
 
         private void cbUpLow_CheckedChanged(object sender, EventArgs e)
         {
             
-            ((ProcUpLowCase)getSelectedWorkProcedure()).AllColumns = cbUpLow.Checked;
-            setUpLowEnabled(!cbUpLow.Checked);
+            ((ProcUpLowCase)GetSelectedWorkProcedure()).AllColumns = cbUpLow.Checked;
+            SetUpLowEnabled(!cbUpLow.Checked);
         }
 
-        private void setUpLowEnabled(bool status)
+        private void SetUpLowEnabled(bool status)
         {
             clbUpLowHeader.Enabled = dgUpLow.Enabled = status;
         }
@@ -1240,12 +1240,12 @@ namespace DataTableConverter.View
 
         private void numDec_ValueChanged(object sender, EventArgs e)
         {
-            ((ProcRound)getSelectedWorkProcedure()).Decimals = (int)((NumericUpDown)sender).Value;
+            ((ProcRound)GetSelectedWorkProcedure()).Decimals = (int)((NumericUpDown)sender).Value;
         }
 
         private void CmBRound_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ((ProcRound)getSelectedWorkProcedure()).Type = CmBRound.SelectedIndex;
+            ((ProcRound)GetSelectedWorkProcedure()).Type = CmBRound.SelectedIndex;
         }
 
         private void dgvMerge_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -1260,7 +1260,7 @@ namespace DataTableConverter.View
 
         private void txtNewColumnPad_TextChanged(object sender, EventArgs e)
         {
-            getSelectedWorkProcedure().NewColumn = ((TextBox)sender).Text;
+            GetSelectedWorkProcedure().NewColumn = ((TextBox)sender).Text;
         }
 
         private void cbPadNewColumn_CheckedChanged(object sender, EventArgs e)
@@ -1279,17 +1279,17 @@ namespace DataTableConverter.View
 
         private void SetPadOperationSide(ProcPadding.Side side)
         {
-            ((ProcPadding)getSelectedWorkProcedure()).OperationSide = side;
+            ((ProcPadding)GetSelectedWorkProcedure()).OperationSide = side;
         }
 
         private void TxtCharacter_TextChanged(object sender, EventArgs e)
         {
-            ((ProcPadding)getSelectedWorkProcedure()).Character = ((TextBox)sender).Text.Length > 0 ? ((TextBox)sender).Text[0] : (char?)null;
+            ((ProcPadding)GetSelectedWorkProcedure()).Character = ((TextBox)sender).Text.Length > 0 ? ((TextBox)sender).Text[0] : (char?)null;
         }
 
         private void nbPadCount_ValueChanged(object sender, EventArgs e)
         {
-            ((ProcPadding)getSelectedWorkProcedure()).Counter = (int)((NumericUpDown)sender).Value;
+            ((ProcPadding)GetSelectedWorkProcedure()).Counter = (int)((NumericUpDown)sender).Value;
         }
 
         private void cbCheckTotal_CheckedChanged(object sender, EventArgs e)

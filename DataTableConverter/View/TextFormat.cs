@@ -189,13 +189,13 @@ namespace DataTableConverter.View
             else if (rbBetween.Checked && checkBetweenText())
             {
                 ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked);
-                DataTable = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked);
+                DataTable = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked);
             }
 
             if(separator != null)
             {
                 ImportSettings = new ImportSettings(separator, getCodePage(), cbContainsHeaders.Checked);
-                DataTable = ImportHelper.openText(path, separator, getCodePage(), cbContainsHeaders.Checked);
+                DataTable = ImportHelper.OpenText(path, separator, getCodePage(), cbContainsHeaders.Checked);
             }
 
             if(DataTable != null)
@@ -208,7 +208,7 @@ namespace DataTableConverter.View
         {
             getDataGridViewItems(out List<int> values, out List<string> headers);
             ImportSettings = new ImportSettings(values, headers, getCodePage());
-            DataTable = ImportHelper.openTextFixed(data, path, values, headers);
+            DataTable = ImportHelper.OpenTextFixed(data, path, values, headers);
         }
 
         private void dgvSetting_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -216,7 +216,7 @@ namespace DataTableConverter.View
             // sync preview
             dgvSetting.BindingContext[dgvSetting.DataSource].EndCurrentEdit();
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            dgvPreview.DataSource = ImportHelper.openTextFixed(data, path, values, headers, true);
+            dgvPreview.DataSource = ImportHelper.OpenTextFixed(data, path, values, headers, true);
         }
 
         private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)
@@ -262,7 +262,7 @@ namespace DataTableConverter.View
         {
             if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
-                dgvPreview.DataSource = ImportHelper.openText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, true);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, true);
             }
         }
 
@@ -444,7 +444,7 @@ namespace DataTableConverter.View
             dgvPreview.DataSource = null;
             if (txtSeparator.ReadOnly = txtBegin.ReadOnly = txtEnd.ReadOnly = rbTab.Checked)
             {
-                dgvPreview.DataSource = ImportHelper.openText(path, "\t", getCodePage(), cbContainsHeaders.Checked, true);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, true);
             }
             
             else if ((txtBegin.ReadOnly = txtEnd.ReadOnly = rbSep.Checked))
@@ -452,7 +452,7 @@ namespace DataTableConverter.View
                 txtSeparator.ReadOnly = false;
                 if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
                 {
-                    dgvPreview.DataSource = ImportHelper.openText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, true);
+                    dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, true);
                 }
             }
             else if (txtSeparator.ReadOnly = rbBetween.Checked)
@@ -460,7 +460,7 @@ namespace DataTableConverter.View
                 txtBegin.ReadOnly = txtEnd.ReadOnly = false;
                 if (checkBetweenText())
                 {
-                    dgvPreview.DataSource = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, true);
+                    dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, true);
                 }
             }
         }
@@ -517,7 +517,7 @@ namespace DataTableConverter.View
         {
             if (checkBetweenText())
             {
-                dgvPreview.DataSource = ImportHelper.openTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, true);
+                dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, true);
             }
             else
             {
