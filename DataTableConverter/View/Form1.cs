@@ -158,6 +158,11 @@ namespace DataTableConverter
             assignDataSource(table);
         }
 
+        private void AddDataSourceAddHistory(List<CellMatrix> newEntry)
+        {
+            historyHelper.addHistory(new History { State = State.ValueChange, Table = newEntry }, getSorting());
+        }
+
         private void addDataSourceAddColumn(int columnIndex)
         {
             historyHelper.addHistory(new History { State = State.InsertColumn, ColumnIndex = columnIndex }, getSorting());
@@ -192,13 +197,6 @@ namespace DataTableConverter
             object[][] newValues = new object[1][];
             newValues[0] = columnValues;
             historyHelper.addHistory(new History { State = State.DeleteColumn, ColumnIndex = index, Column = newItem, ColumnValues = newValues }, getSorting());
-        }
-
-        private void addDataSourceDeleteRow(object[] itemArray, int rowIndex)
-        {
-            object[][] newItem = new object[1][];
-            newItem[0] = itemArray;
-            historyHelper.addHistory(new History { State = State.DeleteRow, RowIndex = rowIndex, Row = newItem }, getSorting());
         }
 
         private void addDataSourceCellChanged(string newText, int columnIndex, int rowIndex)
@@ -746,22 +744,23 @@ namespace DataTableConverter
         {
             if (e.Button == MouseButtons.Right)
             {
+                
                 selectedRow = dgTable.HitTest(e.X, e.Y).RowIndex;
                 selectedColumn = dgTable.HitTest(e.X, e.Y).ColumnIndex;
+                if(selectedColumn > -1 && selectedRow > -1 && !dgTable[selectedColumn, selectedRow].Selected)
+                {
+                    foreach(DataGridViewCell cell in dgTable.SelectedCells)
+                    {
+                        cell.Selected = false;
+                    }
+                    dgTable[selectedColumn, selectedRow].Selected = true;
+                }
                 //Header
                 if (selectedColumn >= 0 && selectedRow == -1)
                 {
                     ctxHeader.Show(dgTable, new Point(e.X, e.Y));
                 }
-                else if (selectedColumn == -1)
-                {
-                    if (selectedRow > -1 && selectedRow != dgTable.Rows.Count - 1)
-                    {
-                        ctxRow.Show(dgTable, new Point(e.X, e.Y));
-                    }
-                }
-                //body
-                else
+                else if(selectedColumn >= 0)
                 {
                     ctxBody.Show(dgTable, new Point(e.X, e.Y));
                 }
@@ -1191,13 +1190,23 @@ namespace DataTableConverter
 
         private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataRow oldRow = ((DataRowView)dgTable.Rows[selectedRow].DataBoundItem).Row;
-            int tableIndex = ((DataView)dgTable.DataSource).Table.Rows.IndexOf(oldRow);
+            int[] rows = ViewHelper.SelectedRowsOfDataGridView(dgTable);
+            List<CellMatrix> newHistoryEntry = new List<CellMatrix>();
+            DataTable table = ((DataView)dgTable.DataSource).Table;
+            foreach (int row in rows)
+            {
+                DataRow oldRow = ((DataRowView)dgTable.Rows[row].DataBoundItem).Row;
+                int tableIndex = table.Rows.IndexOf(oldRow);
 
-            object[] oldContent = oldRow.ItemArray.Clone() as object[];
-            dgTable.Rows.RemoveAt(selectedRow);
+                object[][] oldContent = new object[1][];
+                oldContent[0] = oldRow.ItemArray.Clone() as object[];
 
-            addDataSourceDeleteRow(oldContent, tableIndex);
+
+                newHistoryEntry.Add(new CellMatrix(new History { State = State.DeleteRow, Row = oldContent, RowIndex = tableIndex }));
+
+                table.Rows.RemoveAt(tableIndex);
+            }
+            AddDataSourceAddHistory(newHistoryEntry);
 
             setRowCount();
         }

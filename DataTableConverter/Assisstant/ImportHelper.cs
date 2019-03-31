@@ -29,10 +29,6 @@ namespace DataTableConverter.Assisstant
 
             try
             {
-                //File.ReadLines(path).Take(1)
-                //.SelectMany(x => x.Split(separator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
-                //.ToList()
-                //.ForEach(x => dt.Columns.Add(x.Trim()));
                 int skip = 0;
                 if (containsHeaders)
                 {
@@ -240,52 +236,6 @@ namespace DataTableConverter.Assisstant
         internal static DataTable openExcel(string path, Form1 mainform)
         {
             DataTable data = new DataTable();
-
-            #region old without password
-            //string constr = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={path};Extended Properties='Excel 12.0 XML;HDR=YES;IMEX=1';";
-            //string sheetName = null;
-            //OleDbConnection con = new OleDbConnection(constr);
-            //con.Open();
-            //DataTable dataSchema = con.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
-
-            //if (dataSchema == null)
-            //{
-            //    MessagesOK(MessageBoxIcon.Warning, "Die Datei ist leer!");
-            //}
-            //else
-            //{
-            //    Regex r = new Regex(@"^\'.*?\'$", RegexOptions.IgnoreCase);
-
-            //    string[] sheets = dataSchema.Rows.Cast<DataRow>()
-            //        .Select(row => row["TABLE_NAME"].ToString())
-            //        .Where(sheet =>sheet.EndsWith("$") || sheet.EndsWith("$'"))
-            //        .Select(sheet => {
-            //            int offset = r.Match(sheet).Success ? 1 : 0;
-            //            return sheet.Substring(offset, sheet.Length - 1 - offset * 2);
-            //        }).ToArray();
-
-            //    if (sheets.Length == 1)
-            //    {
-            //        sheetName = sheets[0];
-            //    }
-            //    else
-            //    {
-            //        ExcelSheets form = new ExcelSheets(sheets);
-            //        if (form.ShowDialog() == DialogResult.OK)
-            //        {
-            //            sheetName = form.getSheet();
-            //        }
-            //    }
-            //    if (sheetName != null)
-            //    {
-            //        OleDbCommand oconn = new OleDbCommand($"Select * From [{sheetName}$]", con);
-            //        OleDbDataAdapter sda = new OleDbDataAdapter(oconn);
-            //        sda.Fill(data);
-            //    }
-            //}
-            //con.Close();
-            #endregion
-
             
             Microsoft.Office.Interop.Excel.Application objXL = null;
             Microsoft.Office.Interop.Excel.Workbook objWB = null;
@@ -312,11 +262,6 @@ namespace DataTableConverter.Assisstant
                             {
                                 return data;
                             }
-                        }
-                        else
-                        {
-                            hasPassword = false;
-                            throw ex;
                         }
                     }
                 } while (hasPassword);

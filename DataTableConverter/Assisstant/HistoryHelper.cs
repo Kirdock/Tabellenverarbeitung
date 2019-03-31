@@ -115,7 +115,7 @@ namespace DataTableConverter.Assisstant
                         List<CellMatrix> columnChanges = oldValues.Where(matrix => matrix.bigChange.State == State.InsertColumn || matrix.bigChange.State == State.DeleteColumn).ToList();
                         List<CellMatrix> rowChanges = oldValues.Where(matrix => matrix.bigChange.State == State.InsertRow || matrix.bigChange.State == State.DeleteRow).ToList();
 
-                        if (columnChanges.Count > 1)
+                        if (columnChanges.Count > 0)
                         {
                             switch (columnChanges[0].bigChange.State)
                             {
@@ -133,7 +133,7 @@ namespace DataTableConverter.Assisstant
                                 table = takeOverHistory(table, orderBefore, matrix.bigChange);
                             }
                         }
-                        if (rowChanges.Count > 1)
+                        if (rowChanges.Count > 0)
                         {
                             switch (rowChanges[0].bigChange.State)
                             {
