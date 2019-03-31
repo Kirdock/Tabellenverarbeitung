@@ -118,6 +118,7 @@ namespace DataTableConverter
             if (table != null)
             {
                 EndEdit();
+                int rowCountBefore = table.Rows.Count;
                 if (withSort)
                 {
                     table = GetDataView().ToTable();
@@ -126,7 +127,12 @@ namespace DataTableConverter
                 {
                     table = sourceTable.Copy();
                 }
+                while(rowCountBefore < table.Rows.Count)
+                {
+                    table.Rows.RemoveAt(table.Rows.Count - 1);
+                }
             }
+            table?.AcceptChanges();
             return table;
         }
 
@@ -1480,7 +1486,6 @@ namespace DataTableConverter
 
 
                 AddDataSourceValueChange(newTable);
-                AssignDataSource(newTable);
             }
         }
 
