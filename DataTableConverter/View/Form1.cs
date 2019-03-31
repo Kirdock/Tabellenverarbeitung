@@ -88,6 +88,7 @@ namespace DataTableConverter
                 dgTable.FirstDisplayedScrollingRowIndex = scrollBarVertical;
             }
             restoreDataGridSortMode();
+            dgTable.Columns.Cast<DataGridViewColumn>().Last().AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
         }
 
 
@@ -1329,7 +1330,7 @@ namespace DataTableConverter
             {
                 string identifier = form.Identifier;
                 int identifierIndex = form.IdentifierIndex;
-                List<string> additionalColumns = form.AdditionalColumns;
+                List<PlusListboxItem> additionalColumns = form.AdditionalColumns;
 
                 new Thread(() =>
                 {
@@ -1366,9 +1367,9 @@ namespace DataTableConverter
                         if (dict.ContainsKey(newIdenfifier) && dict.TryGetValue(newIdenfifier, out DataRowArray dataRowArray))
                         {
                             List<string> values = new List<string>();
-                            foreach (string additionalColumn in additionalColumns)
+                            foreach (PlusListboxItem additionalColumn in additionalColumns)
                             {
-                                values.Add(oldRow[additionalColumn].ToString());
+                                values.Add(oldRow[additionalColumn.ToString()].ToString());
                             }
                             dataRowArray.Add(values);
                         }
@@ -1391,9 +1392,9 @@ namespace DataTableConverter
                     SetStatusLabel("Neue Spalten werden hinzugefügt");
                     for (int i = 1; i <= newColumns; i++)
                     {
-                        foreach (string additionalColumn in additionalColumns)
+                        foreach (PlusListboxItem additionalColumn in additionalColumns.Where(item => !item.Checked))
                         {
-                            DataHelper.addColumn(additionalColumn + i, table);
+                            DataHelper.addColumn(additionalColumn.ToString() + i, table);
                         }
                     }
 
@@ -1408,7 +1409,16 @@ namespace DataTableConverter
                             {
                                 for (int y = 0; y < dataRowArray.Values[i].Count; y++)
                                 {
-                                    dataRowArray.DataRow[additionalColumns[y]+i] = dataRowArray.Values[i][y];
+                                    //sum
+                                    if (additionalColumns[y].Checked)
+                                    {
+                                        dataRowArray.DataRow[additionalColumns[y].ToString()] = DataHelper.AddStringAsFloat(dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(), dataRowArray.Values[i][y]);
+                                    }
+                                    //additional Column
+                                    else
+                                    {
+                                        dataRowArray.DataRow[additionalColumns[y].ToString() + i] = dataRowArray.Values[i][y];
+                                    }
                                 }
                             }
                         }

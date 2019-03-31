@@ -84,8 +84,8 @@
     <Compile Include="Classes\HistoryStates.cs" />
     <Compile Include="Classes\ImportSettings.cs" />
     <Compile Include="Classes\NotFoundHeaders.cs" />
+    <Compile Include="Classes\PlusListboxItem.cs" />
     <Compile Include="Classes\Proc.cs" />
-    <Compile Include="Classes\TempReplaceProcedure.cs" />
     <Compile Include="Classes\Case.cs" />
     <Compile Include="Classes\Tolerance.cs" />
     <Compile Include="Classes\Work.cs" />
@@ -105,7 +105,7 @@
     <Compile Include="View\Administration.Designer.cs">
       <DependentUpon>Administration.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\CheckedComboBox.cs">
+    <Compile Include="View\CustomControls\CheckedComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="View\ClipboardForm.cs">
@@ -114,11 +114,14 @@
     <Compile Include="View\ClipboardForm.Designer.cs">
       <DependentUpon>ClipboardForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\DataGridViewDoubleBuffered.cs">
+    <Compile Include="View\CustomControls\DataGridViewDoubleBuffered.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Assisstant\ExportHelper.cs" />
     <Compile Include="Assisstant\MessageHandler.cs" />
+    <Compile Include="View\CustomControls\PlusListbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="View\ExcelSheets.cs">
       <SubType>Form</SubType>
     </Compile>

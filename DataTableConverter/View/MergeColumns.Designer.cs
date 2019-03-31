@@ -30,10 +30,10 @@
         {
             this.CmBHeaders = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.ClBHeaders = new System.Windows.Forms.CheckedListBox();
             this.btnConfirm = new System.Windows.Forms.Button();
             this.BtnCheckAll = new System.Windows.Forms.Button();
             this.BtnUncheckAll = new System.Windows.Forms.Button();
+            this.ClBHeaders = new DataTableConverter.View.CustomControls.PlusListbox();
             this.SuspendLayout();
             // 
             // CmBHeaders
@@ -53,15 +53,6 @@
             this.label1.Size = new System.Drawing.Size(114, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Identifizierende Spalte:";
-            // 
-            // ClBHeaders
-            // 
-            this.ClBHeaders.CheckOnClick = true;
-            this.ClBHeaders.FormattingEnabled = true;
-            this.ClBHeaders.Location = new System.Drawing.Point(154, 57);
-            this.ClBHeaders.Name = "ClBHeaders";
-            this.ClBHeaders.Size = new System.Drawing.Size(275, 274);
-            this.ClBHeaders.TabIndex = 2;
             // 
             // btnConfirm
             // 
@@ -93,15 +84,25 @@
             this.BtnUncheckAll.UseVisualStyleBackColor = true;
             this.BtnUncheckAll.Click += new System.EventHandler(this.BtnUncheckAll_Click);
             // 
+            // ClBHeaders
+            // 
+            this.ClBHeaders.CheckOnClick = true;
+            this.ClBHeaders.FormattingEnabled = true;
+            this.ClBHeaders.Location = new System.Drawing.Point(154, 57);
+            this.ClBHeaders.Name = "ClBHeaders";
+            this.ClBHeaders.Size = new System.Drawing.Size(275, 274);
+            this.ClBHeaders.TabIndex = 6;
+            this.ClBHeaders.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ClBHeaders_MouseDown);
+            // 
             // MergeColumns
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.ClBHeaders);
             this.Controls.Add(this.BtnUncheckAll);
             this.Controls.Add(this.BtnCheckAll);
             this.Controls.Add(this.btnConfirm);
-            this.Controls.Add(this.ClBHeaders);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.CmBHeaders);
             this.Name = "MergeColumns";
@@ -116,9 +117,9 @@
 
         private System.Windows.Forms.ComboBox CmBHeaders;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.CheckedListBox ClBHeaders;
         private System.Windows.Forms.Button btnConfirm;
         private System.Windows.Forms.Button BtnCheckAll;
         private System.Windows.Forms.Button BtnUncheckAll;
+        private CustomControls.PlusListbox ClBHeaders;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataTableConverter.Classes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,11 +15,9 @@ namespace DataTableConverter.View
     {
         internal string Identifier => CmBHeaders.SelectedItem.ToString();
         internal int IdentifierIndex => CmBHeaders.SelectedIndex;
-        internal List<string> AdditionalColumns { get
+        internal List<PlusListboxItem> AdditionalColumns { get
             {
-                List<string> items = ClBHeaders.CheckedItems.Cast<string>().ToList();
-                items.Remove(Identifier);
-                return items;
+                return ClBHeaders.CheckedItems.Cast<PlusListboxItem>().Where(item => item.ToString() != Identifier).ToList();
             }
         }
 
@@ -26,7 +25,12 @@ namespace DataTableConverter.View
         {
             InitializeComponent();
             CmBHeaders.Items.AddRange(headers);
-            ClBHeaders.Items.AddRange(headers);
+            List<PlusListboxItem> list = new List<PlusListboxItem>();
+            foreach(object header in headers)
+            {
+                list.Add(new PlusListboxItem(false, header));
+            }
+            ClBHeaders.Items.AddRange(list.ToArray());
             CmBHeaders.SelectedIndex = 0;
         }
 
@@ -55,6 +59,19 @@ namespace DataTableConverter.View
         private void BtnUncheckAll_Click(object sender, EventArgs e)
         {
             SetChecked(false);
+        }
+
+        private void ClBHeaders_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                int index = ClBHeaders.IndexFromPoint(e.Location);
+                if (index != -1)
+                {
+                    ((PlusListboxItem)ClBHeaders.Items[index]).Checked = !((PlusListboxItem)ClBHeaders.Items[index]).Checked;
+                    ClBHeaders.Refresh();
+                }
+            }
         }
     }
 }

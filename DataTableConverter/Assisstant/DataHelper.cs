@@ -215,5 +215,15 @@ namespace DataTableConverter.Assisstant
 
             return indices;
         }
+
+        internal static string AddStringAsFloat(string a, string b)
+        {
+            string result = string.Empty;
+            if(float.TryParse(a,out float fa) && float.TryParse(b,out float fb))
+            {
+                result = (fa + fb).ToString();
+            }
+            return result;
+        }
     }
 }

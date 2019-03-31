@@ -112,47 +112,15 @@ namespace DataTableConverter.Assisstant
                     oldValues = oldValues.Where(cm => cm.bigChange != null).ToList();
                     if(oldValues.Count > 0)
                     {
-                        List<CellMatrix> columnChanges = oldValues.Where(matrix => matrix.bigChange.State == State.InsertColumn || matrix.bigChange.State == State.DeleteColumn).ToList();
-                        List<CellMatrix> rowChanges = oldValues.Where(matrix => matrix.bigChange.State == State.InsertRow || matrix.bigChange.State == State.DeleteRow).ToList();
+                        List<CellMatrix> rowDelete = oldValues.Where(matrix => matrix.bigChange.State == State.DeleteRow).OrderBy(cm => cm.bigChange.RowIndex).ToList();
+                        List<CellMatrix> columnInsert = oldValues.Where(matrix => matrix.bigChange.State == State.InsertColumn).OrderByDescending(cm => cm.bigChange.ColumnIndex).ToList();
+                        List<CellMatrix> columnDelete = oldValues.Where(matrix => matrix.bigChange.State == State.DeleteColumn).OrderBy(cm => cm.bigChange.ColumnIndex).ToList();
+                        List<CellMatrix> rowInsert = oldValues.Where(matrix => matrix.bigChange.State == State.InsertRow).OrderByDescending(cm => cm.bigChange.RowIndex).ToList();
 
-                        if (columnChanges.Count > 0)
+                        foreach (CellMatrix matrix in rowDelete.Concat(columnInsert).Concat(columnDelete).Concat(rowInsert))
                         {
-                            switch (columnChanges[0].bigChange.State)
-                            {
-                                case State.InsertColumn:
-                                    oldValues = oldValues.OrderByDescending(cm => cm.bigChange.ColumnIndex).ToList();
-                                    break;
-
-                                case State.DeleteColumn:
-                                default:
-                                    oldValues = oldValues.OrderBy(cm => cm.bigChange.ColumnIndex).ToList();
-                                    break;
-                            }
-                            foreach (CellMatrix matrix in oldValues)
-                            {
-                                table = takeOverHistory(table, orderBefore, matrix.bigChange);
-                            }
+                            table = takeOverHistory(table, orderBefore, matrix.bigChange);
                         }
-                        if (rowChanges.Count > 0)
-                        {
-                            switch (rowChanges[0].bigChange.State)
-                            {
-                                case State.InsertRow:
-                                    oldValues = oldValues.OrderByDescending(cm => cm.bigChange.RowIndex).ToList();
-                                    break;
-
-                                case State.DeleteRow:
-                                default:
-                                    oldValues = oldValues.OrderBy(cm => cm.bigChange.RowIndex).ToList();
-                                    break;
-                            }
-                            foreach (CellMatrix matrix in oldValues)
-                            {
-                                table = takeOverHistory(table, orderBefore, matrix.bigChange);
-                            }
-                        }
-
-                        
                     }
                     
                     break;
