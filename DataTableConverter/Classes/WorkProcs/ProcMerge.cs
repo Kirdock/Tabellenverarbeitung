@@ -48,7 +48,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 GetHeaderOfFormula(row[(int)ConditionColumn.Format].ToString(), headers);
                 headers.Add(row[(int)ConditionColumn.Spalte].ToString());
             }
-            return WorkflowHelper.RemoveEmptyHeaders(headers.ToArray());
+            return WorkflowHelper.RemoveEmptyHeaders(headers);
         }
 
         private void GetHeaderOfFormula(string formula, HashSet<string> headers)

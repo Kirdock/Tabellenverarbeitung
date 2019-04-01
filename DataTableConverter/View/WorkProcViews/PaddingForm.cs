@@ -50,6 +50,7 @@ namespace DataTableConverter.View
                 Proc.OperationSide = RbLeft.Checked ? ProcPadding.Side.Left : ProcPadding.Side.Right;
                 Proc.Counter = (int)nbPadCount.Value;
                 Proc.NewColumn = txtNewColumnPad.Text;
+                Proc.CopyOldColumn = cbOldColumn.Checked;
                 cbHeadersPad.CheckedItems.Cast<string>().ToList().ForEach(header => Proc.Columns.Rows.Add(header));
                 DialogResult = DialogResult.OK;
             }
@@ -58,9 +59,13 @@ namespace DataTableConverter.View
         private void cbPadNewColumn_CheckedChanged(object sender, EventArgs e)
         {
             bool checkState = ((CheckBox)sender).Checked;
-            if (!checkState)
+            if (cbOldColumn.Visible = !checkState)
             {
                 txtNewColumnPad.Text = string.Empty;
+            }
+            else
+            {
+                cbOldColumn.Checked = false;
             }
             SetNewColumnVisibility(checkState);
         }

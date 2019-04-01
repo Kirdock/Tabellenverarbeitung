@@ -13,12 +13,12 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray());
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public ProcUser(int ordinal, int id,string name) : base(ordinal, id, name) { }
 
-        public ProcUser(string[] columns, string header)
+        public ProcUser(string[] columns, string header, bool copyOldColumn)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
@@ -27,6 +27,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 Columns.Rows.Add(col);
             }
             NewColumn = header;
+            CopyOldColumn = copyOldColumn;
         }
 
         public override void renameHeaders(string oldName, string newName)
@@ -47,6 +48,11 @@ namespace DataTableConverter.Classes.WorkProcs
             sortingOrder = string.Empty;
             bool intoNewCol = false;
             DataTable replaces = procedure.Replace;
+            if (CopyOldColumn)
+            {
+                //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
+                DataHelper.CopyColumns(columns, table);
+            }
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
                 DataHelper.AddColumn(NewColumn, table);

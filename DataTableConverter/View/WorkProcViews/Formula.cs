@@ -15,6 +15,7 @@ namespace DataTableConverter.View
     public partial class Formula : Form
     {
         private FormulaState Type;
+        internal bool OldColumn => cbOldColumn.Checked;
 
         internal Formula(FormulaState type, object[] headers)
         {
@@ -55,12 +56,13 @@ namespace DataTableConverter.View
             //Bei Funktion: Keine Formel
             //Bei Export: Nur Spaltenauswahl
             txtFormula.Visible = lblFormula.Visible = cbNewColumn.Checked = Type == FormulaState.Merge;
-            cbNewColumn.Visible = Type == FormulaState.Procedure;
+            cbNewColumn.Visible = cbOldColumn.Visible = Type == FormulaState.Procedure;
 
             if (btnUncheckAll.Visible = btnCheckAll.Visible = Type != FormulaState.Merge)
             {
                 int height = 40;
                 adjustControlHeight(cbNewColumn, height);
+                adjustControlHeight(cbOldColumn, height);
                 adjustControlHeight(lblHeader, height);
                 adjustControlHeight(txtHeader, height);
                 adjustControlHeight(btnConfirm, height);
@@ -136,9 +138,14 @@ namespace DataTableConverter.View
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
             setNewColumnVisibility();
+            cbOldColumn.Visible = cbNewColumn.Checked && Type == FormulaState.Procedure;
             if (!cbNewColumn.Checked)
             {
                 txtHeader.Text = string.Empty;
+            }
+            else
+            {
+                cbOldColumn.Checked = false;
             }
         }
 

@@ -2,6 +2,7 @@
 using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.View;
+using DataTableConverter.View.WorkProcViews;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -260,15 +261,11 @@ namespace DataTableConverter
 
         private void case_Click(object sender, EventArgs e, Case cas, string[] caseColumnsWorkflow, DataTable originalTable)
         {
-            List<WorkProc> procs = new List<WorkProc>();
             ProcDuplicate procDuplicate = new ProcDuplicate(0, cas.Id, cas.Name)
             {
                 DuplicateColumns = cas.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray()
             };
-            procs.Add(procDuplicate);
-
-            Work workflow = new Work(string.Empty, procs, 0);
-            workflow_Click(null, null, workflow);
+            StartSingleWorkflow(procDuplicate);
         }
 
         private void workflow_Click(object sender, EventArgs e, Work workflow)
@@ -281,11 +278,15 @@ namespace DataTableConverter
             foreach (WorkProc wp in workflow.Procedures)
             {
                 List<string> notFoundColumns = new List<string>();
-                
-                WorkflowHelper.CheckHeaders(headers, notFoundColumns, wp.GetHeaders());
+                string[] wpHeaders = wp.GetHeaders();
+                WorkflowHelper.CheckHeaders(headers, notFoundColumns, wpHeaders);
                 if (!string.IsNullOrWhiteSpace(wp.NewColumn))
                 {
                     headers.Add(wp.NewColumn);
+                }
+                else if (wp.CopyOldColumn)
+                {
+                    headers.AddRange(wpHeaders.Select(header => header + DataHelper.OldAffix));
                 }
 
                 if(notFoundColumns.Count > 0)
@@ -661,18 +662,17 @@ namespace DataTableConverter
             return index != -1 ? cases[index] : null;
         }
 
-        private void procedureClosed(object sender, FormClosedEventArgs e, Proc procedure)
+        private void procedureClosed(object s, FormClosedEventArgs e, Proc procedure)
         {
-            if (((Formula)sender).DialogResult == DialogResult.OK)
+            Formula sender = (Formula)s;
+            if (sender.DialogResult == DialogResult.OK)
             {
-                string[] columns = ((Formula)sender).getSelectedHeaders();
+                string[] columns = sender.getSelectedHeaders();
                 
                 if (columns.Length > 0)
                 {
-                    ProcUser user = new ProcUser(columns, ((Formula)sender).getHeaderName());
-
+                    ProcUser user = new ProcUser(columns, sender.getHeaderName(),sender.OldColumn);
                     DataTable newTable = GetDataSource();
-                    
                     
                     new Thread(() =>
                     {
@@ -810,7 +810,7 @@ namespace DataTableConverter
             Merge formula = new Merge(DataHelper.HeadersOfDataTable(GetDataSource()), contextGlobal);
             if (formula.ShowDialog() == DialogResult.OK)
             {
-                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc>() { formula.Proc }, 0));
+                StartSingleWorkflow(formula.Proc);
             }
 
         }
@@ -1286,12 +1286,7 @@ namespace DataTableConverter
         {
             UpLowCaseForm form = new UpLowCaseForm(DataHelper.HeadersOfDataTable(GetDataSource()));
             if (form.ShowDialog() == DialogResult.OK) {
-                List<WorkProc> list = new List<WorkProc>
-                {
-                    new ProcUpLowCase(form.getColumns(), form.allColumns(), form.getOption())
-                };
-                Work workflow = new Work(string.Empty, list, 0);
-                workflow_Click(null, null, workflow);
+                StartSingleWorkflow(form.Procedure);
             }
         }
 
@@ -1300,7 +1295,7 @@ namespace DataTableConverter
             RoundForm form = new RoundForm(DataHelper.HeadersOfDataTable(GetDataSource()));
             if(form.ShowDialog() == DialogResult.OK)
             {
-                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { new ProcRound(form.GetSelectedHeaders(), form.GetDecimals(), form.NewColumn(), form.Type) }, 0));
+                StartSingleWorkflow(form.Procedure);
             }
         }
 
@@ -1468,7 +1463,7 @@ namespace DataTableConverter
             PaddingForm form = new PaddingForm(DataHelper.HeadersOfDataTable(GetDataSource()));
             if(form.ShowDialog() == DialogResult.OK)
             {
-                workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { form.Proc }, 0));
+                StartSingleWorkflow(form.Proc);
             }
         }
 
@@ -1486,6 +1481,29 @@ namespace DataTableConverter
 
 
                 AddDataSourceValueChange(newTable);
+            }
+        }
+
+        private void nummerierenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NumerationForm form = new NumerationForm(DataHelper.HeadersOfDataTable(sourceTable));
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                StartSingleWorkflow(form.Procedure);
+            }
+        }
+
+        private void StartSingleWorkflow(WorkProc proc)
+        {
+            workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { proc }, 0));
+        }
+
+        private void substringToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SubstringForm form = new SubstringForm(DataHelper.HeadersOfDataTable(sourceTable));
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                StartSingleWorkflow(form.Procedure);
             }
         }
 

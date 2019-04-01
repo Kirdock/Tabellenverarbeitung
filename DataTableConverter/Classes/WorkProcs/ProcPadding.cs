@@ -40,12 +40,12 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             HashSet<string> headers = new HashSet<string>(GetAffectedHeaders());
             Conditions.Rows.Cast<DataRow>().Select(row => row[(int)ConditionColumn.Spalte].ToString()).ToList().ForEach(header => headers.Add(header));
-            return WorkflowHelper.RemoveEmptyHeaders(headers.ToArray());
+            return WorkflowHelper.RemoveEmptyHeaders(headers);
         }
 
-        private string[] GetAffectedHeaders()
+        internal string[] GetAffectedHeaders()
         {
-            return Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null).ToArray();
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
@@ -54,10 +54,17 @@ namespace DataTableConverter.Classes.WorkProcs
             string[] columns = GetAffectedHeaders();
             sortingOrder = string.Empty;
             bool intoNewCol = false;
+            
 
             if (!Character.HasValue)
             {
                 return;
+            }
+
+            if (CopyOldColumn)
+            {
+                //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
+                DataHelper.CopyColumns(columns, table);
             }
 
             if (!string.IsNullOrWhiteSpace(NewColumn))

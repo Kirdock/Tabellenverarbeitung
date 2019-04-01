@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataTableConverter.Classes.WorkProcs;
+using System;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
 {
     public partial class RoundForm : Form
     {
-        internal int Type { get { return CmBRound.SelectedIndex; } }
+        internal ProcRound Procedure;
 
         internal RoundForm(object[] headers)
         {
@@ -25,11 +19,6 @@ namespace DataTableConverter.View
         internal string[] GetSelectedHeaders()
         {
             return ViewHelper.GetSelectedHeaders(cbHeaders);
-        }
-
-        internal int GetDecimals()
-        {
-            return (int)numDec.Value;
         }
 
         private void btnCheckAll_Click(object sender, EventArgs e)
@@ -45,9 +34,13 @@ namespace DataTableConverter.View
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
             SetNewColumnVisibility();
-            if (!txtHeader.Visible)
+            if (cbOldColumn.Visible = !txtHeader.Visible)
             {
                 txtHeader.Text = string.Empty;
+            }
+            else
+            {
+                cbOldColumn.Checked = false;
             }
         }
 
@@ -56,9 +49,10 @@ namespace DataTableConverter.View
             lblHeader.Visible = txtHeader.Visible = cbNewColumn.Checked;
         }
 
-        internal string NewColumn()
+        private void btnConfirm_Click(object sender, EventArgs e)
         {
-            return txtHeader.Text;
+            Procedure = new ProcRound(GetSelectedHeaders(), (int)numDec.Value, txtHeader.Text, CmBRound.SelectedIndex, cbOldColumn.Checked);
+            DialogResult = DialogResult.OK;
         }
     }
 }

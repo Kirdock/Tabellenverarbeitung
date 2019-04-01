@@ -43,6 +43,7 @@
             this.label21 = new System.Windows.Forms.Label();
             this.txtNewColumnPad = new System.Windows.Forms.TextBox();
             this.BtnConfirm = new System.Windows.Forms.Button();
+            this.cbOldColumn = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nbPadCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPadConditions)).BeginInit();
             this.SuspendLayout();
@@ -213,11 +214,22 @@
             this.BtnConfirm.UseVisualStyleBackColor = true;
             this.BtnConfirm.Click += new System.EventHandler(this.BtnConfirm_Click);
             // 
+            // cbOldColumn
+            // 
+            this.cbOldColumn.AutoSize = true;
+            this.cbOldColumn.Location = new System.Drawing.Point(13, 92);
+            this.cbOldColumn.Name = "cbOldColumn";
+            this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbOldColumn.TabIndex = 37;
+            this.cbOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbOldColumn.UseVisualStyleBackColor = true;
+            // 
             // PaddingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(410, 484);
+            this.Controls.Add(this.cbOldColumn);
             this.Controls.Add(this.BtnConfirm);
             this.Controls.Add(this.RbRight);
             this.Controls.Add(this.RbLeft);
@@ -260,5 +272,6 @@
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.TextBox txtNewColumnPad;
         private System.Windows.Forms.Button BtnConfirm;
+        private System.Windows.Forms.CheckBox cbOldColumn;
     }
 }

@@ -63,6 +63,8 @@
             this.pgbLoading = new System.Windows.Forms.ProgressBar();
             this.ctxBody = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.spalteHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zeilenLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zeilenHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxHeader = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.spalteUmbenennenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spalteLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,9 +80,9 @@
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.zeilenLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.zeilenHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nummerierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.substringToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -257,10 +259,12 @@
             // funktionenToolStripMenuItem
             // 
             this.funktionenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.trimToolStripMenuItem,
-            this.zeilenZusammenfügenToolStripMenuItem1,
             this.großKleinschreibungToolStripMenuItem,
+            this.nummerierenToolStripMenuItem,
             this.rundenToolStripMenuItem,
+            this.zeilenZusammenfügenToolStripMenuItem1,
+            this.substringToolStripMenuItem,
+            this.trimToolStripMenuItem,
             this.zeichenAuffüllenToolStripMenuItem});
             this.funktionenToolStripMenuItem.Name = "funktionenToolStripMenuItem";
             this.funktionenToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
@@ -357,6 +361,20 @@
             this.spalteHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.spalteHinzufügenToolStripMenuItem.Text = "Spalte hinzufügen";
             this.spalteHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.spalteHinzufügenToolStripMenuItem_Click);
+            // 
+            // zeilenLöschenToolStripMenuItem
+            // 
+            this.zeilenLöschenToolStripMenuItem.Name = "zeilenLöschenToolStripMenuItem";
+            this.zeilenLöschenToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.zeilenLöschenToolStripMenuItem.Text = "Zeilen löschen";
+            this.zeilenLöschenToolStripMenuItem.Click += new System.EventHandler(this.zeileLöschenToolStripMenuItem_Click);
+            // 
+            // zeilenHinzufügenToolStripMenuItem
+            // 
+            this.zeilenHinzufügenToolStripMenuItem.Name = "zeilenHinzufügenToolStripMenuItem";
+            this.zeilenHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.zeilenHinzufügenToolStripMenuItem.Text = "Zeile hinzufügen";
+            this.zeilenHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.zeileEinfügenToolStripMenuItem_Click);
             // 
             // ctxHeader
             // 
@@ -469,19 +487,12 @@
             this.clipboardItem.Size = new System.Drawing.Size(209, 22);
             this.clipboardItem.Text = "Zwischenablage einfügen";
             // 
-            // zeilenLöschenToolStripMenuItem
+            // nummerierenToolStripMenuItem
             // 
-            this.zeilenLöschenToolStripMenuItem.Name = "zeilenLöschenToolStripMenuItem";
-            this.zeilenLöschenToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
-            this.zeilenLöschenToolStripMenuItem.Text = "Zeilen löschen";
-            this.zeilenLöschenToolStripMenuItem.Click += new System.EventHandler(this.zeileLöschenToolStripMenuItem_Click);
-            // 
-            // zeilenHinzufügenToolStripMenuItem
-            // 
-            this.zeilenHinzufügenToolStripMenuItem.Name = "zeilenHinzufügenToolStripMenuItem";
-            this.zeilenHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
-            this.zeilenHinzufügenToolStripMenuItem.Text = "Zeile hinzufügen";
-            this.zeilenHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.zeileEinfügenToolStripMenuItem_Click);
+            this.nummerierenToolStripMenuItem.Name = "nummerierenToolStripMenuItem";
+            this.nummerierenToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.nummerierenToolStripMenuItem.Text = "Nummerieren";
+            this.nummerierenToolStripMenuItem.Click += new System.EventHandler(this.nummerierenToolStripMenuItem_Click);
             // 
             // dgTable
             // 
@@ -503,6 +514,13 @@
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
+            // 
+            // substringToolStripMenuItem
+            // 
+            this.substringToolStripMenuItem.Name = "substringToolStripMenuItem";
+            this.substringToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.substringToolStripMenuItem.Text = "Substring";
+            this.substringToolStripMenuItem.Click += new System.EventHandler(this.substringToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -585,6 +603,8 @@
         private System.Windows.Forms.ToolStripMenuItem textErsetzenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem zeilenLöschenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem zeilenHinzufügenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nummerierenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem substringToolStripMenuItem;
     }
 }
 

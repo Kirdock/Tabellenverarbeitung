@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataTableConverter.Classes.WorkProcs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,6 +13,7 @@ namespace DataTableConverter.View
 {
     public partial class UpLowCaseForm : Form
     {
+        internal ProcUpLowCase Procedure;
         internal UpLowCaseForm(object[] header)
         {
             InitializeComponent();
@@ -19,15 +21,6 @@ namespace DataTableConverter.View
             clbHeaders.Items.AddRange(header);
         }
 
-        internal string[] getColumns()
-        {
-            return clbHeaders.CheckedItems.Cast<string>().ToArray();
-        }
-
-        internal int getOption()
-        {
-            return cmbOption.SelectedIndex;
-        }
 
         internal bool allColumns()
         {
@@ -38,6 +31,7 @@ namespace DataTableConverter.View
         {
             if(clbHeaders.CheckedItems.Count > 0 || allColumns())
             {
+                Procedure = new ProcUpLowCase(clbHeaders.CheckedItems.Cast<string>().ToArray(), allColumns(), cmbOption.SelectedIndex);
                 DialogResult = DialogResult.OK;
             }
         }

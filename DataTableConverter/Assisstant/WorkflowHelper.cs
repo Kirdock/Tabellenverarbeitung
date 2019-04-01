@@ -74,7 +74,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static string[] RemoveEmptyHeaders(string[] headers)
+        internal static string[] RemoveEmptyHeaders(IEnumerable<string> headers)
         {
             return headers.Where(header => !string.IsNullOrWhiteSpace(header)).ToArray();
         }
@@ -106,6 +106,14 @@ namespace DataTableConverter.Assisstant
 
                         case 6:
                             newProc = new ProcPadding(ordinal, id, name);
+                            break;
+
+                        case 7:
+                            newProc = new ProcNumber(ordinal, id, name);
+                            break;
+
+                        case 8:
+                            newProc = new ProcSubstring(ordinal, id, name);
                             break;
 
                         case 1:

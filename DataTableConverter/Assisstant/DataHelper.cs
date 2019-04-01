@@ -12,6 +12,7 @@ namespace DataTableConverter.Assisstant
     {
         internal static readonly string FileName = "Dateiname";
         internal static readonly string TempSort = "[TEMP_SORT]";
+        internal static readonly string OldAffix = " Alt";
         internal static object[] HeadersOfDataTable(DataTable table)
         {
             return table != null ? table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray() : new object[0];
@@ -28,6 +29,23 @@ namespace DataTableConverter.Assisstant
             return columnValues;
         }
 
+        internal static void CopyColumns(string[] columns, DataTable table)
+        {
+            string[] oldColumns = new string[columns.Length];
+            for (int i = 0; i < columns.Length; i++)
+            {
+                string oldName = AddColumn(columns[i] + OldAffix, table);
+                oldColumns[i] = oldName;
+            }
+            foreach (DataRow row in table.Rows)
+            {
+                for (int i = 0; i < columns.Length; i++)
+                {
+                    row[oldColumns[i]] = row[columns[i]];
+                }
+            }
+        }
+
         internal static void RemoveNull(DataTable table)
         {
             foreach(DataRow row in table.Rows)
@@ -42,18 +60,21 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void AddColumn(string headerName, DataTable data, int counter = 0)
+        internal static string AddColumn(string headerName, DataTable data, int counter = 0)
         {
+            string result;
             string name = counter == 0 ? headerName : headerName + counter;
             if (data.Columns.Contains(name))
             {
                 counter++;
-                AddColumn(headerName, data, counter);
+                result = AddColumn(headerName, data, counter);
             }
             else
             {
+                result = name;
                 data.Columns.Add(name);
             }
+            return result;
         }
 
         internal static DataTable DictionaryToDataTable(Dictionary<string, int> dict, string columnName)
@@ -218,12 +239,9 @@ namespace DataTableConverter.Assisstant
 
         internal static string AddStringAsFloat(string a, string b)
         {
-            string result = string.Empty;
-            if(float.TryParse(a,out float fa) && float.TryParse(b,out float fb))
-            {
-                result = (fa + fb).ToString();
-            }
-            return result;
+            float.TryParse(a, out float fa);
+            float.TryParse(b, out float fb);
+            return (fa + fb).ToString();
         }
     }
 }

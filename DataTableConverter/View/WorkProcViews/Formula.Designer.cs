@@ -38,6 +38,7 @@
             this.btnUncheckAll = new System.Windows.Forms.Button();
             this.btnConfirm = new System.Windows.Forms.Button();
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
+            this.cbOldColumn = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // txtFormula
@@ -139,11 +140,22 @@
             this.cbHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeaders_ItemCheck);
             this.cbHeaders.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtFormula_KeyDown);
             // 
+            // cbOldColumn
+            // 
+            this.cbOldColumn.AutoSize = true;
+            this.cbOldColumn.Location = new System.Drawing.Point(27, 156);
+            this.cbOldColumn.Name = "cbOldColumn";
+            this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbOldColumn.TabIndex = 13;
+            this.cbOldColumn.Text = "Alte Werte in ALT schreiben?";
+            this.cbOldColumn.UseVisualStyleBackColor = true;
+            // 
             // Formula
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(408, 220);
+            this.Controls.Add(this.cbOldColumn);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.btnUncheckAll);
             this.Controls.Add(this.btnCheckAll);
@@ -176,5 +188,6 @@
         private System.Windows.Forms.Button btnCheckAll;
         private System.Windows.Forms.Button btnUncheckAll;
         private System.Windows.Forms.Button btnConfirm;
+        private System.Windows.Forms.CheckBox cbOldColumn;
     }
 }

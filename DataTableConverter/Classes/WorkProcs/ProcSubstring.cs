@@ -9,31 +9,33 @@ using System.Threading.Tasks;
 namespace DataTableConverter.Classes.WorkProcs
 {
     [Serializable()]
-    class ProcRound : WorkProc
+    class ProcSubstring : WorkProc
     {
-        internal static readonly string ClassName = "Runden";
-        internal int Decimals;
-        internal int Type;
+        internal static readonly string ClassName = "Substring";
+        internal int Start;
+        internal int End;
 
-        public override string[] GetHeaders()
-        {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+        public ProcSubstring(int ordinal, int id, string name) : base(ordinal, id, name) {
+            Start = 1;
         }
 
-        public ProcRound(int ordinal, int id, string name) : base(ordinal, id, name) { }
-
-        public ProcRound(string[] columns, int decimals, string newColumn, int type, bool copyOldColumn)
+        public ProcSubstring(string[] columns, string header, bool copyOldColumn, int start, int end)
         {
-            Decimals = decimals;
-            NewColumn = newColumn;
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
-            Type = type;
             foreach (string col in columns)
             {
                 Columns.Rows.Add(col);
             }
+            NewColumn = header;
             CopyOldColumn = copyOldColumn;
+            Start = start;
+            End = end;
+        }
+
+        public override string[] GetHeaders()
+        {
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public override void renameHeaders(string oldName, string newName)
@@ -69,57 +71,24 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 for (int i = 0; i < row.ItemArray.Length; i++)
                 {
-
-                    if (columns == null || headerIndices.Contains(i))
+                    if (headerIndices.Contains(i))
                     {
                         int index = intoNewCol ? lastCol : i;
-                        if (float.TryParse(row.ItemArray[i].ToString(), out float result))
+                        string value = row[i].ToString();
+                        if (End == 0)
                         {
-                            row.SetField(index, Round(result));
+                            row[index] = Start > value.Length ? string.Empty : value.Substring(Start-1);
                         }
+                        else
+                        {
+                            int length = (End - Start);
+                            row[index] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start-1) : value.Substring(Start-1, length + 1);
+                        }
+
                     }
                 }
             }
         }
 
-        private string Round(float number)
-        {
-            string result;
-            switch (Type)
-            {
-                //normal round
-                case 0:
-                    {
-                        result = Math.Round(number, Decimals, MidpointRounding.AwayFromZero).ToString();
-                    }
-                    break;
-
-                //ceiling
-                case 1:
-                    {
-                        result = RoundUp(number).ToString();
-                    }
-                    break;
-                //floor
-                default:
-                    {
-                        result = RoundDown(number).ToString();
-                    }
-                    break;
-            }
-            return result;
-        }
-
-        private double RoundUp(float input)
-        {
-            double multiplier = Math.Pow(10, Convert.ToDouble(Decimals));
-            return Math.Ceiling(input * multiplier) / multiplier;
-        }
-
-        private double RoundDown(float input)
-        {
-            double multiplier = Math.Pow(10, Convert.ToDouble(Decimals));
-            return Math.Floor(input * multiplier) / multiplier;
-        }
     }
 }

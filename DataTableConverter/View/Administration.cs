@@ -94,6 +94,7 @@ namespace DataTableConverter.View
             viewHelper.AddContextMenuToDataGridView(dgvMerge, true);
             viewHelper.AddContextMenuToDataGridView(dgvPadColumns, true);
             viewHelper.AddContextMenuToDataGridView(dgvPadConditions, true);
+            viewHelper.AddContextMenuToDataGridView(dgvSubstringColumns, true);
         }
 
         private void SetOrderList()
@@ -113,6 +114,7 @@ namespace DataTableConverter.View
             clbHeadersRound.Items.AddRange(headers);
             clbUpLowHeader.Items.AddRange(headers);
             cbHeadersPad.Items.AddRange(headers);
+            cbSubstringHeaders.Items.AddRange(headers);
         }
 
         private void AssignGroupBoxToEnum()
@@ -125,7 +127,9 @@ namespace DataTableConverter.View
                 { gbOrder, typeof(ProcOrder) },
                 { gbUpLowCase, typeof(ProcUpLowCase) },
                 { gbRound, typeof(ProcRound) },
-                { gbPadding, typeof(ProcPadding) }
+                { gbPadding, typeof(ProcPadding) },
+                { gbNumber, typeof(ProcNumber) },
+                { gbSubstring, typeof(ProcSubstring) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -136,8 +140,27 @@ namespace DataTableConverter.View
                 { typeof(ProcUpLowCase), SetUpLowCaseControls },
                 { typeof(ProcRound), SetRoundControls },
                 { typeof(ProcTrim), SetTrimControls },
-                { typeof(ProcPadding), SetPaddingControls }
+                { typeof(ProcPadding), SetPaddingControls },
+                { typeof(ProcNumber), SetNumberControls },
+                { typeof(ProcSubstring), SetSubstringControls }
             };
+        }
+
+        private void GenerateProceduresForWorkflow()
+        {
+            SystemProc = new List<Proc>
+            {
+                new Proc(ProcTrim.ClassName, null, 1),
+                new Proc(ProcMerge.ClassName, null, 2),
+                new Proc(ProcOrder.ClassName, null, 3),
+                new Proc(ProcUpLowCase.ClassName, null, 4),
+                new Proc(ProcRound.ClassName, null, 5),
+                new Proc(ProcPadding.ClassName, null, 6),
+                new Proc(ProcNumber.ClassName, null, 7),
+                new Proc(ProcSubstring.ClassName, null, 8)
+            };
+            SystemProc.Sort();
+            GenerateDuplicateProc();
         }
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
@@ -351,21 +374,6 @@ namespace DataTableConverter.View
             }
         }
 
-        private void GenerateProceduresForWorkflow()
-        {
-            SystemProc = new List<Proc>
-            {
-                new Proc(ProcTrim.ClassName, null, 1),
-                new Proc(ProcMerge.ClassName, null, 2),
-                new Proc(ProcOrder.ClassName, null, 3),
-                new Proc(ProcUpLowCase.ClassName, null, 4),
-                new Proc(ProcRound.ClassName, null, 5),
-                new Proc(ProcPadding.ClassName, null, 6)
-            };
-
-            GenerateDuplicateProc();
-        }
-
         private void GenerateDuplicateProc()
         {
             DuplicateProc = new List<Proc>();
@@ -527,12 +535,36 @@ namespace DataTableConverter.View
             txtNewColumnPad.Text = proc.NewColumn;
             dgvPadColumns.DataSource = proc.Columns;
             dgvPadConditions.DataSource = proc.Conditions;
-            SetHeaderProcedure(proc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
             bool status = proc.OperationSide == ProcPadding.Side.Left;
             RbLeft.Checked = status;
             RbRight.Checked = !status;
             TxtCharacter.Text = proc.Character?.ToString() ?? string.Empty;
             cbPadNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
+            cbPadOldColumn.Checked = proc.CopyOldColumn;
+            SetHeaderPadding(proc.GetAffectedHeaders());
+        }
+
+        private void SetSubstringControls(WorkProc selectedProc)
+        {
+            ProcSubstring proc = selectedProc as ProcSubstring;
+            SetHeaderSubstring(selectedProc.GetHeaders());
+            lblOriginalNameText.Text = ProcSubstring.ClassName;
+            cbSubstringNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
+            txtSubstringNewColumn.Text = proc.NewColumn;
+            nbSubstringStart.Value = proc.Start;
+            nbSubstringEnd.Value = proc.End;
+            cbSubstringOldColumn.Checked = proc.CopyOldColumn;
+            dgvSubstringColumns.DataSource = proc.Columns;
+        }
+
+        private void SetNumberControls(WorkProc selectedProc)
+        {
+            ProcNumber proc = selectedProc as ProcNumber;
+            lblOriginalNameText.Text = ProcNumber.ClassName;
+            txtNumberNewColumn.Text = proc.NewColumn;
+            nbNumberStart.Value = proc.Start;
+            nbNumberEnd.Value = proc.End;
+            cbNumberRepeat.Checked = proc.Repeat;
         }
 
         private void SetTrimControls(WorkProc selectedProc)
@@ -707,6 +739,13 @@ namespace DataTableConverter.View
             cbHeadersPad.ItemCheck += clbHeaderPad_ItemCheck;
         }
 
+        private void SetHeaderSubstring(string[] headers)
+        {
+            cbSubstringHeaders.ItemCheck -= cbSubstringHeaders_ItemCheck;
+            SetChecked(cbSubstringHeaders, headers);
+            cbSubstringHeaders.ItemCheck += cbSubstringHeaders_ItemCheck;
+        }
+
         private void SetHeaderRound(string[] headers)
         {
             clbHeadersRound.ItemCheck -= clbHeadersRound_ItemCheck;
@@ -804,11 +843,7 @@ namespace DataTableConverter.View
 
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
-            lblNewColumn.Visible = txtNewColumn.Visible = cbNewColumn.Checked;
-            if (!cbNewColumn.Checked)
-            {
-                txtNewColumn.Text = string.Empty;
-            }
+            NewColumnChanged(cbNewColumn, cbOldColumn, lblNewColumn, txtNewColumn);
         }
 
         private void txtNewColumn_TextChanged(object sender, EventArgs e)
@@ -1231,10 +1266,19 @@ namespace DataTableConverter.View
 
         private void cbNewColumnRound_CheckedChanged(object sender, EventArgs e)
         {
-            lblNewColumnRound.Visible = txtNewColumnRound.Visible = cbNewColumnRound.Checked;
-            if (!cbNewColumnRound.Checked)
+            NewColumnChanged(cbNewColumnRound, cbOldColumnRound, lblNewColumnRound, txtNewColumnRound);
+        }
+
+        private void NewColumnChanged(CheckBox newColumn, CheckBox oldColumn, Label newColumnLabel, TextBox newColumnTextbox)
+        {
+            newColumnLabel.Visible = newColumnTextbox.Visible = newColumn.Checked;
+            if (oldColumn.Visible = !newColumn.Checked)
             {
-                txtNewColumnRound.Text = string.Empty;
+                newColumnTextbox.Text = string.Empty;
+            }
+            else
+            {
+                oldColumn.Checked = false;
             }
         }
 
@@ -1265,11 +1309,7 @@ namespace DataTableConverter.View
 
         private void cbPadNewColumn_CheckedChanged(object sender, EventArgs e)
         {
-            lblPadNewColumn.Visible = txtNewColumnPad.Visible = ((CheckBox)sender).Checked;
-            if (!((CheckBox)sender).Checked)
-            {
-                txtNewColumnPad.Text = string.Empty;
-            }
+            NewColumnChanged(cbPadNewColumn, cbPadOldColumn, lblPadNewColumn, txtNewColumnPad);
         }
 
         private void RbLeft_CheckedChanged(object sender, EventArgs e)
@@ -1348,6 +1388,74 @@ namespace DataTableConverter.View
             ViewHelper.SetLock(e, Cases, (ListBox)sender, delegate { lbCases_SelectedIndexChanged(null, null); });
         }
 
+        private void cbPadOldColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            ((ProcPadding)GetSelectedWorkProcedure()).CopyOldColumn = cbPadOldColumn.Checked;
+        }
 
+        private void cbOldColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            ((ProcUser)GetSelectedWorkProcedure()).CopyOldColumn = cbOldColumn.Checked;
+        }
+
+        private void cbOldColumnRound_CheckedChanged(object sender, EventArgs e)
+        {
+            ((ProcRound)GetSelectedWorkProcedure()).CopyOldColumn = cbOldColumnRound.Checked;
+        }
+
+        private void txtNumberNewColumn_TextChanged(object sender, EventArgs e)
+        {
+            GetSelectedWorkProcedure().NewColumn = txtNumberNewColumn.Text;
+        }
+
+        private void nbNumberStart_ValueChanged(object sender, EventArgs e)
+        {
+            ((ProcNumber)GetSelectedWorkProcedure()).Start = (int)nbNumberStart.Value;
+        }
+
+        private void nbNumberEnd_ValueChanged(object sender, EventArgs e)
+        {
+            ((ProcNumber)GetSelectedWorkProcedure()).End = (int)nbNumberEnd.Value;
+        }
+
+        private void cbNumberRepeat_CheckedChanged(object sender, EventArgs e)
+        {
+            ((ProcNumber)GetSelectedWorkProcedure()).Repeat = cbNumberRepeat.Checked;
+        }
+
+        private void cbSubstringHeaders_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvSubstringColumns, e, (CheckedListBox)sender);
+        }
+
+        private void ndSubstringStart_ValueChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSubstring).Start = (int)nbSubstringStart.Value;
+        }
+
+        private void dgvSubstringColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            ((DataGridView)sender).BindingContext[((DataGridView)sender).DataSource].EndCurrentEdit();
+        }
+
+        private void txtSubstringNewColumn_TextChanged(object sender, EventArgs e)
+        {
+            GetSelectedWorkProcedure().NewColumn = txtSubstringNewColumn.Text;
+        }
+
+        private void nbSubstringEnd_ValueChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSubstring).End = (int)nbSubstringEnd.Value;
+        }
+
+        private void cbSubstringOldColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            GetSelectedWorkProcedure().CopyOldColumn = cbSubstringOldColumn.Checked;
+        }
+
+        private void cbSubstringNewColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            NewColumnChanged(cbSubstringNewColumn, cbSubstringOldColumn, lblSubstringNewColumn, txtSubstringNewColumn);
+        }
     }
 }

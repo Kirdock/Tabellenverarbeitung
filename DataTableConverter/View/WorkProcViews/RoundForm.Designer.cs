@@ -40,6 +40,7 @@
             this.txtHeader = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.CmBRound = new System.Windows.Forms.ComboBox();
+            this.cbOldColumn = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numDec)).BeginInit();
             this.SuspendLayout();
             // 
@@ -61,13 +62,13 @@
             // 
             // btnConfirm
             // 
-            this.btnConfirm.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnConfirm.Location = new System.Drawing.Point(107, 205);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(150, 23);
             this.btnConfirm.TabIndex = 2;
             this.btnConfirm.Text = "Übernehmen";
             this.btnConfirm.UseVisualStyleBackColor = true;
+            this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
             // 
             // btnUncheckAll
             // 
@@ -160,11 +161,22 @@
             this.CmBRound.Size = new System.Drawing.Size(166, 21);
             this.CmBRound.TabIndex = 22;
             // 
+            // cbOldColumn
+            // 
+            this.cbOldColumn.AutoSize = true;
+            this.cbOldColumn.Location = new System.Drawing.Point(15, 169);
+            this.cbOldColumn.Name = "cbOldColumn";
+            this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbOldColumn.TabIndex = 23;
+            this.cbOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbOldColumn.UseVisualStyleBackColor = true;
+            // 
             // RoundForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(376, 245);
+            this.Controls.Add(this.cbOldColumn);
             this.Controls.Add(this.CmBRound);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnUncheckAll);
@@ -200,5 +212,6 @@
         private System.Windows.Forms.TextBox txtHeader;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox CmBRound;
+        private System.Windows.Forms.CheckBox cbOldColumn;
     }
 }

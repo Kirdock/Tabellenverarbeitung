@@ -90,9 +90,11 @@
     <Compile Include="Classes\Work.cs" />
     <Compile Include="Classes\WorkProc.cs" />
     <Compile Include="Assisstant\ViewHelper.cs" />
+    <Compile Include="Classes\WorkProcs\ProcNumber.cs" />
     <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
     <Compile Include="Classes\WorkProcs\ProcPadding.cs" />
     <Compile Include="Classes\WorkProcs\ProcRound.cs" />
+    <Compile Include="Classes\WorkProcs\ProcSubstring.cs" />
     <Compile Include="Classes\WorkProcs\ProcTrim.cs" />
     <Compile Include="Classes\WorkProcs\ProcMerge.cs" />
     <Compile Include="Classes\WorkProcs\ProcDuplicate.cs" />
@@ -147,16 +149,16 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="View\Merge.cs">
+    <Compile Include="View\WorkProcViews\Merge.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\Merge.Designer.cs">
+    <Compile Include="View\WorkProcViews\Merge.Designer.cs">
       <DependentUpon>Merge.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\Formula.cs">
+    <Compile Include="View\WorkProcViews\Formula.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\Formula.Designer.cs">
+    <Compile Include="View\WorkProcViews\Formula.Designer.cs">
       <DependentUpon>Formula.cs</DependentUpon>
     </Compile>
     <Compile Include="View\MergeColumns.cs">
@@ -171,16 +173,22 @@
     <Compile Include="View\MergeTable.Designer.cs">
       <DependentUpon>MergeTable.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\PaddingForm.cs">
+    <Compile Include="View\WorkProcViews\NumerationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\PaddingForm.Designer.cs">
+    <Compile Include="View\WorkProcViews\NumerationForm.Designer.cs">
+      <DependentUpon>NumerationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\WorkProcViews\PaddingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\PaddingForm.Designer.cs">
       <DependentUpon>PaddingForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\RoundForm.cs">
+    <Compile Include="View\WorkProcViews\RoundForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\RoundForm.Designer.cs">
+    <Compile Include="View\WorkProcViews\RoundForm.Designer.cs">
       <DependentUpon>RoundForm.cs</DependentUpon>
     </Compile>
     <Compile Include="View\SelectDuplicateColumns.cs">
@@ -195,10 +203,10 @@
     <Compile Include="View\SettingForm.Designer.cs">
       <DependentUpon>SettingForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\SortForm.cs">
+    <Compile Include="View\WorkProcViews\SortForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\SortForm.Designer.cs">
+    <Compile Include="View\WorkProcViews\SortForm.Designer.cs">
       <DependentUpon>SortForm.cs</DependentUpon>
     </Compile>
     <Compile Include="View\SplitForm.cs">
@@ -213,10 +221,16 @@
     <Compile Include="View\TextFormat.Designer.cs">
       <DependentUpon>TextFormat.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\UpLowCaseForm.cs">
+    <Compile Include="View\WorkProcViews\SubstringForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\UpLowCaseForm.Designer.cs">
+    <Compile Include="View\WorkProcViews\SubstringForm.Designer.cs">
+      <DependentUpon>SubstringForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\WorkProcViews\UpLowCaseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\UpLowCaseForm.Designer.cs">
       <DependentUpon>UpLowCaseForm.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="View\Administration.resx">
@@ -246,10 +260,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="View\Merge.resx">
+    <EmbeddedResource Include="View\WorkProcViews\Merge.resx">
       <DependentUpon>Merge.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\Formula.resx">
+    <EmbeddedResource Include="View\WorkProcViews\Formula.resx">
       <DependentUpon>Formula.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\MergeColumns.resx">
@@ -258,16 +272,19 @@
     <EmbeddedResource Include="View\MergeTable.resx">
       <DependentUpon>MergeTable.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\PaddingForm.resx">
+    <EmbeddedResource Include="View\WorkProcViews\NumerationForm.resx">
+      <DependentUpon>NumerationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\PaddingForm.resx">
       <DependentUpon>PaddingForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\RoundForm.resx">
+    <EmbeddedResource Include="View\WorkProcViews\RoundForm.resx">
       <DependentUpon>RoundForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\SelectDuplicateColumns.resx">
       <DependentUpon>SelectDuplicateColumns.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\SortForm.resx">
+    <EmbeddedResource Include="View\WorkProcViews\SortForm.resx">
       <DependentUpon>SortForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\SplitForm.resx">
@@ -276,7 +293,10 @@
     <EmbeddedResource Include="View\TextFormat.resx">
       <DependentUpon>TextFormat.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\UpLowCaseForm.resx">
+    <EmbeddedResource Include="View\WorkProcViews\SubstringForm.resx">
+      <DependentUpon>SubstringForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\UpLowCaseForm.resx">
       <DependentUpon>UpLowCaseForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
@@ -334,5 +354,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
