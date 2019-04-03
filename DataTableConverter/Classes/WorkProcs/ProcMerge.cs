@@ -104,39 +104,47 @@ namespace DataTableConverter.Classes.WorkProcs
             HashSet<string> headers = new HashSet<string>();
             GetHeaderOfFormula(formula, headers);
             string[] columns = headers.ToArray();
-            string format = string.Empty;
-            int counter = columns.Length - 1;
-            bool skipWhenEmpty = false;
-            for (int i = formula.Length - 1; i >= 0; i--)
+            StringBuilder format = new StringBuilder();
+            int counter = 0;
+            bool isStart = true;
+            StringBuilder stringBetween = new StringBuilder();
+            bool emptyBefore = true;
+            for (int i = 0; i < formula.Length; i++)
             {
-                
                 char c = formula[i];
 
-                if (c != ']')
+                if (c != '[')
                 {
-                    if (skipWhenEmpty)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        format = c + format;
-                    }
+                    stringBetween.Append(c);
                 }
-                else
+                else //insert column value
                 {
                     string header = columns[counter];
-                    skipWhenEmpty = string.IsNullOrWhiteSpace(row[header]?.ToString());
+                    string value = row[header]?.ToString();
+                    bool skipWhenEmpty = string.IsNullOrWhiteSpace(value);
+                    
+                    if (isStart)
+                    {
+                        isStart = false;
+                        format.Append(stringBetween);
+                        stringBetween.Clear();
+                    }
+                    
                     if (!skipWhenEmpty)
                     {
-                        format = row[header] + format;
+                        if (!emptyBefore)
+                        {
+                            format.Append(stringBetween);
+                        }
+                        format.Append(value);
                     }
-
-                    i -= (header.Length + 1);
-                    counter--;
+                    stringBetween.Clear();
+                    i += (header.Length + 1);
+                    counter++;
+                    emptyBefore &= skipWhenEmpty;
                 }
             }
-            return format;
+            return stringBetween.Length != 0 ? format.Append(stringBetween).ToString() : format.ToString();
         }
 
     }
