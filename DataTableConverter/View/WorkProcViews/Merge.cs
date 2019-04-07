@@ -17,7 +17,7 @@ namespace DataTableConverter.View
     {
         internal string Formula { get { return txtFormula.Text; } }
         internal ProcMerge Proc;
-        internal ViewHelper ViewHelper;
+        internal ViewHelper UIHelper;
 
         internal Merge(object[] headers, ContextMenuStrip ctxRow)
         {
@@ -25,8 +25,8 @@ namespace DataTableConverter.View
             cbHeaders.Items.AddRange(headers);
             Proc = new ProcMerge();
             InitDataGridView(headers);
-            ViewHelper = new ViewHelper(ctxRow, null, null);
-            ViewHelper.AddContextMenuToDataGridView(dgvMerge, false);
+            UIHelper = new ViewHelper(ctxRow, null, null);
+            UIHelper.AddContextMenuToDataGridView(dgvMerge, false);
         }
 
         private void InitDataGridView(object[] headers)
@@ -97,6 +97,11 @@ namespace DataTableConverter.View
         private void btnConfirm_Click(object sender, EventArgs e)
         {
             CloseForm();
+        }
+
+        private void Merge_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            UIHelper.Clear();
         }
     }
 }

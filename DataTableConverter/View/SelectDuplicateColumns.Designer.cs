@@ -48,7 +48,6 @@
             this.dgDuplicate.RowHeadersVisible = false;
             this.dgDuplicate.Size = new System.Drawing.Size(408, 426);
             this.dgDuplicate.TabIndex = 0;
-            this.dgDuplicate.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgDuplicate_MouseDown);
             // 
             // btnConfirm
             // 

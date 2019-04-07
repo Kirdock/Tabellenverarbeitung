@@ -1,5 +1,6 @@
 ﻿using CheckComboBoxTest;
 using DataTableConverter.Classes;
+using DataTableConverter.Classes.WorkProcs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,31 +15,52 @@ namespace DataTableConverter.View
 {
     public partial class ReplaceWholeForm : Form
     {
-        internal string ReplaceText => txtText.Text;
-        internal string[] SelectedHeaders => ViewHelper.GetSelectedHeaders(cbHeaders);
+        internal DataTable Table;
+        private ViewHelper UIHelper;
+        private int ComboBoxIndex;
 
-        internal ReplaceWholeForm(object[] headers)
+        internal ReplaceWholeForm(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
-            cbHeaders.Items.AddRange(headers);
+            InitDataTable(headers);
+            UIHelper = new ViewHelper(ctxRow, null, null);
+            UIHelper.AddContextMenuToDataGridView(dgTable, false);
+            ViewHelper.AdjustComboBoxGridView(dgTable, ComboBoxIndex, headers);
         }
 
-        private void txtFormula_KeyDown(object sender, KeyEventArgs e)
+        private void InitDataTable(object[] headers)
         {
-            if(e.KeyCode == Keys.Enter)
+            Table = new DataTable();
+            ProcReplaceWhole.SetColumns(Table);
+
+            dgTable.DataSource = Table;
+
+            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
             {
-                CloseForm();
-            }
+                DataSource = headers,
+                DataPropertyName = Table.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].ColumnName,
+                HeaderText = Table.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].ColumnName + " "
+            };
+            dgTable.Columns.Add(cmb);
+            dgTable.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].Visible = false;
+            ComboBoxIndex = cmb.DisplayIndex = 0;
+            
         }
 
         private void CloseForm()
         {
+            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
             DialogResult = DialogResult.OK;
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
             CloseForm();
+        }
+
+        private void ReplaceWholeForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            UIHelper.Clear();
         }
     }
 }

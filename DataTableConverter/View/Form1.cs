@@ -1517,10 +1517,10 @@ namespace DataTableConverter
 
         private void textErsetzenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            ReplaceWholeForm form = new ReplaceWholeForm(DataHelper.HeadersOfDataTable(sourceTable));
+            ReplaceWholeForm form = new ReplaceWholeForm(DataHelper.HeadersOfDataTable(sourceTable), contextGlobal);
             if(form.ShowDialog() == DialogResult.OK)
             {
-                ProcReplaceWhole proc = new ProcReplaceWhole(form.SelectedHeaders, form.ReplaceText);
+                ProcReplaceWhole proc = new ProcReplaceWhole(form.Table);
                 StartSingleWorkflow(proc);
             }
         }

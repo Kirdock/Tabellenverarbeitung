@@ -32,7 +32,7 @@ namespace DataTableConverter.View
         internal List<Tolerance> Tolerances { get; set; }
         internal List<Case> Cases { get; set; }
         private Proc selectedProc;
-        private ViewHelper viewHelper;
+        private ViewHelper ViewHelper;
         private Dictionary<Type, Action<WorkProc>> assignControls;
 
         internal Administration(object[] headers, ContextMenuStrip ctxRow)
@@ -51,7 +51,7 @@ namespace DataTableConverter.View
             LoadCases();
             LoadWorkflows();
 
-            viewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
+            ViewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
             
             ltbProcedures_SelectedIndexChanged(null, null);
             GenerateProceduresForWorkflow();
@@ -108,17 +108,35 @@ namespace DataTableConverter.View
 
         private void AddContextMenu()
         {
-            viewHelper.AddContextMenuToDataGridView(dgTolerance, true);
-            viewHelper.AddContextMenuToDataGridView(dgCaseColumns, true);
-            viewHelper.AddContextMenuToDataGridView(dgvColumns, true);
-            viewHelper.AddContextMenuToDataGridView(dgvReplaces, true);
-            viewHelper.AddContextMenuToDataGridView(dgvRound, true);
-            viewHelper.AddContextMenuToDataGridView(dgUpLow, true);
-            viewHelper.AddContextMenuToDataGridView(dgOrderColumns, false);
-            viewHelper.AddContextMenuToDataGridView(dgvMerge, true);
-            viewHelper.AddContextMenuToDataGridView(dgvPadColumns, true);
-            viewHelper.AddContextMenuToDataGridView(dgvPadConditions, true);
-            viewHelper.AddContextMenuToDataGridView(dgvSubstringColumns, true);
+            DataGridView[] dataGridViewsClipboard = new DataGridView[]
+            {
+                dgTolerance,
+                dgCaseColumns,
+                dgvColumns,
+                dgvReplaces,
+                dgvRound,
+                dgUpLow,
+                dgvMerge,
+                dgvPadColumns,
+                dgvPadConditions,
+                dgvSubstringColumns,
+                dgvReplaceWhole
+            };
+
+            DataGridView[] dataGridViews = new DataGridView[]
+            {
+                dgOrderColumns
+            };
+
+            foreach (DataGridView dataGridView in dataGridViewsClipboard)
+            {
+                ViewHelper.AddContextMenuToDataGridView(dataGridView, true);
+            }
+            
+            foreach(DataGridView dataGridView in dataGridViews)
+            {
+                ViewHelper.AddContextMenuToDataGridView(dataGridView, false);
+            }
         }
 
         private void SetOrderList()
@@ -132,13 +150,20 @@ namespace DataTableConverter.View
 
         private void SetHeaders(object[] headers)
         {
-            cbHeaders.Items.AddRange(headers);
-            clbHeaderProcedure.Items.AddRange(headers);
-            clbHeaderOrder.Items.AddRange(headers);
-            clbHeadersRound.Items.AddRange(headers);
-            clbUpLowHeader.Items.AddRange(headers);
-            cbHeadersPad.Items.AddRange(headers);
-            cbSubstringHeaders.Items.AddRange(headers);
+            CheckedComboBox[] checkedComboBoxes = new CheckedComboBox[]
+            {
+                cbHeaders,
+                clbHeaderOrder,
+                clbHeaderProcedure,
+                clbHeadersRound,
+                clbUpLowHeader,
+                cbSubstringHeaders,
+                cbHeadersReplaceWhole
+            };
+            foreach(CheckedComboBox checkedComboBox in checkedComboBoxes)
+            {
+                checkedComboBox.Items.AddRange(headers);
+            }
         }
 
         private void AssignGroupBoxToEnum()
@@ -153,7 +178,8 @@ namespace DataTableConverter.View
                 { gbRound, typeof(ProcRound) },
                 { gbPadding, typeof(ProcPadding) },
                 { gbNumber, typeof(ProcNumber) },
-                { gbSubstring, typeof(ProcSubstring) }
+                { gbSubstring, typeof(ProcSubstring) },
+                { gbReplaceWhole, typeof(ProcReplaceWhole) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -166,7 +192,8 @@ namespace DataTableConverter.View
                 { typeof(ProcTrim), SetTrimControls },
                 { typeof(ProcPadding), SetPaddingControls },
                 { typeof(ProcNumber), SetNumberControls },
-                { typeof(ProcSubstring), SetSubstringControls }
+                { typeof(ProcSubstring), SetSubstringControls },
+                { typeof(ProcReplaceWhole), SetReplaceWholeControls }
             };
         }
 
@@ -181,7 +208,8 @@ namespace DataTableConverter.View
                 new Proc(ProcRound.ClassName, null, 5),
                 new Proc(ProcPadding.ClassName, null, 6),
                 new Proc(ProcNumber.ClassName, null, 7),
-                new Proc(ProcSubstring.ClassName, null, 8)
+                new Proc(ProcSubstring.ClassName, null, 8),
+                new Proc(ProcReplaceWhole.ClassName, null, 9)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -189,7 +217,7 @@ namespace DataTableConverter.View
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
         {
-            viewHelper.Clear();
+            ViewHelper.Clear();
             SaveSplitterDistance();
             
             if (ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
@@ -586,6 +614,15 @@ namespace DataTableConverter.View
             dgvSubstringColumns.DataSource = proc.Columns;
         }
 
+        private void SetReplaceWholeControls(WorkProc selectedProc)
+        {
+            ProcReplaceWhole proc = selectedProc as ProcReplaceWhole;
+            SetHeaderReplaceWhole(selectedProc.GetHeaders());
+            lblOriginalNameText.Text = ProcReplaceWhole.ClassName;
+            dgvReplaceWhole.DataSource = proc.Columns;
+
+        }
+
         private void SetNumberControls(WorkProc selectedProc)
         {
             ProcNumber proc = selectedProc as ProcNumber;
@@ -779,6 +816,11 @@ namespace DataTableConverter.View
         private void SetHeaderSubstring(string[] headers)
         {
             SetChecked(cbSubstringHeaders, headers, cbSubstringHeaders_ItemCheck);
+        }
+
+        private void SetHeaderReplaceWhole(string[] headers)
+        {
+            SetChecked(cbHeadersReplaceWhole, headers, cbHeadersReplaceWhole_ItemCheck);
         }
 
         private void SetHeaderRound(string[] headers)
@@ -1102,9 +1144,9 @@ namespace DataTableConverter.View
                 txtShortcut.Text = selectedCase.Shortcut;
                 txtShortcutTotal.Text = selectedCase.ShortcutTotal;
                 dgCaseColumns.DataSource = selectedCase.Columns;
-                if (viewHelper != null)
+                if (ViewHelper != null)
                 {
-                    viewHelper.SelectedCase = selectedCase.Id;
+                    ViewHelper.SelectedCase = selectedCase.Id;
                 }
                 SetCaseLock();
             }
@@ -1323,12 +1365,7 @@ namespace DataTableConverter.View
             ((ProcRound)GetSelectedWorkProcedure()).Type = CmBRound.SelectedIndex;
         }
 
-        private void dgvMerge_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            dgvMerge.BindingContext[dgvMerge.DataSource].EndCurrentEdit();
-        }
-
-        private void dgvPadColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             ((DataGridView)sender).BindingContext[((DataGridView)sender).DataSource].EndCurrentEdit();
         }
@@ -1381,7 +1418,10 @@ namespace DataTableConverter.View
 
         private void lbWorkflows_DrawItem(object sender, DrawItemEventArgs e)
         {
-            ViewHelper.DrawLock((ListBox)sender, e, Workflows[e.Index].Locked);
+            if (e.Index < Workflows.Count)
+            {
+                ViewHelper.DrawLock((ListBox)sender, e, Workflows[e.Index].Locked);
+            }
         }
 
         private void lbWorkflows_MouseDown(object sender, MouseEventArgs e)
@@ -1391,7 +1431,10 @@ namespace DataTableConverter.View
 
         private void ltbProcedures_DrawItem(object sender, DrawItemEventArgs e)
         {
-            ViewHelper.DrawLock((ListBox)sender, e, Procedures[e.Index].Locked);
+            if (e.Index < Procedures.Count)
+            {
+                ViewHelper.DrawLock((ListBox)sender, e, Procedures[e.Index].Locked);
+            }
         }
 
         private void ltbProcedures_MouseDown(object sender, MouseEventArgs e)
@@ -1401,7 +1444,10 @@ namespace DataTableConverter.View
 
         private void lbTolerances_DrawItem(object sender, DrawItemEventArgs e)
         {
-            ViewHelper.DrawLock((ListBox)sender, e, Tolerances[e.Index].Locked);
+            if (e.Index < Tolerances.Count)
+            {
+                ViewHelper.DrawLock((ListBox)sender, e, Tolerances[e.Index].Locked);
+            }
         }
 
         private void lbTolerances_MouseDown(object sender, MouseEventArgs e)
@@ -1411,7 +1457,10 @@ namespace DataTableConverter.View
 
         private void lbCases_DrawItem(object sender, DrawItemEventArgs e)
         {
-            ViewHelper.DrawLock((ListBox)sender, e, Cases[e.Index].Locked);
+            if (e.Index < Cases.Count)
+            {
+                ViewHelper.DrawLock((ListBox)sender, e, Cases[e.Index].Locked);
+            }
         }
 
         private void lbCases_MouseDown(object sender, MouseEventArgs e)
@@ -1472,11 +1521,6 @@ namespace DataTableConverter.View
             }
         }
 
-        private void dgvSubstringColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            ((DataGridView)sender).BindingContext[((DataGridView)sender).DataSource].EndCurrentEdit();
-        }
-
         private void txtSubstringNewColumn_TextChanged(object sender, EventArgs e)
         {
             GetSelectedWorkProcedure().NewColumn = txtSubstringNewColumn.Text;
@@ -1507,18 +1551,23 @@ namespace DataTableConverter.View
 
         private void GroupBox_EnabledChanged(object s, EventArgs e)
         {
-            ViewHelper.SetGroupBoxColor(s as GroupBox);
+            ViewHelper.SetControlColor(s as GroupBox);
         }
 
         private void SplitContainer_EnabledChanged(object sender, EventArgs e)
         {
-            ViewHelper.SetGroupBoxColor(splitWorkflowProperties.Panel1);
-            ViewHelper.SetGroupBoxColor(splitWorkflowProperties.Panel2);
+            ViewHelper.SetControlColor(splitWorkflowProperties.Panel1);
+            ViewHelper.SetControlColor(splitWorkflowProperties.Panel2);
         }
 
         private void SplitterPanel_EnabledChanged(object sender, EventArgs e)
         {
-            ViewHelper.SetGroupBoxColor(sender as SplitterPanel);
+            ViewHelper.SetControlColor(sender as SplitterPanel);
+        }
+
+        private void cbHeadersReplaceWhole_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvReplaceWhole, e, sender as CheckedListBox);
         }
     }
 }

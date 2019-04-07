@@ -13,10 +13,12 @@ namespace DataTableConverter.View
     public partial class SelectDuplicateColumns : Form
     {
         internal DataTable Table { get; set; }
+        private int ComboBoxIndex;
         internal SelectDuplicateColumns(string[] caseHeaders, object[] headers)
         {
             InitializeComponent();
             setDataGridView(caseHeaders, headers);
+            ViewHelper.AdjustComboBoxGridView(dgDuplicate, ComboBoxIndex, headers);
         }
 
         private void setDataGridView(string[] caseHeaders, object[] headers)
@@ -33,7 +35,7 @@ namespace DataTableConverter.View
                 DataPropertyName = "Zuweisung",
                 HeaderText = "Zuweisung "
             };
-
+            ComboBoxIndex = dgDuplicate.Columns.Count;
             dgDuplicate.Columns.Add(cmb);
 
             foreach (string header in caseHeaders)
@@ -74,28 +76,6 @@ namespace DataTableConverter.View
             dgDuplicate.BindingContext[dgDuplicate.DataSource].EndCurrentEdit();
             Table = ((DataTable)dgDuplicate.DataSource).Copy();
 
-        }
-
-        private void dgDuplicate_MouseDown(object sender, MouseEventArgs e)
-        {
-            DataGridView.HitTestInfo info = dgDuplicate.HitTest(e.X, e.Y);
-
-            if (info.Type == DataGridViewHitTestType.Cell)
-            {
-                switch (info.ColumnIndex)
-                {
-                    // Add and remove case statements as necessary depending on
-                    // which columns have ComboBoxes in them.
-
-                    case 1: // Column index 1
-                    case 2: // Column index 3
-                        dgDuplicate.CurrentCell =
-                            dgDuplicate.Rows[info.RowIndex].Cells[info.ColumnIndex];
-                        break;
-                    default:
-                        break;
-                }
-            }
         }
     }
 }

@@ -11,18 +11,32 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     class ProcReplaceWhole : WorkProc
     {
-        internal string ReplaceText;
         internal static readonly string ClassName = "Text ersetzen";
+        internal enum ColumnIndex : int { Column = 0, Value = 1};
 
-        public ProcReplaceWhole(string[] columns, string replaceText)
+        public ProcReplaceWhole(int ordinal, int id, string name) : base(ordinal, id, name) {
+            InitColumns();
+        }
+
+        public ProcReplaceWhole(DataTable table)
+        {
+            InitColumns();
+            foreach (DataRow row in table.Rows)
+            {
+                Columns.Rows.Add(new object[] { row[(int)ColumnIndex.Column].ToString(), row[(int)ColumnIndex.Value].ToString() });
+            }
+        }
+
+        private void InitColumns()
         {
             Columns = new DataTable { TableName = "Columnnames" };
-            Columns.Columns.Add("Spalten", typeof(string));
-            foreach (string col in columns)
-            {
-                Columns.Rows.Add(col);
-            }
-            ReplaceText = replaceText;
+            SetColumns(Columns);
+        }
+
+        internal static void SetColumns(DataTable table)
+        {
+            table.Columns.Add("Spalten", typeof(string));
+            table.Columns.Add("Text", typeof(string));
         }
 
 
@@ -35,24 +49,21 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             foreach (DataRow row in Columns.Rows)
             {
-                if (row.ItemArray[0].ToString() == oldName)
+                if (row.ItemArray[(int)ColumnIndex.Column].ToString() == oldName)
                 {
-                    row.SetField(0, newName);
+                    row.SetField((int) ColumnIndex.Column, newName);
                 }
             }
         }
 
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
         {
-            string[] columns = GetHeaders();
             sortingOrder = string.Empty;
-
-            List<int> headerIndices = DataHelper.HeaderIndices(table, columns);
             foreach (DataRow row in table.Rows)
             {
-                foreach (int i in headerIndices)
+                foreach(DataRow replaceRow in DataHelper.DataTableWithoutEmpty(Columns, (int)ColumnIndex.Column))
                 {
-                    row[i] = ReplaceText;
+                    row[replaceRow[(int)ColumnIndex.Column].ToString()] = replaceRow[(int)ColumnIndex.Value].ToString();
                 }
             }
         }

@@ -78,6 +78,11 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
+        internal static IEnumerable<DataRow> DataTableWithoutEmpty(DataTable table, int column)
+        {
+            return table.Rows.Cast<DataRow>().Where(dr => dr.ItemArray.Length > 0 && !string.IsNullOrWhiteSpace(dr.ItemArray[column]?.ToString()));
+        }
+
         internal static DataTable DictionaryToDataTable(Dictionary<string, int> dict, string columnName)
         {
             DataTable result = new DataTable();

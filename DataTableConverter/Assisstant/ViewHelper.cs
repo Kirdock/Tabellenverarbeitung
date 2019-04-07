@@ -20,6 +20,37 @@ namespace DataTableConverter
         private ToolStripItem ClipboardItem, DeleteRowItem, InsertRowItem;
         private Action<object, EventArgs> MyFunction;
         private List<Work> Workflows;
+
+        internal static void AdjustComboBoxGridView(DataGridView dataGridView, int comboBoxIndex, object[] headers)
+        {
+            dataGridView.EditMode = DataGridViewEditMode.EditOnEnter;
+            dataGridView.CellFormatting += (sender, e) => dataGridView_CellFormatting(sender, e, comboBoxIndex, headers);
+            dataGridView.EditingControlShowing += dataGridView_EditingControlShowing;
+        }
+        private static void dataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
+        {
+            if (e.ColumnIndex == comboBoxIndex && e.Value?.ToString() == string.Empty)
+            {
+                e.Value = headers[0];
+            }
+        }
+
+
+        private static void dataGridView_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (e.Control is ComboBox)
+            {
+                ComboBox ctl = e.Control as ComboBox;
+                ctl.Enter -= new EventHandler(ctl_Enter);
+                ctl.Enter += new EventHandler(ctl_Enter);
+            }
+        }
+
+        private static void ctl_Enter(object sender, EventArgs e)
+        {
+            (sender as ComboBox).DroppedDown = true;
+        }
+
         internal int SelectedCase { get; set; }
         private static readonly string LockIcon = "\uD83D\uDD12";
 
@@ -372,9 +403,9 @@ namespace DataTableConverter
             return view.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.RowIndex).Where(row => row != view.Rows.Count - 1).Distinct().OrderByDescending(index => index).ToArray();
         }
 
-        internal static void SetGroupBoxColor(Control groupBox)
+        internal static void SetControlColor(Control control)
         {
-            groupBox.BackColor = groupBox.Enabled ? Color.White : Properties.Settings.Default.Locked;
+            control.BackColor = control.Enabled ? Color.White : Properties.Settings.Default.Locked;
         }
     }
 }
