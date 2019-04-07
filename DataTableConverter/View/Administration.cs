@@ -38,6 +38,7 @@ namespace DataTableConverter.View
         internal Administration(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
+            AssignGroupBoxToEnum();
             SetHeaders(headers);
             SetOrderList();
             
@@ -51,7 +52,7 @@ namespace DataTableConverter.View
             LoadWorkflows();
 
             viewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
-            AssignGroupBoxToEnum();
+            
             ltbProcedures_SelectedIndexChanged(null, null);
             GenerateProceduresForWorkflow();
             LoadProceduresWorkflow(false);
@@ -478,7 +479,12 @@ namespace DataTableConverter.View
 
         private void SetWorkflowLock(Work workflow = null)
         {
-            splitWorkflowProcProperties.Enabled = btnDeleteWorkflow.Enabled = !(workflow ?? GetSelectedWorkflow()).Locked;
+            bool enabled = splitWorkflowProcProperties.Enabled = btnDeleteWorkflow.Enabled = !(workflow ?? GetSelectedWorkflow()).Locked;
+            foreach(GroupBox groupBox in gbState.Keys)
+            {
+                groupBox.Enabled = enabled;
+            }
+            gbTrim.Enabled = enabled;
         }
 
         private void SetProcedureLock(Proc procedure = null)
@@ -488,12 +494,12 @@ namespace DataTableConverter.View
 
         private void SetToleranceLock(Tolerance procedure = null)
         {
-            dgTolerance.Enabled = txtToleranceName.Enabled = btnDeleteTolerance.Enabled = !(procedure ?? Tolerances[lbTolerances.SelectedIndex]).Locked;
+            splitTolerances.Panel2.Enabled = btnDeleteTolerance.Enabled = !(procedure ?? Tolerances[lbTolerances.SelectedIndex]).Locked;
         }
 
         private void SetCaseLock(Case procedure = null)
         {
-            txtCaseName.Enabled = gbCaseShortcuts.Enabled = gbCaseColumns.Enabled = btnDeleteCase.Enabled = !(procedure ?? Cases[lbCases.SelectedIndex]).Locked;
+            splitCases.Panel2.Enabled = gbCaseShortcuts.Enabled = gbCaseColumns.Enabled = btnDeleteCase.Enabled = !(procedure ?? Cases[lbCases.SelectedIndex]).Locked;
         }
 
         private void SetWorkflowProcedures(List<WorkProc> proc, BindingList<WorkProc> newList = null)
@@ -1497,6 +1503,22 @@ namespace DataTableConverter.View
         private void cbSubstringNewColumn_CheckedChanged(object sender, EventArgs e)
         {
             NewColumnChanged(cbSubstringNewColumn, cbSubstringOldColumn, lblSubstringNewColumn, txtSubstringNewColumn);
+        }
+
+        private void GroupBox_EnabledChanged(object s, EventArgs e)
+        {
+            ViewHelper.SetGroupBoxColor(s as GroupBox);
+        }
+
+        private void SplitContainer_EnabledChanged(object sender, EventArgs e)
+        {
+            ViewHelper.SetGroupBoxColor(splitWorkflowProperties.Panel1);
+            ViewHelper.SetGroupBoxColor(splitWorkflowProperties.Panel2);
+        }
+
+        private void SplitterPanel_EnabledChanged(object sender, EventArgs e)
+        {
+            ViewHelper.SetGroupBoxColor(sender as SplitterPanel);
         }
     }
 }

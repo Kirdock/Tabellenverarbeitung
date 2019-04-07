@@ -288,7 +288,7 @@ namespace DataTableConverter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Red")]
+        [global::System.Configuration.DefaultSettingValueAttribute("255, 128, 128")]
         public global::System.Drawing.Color Locked {
             get {
                 return ((global::System.Drawing.Color)(this["Locked"]));
@@ -331,6 +331,18 @@ namespace DataTableConverter.Properties {
             }
             set {
                 this["PVMAddressText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("X")]
+        public string FailAddressValue {
+            get {
+                return ((string)(this["FailAddressValue"]));
+            }
+            set {
+                this["FailAddressValue"] = value;
             }
         }
     }

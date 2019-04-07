@@ -25,6 +25,7 @@ namespace DataTableConverter.View
             txtFailAddress.Text = Properties.Settings.Default.FailAddressText;
             txtRightAddress.Text = Properties.Settings.Default.RightAddressText;
             txtPVM.Text = Properties.Settings.Default.PVMAddressText;
+            txtFailAddressValue.Text = Properties.Settings.Default.FailAddressValue;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -36,6 +37,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.FailAddressText = txtFailAddress.Text;
                 Properties.Settings.Default.RightAddressText = txtRightAddress.Text;
                 Properties.Settings.Default.PVMAddressText = txtPVM.Text;
+                Properties.Settings.Default.FailAddressValue = txtFailAddressValue.Text;
                 Properties.Settings.Default.Save();
             }
             else
@@ -51,7 +53,8 @@ namespace DataTableConverter.View
             {
                 txtFailAddress,
                 txtRightAddress,
-                txtPVM
+                txtPVM,
+                txtFailAddressValue
             };
             foreach(TextBox textBox in textBoxes)
             {

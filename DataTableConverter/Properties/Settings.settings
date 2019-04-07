@@ -69,7 +69,7 @@
       <Value Profile="(Default)">Red</Value>
     </Setting>
     <Setting Name="Locked" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">Red</Value>
+      <Value Profile="(Default)">255, 128, 128</Value>
     </Setting>
     <Setting Name="FailAddressText" Type="System.String" Scope="User">
       <Value Profile="(Default)">F</Value>
@@ -79,6 +79,9 @@
     </Setting>
     <Setting Name="PVMAddressText" Type="System.String" Scope="User">
       <Value Profile="(Default)">K</Value>
+    </Setting>
+    <Setting Name="FailAddressValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)">X</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -42,6 +42,8 @@
             this.txtRightAddress = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.txtPVM = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtFailAddressValue = new System.Windows.Forms.TextBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -108,6 +110,8 @@
             // 
             // tpFileShortcuts
             // 
+            this.tpFileShortcuts.Controls.Add(this.txtFailAddressValue);
+            this.tpFileShortcuts.Controls.Add(this.label6);
             this.tpFileShortcuts.Controls.Add(this.txtPVM);
             this.tpFileShortcuts.Controls.Add(this.label5);
             this.tpFileShortcuts.Controls.Add(this.txtRightAddress);
@@ -170,6 +174,22 @@
             this.txtPVM.Size = new System.Drawing.Size(100, 20);
             this.txtPVM.TabIndex = 5;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(8, 131);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(168, 13);
+            this.label6.TabIndex = 6;
+            this.label6.Text = "Identifizierung fehlerhafte Dateien:";
+            // 
+            // txtFailAddressValue
+            // 
+            this.txtFailAddressValue.Location = new System.Drawing.Point(192, 131);
+            this.txtFailAddressValue.Name = "txtFailAddressValue";
+            this.txtFailAddressValue.Size = new System.Drawing.Size(100, 20);
+            this.txtFailAddressValue.TabIndex = 7;
+            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -205,5 +225,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtFailAddress;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtFailAddressValue;
+        private System.Windows.Forms.Label label6;
     }
 }

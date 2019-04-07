@@ -371,5 +371,10 @@ namespace DataTableConverter
         {
             return view.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.RowIndex).Where(row => row != view.Rows.Count - 1).Distinct().OrderByDescending(index => index).ToArray();
         }
+
+        internal static void SetGroupBoxColor(Control groupBox)
+        {
+            groupBox.BackColor = groupBox.Enabled ? Color.White : Properties.Settings.Default.Locked;
+        }
     }
 }
