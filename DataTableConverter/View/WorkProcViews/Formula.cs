@@ -21,16 +21,16 @@ namespace DataTableConverter.View
         {
             InitializeComponent();
             Type = type;
-            adjustForm();
+            AdjustForm();
             
             cbHeaders.Items.AddRange(headers);
             if (Type == FormulaState.Export)
             {
-                loadSetting();
+                LoadSetting();
             }
         }
 
-        private void loadSetting()
+        private void LoadSetting()
         {
             if (Properties.Settings.Default.ExportSpec != null)
             {
@@ -46,59 +46,27 @@ namespace DataTableConverter.View
             }
         }
 
-        internal string[] getSelectedHeaders()
+        internal string[] SelectedHeaders()
         {
             return ViewHelper.GetSelectedHeaders(cbHeaders);
         }
 
-        private void adjustForm()
+        private void AdjustForm()
         {
-            //Bei Funktion: Keine Formel
-            //Bei Export: Nur Spaltenauswahl
-            txtFormula.Visible = lblFormula.Visible = cbNewColumn.Checked = Type == FormulaState.Merge;
             cbNewColumn.Visible = cbOldColumn.Visible = Type == FormulaState.Procedure;
-
-            if (btnUncheckAll.Visible = btnCheckAll.Visible = Type != FormulaState.Merge)
-            {
-                int height = 40;
-                adjustControlHeight(cbNewColumn, height);
-                adjustControlHeight(cbOldColumn, height);
-                adjustControlHeight(lblHeader, height);
-                adjustControlHeight(txtHeader, height);
-                adjustControlHeight(btnConfirm, height);
-                Height -= height;
-            }
-            setNewColumnVisibility();
+            SetNewColumnVisibility();
         }
 
-        private void adjustControlHeight(Control control, int height)
-        {
-            control.Location = new Point(control.Location.X, control.Location.Y - height);
-        }
-
-        private void setNewColumnVisibility()
+        private void SetNewColumnVisibility()
         {
             lblHeader.Visible = txtHeader.Visible = cbNewColumn.Checked;
         }
 
-        private void addColumn(string column)
-        {
-            if (!txtFormula.Text.Contains(column))
-            {
-                string separator = txtFormula.Text.Length > 0 ? " " : string.Empty;
-                txtFormula.Text = $"{txtFormula.Text}{separator}[{column}]";
-            }
-        }
-
-        internal string getHeaderName()
+        internal string HeaderName()
         {
             return txtHeader.Text;
         }
 
-        private void removeColumn(string column)
-        {
-            txtFormula.Text = txtFormula.Text.Replace($" [{column}]", "");
-        }
 
         private void txtFormula_KeyDown(object sender, KeyEventArgs e)
         {
@@ -114,31 +82,25 @@ namespace DataTableConverter.View
             {
                 MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
             }
-            else if (cbNewColumn.Checked && isDuplicate(txtHeader.Text))
+            else if (cbNewColumn.Checked && IsDuplicate(txtHeader.Text))
             {
                 MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit diesem Namen.\nBitte geben Sie einen anderen an");
             }
             else
             {
-                this.DialogResult = DialogResult.OK;
-                Close();
+                DialogResult = DialogResult.OK;
             }
         }
 
-        private bool isDuplicate(string text)
+        private bool IsDuplicate(string text)
         {
             return cbHeaders.Items.Contains(text);
         }
 
-        internal string getFormula()
-        {
-            return txtFormula.Text;
-        }
-
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
-            setNewColumnVisibility();
-            cbOldColumn.Visible = cbNewColumn.Checked && Type == FormulaState.Procedure;
+            SetNewColumnVisibility();
+            cbOldColumn.Visible = !cbNewColumn.Checked && Type == FormulaState.Procedure;
             if (!cbNewColumn.Checked)
             {
                 txtHeader.Text = string.Empty;
@@ -146,18 +108,6 @@ namespace DataTableConverter.View
             else
             {
                 cbOldColumn.Checked = false;
-            }
-        }
-
-        private void cbHeaders_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            if (e.NewValue == CheckState.Checked)
-            {
-                addColumn(cbHeaders.Items[e.Index].ToString());
-            }
-            else
-            {
-                removeColumn(cbHeaders.Items[e.Index].ToString());
             }
         }
 

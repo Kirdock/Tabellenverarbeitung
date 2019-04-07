@@ -42,7 +42,7 @@ namespace DataTableConverter
             dictSorting = new Dictionary<string, SortOrder>();
             dictKeys = new List<string>();
             InitializeComponent();
-            ExportHelper.checkFolders();
+            ExportHelper.CheckFolders();
             LoadProcedures();
             LoadWorkflows();
             LoadTolerances();
@@ -63,7 +63,7 @@ namespace DataTableConverter
         private void SetSorting(string order)
         {
             SortingOrder = order;
-            dictSorting = ViewHelper.generateSortingList(GetSorting());
+            dictSorting = ViewHelper.GenerateSortingList(GetSorting());
             dictKeys = dictSorting.Keys.ToList();
         }
 
@@ -381,21 +381,25 @@ namespace DataTableConverter
                 Multiselect = state == ImportState.None || state == ImportState.Append
             };
             DataTable oldTable = GetDataSource();
-            if (dialog.ShowDialog() == DialogResult.OK)
+            string mergePath = string.Empty;
+            bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
+            if (validMerge || dialog.ShowDialog() == DialogResult.OK)
             {
+                string[] filenames = validMerge ? new string[1] {mergePath} : dialog.FileNames;
                 if (state == ImportState.None)
                 {
-                    SetFileName(dialog.FileNames[0]);
+                    SetFileName(filenames[0]);
                 }
+
                 new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     StartLoadingBar();
-                    bool multipleFiles = dialog.FileNames.Length > 1;
+                    bool multipleFiles = filenames.Length > 1;
                     Dictionary<string, ImportSettings> takeOver = new Dictionary<string, ImportSettings>();
                     DataTable newTable = null;
-                    string fileNameBefore = Path.GetFileName(dialog.FileNames[0]);
-                    foreach (string file in dialog.FileNames)
+                    string fileNameBefore = Path.GetFileName(filenames[0]);
+                    foreach (string file in filenames)
                     {
                         try
                         {
@@ -468,7 +472,7 @@ namespace DataTableConverter
                             ErrorHelper.LogMessage(ex);
                         }
                     }
-                    FinishImport(newTable, state, oldTable, Path.GetFileName(dialog.FileNames[0]));
+                    FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]));
                 }).Start();
             }
         }
@@ -629,12 +633,30 @@ namespace DataTableConverter
 
         private void procedure_Click(object sender, EventArgs e, Proc procedure)
         {
-            Formula formula = new Formula(FormulaState.Procedure, DataHelper.HeadersOfDataTable(GetDataSource()))
+            Formula formula = new Formula(FormulaState.Procedure, DataHelper.HeadersOfDataTable(sourceTable));
+            if (formula.ShowDialog() == DialogResult.OK)
             {
-                Text = "Bitte Spalten angeben"
-            };
-            formula.FormClosed += (sender2, e2) => procedureClosed(sender2, e2, procedure);
-            formula.Show();
+                string[] columns = formula.SelectedHeaders();
+
+                if (columns.Length > 0)
+                {
+                    ProcUser user = new ProcUser(columns, formula.HeaderName(), formula.OldColumn);
+                    DataTable newTable = GetDataSource();
+
+                    new Thread(() =>
+                    {
+                        try
+                        {
+                            ReplaceProcedure(newTable, procedure, user);
+                            dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(newTable); }));
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex);
+                        }
+                    }).Start();
+                }
+            }
         }
 
         private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp)
@@ -660,34 +682,6 @@ namespace DataTableConverter
         {
             int index = cases.FindIndex(cs => cs.Id == id);
             return index != -1 ? cases[index] : null;
-        }
-
-        private void procedureClosed(object s, FormClosedEventArgs e, Proc procedure)
-        {
-            Formula sender = (Formula)s;
-            if (sender.DialogResult == DialogResult.OK)
-            {
-                string[] columns = sender.getSelectedHeaders();
-                
-                if (columns.Length > 0)
-                {
-                    ProcUser user = new ProcUser(columns, sender.getHeaderName(),sender.OldColumn);
-                    DataTable newTable = GetDataSource();
-                    
-                    new Thread(() =>
-                    {
-                        try
-                        {
-                            ReplaceProcedure(newTable, procedure, user);
-                            dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(newTable); }));
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorHelper.LogMessage(ex);
-                        }
-                    }).Start();
-                }
-            }
         }
 
         private void TrimDataTable(DataTable dt)
@@ -723,7 +717,11 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.exportExcel(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                            string newPath = ExportHelper.ExportExcel(table, Path.GetDirectoryName(path),path);
+                            if(newPath != null)
+                            {
+                                SetFileName(newPath);
+                            }
                             StopLoadingBar();
                         }
                         catch (Exception ex)
@@ -733,7 +731,6 @@ namespace DataTableConverter
                     }).Start();
                 }
             }
-            //ExportHelper.exportExcel(dgTable);
         }
 
         private void spalteHinzufügenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -836,7 +833,7 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.exportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path));
+                            ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path));
                             StopLoadingBar();
                         }
                         catch (Exception ex)
@@ -965,7 +962,7 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.exportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                            ExportHelper.ExportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
                             StopLoadingBar();
                         }
                         catch (Exception ex)
@@ -979,20 +976,11 @@ namespace DataTableConverter
 
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Formula formula = new Formula(FormulaState.Export, DataHelper.HeadersOfDataTable(GetDataSource()))
-            {
-                Text = "Bitte Spalten angeben"
-            };
-            formula.FormClosed += new FormClosedEventHandler(saveCustomClosed);
-            formula.Show();
-        }
-
-        private void saveCustomClosed(object sender, FormClosedEventArgs e)
-        {
-            if (((Formula)sender).DialogResult == DialogResult.OK)
+            Formula formula = new Formula(FormulaState.Export, DataHelper.HeadersOfDataTable(sourceTable));
+            if(formula.ShowDialog() == DialogResult.OK)
             {
                 DataTable table = GetDataSource(true);
-                HashSet<int> columns = new HashSet<int>(DataHelper.HeaderIndices(table, ((Formula)sender).getSelectedHeaders()));
+                HashSet<int> columns = new HashSet<int>(DataHelper.HeaderIndices(table, formula.SelectedHeaders()));
 
                 int realCounter = 0;
                 for (int i = 0; i < table.Columns.Count; i++)
@@ -1011,7 +999,7 @@ namespace DataTableConverter
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCustom formula = new ExportCustom(DataHelper.HeadersOfDataTable(GetDataSource()));
+            ExportCustom formula = new ExportCustom(DataHelper.HeadersOfDataTable(sourceTable), sourceTable);
             formula.FormClosed += new FormClosedEventHandler(saveExportClosed);
             formula.Show();
         }
@@ -1022,22 +1010,39 @@ namespace DataTableConverter
             ExportCustom export = (ExportCustom)sender;
             if (export.DialogResult == DialogResult.OK)
             {
-                Dictionary<string, DataTable> Dict = new Dictionary<string, DataTable>();
-                DataTable Temp = new DataTable();
-                originalTable.Columns.Cast<DataColumn>().Select(Column => Column.ColumnName).ToList().ForEach(Header => Temp.Columns.Add(Header));
+                Dictionary<string, List<DataTable>> Dict = new Dictionary<string, List<DataTable>>();
+                DataTable tableSkeleton = new DataTable() { TableName = null };
+                originalTable.Columns.Cast<DataColumn>().Select(Column => Column.ColumnName).ToList().ForEach(Header => tableSkeleton.Columns.Add(Header));
                 if (export.AllValues())
                 {
-                    originalTable.Rows.Cast<DataRow>().Select(Row => Row[export.getColumnIndex()].ToString()).Distinct().ToList().ForEach(Value => Dict.Add(Value, Temp.Copy()));
+                    export.ValuesOfColumn().ForEach(value => Dict.Add(value, new List<DataTable> { tableSkeleton.Copy() }));
                 }
                 else
                 {
-                    Dict.Add(export.getValue(), new DataTable());
+                    foreach(string key in export.Files.Keys)
+                    {
+                        if(export.Files.TryGetValue(key,out List<string> values))
+                        {
+                            DataTable temp = tableSkeleton.Copy();
+                            temp.TableName = key;
+                            foreach (string value in values) {
+                                if (Dict.TryGetValue(value, out List<DataTable> tables))
+                                {
+                                    tables.Add(temp);
+                                }
+                                else
+                                {
+                                    Dict.Add(value, new List<DataTable> { temp });
+                                }
+                            }
+                        }
+                    }
                 }
                 for (int i = 0; i < originalTable.Rows.Count; i++)
                 {
-                    if(Dict.TryGetValue(originalTable.Rows[i][export.getColumnIndex()].ToString(),out DataTable Table))
+                    if(Dict.TryGetValue(originalTable.Rows[i][export.getColumnIndex()].ToString(),out List<DataTable> tables))
                     {
-                        Table.ImportRow(originalTable.Rows[i]);
+                        tables.ForEach(table => table.ImportRow(originalTable.Rows[i]));
                     }
                 }
                 StartLoadingBar();
@@ -1046,32 +1051,35 @@ namespace DataTableConverter
                 {
                     foreach (string Key in Dict.Keys)
                     {
-                        if (Dict.TryGetValue(Key, out DataTable Table))
+                        if (Dict.TryGetValue(Key, out List<DataTable> tables))
                         {
-                            string FileName = $"{Path.GetFileNameWithoutExtension(FilePath)} {Key}";
-                            string path = Path.GetDirectoryName(FilePath);
-                            switch (Format)
+                            foreach (DataTable Table in tables)
                             {
-                                //CSV
-                                case 0:
-                                    {
-                                        ExportHelper.exportCsv(Table, path, FileName);
-                                    }
-                                    break;
+                                string FileName = Table.TableName == string.Empty ? $"{Path.GetFileNameWithoutExtension(FilePath)} {Key}" : Table.TableName;
+                                string path = Path.GetDirectoryName(FilePath);
+                                switch (Format)
+                                {
+                                    //CSV
+                                    case 0:
+                                        {
+                                            ExportHelper.ExportCsv(Table, path, FileName);
+                                        }
+                                        break;
 
-                                //Dbase
-                                case 1:
-                                    {
-                                        ExportHelper.exportDbase(FileName, Table,path);
-                                    }
-                                    break;
+                                    //Dbase
+                                    case 1:
+                                        {
+                                            ExportHelper.ExportDbase(FileName, Table, path);
+                                        }
+                                        break;
 
-                                //Excel
-                                case 2:
-                                    {
-                                        ExportHelper.exportExcel(Table, path, FileName);
-                                    }
-                                    break;
+                                    //Excel
+                                    case 2:
+                                        {
+                                            ExportHelper.ExportExcel(Table, path, FileName);
+                                        }
+                                        break;
+                                }
                             }
                         }
                     }
@@ -1505,6 +1513,22 @@ namespace DataTableConverter
             {
                 StartSingleWorkflow(form.Procedure);
             }
+        }
+
+        private void textErsetzenToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            ReplaceWholeForm form = new ReplaceWholeForm(DataHelper.HeadersOfDataTable(sourceTable));
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                ProcReplaceWhole proc = new ProcReplaceWhole(form.SelectedHeaders, form.ReplaceText);
+                StartSingleWorkflow(proc);
+            }
+        }
+
+        private void einstellungenToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            SettingForm form = new SettingForm();
+            form.Show();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

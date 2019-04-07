@@ -77,12 +77,12 @@ namespace DataTableConverter.Classes.WorkProcs
                         string value = row[i].ToString();
                         if (End == 0)
                         {
-                            row[index] = Start > value.Length ? string.Empty : value.Substring(Start-1);
+                            row[index] = Start > value.Length ? string.Empty : value.Substring(Start - 1);
                         }
                         else
                         {
                             int length = (End - Start);
-                            row[index] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start-1) : value.Substring(Start-1, length + 1);
+                            row[index] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start - 1) : value.Substring(Start - 1, length + 1);
                         }
 
                     }

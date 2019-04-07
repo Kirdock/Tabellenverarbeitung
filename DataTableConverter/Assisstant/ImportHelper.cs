@@ -391,7 +391,7 @@ namespace DataTableConverter.Assisstant
                 header.ForEach(x => dt.Columns.Add(x.ToString()));
 
                 int startindex = 0;
-                while (startindex < data.Length && (isPreview && dt.Rows.Count < 3 || !isPreview))
+                while (startindex < data.Length && (!isPreview || dt.Rows.Count < 3))
                 {
                     List<string> row = new List<string>();
 
@@ -403,14 +403,10 @@ namespace DataTableConverter.Assisstant
                     }
                     dt.Rows.Add(row.ToArray());
                 }
-
-
-                //File.ReadLines doesn't read all lines, it returns a IEnumerable, and lines are lazy evaluated,
-                //  so just the first line will be loaded two times.
             }
             catch (IOException)
             {
-                MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm benutzt und kann nicht geöffnet werden.");
+                MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm verwendet und kann nicht geöffnet werden.");
             }
             return dt;
         }

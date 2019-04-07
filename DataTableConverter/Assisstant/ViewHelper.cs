@@ -21,7 +21,7 @@ namespace DataTableConverter
         private Action<object, EventArgs> MyFunction;
         private List<Work> Workflows;
         internal int SelectedCase { get; set; }
-        private static string LockIcon = "\uD83D\uDD12";
+        private static readonly string LockIcon = "\uD83D\uDD12";
 
         public ViewHelper(ContextMenuStrip ctxrow, Action<object,EventArgs> myfunction, List<Work> workflows)
         {
@@ -65,8 +65,9 @@ namespace DataTableConverter
             e.Handled = !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar);
         }
 
-        internal static void InsertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, Action<object, DataGridViewCellEventArgs> myfunc = null)
+        internal static void InsertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, DataGridViewCellValidatingEventHandler dgEvent = null, Action<object, DataGridViewCellEventArgs> myfunc = null)
         {
+            rowIndex = rowIndex < 0 ? 0 : rowIndex;
             Thread thread = new Thread(() =>
             {
                 bool errorMessageShown = false;
@@ -102,20 +103,29 @@ namespace DataTableConverter
                                 table.Rows.InsertAt(newRow, rowIndex);
                                 rowIndex++;
                             }
-                            catch
+                            catch (Exception ex)
                             {
                                 if (!errorMessageShown)
                                 {
                                     MessageHandler.MessagesOK(MessageBoxIcon.Error, "Typen stimmen nicht überein! Es kann kein Text in ein Nummernfeld eingegeben werden!");
                                     errorMessageShown = true;
+                                    ErrorHelper.LogMessage(ex, false);
                                 }
                             } //Error, wenn Typen wie int nicht übereinstimmen
+                        }
+                        if(dgEvent != null)
+                        {
+                            myDataGridView.CellValidating -= dgEvent;
                         }
                         myDataGridView.BeginInvoke(new MethodInvoker(() =>
                         {
                             myDataGridView.DataSource = null;
                             myDataGridView.DataSource = table;
                             myfunc?.Invoke(null, null);
+                            if (dgEvent != null)
+                            {
+                                myDataGridView.CellValidating += dgEvent;
+                            }
                         }));
                     }
                 }
@@ -127,7 +137,7 @@ namespace DataTableConverter
 
         internal static DataView GetSortedView(string order, DataTable table)
         {
-            Dictionary<string, SortOrder> dict = generateSortingList(order);
+            Dictionary<string, SortOrder> dict = GenerateSortingList(order);
             if (dict.Count == 0)
             {
                 return table.DefaultView;
@@ -146,7 +156,7 @@ namespace DataTableConverter
             }
         }
 
-        internal static Dictionary<string, SortOrder> generateSortingList(string orderBefore)
+        internal static Dictionary<string, SortOrder> GenerateSortingList(string orderBefore)
         {
             Dictionary<string, SortOrder> dict = new Dictionary<string, SortOrder>();
             if (!string.IsNullOrWhiteSpace(orderBefore))
@@ -359,7 +369,7 @@ namespace DataTableConverter
 
         internal static int[] SelectedRowsOfDataGridView(DataGridView view)
         {
-            return view.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.RowIndex).Distinct().OrderByDescending(index => index).ToArray();
+            return view.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.RowIndex).Where(row => row != view.Rows.Count - 1).Distinct().OrderByDescending(index => index).ToArray();
         }
     }
 }

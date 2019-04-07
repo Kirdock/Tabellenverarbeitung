@@ -28,30 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.txtFormula = new System.Windows.Forms.TextBox();
             this.txtHeader = new System.Windows.Forms.TextBox();
             this.lblHeader = new System.Windows.Forms.Label();
             this.cbNewColumn = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.lblFormula = new System.Windows.Forms.Label();
             this.btnCheckAll = new System.Windows.Forms.Button();
             this.btnUncheckAll = new System.Windows.Forms.Button();
             this.btnConfirm = new System.Windows.Forms.Button();
-            this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.cbOldColumn = new System.Windows.Forms.CheckBox();
+            this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.SuspendLayout();
-            // 
-            // txtFormula
-            // 
-            this.txtFormula.Location = new System.Drawing.Point(27, 95);
-            this.txtFormula.Name = "txtFormula";
-            this.txtFormula.Size = new System.Drawing.Size(341, 20);
-            this.txtFormula.TabIndex = 0;
-            this.txtFormula.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtFormula_KeyDown);
             // 
             // txtHeader
             // 
-            this.txtHeader.Location = new System.Drawing.Point(119, 157);
+            this.txtHeader.Location = new System.Drawing.Point(119, 127);
             this.txtHeader.Name = "txtHeader";
             this.txtHeader.Size = new System.Drawing.Size(249, 20);
             this.txtHeader.TabIndex = 4;
@@ -60,7 +50,7 @@
             // lblHeader
             // 
             this.lblHeader.AutoSize = true;
-            this.lblHeader.Location = new System.Drawing.Point(24, 160);
+            this.lblHeader.Location = new System.Drawing.Point(24, 130);
             this.lblHeader.Name = "lblHeader";
             this.lblHeader.Size = new System.Drawing.Size(89, 13);
             this.lblHeader.TabIndex = 5;
@@ -69,7 +59,7 @@
             // cbNewColumn
             // 
             this.cbNewColumn.AutoSize = true;
-            this.cbNewColumn.Location = new System.Drawing.Point(27, 130);
+            this.cbNewColumn.Location = new System.Drawing.Point(27, 100);
             this.cbNewColumn.Name = "cbNewColumn";
             this.cbNewColumn.Size = new System.Drawing.Size(193, 17);
             this.cbNewColumn.TabIndex = 6;
@@ -85,15 +75,6 @@
             this.label1.Size = new System.Drawing.Size(107, 13);
             this.label1.TabIndex = 8;
             this.label1.Text = "Auswahl der Spalten:";
-            // 
-            // lblFormula
-            // 
-            this.lblFormula.AutoSize = true;
-            this.lblFormula.Location = new System.Drawing.Point(24, 79);
-            this.lblFormula.Name = "lblFormula";
-            this.lblFormula.Size = new System.Drawing.Size(42, 13);
-            this.lblFormula.TabIndex = 9;
-            this.lblFormula.Text = "Format:";
             // 
             // btnCheckAll
             // 
@@ -117,13 +98,23 @@
             // 
             // btnConfirm
             // 
-            this.btnConfirm.Location = new System.Drawing.Point(139, 183);
+            this.btnConfirm.Location = new System.Drawing.Point(139, 153);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(101, 23);
             this.btnConfirm.TabIndex = 12;
             this.btnConfirm.Text = "Übernehmen";
             this.btnConfirm.UseVisualStyleBackColor = true;
             this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
+            // 
+            // cbOldColumn
+            // 
+            this.cbOldColumn.AutoSize = true;
+            this.cbOldColumn.Location = new System.Drawing.Point(27, 126);
+            this.cbOldColumn.Name = "cbOldColumn";
+            this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbOldColumn.TabIndex = 13;
+            this.cbOldColumn.Text = "Alte Werte in ALT schreiben?";
+            this.cbOldColumn.UseVisualStyleBackColor = true;
             // 
             // cbHeaders
             // 
@@ -137,38 +128,25 @@
             this.cbHeaders.Size = new System.Drawing.Size(341, 21);
             this.cbHeaders.TabIndex = 7;
             this.cbHeaders.ValueSeparator = ", ";
-            this.cbHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeaders_ItemCheck);
             this.cbHeaders.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtFormula_KeyDown);
-            // 
-            // cbOldColumn
-            // 
-            this.cbOldColumn.AutoSize = true;
-            this.cbOldColumn.Location = new System.Drawing.Point(27, 156);
-            this.cbOldColumn.Name = "cbOldColumn";
-            this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
-            this.cbOldColumn.TabIndex = 13;
-            this.cbOldColumn.Text = "Alte Werte in ALT schreiben?";
-            this.cbOldColumn.UseVisualStyleBackColor = true;
             // 
             // Formula
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(408, 220);
+            this.ClientSize = new System.Drawing.Size(408, 189);
             this.Controls.Add(this.cbOldColumn);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.btnUncheckAll);
             this.Controls.Add(this.btnCheckAll);
-            this.Controls.Add(this.lblFormula);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cbHeaders);
             this.Controls.Add(this.cbNewColumn);
             this.Controls.Add(this.lblHeader);
             this.Controls.Add(this.txtHeader);
-            this.Controls.Add(this.txtFormula);
             this.Name = "Formula";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Formula";
+            this.Text = "Bitte Spalten angeben";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Formula_FormClosing);
             this.ResumeLayout(false);
@@ -177,14 +155,11 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox txtFormula;
         private System.Windows.Forms.TextBox txtHeader;
         private System.Windows.Forms.Label lblHeader;
         private System.Windows.Forms.CheckBox cbNewColumn;
         private CheckComboBoxTest.CheckedComboBox cbHeaders;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lblFormula;
         private System.Windows.Forms.Button btnCheckAll;
         private System.Windows.Forms.Button btnUncheckAll;
         private System.Windows.Forms.Button btnConfirm;

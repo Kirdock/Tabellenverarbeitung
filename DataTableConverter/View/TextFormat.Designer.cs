@@ -36,6 +36,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cmbEncoding = new System.Windows.Forms.ComboBox();
             this.gbSeparated = new System.Windows.Forms.GroupBox();
+            this.cbContainsHeaders = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtEnd = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -61,7 +62,6 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cbContainsHeaders = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             this.gbFixed.SuspendLayout();
@@ -162,6 +162,17 @@
             this.gbSeparated.TabStop = false;
             this.gbSeparated.Text = "Getrennt";
             this.gbSeparated.Visible = false;
+            // 
+            // cbContainsHeaders
+            // 
+            this.cbContainsHeaders.AutoSize = true;
+            this.cbContainsHeaders.Location = new System.Drawing.Point(84, 148);
+            this.cbContainsHeaders.Name = "cbContainsHeaders";
+            this.cbContainsHeaders.Size = new System.Drawing.Size(143, 17);
+            this.cbContainsHeaders.TabIndex = 10;
+            this.cbContainsHeaders.Text = "Überschrift in erster Zeile";
+            this.cbContainsHeaders.UseVisualStyleBackColor = true;
+            this.cbContainsHeaders.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // label4
             // 
@@ -424,24 +435,13 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
-            // cbContainsHeaders
-            // 
-            this.cbContainsHeaders.AutoSize = true;
-            this.cbContainsHeaders.Location = new System.Drawing.Point(84, 148);
-            this.cbContainsHeaders.Name = "cbContainsHeaders";
-            this.cbContainsHeaders.Size = new System.Drawing.Size(143, 17);
-            this.cbContainsHeaders.TabIndex = 10;
-            this.cbContainsHeaders.Text = "Überschrift in erster Zeile";
-            this.cbContainsHeaders.UseVisualStyleBackColor = true;
-            this.cbContainsHeaders.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
-            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 576);
-            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.gbFixed);
+            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.Name = "TextFormat";

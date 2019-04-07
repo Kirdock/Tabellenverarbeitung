@@ -45,7 +45,7 @@
             // 
             this.cmbIdentifierOriginal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbIdentifierOriginal.FormattingEnabled = true;
-            this.cmbIdentifierOriginal.Location = new System.Drawing.Point(151, 28);
+            this.cmbIdentifierOriginal.Location = new System.Drawing.Point(230, 31);
             this.cmbIdentifierOriginal.Name = "cmbIdentifierOriginal";
             this.cmbIdentifierOriginal.Size = new System.Drawing.Size(121, 21);
             this.cmbIdentifierOriginal.TabIndex = 0;
@@ -54,7 +54,7 @@
             // 
             this.cmbIdentifierMerge.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbIdentifierMerge.FormattingEnabled = true;
-            this.cmbIdentifierMerge.Location = new System.Drawing.Point(151, 71);
+            this.cmbIdentifierMerge.Location = new System.Drawing.Point(230, 74);
             this.cmbIdentifierMerge.Name = "cmbIdentifierMerge";
             this.cmbIdentifierMerge.Size = new System.Drawing.Size(121, 21);
             this.cmbIdentifierMerge.TabIndex = 1;
@@ -63,7 +63,7 @@
             // 
             this.clbColumns.CheckOnClick = true;
             this.clbColumns.FormattingEnabled = true;
-            this.clbColumns.Location = new System.Drawing.Point(298, 58);
+            this.clbColumns.Location = new System.Drawing.Point(377, 61);
             this.clbColumns.Name = "clbColumns";
             this.clbColumns.Size = new System.Drawing.Size(294, 289);
             this.clbColumns.TabIndex = 2;
@@ -71,24 +71,24 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 31);
+            this.label1.Location = new System.Drawing.Point(12, 34);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(119, 13);
+            this.label1.Size = new System.Drawing.Size(218, 13);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Identifizierung Tabelle1:";
+            this.label1.Text = "Identifizierung der bereits geladenen Tabelle:";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 74);
+            this.label2.Location = new System.Drawing.Point(12, 77);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(119, 13);
+            this.label2.Size = new System.Drawing.Size(215, 13);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Identifizierung Tabelle2:";
+            this.label2.Text = "Identifizierung der hinzuzufügenden Tabelle:";
             // 
             // btnTakeOver
             // 
-            this.btnTakeOver.Location = new System.Drawing.Point(151, 211);
+            this.btnTakeOver.Location = new System.Drawing.Point(230, 214);
             this.btnTakeOver.Name = "btnTakeOver";
             this.btnTakeOver.Size = new System.Drawing.Size(121, 23);
             this.btnTakeOver.TabIndex = 5;
@@ -98,7 +98,7 @@
             // 
             // btnSelectAll
             // 
-            this.btnSelectAll.Location = new System.Drawing.Point(298, 26);
+            this.btnSelectAll.Location = new System.Drawing.Point(377, 29);
             this.btnSelectAll.Name = "btnSelectAll";
             this.btnSelectAll.Size = new System.Drawing.Size(117, 23);
             this.btnSelectAll.TabIndex = 6;
@@ -108,7 +108,7 @@
             // 
             // btnRemoveAll
             // 
-            this.btnRemoveAll.Location = new System.Drawing.Point(475, 26);
+            this.btnRemoveAll.Location = new System.Drawing.Point(554, 29);
             this.btnRemoveAll.Name = "btnRemoveAll";
             this.btnRemoveAll.Size = new System.Drawing.Size(117, 23);
             this.btnRemoveAll.TabIndex = 7;
@@ -129,9 +129,9 @@
             // 
             // txtOrder
             // 
-            this.txtOrder.Location = new System.Drawing.Point(15, 165);
+            this.txtOrder.Location = new System.Drawing.Point(15, 168);
             this.txtOrder.Name = "txtOrder";
-            this.txtOrder.Size = new System.Drawing.Size(257, 20);
+            this.txtOrder.Size = new System.Drawing.Size(336, 20);
             this.txtOrder.TabIndex = 9;
             // 
             // lblOrder
@@ -147,7 +147,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(620, 365);
+            this.ClientSize = new System.Drawing.Size(690, 365);
             this.Controls.Add(this.lblOrder);
             this.Controls.Add(this.txtOrder);
             this.Controls.Add(this.chbRememberOrder);
@@ -159,9 +159,10 @@
             this.Controls.Add(this.clbColumns);
             this.Controls.Add(this.cmbIdentifierMerge);
             this.Controls.Add(this.cmbIdentifierOriginal);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MergeTable";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "MergeTable";
+            this.Text = "PVM";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MergeTable_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();

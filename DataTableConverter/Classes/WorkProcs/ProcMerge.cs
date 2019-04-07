@@ -41,17 +41,17 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            HashSet<string> headers = new HashSet<string>();
+            List<string> headers = new List<string>();
             GetHeaderOfFormula(Formula, headers);
             foreach(DataRow row in Conditions.Rows)
             {
                 GetHeaderOfFormula(row[(int)ConditionColumn.Format].ToString(), headers);
                 headers.Add(row[(int)ConditionColumn.Spalte].ToString());
             }
-            return WorkflowHelper.RemoveEmptyHeaders(headers);
+            return WorkflowHelper.RemoveEmptyHeaders(headers.Distinct());
         }
 
-        private void GetHeaderOfFormula(string formula, HashSet<string> headers)
+        private void GetHeaderOfFormula(string formula, List<string> headers)
         {
             string regularExpressionPattern = @"\[(.*?)\]";
             Regex re = new Regex(regularExpressionPattern);
@@ -62,6 +62,23 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 headers.Add(matches[i].Value.Substring(1, matches[i].Value.Length - 2));
             }
+        }
+
+        private List<string[]> GetHeaderInBrackets(string formula)
+        {
+            List<string[]> headers = new List<string[]>();
+            string regularExpressionPattern = @"\((.*?)\)";
+            Regex re = new Regex(regularExpressionPattern);
+
+            MatchCollection matches = re.Matches(formula);
+
+            for (int i = 0; i < matches.Count; i++)
+            {
+                List<string> headerInBrackets = new List<string>();
+                GetHeaderOfFormula(matches[i].Groups[1].Value, headerInBrackets);
+                headers.Add(headerInBrackets.ToArray());
+            }
+            return headers;
         }
 
         public override void renameHeaders(string oldName, string newName)
@@ -101,7 +118,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         private string GetFormat(DataRow row, string formula)
         {
-            HashSet<string> headers = new HashSet<string>();
+            List<string> headers = new List<string>();
             GetHeaderOfFormula(formula, headers);
             string[] columns = headers.ToArray();
             StringBuilder format = new StringBuilder();
@@ -109,28 +126,47 @@ namespace DataTableConverter.Classes.WorkProcs
             bool isStart = true;
             StringBuilder stringBetween = new StringBuilder();
             bool emptyBefore = true;
+            List<string[]> headersInBrackets = GetHeaderInBrackets(formula);
+            if(headersInBrackets.Count == 0)
+            {
+                headersInBrackets.Add(new string[0]); //to not enter an ArrayOutOfBoundsException
+            }
+            int bracketCount = 0;
             for (int i = 0; i < formula.Length; i++)
             {
                 char c = formula[i];
 
-                if (c != '[')
+                if (c == '(')
                 {
-                    stringBetween.Append(c);
+                    string value = string.Empty;
+                    foreach (string header in headersInBrackets[bracketCount])
+                    {
+                        string result;
+                        if (!string.IsNullOrWhiteSpace((result = row[header]?.ToString())))
+                        {
+                            value = result;
+                            break;
+                        }
+                    }
+                    format.Append(value);
+                    counter += headersInBrackets[bracketCount].Length;
+                    i = formula.IndexOf(')', i);
+                    bracketCount++;
                 }
-                else //insert column value
+                else if (c == '[') //insert column value
                 {
                     string header = columns[counter];
                     string value = row[header]?.ToString();
-                    bool skipWhenEmpty = string.IsNullOrWhiteSpace(value);
-                    
+                    bool isEmpty = string.IsNullOrWhiteSpace(value);
+
                     if (isStart)
                     {
                         isStart = false;
                         format.Append(stringBetween);
                         stringBetween.Clear();
                     }
-                    
-                    if (!skipWhenEmpty)
+
+                    if (!isEmpty)
                     {
                         if (!emptyBefore)
                         {
@@ -141,11 +177,14 @@ namespace DataTableConverter.Classes.WorkProcs
                     stringBetween.Clear();
                     i += (header.Length + 1);
                     counter++;
-                    emptyBefore &= skipWhenEmpty;
+                    emptyBefore &= isEmpty;
+                }
+                else
+                {
+                    stringBetween.Append(c);
                 }
             }
             return stringBetween.Length != 0 ? format.Append(stringBetween).ToString() : format.ToString();
         }
-
     }
 }

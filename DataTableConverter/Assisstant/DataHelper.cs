@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
 {
@@ -96,6 +97,11 @@ namespace DataTableConverter.Assisstant
             }
 
             return result;
+        }
+
+        internal static string[] GetValuesOfColumnDistrinct(string column, DataTable table)
+        {
+            return table.Rows.Cast<DataRow>().Select(row => row[column].ToString()).Distinct().ToArray();
         }
 
         internal static void SetHeaders(DataTable table, DataTable oldTable)

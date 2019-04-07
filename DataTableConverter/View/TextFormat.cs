@@ -222,9 +222,9 @@ namespace DataTableConverter.View
         private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)
         {
             bool valid = true;
-            
             string currentElement = e.FormattedValue?.ToString();
-            if (!string.IsNullOrWhiteSpace(currentElement) && e.ColumnIndex > 0)
+
+            if (!string.IsNullOrWhiteSpace(currentElement) && e.ColumnIndex > 0 && dgvSetting.Columns.Count > 2)
             {
                 int to, from;
                 if (e.ColumnIndex == 1)
@@ -510,7 +510,7 @@ namespace DataTableConverter.View
 
         private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, dgvSetting_CellValueChanged);
+            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, dgvSetting_CellValidating, dgvSetting_CellValueChanged);
         }
 
         private void txtBegin_TextChanged(object sender, EventArgs e)

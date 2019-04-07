@@ -68,7 +68,6 @@ namespace DataTableConverter.Classes.WorkProcs
                     {
                         string value = row[i].ToString();
                         string replace = rep[0].ToString();
-                        bool condition = procedure.CheckTotal ? value == replace : value.Contains(replace);
 
                         if (procedure.CheckTotal && value == replace)
                         {

@@ -29,7 +29,7 @@ namespace DataTableConverter
         internal static readonly int DbaseMaxFileLength = 8;
 
 
-        internal static void checkFolders()
+        internal static void CheckFolders()
         {
             if (!Directory.Exists(ProjectPath))
             {
@@ -38,7 +38,7 @@ namespace DataTableConverter
             }
         }
         
-        internal static bool saveProcedures(List<Proc> procedures)
+        internal static bool SaveProcedures(List<Proc> procedures)
         {
             bool error = false;
             try
@@ -56,7 +56,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool saveWorkflows(List<Work> workflows)
+        internal static bool SaveWorkflows(List<Work> workflows)
         {
             bool error = false;
             try
@@ -74,7 +74,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool saveTolerances(List<Tolerance> tolerances)
+        internal static bool SaveTolerances(List<Tolerance> tolerances)
         {
             bool error = false;
             try
@@ -92,7 +92,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool saveCases(List<Case> cases)
+        internal static bool SaveCases(List<Case> cases)
         {
             bool error = false;
             try
@@ -110,7 +110,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static void exportCsv(DataTable dt, string directory, string filename)
+        internal static void ExportCsv(DataTable dt, string directory, string filename)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -125,8 +125,9 @@ namespace DataTableConverter
             File.WriteAllText(Path.Combine(directory,filename+".csv"), sb.ToString());
         }
 
-        internal static void exportExcel(DataTable dt, string directory, string filename)
+        internal static string ExportExcel(DataTable dt, string directory, string filename)
         {
+            string path = null;
             try
             {
                 string workSheetName = "Tabelle 1";
@@ -179,8 +180,15 @@ namespace DataTableConverter
                                                    System.Type.Missing,
                                                    Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
                                                    System.Type.Missing).Name = workSheetName;
-
-                workbook.SaveAs(Path.Combine(directory, filename + ".xls"), Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                string saveName = Path.GetFileNameWithoutExtension(filename)+".xls";
+                Microsoft.Office.Interop.Excel.XlFileFormat fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal;
+                if (Path.GetExtension(filename) != ".xls")
+                {
+                    saveName += "x";
+                    fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook;
+                }
+                path = Path.Combine(directory, saveName);
+                workbook.SaveAs(Path.Combine(directory, saveName), fileFormat, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                 workbook.Close(false, Type.Missing, Type.Missing);
                 excel.Quit();
 
@@ -194,9 +202,10 @@ namespace DataTableConverter
             {
                 ErrorHelper.LogMessage(ex);
             }
+            return path;
         }
 
-        internal static void exportDbase(string originalFileName, DataTable dataTable, string originalPath)
+        internal static void ExportDbase(string originalFileName, DataTable dataTable, string originalPath)
         {
 
             string fileName = originalFileName.ToUpper();
@@ -215,8 +224,8 @@ namespace DataTableConverter
             }
 
 
-            int[] max = getMaxLengthOfColumns(dataTable);
-            createTable(dataTable, max, path, fileName);
+            int[] max = MaxLengthOfColumns(dataTable);
+            CreateTable(dataTable, max, path, fileName);
 
             try
             {
@@ -226,7 +235,7 @@ namespace DataTableConverter
                 byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
                 byte[] bytes = new byte[1] { 0x1A };
 
-                string text = joinTable(dataTable, max);
+                string text = JoinTable(dataTable, max);
                 stream.Position = 4;
                 stream.Write(records, 0, records.Length);
 
@@ -251,7 +260,7 @@ namespace DataTableConverter
 
         }
 
-        private static void createTable(DataTable table, int[] max, string path, string filename)
+        private static void CreateTable(DataTable table, int[] max, string path, string filename)
         {
             StringBuilder csb = new StringBuilder($"create table [{filename}] (");
             for (int i = 0; i < table.Columns.Count; i++)
@@ -274,7 +283,7 @@ namespace DataTableConverter
             con.Close();
         }
 
-        private static string joinTable(DataTable table, int[] max)
+        private static string JoinTable(DataTable table, int[] max)
         {
             StringBuilder builder = new StringBuilder();
             foreach(DataRow row in table.Rows)
@@ -289,7 +298,7 @@ namespace DataTableConverter
             return builder.ToString();
         }
 
-        private static int[] getMaxLengthOfColumns(DataTable dataTable)
+        private static int[] MaxLengthOfColumns(DataTable dataTable)
         {
             int[] max = new int[dataTable.Columns.Count];
             for(int i = 0; i < max.Length; i++)

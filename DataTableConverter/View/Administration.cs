@@ -38,7 +38,6 @@ namespace DataTableConverter.View
         internal Administration(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
-
             SetHeaders(headers);
             SetOrderList();
             
@@ -69,6 +68,30 @@ namespace DataTableConverter.View
             
             AddContextMenu();
             RestoreSplitterDistance();
+            SetColors();
+        }
+
+        private void SetColors()
+        {
+            Label[] labels = new Label[]
+            {
+                lblNumberColumnName,
+                lblSubstringNewColumn,
+                lblWorkProcName,
+                lblWorkName,
+                lblPadNewColumn,
+                lblNewColumn,
+                lblNewColumnRound,
+                lblProcName,
+                lblCaseName,
+                lblTotalShortcut,
+                lblPartialShortcut,
+                lblToleranceName
+            };
+            foreach (Label label in labels)
+            {
+                label.ForeColor = Properties.Settings.Default.RequiredField;
+            }
         }
 
         private void RestoreSplitterDistance()
@@ -168,7 +191,7 @@ namespace DataTableConverter.View
             viewHelper.Clear();
             SaveSplitterDistance();
             
-            if (ExportHelper.saveWorkflows(Workflows) || ExportHelper.saveProcedures(Procedures) || ExportHelper.saveTolerances(Tolerances) || ExportHelper.saveCases(Cases))
+            if (ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
             {
                 DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
                 e.Cancel = result == DialogResult.No;
@@ -704,17 +727,29 @@ namespace DataTableConverter.View
             return Procedures[GetProcedureIndexThroughId(id)].Name;
         }
 
+        private void ResetHeader(CheckedComboBox box, ItemCheckEventHandler handler)
+        {
+            box.ItemCheck -= handler;
+            for(int i = 0; i < box.Items.Count; i++)
+            {
+                box.SetItemChecked(i, false);
+            }
+            box.ItemCheck += handler;
+        }
+
         private void SetCmbHeader(string formula)
         {
             if (formula != null)
             {
+                ResetHeader(cbHeaders, cbHeaders_ItemCheck);
+
                 cbHeaders.ItemCheck -= cbHeaders_ItemCheck;
                 Regex re = new Regex(@"\[(.*?)\]");
                 MatchCollection matches = re.Matches(formula);
                 string[] headers = new string[matches.Count];
                 for (int i = 0; i < matches.Count; i++)
                 {
-                    string header = matches[i].Value.Substring(1, matches[i].Value.Length - 2);
+                    string header = matches[i].Value.Substring(1, matches[i].Value.Length - 2); //matches.Groups[1].Value
                     int index;
                     if ((index = cbHeaders.Items.IndexOf(header)) != -1)
                     {
@@ -727,52 +762,42 @@ namespace DataTableConverter.View
 
         private void SetHeaderProcedure(string[] headers)
         {
-            clbHeaderProcedure.ItemCheck -= clbHeaderProcedure_ItemCheck;
-            SetChecked(clbHeaderProcedure, headers);
-            clbHeaderProcedure.ItemCheck += clbHeaderProcedure_ItemCheck;
+            SetChecked(clbHeaderProcedure, headers, clbHeaderProcedure_ItemCheck);
         }
 
         private void SetHeaderPadding(string[] headers)
         {
-            cbHeadersPad.ItemCheck -= clbHeaderPad_ItemCheck;
-            SetChecked(cbHeadersPad, headers);
-            cbHeadersPad.ItemCheck += clbHeaderPad_ItemCheck;
+            SetChecked(cbHeadersPad, headers, clbHeaderPad_ItemCheck);
         }
 
         private void SetHeaderSubstring(string[] headers)
         {
-            cbSubstringHeaders.ItemCheck -= cbSubstringHeaders_ItemCheck;
-            SetChecked(cbSubstringHeaders, headers);
-            cbSubstringHeaders.ItemCheck += cbSubstringHeaders_ItemCheck;
+            SetChecked(cbSubstringHeaders, headers, cbSubstringHeaders_ItemCheck);
         }
 
         private void SetHeaderRound(string[] headers)
         {
-            clbHeadersRound.ItemCheck -= clbHeadersRound_ItemCheck;
-            SetChecked(clbHeadersRound, headers);
-            clbHeadersRound.ItemCheck += clbHeadersRound_ItemCheck;
+            SetChecked(clbHeadersRound, headers, clbHeadersRound_ItemCheck);
         }
 
         private void SetHeaderUpLowCase(string[] headers)
         {
-            clbUpLowHeader.ItemCheck -= clbUpLowHeader_ItemCheck;
-            SetChecked(clbUpLowHeader, headers);
-            clbUpLowHeader.ItemCheck += clbUpLowHeader_ItemCheck;
+            SetChecked(clbUpLowHeader, headers, clbUpLowHeader_ItemCheck);
         }
 
-        private void SetChecked(CheckedComboBox box, string[] headers)
+        private void SetChecked(CheckedComboBox box, string[] headers, ItemCheckEventHandler handler)
         {
+            box.ItemCheck -= handler;
             for (int i = 0; i < box.Items.Count; i++)
             {
                 box.SetItemChecked(i, headers.Contains(box.Items[i].ToString()));
             }
+            box.ItemCheck += handler;
         }
 
         private void SetHeaderOrder(string[] headers)
         {
-            clbHeaderOrder.ItemCheck -= clbHeaderOrder_ItemCheck;
-            SetChecked(clbHeaderOrder, headers);
-            clbHeaderOrder.ItemCheck += clbHeaderOrder_ItemCheck;
+            SetChecked(clbHeaderOrder, headers, clbHeaderOrder_ItemCheck);
         }
 
         private WorkProc GetSelectedWorkProcedure()
@@ -1430,7 +1455,15 @@ namespace DataTableConverter.View
 
         private void ndSubstringStart_ValueChanged(object sender, EventArgs e)
         {
-            (GetSelectedWorkProcedure() as ProcSubstring).Start = (int)nbSubstringStart.Value;
+            if (nbSubstringEnd.Value > nbSubstringStart.Value)
+            {
+                nbSubstringStart.Value = (GetSelectedWorkProcedure() as ProcSubstring).Start;
+                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Startposition darf nicht größer als Endposition sein!");
+            }
+            else
+            {
+                (GetSelectedWorkProcedure() as ProcSubstring).Start = (int)nbSubstringStart.Value;
+            }
         }
 
         private void dgvSubstringColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -1445,7 +1478,15 @@ namespace DataTableConverter.View
 
         private void nbSubstringEnd_ValueChanged(object sender, EventArgs e)
         {
-            (GetSelectedWorkProcedure() as ProcSubstring).End = (int)nbSubstringEnd.Value;
+            if(nbSubstringEnd.Value > nbSubstringStart.Value)
+            {
+                nbSubstringEnd.Value = (GetSelectedWorkProcedure() as ProcSubstring).End;
+                MessageHandler.MessagesOK(System.Windows.Forms.MessageBoxIcon.Warning, "Startposition darf nicht größer als Endposition sein!");
+            }
+            else
+            {
+                (GetSelectedWorkProcedure() as ProcSubstring).End = (int)nbSubstringEnd.Value;
+            }
         }
 
         private void cbSubstringOldColumn_CheckedChanged(object sender, EventArgs e)

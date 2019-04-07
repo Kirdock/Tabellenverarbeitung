@@ -240,18 +240,6 @@ namespace DataTableConverter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ExportCustomText {
-            get {
-                return ((string)(this["ExportCustomText"]));
-            }
-            set {
-                this["ExportCustomText"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool ExportCustomCheck {
             get {
@@ -283,6 +271,66 @@ namespace DataTableConverter.Properties {
             }
             set {
                 this["HeaderInFirstRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Red")]
+        public global::System.Drawing.Color RequiredField {
+            get {
+                return ((global::System.Drawing.Color)(this["RequiredField"]));
+            }
+            set {
+                this["RequiredField"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Red")]
+        public global::System.Drawing.Color Locked {
+            get {
+                return ((global::System.Drawing.Color)(this["Locked"]));
+            }
+            set {
+                this["Locked"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("F")]
+        public string FailAddressText {
+            get {
+                return ((string)(this["FailAddressText"]));
+            }
+            set {
+                this["FailAddressText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("P")]
+        public string RightAddressText {
+            get {
+                return ((string)(this["RightAddressText"]));
+            }
+            set {
+                this["RightAddressText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("K")]
+        public string PVMAddressText {
+            get {
+                return ((string)(this["PVMAddressText"]));
+            }
+            set {
+                this["PVMAddressText"] = value;
             }
         }
     }

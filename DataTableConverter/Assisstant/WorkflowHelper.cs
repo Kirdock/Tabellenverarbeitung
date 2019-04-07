@@ -23,9 +23,13 @@ namespace DataTableConverter.Assisstant
                 {
                     foreach (Tolerance tol in tolerances)
                     {
-                        foreach (string t in tol.getColumnsAsArrayToLower())
+                        List<string> array = new List<string>(tol.getColumnsAsArrayToLower()) { tol.Name }.Distinct().ToList();
+                        string replaceWith = array.Contains(string.Empty) ? string.Empty : tol.Name;
+                        array.Remove(string.Empty);
+
+                        foreach (string t in array)
                         {
-                            result.Replace(t, tol.Name);
+                            result.Replace(t, replaceWith);
                         }
                     }
                 }
