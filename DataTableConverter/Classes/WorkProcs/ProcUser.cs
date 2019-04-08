@@ -47,7 +47,7 @@ namespace DataTableConverter.Classes.WorkProcs
             string[] columns = GetHeaders();
             sortingOrder = string.Empty;
             bool intoNewCol = false;
-            DataTable replaces = procedure.Replace;
+            IEnumerable<DataRow> replaces = procedure.Replace.Rows.Cast<DataRow>().Where(row => !string.IsNullOrWhiteSpace(row[0]?.ToString()));
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
@@ -67,7 +67,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                     if (procedure.CheckTotal)
                     {
-                        IEnumerable<DataRow> foundRows = replaces.Rows.Cast<DataRow>().Where(replace => replace[0].ToString() == value);
+                        IEnumerable<DataRow> foundRows = replaces.Where(replace => replace[0].ToString() == value);
                         if(foundRows.Count() > 0)
                         {
                             row[index] = foundRows.First()[1];
@@ -79,7 +79,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
                     else
                     {
-                        foreach (DataRow rep in replaces.Rows)
+                        foreach (DataRow rep in replaces)
                         {
                             value = value.Replace(rep[0].ToString(), rep[1].ToString());
                         }
