@@ -22,6 +22,81 @@ namespace DataTableConverter.Assisstant
         internal static readonly string ProjectProcedures = ExportHelper.ProjectProcedures;
         internal static readonly string ProjectTolerances = ExportHelper.ProjectTolerance;
         internal static readonly string ProjectCases = ExportHelper.ProjectCases;
+        internal static readonly string TextExt = "*.txt";
+        internal static readonly string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
+        internal static readonly string DbfExt = "*.dbf";
+        internal static readonly string CsvExt = "*.csv";
+        internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+
+
+        internal static DataTable ImportFile(string file, Form1 mainform, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings)
+        {
+            string filename = Path.GetFileName(file);
+            string extension = Path.GetExtension(file).ToLower();
+            DataTable table = null;
+
+            if (extension == ".dbf")
+            {
+                table = OpenDBF(file);
+            }
+            else if (extension != string.Empty && AccessExt.Contains(extension))
+            {
+                table = OpenMSAccess(file);
+            }
+            else if (extension != string.Empty && ExcelExt.Contains(extension))
+            {
+                table = OpenExcel(file, mainform);
+            }
+            else
+            {
+                if (fileImportSettings != null && fileImportSettings.TryGetValue(extension, out ImportSettings settings))
+                {
+                    if (settings.Values != null)
+                    {
+                        string data = File.ReadAllText(file, Encoding.GetEncoding(settings.CodePage));
+                        table = OpenTextFixed(data, file, settings.Values, settings.Headers);
+                    }
+                    else if (settings.Separator != null)
+                    {
+                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders);
+                    }
+                    else
+                    {
+                        table = OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders);
+                    }
+
+                }
+                else
+                {
+                    TextFormat form = new TextFormat(file, multipleFiles);
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        if (form.TakeOver && fileImportSettings != null)
+                        {
+                            fileImportSettings.Add(extension, form.ImportSettings);
+                        }
+                        table = form.DataTable;
+                    }
+                }
+            }
+            return table;
+        }
+
+        internal static OpenFileDialog GetOpenFileDialog(bool status)
+        {
+            return new OpenFileDialog
+            {
+                Filter = $"Text-, CSV-, DBASE und Excel-Dateien ({CsvExt}, {TextExt}, {AccessExt}, {DbfExt}*.xl*)|{CsvExt};{TextExt}; {ExcelExt}; {DbfExt}; {AccessExt}"
+                            + $"|Textdateien ({TextExt})|{TextExt}"
+                            + $"|Access-Dateien ({AccessExt})|{AccessExt}"
+                            + $"|CSV-Dateien ({CsvExt})|{CsvExt}"
+                            + $"|dBase-Dateien ({DbfExt})|{DbfExt}"
+                            + $"|Excel-Dateien (*.xl*)|{ExcelExt}"
+                            + "|Alle Dateien (*.*)|*.*",
+                RestoreDirectory = true,
+                Multiselect = status
+            };
+        }
 
         internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, bool isPreview = false)
         {

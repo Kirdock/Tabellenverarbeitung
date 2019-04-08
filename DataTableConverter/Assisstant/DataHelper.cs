@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -171,6 +172,66 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        internal static void SplitDataTable(DataTable table, string path, int saveFormat)
+        {
+            DataTable table1 = new DataTable() { TableName = AppendFileName(path, Properties.Settings.Default.FailAddressText) };
+            string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
+            DataTable table2;
+            foreach (DataColumn column in table.Columns)
+            {
+                table1.Columns.Add(column.ColumnName);
+            }
+            table2 = table1.Copy();
+            table2.TableName = AppendFileName(path, Properties.Settings.Default.RightAddressText);
+
+
+            foreach (DataRow row in table.Rows)
+            {
+                string value = row[invalidColumnName].ToString();
+                if (value == Properties.Settings.Default.FailAddressValue)
+                {
+                    table1.ImportRow(row);
+                }
+                else
+                {
+                    table2.ImportRow(row);
+                }
+            }
+            path = Path.GetDirectoryName(path);
+            foreach (DataTable Table in new DataTable[] { table1, table2 })
+            {
+                string FileName = Table.TableName;
+                switch (saveFormat)
+                {
+                    //CSV
+                    case 0:
+                        {
+                            ExportHelper.ExportCsv(Table, path, FileName);
+                        }
+                        break;
+
+                    //Dbase
+                    case 1:
+                        {
+                            ExportHelper.ExportDbase(FileName, Table, path);
+                        }
+                        break;
+
+                    //Excel
+                    case 2:
+                        {
+                            ExportHelper.ExportExcel(Table, path, FileName);
+                        }
+                        break;
+                }
+            }
+        }
+
+        private static string AppendFileName(string path, string name)
+        {
+            return Path.GetFileNameWithoutExtension(path) + name;
+        }
+
         internal static List<CellMatrix> ChangesOfDataTable(DataTable tableNew)
         {
             List<CellMatrix> result = new List<CellMatrix>();
@@ -253,6 +314,71 @@ namespace DataTableConverter.Assisstant
             float.TryParse(a, out float fa);
             float.TryParse(b, out float fb);
             return (fa + fb).ToString();
+        }
+
+        internal static void AddColumnsOfDataTable(DataTable importTable, DataTable sourceTable, string[] ImportColumns, int SourceMergeIndex, int ImportMergeIndex, bool SortColumn, string orderColumnName, ProgressBar pgbLoading)
+        {
+            int oldCount = sourceTable.Columns.Count;
+            int newColumnIndex = oldCount + ImportColumns.Length - 1; //-1: without identifier
+
+            for (int i = 0; i < ImportColumns.Length; i++)
+            {
+                if (i == ImportMergeIndex) continue;
+
+                AddColumn(ImportColumns[i], sourceTable);
+            }
+            if (SortColumn)
+            {
+                string SortColumnName = "[Sortierung]";
+                AddColumn(orderColumnName, sourceTable);
+                int LastIndex = importTable.Columns.Count;
+                AddColumn(SortColumnName, importTable);
+                for (int i = 0; i < importTable.Rows.Count; i++)
+                {
+                    importTable.Rows[i][LastIndex] = i.ToString();
+                }
+                ImportColumns = new List<string>(ImportColumns)
+                            {
+                                SortColumnName
+                            }.ToArray();
+            }
+
+            pgbLoading?.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = importTable.Rows.Count; }));
+
+
+            HashSet<int> hs = new HashSet<int>();
+
+
+            for (int y = 0; y < sourceTable.Rows.Count; y++)
+            {
+                DataRow source = sourceTable.Rows[y];
+
+                for (int rowIndex = 0; rowIndex < importTable.Rows.Count; rowIndex++)
+                {
+
+                    DataRow row = importTable.Rows[rowIndex];
+                    if (source.ItemArray[SourceMergeIndex].ToString() == row.ItemArray[ImportMergeIndex].ToString())
+                    {
+                        int Offset = 0;
+                        for (int i = 0; i < ImportColumns.Length; i++)
+                        {
+                            if (i == ImportMergeIndex)
+                            {
+                                Offset++;
+                            }
+                            else
+                            {
+                                source.SetField(oldCount + i - Offset, row.ItemArray[i]);
+                            }
+                        }
+                        importTable.Rows.RemoveAt(rowIndex);
+                        break;
+
+                    }
+                }
+
+                pgbLoading?.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
+        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
@@ -53,20 +53,19 @@ namespace DataTableConverter.Classes.WorkProcs
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
                 DataHelper.CopyColumns(columns, table);
             }
-            if (!string.IsNullOrWhiteSpace(NewColumn))
+            else if (!string.IsNullOrWhiteSpace(NewColumn))
             {
                 DataHelper.AddColumn(NewColumn, table);
                 intoNewCol = true;
             }
-            List<int> headerIndices = DataHelper.HeaderIndices(table, columns);
             foreach (DataRow row in table.Rows)
             {
-                foreach (int i in headerIndices)
+                foreach (string column in columns)
                 {
-                    int index = intoNewCol ? lastCol : i;
+                    int index = intoNewCol ? lastCol : table.Columns.IndexOf(column);
                     foreach (DataRow rep in replaces.Rows)
                     {
-                        string value = row[i].ToString();
+                        string value = row[column].ToString();
                         string replace = rep[0].ToString();
 
                         if (procedure.CheckTotal && value == replace)
@@ -79,7 +78,7 @@ namespace DataTableConverter.Classes.WorkProcs
                         }
                         else if (intoNewCol)
                         {
-                            row[index] = row[i];
+                            row[index] = row[column];
                         }
                     }
                 }

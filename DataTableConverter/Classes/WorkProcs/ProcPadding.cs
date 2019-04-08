@@ -48,7 +48,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
+        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetAffectedHeaders();
@@ -72,13 +72,13 @@ namespace DataTableConverter.Classes.WorkProcs
                 DataHelper.AddColumn(NewColumn, table);
                 intoNewCol = true;
             }
-            List<int> headerIndices = DataHelper.HeaderIndices(table, columns);
+
             foreach (DataRow row in table.Rows)
             {
-                foreach (int i in headerIndices)
+                foreach (string col in columns)
                 {
                     bool valid = Conditions.Rows.Count == 0;
-                    int index = intoNewCol ? lastCol : i;
+                    int index = intoNewCol ? lastCol : table.Columns.IndexOf(col);
                     bool result = !valid;
                     foreach (DataRow rep in Conditions.Rows)
                     {
@@ -94,18 +94,18 @@ namespace DataTableConverter.Classes.WorkProcs
                         switch (OperationSide)
                         {
                             case Side.Left:
-                                row[index] = row[i].ToString().PadLeft(Counter, Character.Value);
+                                row[index] = row[col].ToString().PadLeft(Counter, Character.Value);
                                 break;
 
                             case Side.Right:
                             default:
-                                row[index] = row[i].ToString().PadRight(Counter, Character.Value);
+                                row[index] = row[col].ToString().PadRight(Counter, Character.Value);
                                 break;
                         }
                     }
                     else if(intoNewCol)
                     {
-                        row[index] = row[i];
+                        row[index] = row[col];
                     }
                 }
             }

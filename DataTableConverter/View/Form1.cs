@@ -21,9 +21,7 @@ namespace DataTableConverter
     public partial class Form1 : Form
     {
         private int selectedRow = 0, selectedColumn = 0;
-        private readonly string dbfExt = "*.dbf";
-        private readonly string csvExt = "*.csv";
-        private readonly string excelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+        
         private List<Proc> procedures;
         private List<Work> workflows;
         private List<Tolerance> tolerances;
@@ -365,21 +363,9 @@ namespace DataTableConverter
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e, ImportState state = ImportState.None)
         {
-            string textExt = "*.txt";
-            string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
 
-            OpenFileDialog dialog = new OpenFileDialog
-            {
-                Filter = $"Text-, CSV-, DBASE und Excel-Dateien ({csvExt}, {textExt}, {AccessExt}, {dbfExt}*.xl*)|{csvExt};{textExt}; {excelExt}; {dbfExt}; {AccessExt}"
-                            + $"|Textdateien ({textExt})|{textExt}"
-                            + $"|Access-Dateien ({AccessExt})|{AccessExt}"
-                            + $"|CSV-Dateien ({csvExt})|{csvExt}"
-                            + $"|dBase-Dateien ({dbfExt})|{dbfExt}"
-                            + $"|Excel-Dateien (*.xl*)|{excelExt}"
-                            + "|Alle Dateien (*.*)|*.*",
-                RestoreDirectory = true,
-                Multiselect = state == ImportState.None || state == ImportState.Append
-            };
+
+            OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state == ImportState.None || state == ImportState.Append);
             DataTable oldTable = GetDataSource();
             string mergePath = string.Empty;
             bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
@@ -396,64 +382,16 @@ namespace DataTableConverter
                     Thread.CurrentThread.IsBackground = true;
                     StartLoadingBar();
                     bool multipleFiles = filenames.Length > 1;
-                    Dictionary<string, ImportSettings> takeOver = new Dictionary<string, ImportSettings>();
+                    Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
                     DataTable newTable = null;
                     string fileNameBefore = Path.GetFileName(filenames[0]);
                     foreach (string file in filenames)
                     {
                         try
                         {
+                            
                             string filename = Path.GetFileName(file);
-                            string extension = Path.GetExtension(file).ToLower();
-                            DataTable table = null;
-
-                            if (extension == ".dbf")
-                            {
-                                table = ImportHelper.OpenDBF(file);
-                            }
-                            else if (extension != string.Empty && AccessExt.Contains(extension))
-                            {
-                                table = ImportHelper.OpenMSAccess(file);
-                            }
-                            else if (extension != string.Empty && excelExt.Contains(extension))
-                            {
-                                table = ImportHelper.OpenExcel(file, this);
-                            }
-                            else
-                            {
-                                if (takeOver.TryGetValue(extension, out ImportSettings settings))
-                                {
-                                    if (settings.Values != null)
-                                    {
-                                        string data = File.ReadAllText(file, Encoding.GetEncoding(settings.CodePage));
-                                        table = ImportHelper.OpenTextFixed(data, file, settings.Values, settings.Headers);
-                                    }
-                                    else if(settings.Separator != null)
-                                    {
-                                        table = ImportHelper.OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders);
-                                    }
-                                    else
-                                    {
-                                        table = ImportHelper.OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders);
-                                    }
-
-                                }
-                                else
-                                {
-                                    TextFormat form = new TextFormat(file, multipleFiles);
-                                    //BeginInvoke(new MethodInvoker(() =>
-                                    //{
-                                        if (form.ShowDialog() == DialogResult.OK)
-                                        {
-                                            if (form.TakeOver)
-                                            {
-                                                takeOver.Add(extension, form.ImportSettings);
-                                            }
-                                            table = form.DataTable;
-                                        }
-                                    //}));
-                                }
-                            }
+                            DataTable table = ImportHelper.ImportFile(file, this, multipleFiles, fileImportSettings);
                             if (table != null)
                             {
                                 if (newTable != null)
@@ -526,70 +464,8 @@ namespace DataTableConverter
                 new Thread(() =>
                 {
                     try {
-                        
-                        #region Compare Everything
-                        int oldCount = sourceTable.Columns.Count;
-                        int newColumnIndex = oldCount + ImportColumns.Length -1; //-1: without identifier
-
-                        for (int i = 0; i < ImportColumns.Length; i++)
-                        {
-                            if (i == ImportMergeIndex) continue;
-
-                            DataHelper.AddColumn(ImportColumns[i], sourceTable);
-                        }
-                        if (SortColumn)
-                        {
-                            string SortColumnName = "[Sortierung]";
-                            DataHelper.AddColumn(orderColumnName, sourceTable);
-                            int LastIndex = importTable.Columns.Count;
-                            DataHelper.AddColumn(SortColumnName, importTable);
-                            for(int i = 0; i < importTable.Rows.Count; i++)
-                            {
-                                importTable.Rows[i][LastIndex] = i.ToString();
-                            }
-                            ImportColumns = new List<string>(ImportColumns)
-                            {
-                                SortColumnName
-                            }.ToArray();
-                        }
-
-                        pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = importTable.Rows.Count; }));
-
-
-                        HashSet<int> hs = new HashSet<int>();
-                    
-
-                        for (int y = 0; y < sourceTable.Rows.Count; y++)
-                        {
-                            DataRow source = sourceTable.Rows[y];
-                        
-                            for (int rowIndex = 0; rowIndex < importTable.Rows.Count; rowIndex++)
-                            {
-
-                                DataRow row = importTable.Rows[rowIndex];
-                                if (source.ItemArray[SourceMergeIndex].ToString() == row.ItemArray[ImportMergeIndex].ToString())
-                                {
-                                    int Offset = 0;
-                                    for (int i = 0; i < ImportColumns.Length; i++)
-                                    {
-                                        if (i == ImportMergeIndex)
-                                        {
-                                            Offset++;
-                                        }
-                                        else
-                                        {
-                                            source.SetField(oldCount + i - Offset, row.ItemArray[i]);
-                                        }
-                                    }
-                                    importTable.Rows.RemoveAt(rowIndex);
-                                    break;
-                                
-                                }
-                            }
-
-                            pgbLoading.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
-                        }
-                        #endregion
+                        DataHelper.AddColumnsOfDataTable(importTable, sourceTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, SortColumn, orderColumnName, pgbLoading);
+                        DataHelper.SplitDataTable(sourceTable, FilePath, 0);
 
                         dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(sourceTable); }));
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
@@ -661,7 +537,7 @@ namespace DataTableConverter
 
         private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp)
         {
-            wp.doWork(table, out string newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId));
+            wp.doWork(table, out string newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath);
             if (newOrder != string.Empty)
             {
                 SetSorting(newOrder);
@@ -688,7 +564,7 @@ namespace DataTableConverter
         {
             Thread.CurrentThread.IsBackground = true;
             ProcTrim proc = new ProcTrim();
-            proc.doWork(dt, out string sortingOrder, null, null, null);
+            proc.doWork(dt, out string sortingOrder, null, null, null, FilePath);
             dgTable.Invoke(new MethodInvoker(() =>
             {
                 AddDataSourceValueChange(dt);
@@ -702,7 +578,7 @@ namespace DataTableConverter
             {
                 SaveFileDialog saveFileDialog1 = new SaveFileDialog
                 {
-                    Filter = $"Excel Dateien|{excelExt}|Alle Dateien (*.*)|*.*",
+                    Filter = $"Excel Dateien|{ImportHelper.ExcelExt}|Alle Dateien (*.*)|*.*",
                     FilterIndex = 1,
                     RestoreDirectory = true
                 };
@@ -818,7 +694,7 @@ namespace DataTableConverter
             {
                 SaveFileDialog saveFileDialog1 = new SaveFileDialog
                 {
-                    Filter = $"DBASE Dateien ({dbfExt})|{dbfExt}|Alle Dateien (*.*)|*.*",
+                    Filter = $"DBASE Dateien ({ImportHelper.DbfExt})|{ImportHelper.DbfExt}|Alle Dateien (*.*)|*.*",
                     FilterIndex = 1,
                     RestoreDirectory = true
                 };
@@ -948,7 +824,7 @@ namespace DataTableConverter
                 DataTable table = dt ?? GetDataSource(true);
                 SaveFileDialog saveFileDialog1 = new SaveFileDialog
                 {
-                    Filter = $"CSV Dateien ({csvExt})|{csvExt}|Alle Dateien (*.*)|*.*",
+                    Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
                     FilterIndex = 1,
                     RestoreDirectory = true
                 };
@@ -1316,7 +1192,7 @@ namespace DataTableConverter
             {
                 dBASEToolStripMenuItem_Click(null, null, FileName);
             }
-            else if (extension != string.Empty && excelExt.Contains(extension))
+            else if (extension != string.Empty && ImportHelper.ExcelExt.Contains(extension))
             {
                 excelToolStripMenuItem_Click(null, null, FileName);
             }

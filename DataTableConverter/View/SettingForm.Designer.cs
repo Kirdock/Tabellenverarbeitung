@@ -34,16 +34,18 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cRequired = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.tpFileShortcuts = new System.Windows.Forms.TabPage();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtFailAddress = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.txtRightAddress = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.txtPVM = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.txtFailAddressValue = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtPVM = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtRightAddress = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtFailAddress = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.txtInvalidColumn = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -110,6 +112,8 @@
             // 
             // tpFileShortcuts
             // 
+            this.tpFileShortcuts.Controls.Add(this.label7);
+            this.tpFileShortcuts.Controls.Add(this.txtInvalidColumn);
             this.tpFileShortcuts.Controls.Add(this.txtFailAddressValue);
             this.tpFileShortcuts.Controls.Add(this.label6);
             this.tpFileShortcuts.Controls.Add(this.txtPVM);
@@ -126,37 +130,28 @@
             this.tpFileShortcuts.Text = "Dateikürzel";
             this.tpFileShortcuts.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // txtFailAddressValue
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 18);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(163, 13);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Kürzel der fehlerhaften Adressen:";
+            this.txtFailAddressValue.Location = new System.Drawing.Point(192, 176);
+            this.txtFailAddressValue.Name = "txtFailAddressValue";
+            this.txtFailAddressValue.Size = new System.Drawing.Size(100, 20);
+            this.txtFailAddressValue.TabIndex = 7;
             // 
-            // txtFailAddress
+            // label6
             // 
-            this.txtFailAddress.Location = new System.Drawing.Point(192, 18);
-            this.txtFailAddress.Name = "txtFailAddress";
-            this.txtFailAddress.Size = new System.Drawing.Size(100, 20);
-            this.txtFailAddress.TabIndex = 1;
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(8, 176);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(178, 13);
+            this.label6.TabIndex = 6;
+            this.label6.Text = "Identifizierung fehlerhafter Adressen:";
             // 
-            // label4
+            // txtPVM
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 58);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(147, 13);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "Kürzel der richtigen Adressen:";
-            // 
-            // txtRightAddress
-            // 
-            this.txtRightAddress.Location = new System.Drawing.Point(192, 58);
-            this.txtRightAddress.Name = "txtRightAddress";
-            this.txtRightAddress.Size = new System.Drawing.Size(100, 20);
-            this.txtRightAddress.TabIndex = 3;
+            this.txtPVM.Location = new System.Drawing.Point(192, 97);
+            this.txtPVM.Name = "txtPVM";
+            this.txtPVM.Size = new System.Drawing.Size(100, 20);
+            this.txtPVM.TabIndex = 5;
             // 
             // label5
             // 
@@ -167,28 +162,53 @@
             this.label5.TabIndex = 4;
             this.label5.Text = "Kürzel für PVM Datei:";
             // 
-            // txtPVM
+            // txtRightAddress
             // 
-            this.txtPVM.Location = new System.Drawing.Point(192, 97);
-            this.txtPVM.Name = "txtPVM";
-            this.txtPVM.Size = new System.Drawing.Size(100, 20);
-            this.txtPVM.TabIndex = 5;
+            this.txtRightAddress.Location = new System.Drawing.Point(192, 58);
+            this.txtRightAddress.Name = "txtRightAddress";
+            this.txtRightAddress.Size = new System.Drawing.Size(100, 20);
+            this.txtRightAddress.TabIndex = 3;
             // 
-            // label6
+            // label4
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(8, 131);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(168, 13);
-            this.label6.TabIndex = 6;
-            this.label6.Text = "Identifizierung fehlerhafte Dateien:";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(8, 58);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(147, 13);
+            this.label4.TabIndex = 2;
+            this.label4.Text = "Kürzel der richtigen Adressen:";
             // 
-            // txtFailAddressValue
+            // txtFailAddress
             // 
-            this.txtFailAddressValue.Location = new System.Drawing.Point(192, 131);
-            this.txtFailAddressValue.Name = "txtFailAddressValue";
-            this.txtFailAddressValue.Size = new System.Drawing.Size(100, 20);
-            this.txtFailAddressValue.TabIndex = 7;
+            this.txtFailAddress.Location = new System.Drawing.Point(192, 18);
+            this.txtFailAddress.Name = "txtFailAddress";
+            this.txtFailAddress.Size = new System.Drawing.Size(100, 20);
+            this.txtFailAddress.TabIndex = 1;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(8, 18);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(163, 13);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Kürzel der fehlerhaften Adressen:";
+            // 
+            // txtInvalidColumn
+            // 
+            this.txtInvalidColumn.Location = new System.Drawing.Point(192, 138);
+            this.txtInvalidColumn.Name = "txtInvalidColumn";
+            this.txtInvalidColumn.Size = new System.Drawing.Size(100, 20);
+            this.txtInvalidColumn.TabIndex = 8;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(8, 141);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(157, 13);
+            this.label7.TabIndex = 9;
+            this.label7.Text = "Spalte der ungültigen Adressen:";
             // 
             // SettingForm
             // 
@@ -227,5 +247,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtFailAddressValue;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtInvalidColumn;
     }
 }

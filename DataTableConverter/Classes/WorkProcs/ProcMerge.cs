@@ -96,7 +96,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return source.Replace($"[{oldName}]", $"[{newName}]");
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
+        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
             sortingOrder = string.Empty; //base(table, sortingOrder, columns)
             int column = table.Columns.Count;

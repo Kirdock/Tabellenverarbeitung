@@ -345,5 +345,17 @@ namespace DataTableConverter.Properties {
                 this["FailAddressValue"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ungültig")]
+        public string InvalidColumnName {
+            get {
+                return ((string)(this["InvalidColumnName"]));
+            }
+            set {
+                this["InvalidColumnName"] = value;
+            }
+        }
     }
 }

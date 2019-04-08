@@ -83,5 +83,8 @@
     <Setting Name="FailAddressValue" Type="System.String" Scope="User">
       <Value Profile="(Default)">X</Value>
     </Setting>
+    <Setting Name="InvalidColumnName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ungültig</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

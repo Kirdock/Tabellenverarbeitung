@@ -54,6 +54,6 @@ namespace DataTableConverter.Classes
 
         abstract public void renameHeaders(string oldName, string newName);
 
-        abstract public void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure);
+        abstract public void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath);
     }
 }

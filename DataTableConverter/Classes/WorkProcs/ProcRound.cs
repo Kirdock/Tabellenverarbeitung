@@ -47,7 +47,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure)
+        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
@@ -73,7 +73,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     if (columns == null || headerIndices.Contains(i))
                     {
                         int index = intoNewCol ? lastCol : i;
-                        if (float.TryParse(row.ItemArray[i].ToString(), out float result))
+                        if (float.TryParse(row[i].ToString(), out float result))
                         {
                             row.SetField(index, Round(result));
                         }
