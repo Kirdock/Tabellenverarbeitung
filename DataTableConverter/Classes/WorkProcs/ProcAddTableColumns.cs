@@ -129,7 +129,10 @@ namespace DataTableConverter.Classes.WorkProcs
                     if(notFoundHeaders.Count == 0)
                     {
                         DataHelper.AddColumnsOfDataTable(table, newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), RememberSort, NewColumn, null);
-                        DataHelper.SplitDataTable(table, path,SaveFormat);
+                        if (Properties.Settings.Default.SplitPVM)
+                        {
+                            DataHelper.SplitDataTable(table, path, SaveFormat);
+                        }
                     }
                 }
             }

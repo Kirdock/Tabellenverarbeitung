@@ -465,7 +465,10 @@ namespace DataTableConverter
                 {
                     try {
                         DataHelper.AddColumnsOfDataTable(importTable, sourceTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, SortColumn, orderColumnName, pgbLoading);
-                        DataHelper.SplitDataTable(sourceTable, FilePath, 0);
+                        if (Properties.Settings.Default.SplitPVM)
+                        {
+                            DataHelper.SplitDataTable(sourceTable, FilePath, 0);
+                        }
 
                         dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(sourceTable); }));
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));

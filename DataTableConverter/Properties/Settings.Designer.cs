@@ -357,5 +357,17 @@ namespace DataTableConverter.Properties {
                 this["InvalidColumnName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SplitPVM {
+            get {
+                return ((bool)(this["SplitPVM"]));
+            }
+            set {
+                this["SplitPVM"] = value;
+            }
+        }
     }
 }

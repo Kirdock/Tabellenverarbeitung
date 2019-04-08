@@ -35,6 +35,8 @@
             this.cRequired = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.tpFileShortcuts = new System.Windows.Forms.TabPage();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtInvalidColumn = new System.Windows.Forms.TextBox();
             this.txtFailAddressValue = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.txtPVM = new System.Windows.Forms.TextBox();
@@ -44,8 +46,7 @@
             this.txtFailAddress = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.txtInvalidColumn = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
+            this.cbSplitPVM = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -112,6 +113,7 @@
             // 
             // tpFileShortcuts
             // 
+            this.tpFileShortcuts.Controls.Add(this.cbSplitPVM);
             this.tpFileShortcuts.Controls.Add(this.label7);
             this.tpFileShortcuts.Controls.Add(this.txtInvalidColumn);
             this.tpFileShortcuts.Controls.Add(this.txtFailAddressValue);
@@ -129,6 +131,22 @@
             this.tpFileShortcuts.TabIndex = 1;
             this.tpFileShortcuts.Text = "Dateikürzel";
             this.tpFileShortcuts.UseVisualStyleBackColor = true;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(8, 141);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(157, 13);
+            this.label7.TabIndex = 9;
+            this.label7.Text = "Spalte der ungültigen Adressen:";
+            // 
+            // txtInvalidColumn
+            // 
+            this.txtInvalidColumn.Location = new System.Drawing.Point(192, 138);
+            this.txtInvalidColumn.Name = "txtInvalidColumn";
+            this.txtInvalidColumn.Size = new System.Drawing.Size(100, 20);
+            this.txtInvalidColumn.TabIndex = 8;
             // 
             // txtFailAddressValue
             // 
@@ -194,21 +212,16 @@
             this.label3.TabIndex = 0;
             this.label3.Text = "Kürzel der fehlerhaften Adressen:";
             // 
-            // txtInvalidColumn
+            // cbSplitPVM
             // 
-            this.txtInvalidColumn.Location = new System.Drawing.Point(192, 138);
-            this.txtInvalidColumn.Name = "txtInvalidColumn";
-            this.txtInvalidColumn.Size = new System.Drawing.Size(100, 20);
-            this.txtInvalidColumn.TabIndex = 8;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(8, 141);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(157, 13);
-            this.label7.TabIndex = 9;
-            this.label7.Text = "Spalte der ungültigen Adressen:";
+            this.cbSplitPVM.AutoSize = true;
+            this.cbSplitPVM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cbSplitPVM.Location = new System.Drawing.Point(6, 215);
+            this.cbSplitPVM.Name = "cbSplitPVM";
+            this.cbSplitPVM.Size = new System.Drawing.Size(217, 17);
+            this.cbSplitPVM.TabIndex = 10;
+            this.cbSplitPVM.Text = "Aufteilen der Adressen nach PVM-Import";
+            this.cbSplitPVM.UseVisualStyleBackColor = true;
             // 
             // SettingForm
             // 
@@ -249,5 +262,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox txtInvalidColumn;
+        private System.Windows.Forms.CheckBox cbSplitPVM;
     }
 }

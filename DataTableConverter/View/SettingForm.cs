@@ -27,6 +27,7 @@ namespace DataTableConverter.View
             txtPVM.Text = Properties.Settings.Default.PVMAddressText;
             txtFailAddressValue.Text = Properties.Settings.Default.FailAddressValue;
             txtInvalidColumn.Text = Properties.Settings.Default.InvalidColumnName;
+            cbSplitPVM.Checked = Properties.Settings.Default.SplitPVM;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -40,6 +41,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.PVMAddressText = txtPVM.Text;
                 Properties.Settings.Default.FailAddressValue = txtFailAddressValue.Text;
                 Properties.Settings.Default.InvalidColumnName = txtInvalidColumn.Text;
+                Properties.Settings.Default.SplitPVM = cbSplitPVM.Checked;
                 Properties.Settings.Default.Save();
             }
             else

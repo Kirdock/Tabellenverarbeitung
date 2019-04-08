@@ -86,5 +86,8 @@
     <Setting Name="InvalidColumnName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Ungültig</Value>
     </Setting>
+    <Setting Name="SplitPVM" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

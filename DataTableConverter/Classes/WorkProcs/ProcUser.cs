@@ -63,23 +63,27 @@ namespace DataTableConverter.Classes.WorkProcs
                 foreach (string column in columns)
                 {
                     int index = intoNewCol ? lastCol : table.Columns.IndexOf(column);
-                    foreach (DataRow rep in replaces.Rows)
-                    {
-                        string value = row[column].ToString();
-                        string replace = rep[0].ToString();
+                    string value = row[column].ToString();
 
-                        if (procedure.CheckTotal && value == replace)
+                    if (procedure.CheckTotal)
+                    {
+                        IEnumerable<DataRow> foundRows = replaces.Rows.Cast<DataRow>().Where(replace => replace[0].ToString() == value);
+                        if(foundRows.Count() > 0)
                         {
-                            row[index] = rep[1].ToString();
+                            row[index] = foundRows.First()[1];
                         }
-                        else if (!procedure.CheckTotal && value.Contains(replace))
+                        else
                         {
-                            row[index] = value.Replace(replace, rep[1].ToString());
+                            row[index] = value;
                         }
-                        else if (intoNewCol)
+                    }
+                    else
+                    {
+                        foreach (DataRow rep in replaces.Rows)
                         {
-                            row[index] = row[column];
+                            value = value.Replace(rep[0].ToString(), rep[1].ToString());
                         }
+                        row[index] = value;
                     }
                 }
             }
