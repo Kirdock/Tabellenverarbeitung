@@ -369,5 +369,29 @@ namespace DataTableConverter.Properties {
                 this["SplitPVM"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ImportHeaderUpperCase {
+            get {
+                return ((bool)(this["ImportHeaderUpperCase"]));
+            }
+            set {
+                this["ImportHeaderUpperCase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int PVMSaveFormat {
+            get {
+                return ((int)(this["PVMSaveFormat"]));
+            }
+            set {
+                this["PVMSaveFormat"] = value;
+            }
+        }
     }
 }

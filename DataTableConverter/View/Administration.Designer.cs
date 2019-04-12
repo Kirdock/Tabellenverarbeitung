@@ -177,6 +177,13 @@
             this.dgCaseColumns = new System.Windows.Forms.DataGridView();
             this.txtCaseName = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtIdentifierSource = new System.Windows.Forms.TextBox();
+            this.txtIdentifierAppend = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cbNewColumnAddTableColumn = new System.Windows.Forms.CheckBox();
+            this.txtNewColumnAddTableColumn = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -245,6 +252,7 @@
             this.gbCaseShortcuts.SuspendLayout();
             this.gbCaseColumns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).BeginInit();
+            this.gbAddTableColumns.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -478,6 +486,7 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbReplaceWhole);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPadding);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
@@ -667,6 +676,7 @@
             this.gbReplaceWhole.TabIndex = 20;
             this.gbReplaceWhole.TabStop = false;
             this.gbReplaceWhole.Text = "Spaltenangabe";
+            this.gbReplaceWhole.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
             // 
             // label6
             // 
@@ -2120,6 +2130,83 @@
             this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTip1.ToolTipTitle = "Info";
             // 
+            // gbAddTableColumns
+            // 
+            this.gbAddTableColumns.Controls.Add(this.txtNewColumnAddTableColumn);
+            this.gbAddTableColumns.Controls.Add(this.cbNewColumnAddTableColumn);
+            this.gbAddTableColumns.Controls.Add(this.txtIdentifierAppend);
+            this.gbAddTableColumns.Controls.Add(this.label3);
+            this.gbAddTableColumns.Controls.Add(this.txtIdentifierSource);
+            this.gbAddTableColumns.Controls.Add(this.label1);
+            this.gbAddTableColumns.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbAddTableColumns.Location = new System.Drawing.Point(0, 92);
+            this.gbAddTableColumns.Name = "gbAddTableColumns";
+            this.gbAddTableColumns.Size = new System.Drawing.Size(282, 673);
+            this.gbAddTableColumns.TabIndex = 21;
+            this.gbAddTableColumns.TabStop = false;
+            this.gbAddTableColumns.Text = "Spaltenangabe";
+            this.gbAddTableColumns.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 19);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(231, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Identifizierung der bereits eingelesenen Tabelle:";
+            // 
+            // txtIdentifierSource
+            // 
+            this.txtIdentifierSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtIdentifierSource.Location = new System.Drawing.Point(6, 42);
+            this.txtIdentifierSource.Name = "txtIdentifierSource";
+            this.txtIdentifierSource.Size = new System.Drawing.Size(270, 20);
+            this.txtIdentifierSource.TabIndex = 1;
+            this.txtIdentifierSource.TextChanged += new System.EventHandler(this.txtIdentifierSource_TextChanged);
+            // 
+            // txtIdentifierAppend
+            // 
+            this.txtIdentifierAppend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtIdentifierAppend.Location = new System.Drawing.Point(6, 104);
+            this.txtIdentifierAppend.Name = "txtIdentifierAppend";
+            this.txtIdentifierAppend.Size = new System.Drawing.Size(270, 20);
+            this.txtIdentifierAppend.TabIndex = 3;
+            this.txtIdentifierAppend.TextChanged += new System.EventHandler(this.txtIdentifierAppend_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 81);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(202, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Identifizierung der einzulesenden Tabelle:";
+            // 
+            // cbNewColumnAddTableColumn
+            // 
+            this.cbNewColumnAddTableColumn.AutoSize = true;
+            this.cbNewColumnAddTableColumn.Location = new System.Drawing.Point(7, 137);
+            this.cbNewColumnAddTableColumn.Name = "cbNewColumnAddTableColumn";
+            this.cbNewColumnAddTableColumn.Size = new System.Drawing.Size(112, 17);
+            this.cbNewColumnAddTableColumn.TabIndex = 4;
+            this.cbNewColumnAddTableColumn.Text = "Sortierung merken";
+            this.cbNewColumnAddTableColumn.UseVisualStyleBackColor = true;
+            this.cbNewColumnAddTableColumn.CheckedChanged += new System.EventHandler(this.cbNewColumnAddTableColumn_CheckedChanged);
+            // 
+            // txtNewColumnAddTableColumn
+            // 
+            this.txtNewColumnAddTableColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtNewColumnAddTableColumn.Location = new System.Drawing.Point(5, 163);
+            this.txtNewColumnAddTableColumn.Name = "txtNewColumnAddTableColumn";
+            this.txtNewColumnAddTableColumn.Size = new System.Drawing.Size(270, 20);
+            this.txtNewColumnAddTableColumn.TabIndex = 5;
+            this.txtNewColumnAddTableColumn.Visible = false;
+            this.txtNewColumnAddTableColumn.TextChanged += new System.EventHandler(this.txtNewColumnAddTableColumn_TextChanged);
+            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2213,6 +2300,8 @@
             this.gbCaseShortcuts.PerformLayout();
             this.gbCaseColumns.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).EndInit();
+            this.gbAddTableColumns.ResumeLayout(false);
+            this.gbAddTableColumns.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -2367,5 +2456,12 @@
         private System.Windows.Forms.DataGridView dgvReplaceWhole;
         private CheckComboBoxTest.CheckedComboBox cbHeadersReplaceWhole;
         private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.GroupBox gbAddTableColumns;
+        private System.Windows.Forms.TextBox txtIdentifierSource;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtIdentifierAppend;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtNewColumnAddTableColumn;
+        private System.Windows.Forms.CheckBox cbNewColumnAddTableColumn;
     }
 }

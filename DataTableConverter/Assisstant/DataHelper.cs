@@ -172,10 +172,10 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void SplitDataTable(DataTable table, string path, int saveFormat)
+        internal static void SplitDataTable(DataTable table, string path, string columnName = null)
         {
             DataTable table1 = new DataTable() { TableName = AppendFileName(path, Properties.Settings.Default.FailAddressText) };
-            string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
+            string invalidColumnName = columnName ?? Properties.Settings.Default.InvalidColumnName;
             DataTable table2;
             foreach (DataColumn column in table.Columns)
             {
@@ -201,7 +201,7 @@ namespace DataTableConverter.Assisstant
             foreach (DataTable Table in new DataTable[] { table1, table2 })
             {
                 string FileName = Table.TableName;
-                switch (saveFormat)
+                switch (Properties.Settings.Default.PVMSaveFormat)
                 {
                     //CSV
                     case 0:

@@ -67,10 +67,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
                     if (procedure.CheckTotal)
                     {
-                        IEnumerable<DataRow> foundRows = replaces.Where(replace => replace[0].ToString() == value);
-                        if(foundRows.Count() > 0)
+                        DataRow foundRows = replaces.FirstOrDefault(replace => replace[0].ToString() == value);
+                        if(foundRows != null)
                         {
-                            row[index] = foundRows.First()[1];
+                            row[index] = foundRows[1];
                         }
                         else
                         {

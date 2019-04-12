@@ -124,6 +124,10 @@ namespace DataTableConverter.Assisstant
                             newProc = new ProcReplaceWhole(ordinal, id, name);
                             break;
 
+                        case 10:
+                            newProc = new ProcAddTableColumns(ordinal, id, name);
+                            break;
+
                         case 1:
                         default:
                             newProc = new ProcTrim(ordinal, id, name);

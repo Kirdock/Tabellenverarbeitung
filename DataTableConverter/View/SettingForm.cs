@@ -28,6 +28,8 @@ namespace DataTableConverter.View
             txtFailAddressValue.Text = Properties.Settings.Default.FailAddressValue;
             txtInvalidColumn.Text = Properties.Settings.Default.InvalidColumnName;
             cbSplitPVM.Checked = Properties.Settings.Default.SplitPVM;
+            cbHeaderUpperCase.Checked = Properties.Settings.Default.ImportHeaderUpperCase;
+            cbPVMSaveFormat.SelectedIndex = Properties.Settings.Default.PVMSaveFormat;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -42,6 +44,8 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.FailAddressValue = txtFailAddressValue.Text;
                 Properties.Settings.Default.InvalidColumnName = txtInvalidColumn.Text;
                 Properties.Settings.Default.SplitPVM = cbSplitPVM.Checked;
+                Properties.Settings.Default.ImportHeaderUpperCase = cbHeaderUpperCase.Checked;
+                Properties.Settings.Default.PVMSaveFormat = cbPVMSaveFormat.SelectedIndex;
                 Properties.Settings.Default.Save();
             }
             else

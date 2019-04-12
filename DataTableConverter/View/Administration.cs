@@ -179,7 +179,8 @@ namespace DataTableConverter.View
                 { gbPadding, typeof(ProcPadding) },
                 { gbNumber, typeof(ProcNumber) },
                 { gbSubstring, typeof(ProcSubstring) },
-                { gbReplaceWhole, typeof(ProcReplaceWhole) }
+                { gbReplaceWhole, typeof(ProcReplaceWhole) },
+                {gbAddTableColumns, typeof(ProcAddTableColumns) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -193,7 +194,8 @@ namespace DataTableConverter.View
                 { typeof(ProcPadding), SetPaddingControls },
                 { typeof(ProcNumber), SetNumberControls },
                 { typeof(ProcSubstring), SetSubstringControls },
-                { typeof(ProcReplaceWhole), SetReplaceWholeControls }
+                { typeof(ProcReplaceWhole), SetReplaceWholeControls },
+                {typeof(ProcAddTableColumns), SetAddTableColumnsControls }
             };
         }
 
@@ -209,7 +211,8 @@ namespace DataTableConverter.View
                 new Proc(ProcPadding.ClassName, null, 6),
                 new Proc(ProcNumber.ClassName, null, 7),
                 new Proc(ProcSubstring.ClassName, null, 8),
-                new Proc(ProcReplaceWhole.ClassName, null, 9)
+                new Proc(ProcReplaceWhole.ClassName, null, 9),
+                new Proc(ProcAddTableColumns.ClassName, null, 10)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -621,6 +624,16 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = ProcReplaceWhole.ClassName;
             dgvReplaceWhole.DataSource = proc.Columns;
 
+        }
+
+        private void SetAddTableColumnsControls(WorkProc selectedProc)
+        {
+            ProcAddTableColumns proc = selectedProc as ProcAddTableColumns;
+            lblOriginalNameText.Text = ProcAddTableColumns.ClassName;
+            txtIdentifierSource.Text = proc.IdentifySource;
+            txtIdentifierAppend.Text = proc.IdentifyAppend;
+            txtNewColumn.Text = proc.NewColumn;
+            cbNewColumnAddTableColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
         }
 
         private void SetNumberControls(WorkProc selectedProc)
@@ -1568,6 +1581,30 @@ namespace DataTableConverter.View
         private void cbHeadersReplaceWhole_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvReplaceWhole, e, sender as CheckedListBox);
+        }
+
+        private void txtIdentifierSource_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcAddTableColumns).IdentifySource = txtIdentifierSource.Text;
+        }
+
+        private void txtIdentifierAppend_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcAddTableColumns).IdentifyAppend = txtIdentifierAppend.Text;
+        }
+
+        private void txtNewColumnAddTableColumn_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcAddTableColumns).NewColumn = txtNewColumnAddTableColumn.Text;
+        }
+
+        private void cbNewColumnAddTableColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            txtNewColumnAddTableColumn.Visible = cbNewColumnAddTableColumn.Checked;
+            if (!cbNewColumnAddTableColumn.Checked)
+            {
+                (GetSelectedWorkProcedure() as ProcAddTableColumns).NewColumn = string.Empty;
+            }
         }
     }
 }

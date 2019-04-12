@@ -32,6 +32,7 @@ namespace DataTableConverter.View
             }
             ClBHeaders.Items.AddRange(list.ToArray());
             CmBHeaders.SelectedIndex = 0;
+            SetChecked(true);
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)

@@ -333,7 +333,7 @@ namespace DataTableConverter
         {
             DataTable table = GetDataSource();
             StartLoadingBar();
-            new Thread(() =>
+            Thread thread = new Thread(() =>
             {
                 try
                 {
@@ -348,12 +348,14 @@ namespace DataTableConverter
                         AddDataSourceValueChange(table);
                     }));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ErrorHelper.LogMessage(ex);
                 }
                 StopLoadingBar();
-            }).Start();
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private int GetProcedureThroughId(int id)
@@ -377,7 +379,7 @@ namespace DataTableConverter
                     SetFileName(filenames[0]);
                 }
 
-                new Thread(() =>
+                Thread thread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     StartLoadingBar();
@@ -389,7 +391,7 @@ namespace DataTableConverter
                     {
                         try
                         {
-                            
+
                             string filename = Path.GetFileName(file);
                             DataTable table = ImportHelper.ImportFile(file, this, multipleFiles, fileImportSettings);
                             if (table != null)
@@ -411,7 +413,9 @@ namespace DataTableConverter
                         }
                     }
                     FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]));
-                }).Start();
+                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
             }
         }
 
@@ -467,7 +471,7 @@ namespace DataTableConverter
                         DataHelper.AddColumnsOfDataTable(importTable, sourceTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, SortColumn, orderColumnName, pgbLoading);
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            DataHelper.SplitDataTable(sourceTable, FilePath, 0);
+                            DataHelper.SplitDataTable(sourceTable, FilePath);
                         }
 
                         dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(sourceTable); }));

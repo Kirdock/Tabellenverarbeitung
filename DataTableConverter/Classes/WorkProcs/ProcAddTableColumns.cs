@@ -15,15 +15,15 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcAddTableColumns : WorkProc
     {
         internal string IdentifySource, IdentifyAppend;
-        internal bool SaveWhenFinished = true;
-        internal bool ImportAll = true;
-        internal bool RememberSort;
-        internal int SaveFormat;
+        internal static string ClassName = "PVM";
+        //internal bool ImportAll = true;
 
         public override string[] GetHeaders()
         {
-            return new string[] { IdentifySource };
+            return WorkflowHelper.RemoveEmptyHeaders(new string[] { IdentifySource });
         }
+
+        public ProcAddTableColumns(int ordinal, int id, string name) :base(ordinal, id, name) { }
 
         public override void renameHeaders(string oldName, string newName)
         {
@@ -33,15 +33,6 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        //public override void GetImportTableInformation()
-        //{
-        //    ref WorkflowHelper.RemoveEmptyHeaders(DataHelper.HeadersOfDataTable(Columns).Cast<string>());
-        //    ref IdentifyAppend;
-        //    ref InvalidColumnName;
-
-
-        //}
-
         public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath)
         {
             //I should first load the File (before workflow.start; right after header-check)
@@ -49,8 +40,12 @@ namespace DataTableConverter.Classes.WorkProcs
             //new SelectDuplicateColumns dialog only for second table
 
             sortingOrder = string.Empty;
+            if(string.IsNullOrWhiteSpace(IdentifyAppend) || string.IsNullOrWhiteSpace(IdentifySource))
+            {
+                return;
+            }
             string path = null;
-            string InvalidColumnName = Properties.Settings.Default.InvalidColumnName;
+            string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
             if (!CheckFile(filePath, ref path)) //find file
             {
                 OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(false);
@@ -67,43 +62,48 @@ namespace DataTableConverter.Classes.WorkProcs
                     List<string> selectedImportHeaders = DataHelper.HeadersOfDataTable(Columns).Cast<string>().ToList();
                     List<string> notFoundHeaders = new List<string>();
                     string[] importColumns = new string[0];
-                    if (!ImportAll)
-                    {
-                        List<string> list = new List<string>(selectedImportHeaders) { IdentifyAppend, InvalidColumnName };
+                    //if (!ImportAll)
+                    //{
+                    //    List<string> list = new List<string>(selectedImportHeaders) { IdentifyAppend, InvalidColumnName };
 
-                        foreach (string header in WorkflowHelper.RemoveEmptyHeaders(list))
-                        {
-                            if (newTable.Columns.IndexOf(header) == -1)
-                            {
-                                notFoundHeaders.Add(header);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (newTable.Columns.IndexOf(IdentifyAppend) == -1)
+                    //    foreach (string header in WorkflowHelper.RemoveEmptyHeaders(list))
+                    //    {
+                    //        if (newTable.Columns.IndexOf(header) == -1)
+                    //        {
+                    //            notFoundHeaders.Add(header);
+                    //        }
+                    //    }
+                    //}
+                    //else
+                    //{
+                        if (!newTable.Columns.Contains(IdentifyAppend))
                         {
                             notFoundHeaders.Add(IdentifyAppend);
+                        }
+                        else if (!newTable.Columns.Contains(invalidColumnName))
+                        {
+                            notFoundHeaders.Add(invalidColumnName);
                         }
                         else
                         {
                             importColumns = ImportHeaders.Cast<string>().ToArray();
                         }
-                    }
+                    //}
 
                     if (notFoundHeaders.Count > 0)
                     {
                         SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders);
-                        if(form.ShowDialog() == DialogResult.OK)
+                        form.Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden";
+                        if (form.ShowDialog() == DialogResult.OK)
                         {
                             string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
                             string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
 
                             for (int i = 0; i < from.Length; i++)
                             {
-                                if(from[i] == InvalidColumnName)
+                                if(from[i] == invalidColumnName)
                                 {
-                                    InvalidColumnName = to[i];
+                                    invalidColumnName = to[i];
                                 }
                                 if (from[i] == IdentifyAppend)
                                 {
@@ -116,22 +116,22 @@ namespace DataTableConverter.Classes.WorkProcs
                                 }
                             }
                             notFoundHeaders.Clear();
-                            if (ImportAll)
-                            {
-                                importColumns = new List<string>(ImportHeaders.Cast<string>()) { IdentifyAppend }.ToArray();
-                            }
-                            else
-                            {
-                                importColumns = selectedImportHeaders.ToArray();
-                            }
+                            //if (ImportAll)
+                            //{
+                            importColumns = ImportHeaders.Cast<string>().ToArray(); //new List<string>(ImportHeaders.Cast<string>()) { IdentifyAppend }.ToArray();
+                            //}
+                            //else
+                            //{
+                            //    importColumns = selectedImportHeaders.ToArray();
+                            //}
                         }
                     }
                     if(notFoundHeaders.Count == 0)
                     {
-                        DataHelper.AddColumnsOfDataTable(table, newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), RememberSort, NewColumn, null);
+                        DataHelper.AddColumnsOfDataTable(newTable, table, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), !string.IsNullOrWhiteSpace(NewColumn), NewColumn, null);
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            DataHelper.SplitDataTable(table, path, SaveFormat);
+                            DataHelper.SplitDataTable(table, path, invalidColumnName);
                         }
                     }
                 }

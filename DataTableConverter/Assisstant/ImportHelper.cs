@@ -79,6 +79,7 @@ namespace DataTableConverter.Assisstant
                     }
                 }
             }
+            CheckDataTableColumnHeader(table);
             return table;
         }
 
@@ -114,7 +115,7 @@ namespace DataTableConverter.Assisstant
 
                     foreach (string column in list)
                     {
-                        DataHelper.AddColumn(column.Trim(), dt);
+                        DataHelper.AddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? column.ToUpper() : column).Trim(), dt);
                     }
                 }
 
@@ -174,7 +175,7 @@ namespace DataTableConverter.Assisstant
 
                     foreach (string field in headerRow)
                     {
-                        DataHelper.AddColumn(field, dt);
+                        DataHelper.AddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? field.ToUpper() : field).Trim(), dt);
                     }
                 }
 
@@ -308,6 +309,17 @@ namespace DataTableConverter.Assisstant
             return Table;
         }
 
+        private static void CheckDataTableColumnHeader(DataTable table)
+        {
+            if (table != null)
+            {
+                foreach (DataColumn col in table.Columns)
+                {
+                    col.ColumnName = col.ColumnName.ToUpper();
+                }
+            }
+        }
+
         internal static DataTable OpenExcel(string path, Form1 mainform)
         {
             DataTable data = new DataTable();
@@ -340,12 +352,13 @@ namespace DataTableConverter.Assisstant
                         }
                     }
                 } while (hasPassword);
-                
-                string[] selectedSheets = (string[])mainform.Invoke(
-                    new Func<string[]>(() =>
-                    SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray())
-                    )
-                );
+
+                string[] selectedSheets = SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray());
+                //    (string[])mainform.Invoke(
+                //    new Func<string[]>(() =>
+                //    SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray())
+                //    )
+                //);
                 bool fileNameColumn;
                 if(fileNameColumn = (data.Columns.IndexOf(DataHelper.FileName) == -1 && selectedSheets.Length > 1))
                 {
