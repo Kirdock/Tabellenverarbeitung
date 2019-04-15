@@ -284,7 +284,7 @@ namespace DataTableConverter
                 }
                 else if (wp.CopyOldColumn)
                 {
-                    headers.AddRange(wpHeaders.Select(header => header + DataHelper.OldAffix));
+                    headers.AddRange(wpHeaders.Select(header => header + Properties.Settings.Default.OldAffix));
                 }
 
                 if(notFoundColumns.Count > 0)

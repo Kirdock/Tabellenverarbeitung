@@ -393,5 +393,17 @@ namespace DataTableConverter.Properties {
                 this["PVMSaveFormat"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("_ALT")]
+        public string OldAffix {
+            get {
+                return ((string)(this["OldAffix"]));
+            }
+            set {
+                this["OldAffix"] = value;
+            }
+        }
     }
 }

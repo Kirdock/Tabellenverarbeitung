@@ -35,6 +35,8 @@
             this.cRequired = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.tpFileShortcuts = new System.Windows.Forms.TabPage();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cbPVMSaveFormat = new System.Windows.Forms.ComboBox();
             this.cbSplitPVM = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.txtInvalidColumn = new System.Windows.Forms.TextBox();
@@ -49,8 +51,8 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.cbPVMSaveFormat = new System.Windows.Forms.ComboBox();
-            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.txtOldAffix = new System.Windows.Forms.TextBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -139,6 +141,28 @@
             this.tpFileShortcuts.TabIndex = 1;
             this.tpFileShortcuts.Text = "Dateikürzel";
             this.tpFileShortcuts.UseVisualStyleBackColor = true;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(250, 216);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(42, 13);
+            this.label8.TabIndex = 12;
+            this.label8.Text = "Format:";
+            // 
+            // cbPVMSaveFormat
+            // 
+            this.cbPVMSaveFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPVMSaveFormat.FormattingEnabled = true;
+            this.cbPVMSaveFormat.Items.AddRange(new object[] {
+            "CSV",
+            "DBASE",
+            "Excel"});
+            this.cbPVMSaveFormat.Location = new System.Drawing.Point(298, 211);
+            this.cbPVMSaveFormat.Name = "cbPVMSaveFormat";
+            this.cbPVMSaveFormat.Size = new System.Drawing.Size(121, 21);
+            this.cbPVMSaveFormat.TabIndex = 11;
             // 
             // cbSplitPVM
             // 
@@ -233,6 +257,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.txtOldAffix);
+            this.tabPage2.Controls.Add(this.label9);
             this.tabPage2.Controls.Add(this.cbHeaderUpperCase);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -253,27 +279,21 @@
             this.cbHeaderUpperCase.Text = "Überschriften in Großbuchstaben einlesen";
             this.cbHeaderUpperCase.UseVisualStyleBackColor = true;
             // 
-            // cbPVMSaveFormat
+            // label9
             // 
-            this.cbPVMSaveFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPVMSaveFormat.FormattingEnabled = true;
-            this.cbPVMSaveFormat.Items.AddRange(new object[] {
-            "CSV",
-            "DBASE",
-            "Excel"});
-            this.cbPVMSaveFormat.Location = new System.Drawing.Point(298, 211);
-            this.cbPVMSaveFormat.Name = "cbPVMSaveFormat";
-            this.cbPVMSaveFormat.Size = new System.Drawing.Size(121, 21);
-            this.cbPVMSaveFormat.TabIndex = 11;
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(8, 49);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(169, 13);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "Alte Werte in ALT speichern. Affix:";
             // 
-            // label8
+            // txtOldAffix
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(250, 216);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(42, 13);
-            this.label8.TabIndex = 12;
-            this.label8.Text = "Format:";
+            this.txtOldAffix.Location = new System.Drawing.Point(217, 42);
+            this.txtOldAffix.Name = "txtOldAffix";
+            this.txtOldAffix.Size = new System.Drawing.Size(100, 20);
+            this.txtOldAffix.TabIndex = 2;
             // 
             // SettingForm
             // 
@@ -321,5 +341,7 @@
         private System.Windows.Forms.CheckBox cbHeaderUpperCase;
         private System.Windows.Forms.ComboBox cbPVMSaveFormat;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox txtOldAffix;
+        private System.Windows.Forms.Label label9;
     }
 }

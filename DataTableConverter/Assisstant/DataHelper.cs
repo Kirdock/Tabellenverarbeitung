@@ -14,7 +14,6 @@ namespace DataTableConverter.Assisstant
     {
         internal static readonly string FileName = "Dateiname";
         internal static readonly string TempSort = "[TEMP_SORT]";
-        internal static readonly string OldAffix = " Alt";
         internal static object[] HeadersOfDataTable(DataTable table)
         {
             return table != null ? table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray() : new object[0];
@@ -36,7 +35,7 @@ namespace DataTableConverter.Assisstant
             string[] oldColumns = new string[columns.Length];
             for (int i = 0; i < columns.Length; i++)
             {
-                string oldName = AddColumn(columns[i] + OldAffix, table);
+                string oldName = AddColumn(columns[i] + Properties.Settings.Default.OldAffix, table);
                 oldColumns[i] = oldName;
             }
             foreach (DataRow row in table.Rows)

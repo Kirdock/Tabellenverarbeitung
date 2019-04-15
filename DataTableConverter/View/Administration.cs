@@ -53,23 +53,21 @@ namespace DataTableConverter.View
 
             ViewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
             
-            ltbProcedures_SelectedIndexChanged(null, null);
             GenerateProceduresForWorkflow();
             LoadProceduresWorkflow(false);
-
-            lbWorkflows_SelectedIndexChanged(null, null);
-
-            lbTolerances_SelectedIndexChanged(null, null);
-
-
-            lbCases_SelectedIndexChanged(null, null);
             SetGroupBoxVisibility(null);
-            lbUsedProcedures_SelectedIndexChanged(null, null);
-
-            
             AddContextMenu();
             RestoreSplitterDistance();
             SetColors();
+        }
+
+        private void Administration_Load(object sender, EventArgs e)
+        {
+            ltbProcedures_SelectedIndexChanged(null, null);
+            lbWorkflows_SelectedIndexChanged(null, null);
+            lbTolerances_SelectedIndexChanged(null, null);
+            lbCases_SelectedIndexChanged(null, null);
+            lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 
         private void SetColors()
@@ -370,7 +368,7 @@ namespace DataTableConverter.View
             {
                 selectedProc = (Proc)ltbProcedures.SelectedItem;
                 txtName.Text = selectedProc.Name;
-                dgvReplaces.DataSource = selectedProc.Replace;
+                SetDataSource(dgvReplaces, selectedProc.Replace);
                 cbCheckTotal.Checked = selectedProc.CheckTotal;
                 SetProcedureLock(selectedProc);
             }
@@ -568,6 +566,14 @@ namespace DataTableConverter.View
             return procs;
         }
 
+        private void SetDataSource(DataGridView view, DataTable table)
+        {
+            view.DataSource = null;
+            view.DataSource = table;
+            view.ClearSelection();
+            view.CurrentCell = null;
+        }
+
         private Proc GetMergeProcedureIndexThroughId(int selectedId, Type type)
         {
             List <Proc> procs = type == typeof(ProcUser)? Procedures : type == typeof(ProcDuplicate) ? DuplicateProc : SystemProc;
@@ -583,8 +589,7 @@ namespace DataTableConverter.View
         {
             SetCmbHeader(selectedProc.Formula);
             lblOriginalNameText.Text = ProcMerge.ClassName;
-            dgvMerge.DataSource = null;
-            dgvMerge.DataSource = ((ProcMerge)selectedProc).Conditions;
+            SetDataSource(dgvMerge, ((ProcMerge)selectedProc).Conditions);
         }
 
         private void SetPaddingControls(WorkProc selectedProc)
@@ -593,8 +598,7 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = ProcPadding.ClassName;
             nbPadCount.Value = proc.Counter;
             txtNewColumnPad.Text = proc.NewColumn;
-            dgvPadColumns.DataSource = proc.Columns;
-            dgvPadConditions.DataSource = proc.Conditions;
+            
             bool status = proc.OperationSide == ProcPadding.Side.Left;
             RbLeft.Checked = status;
             RbRight.Checked = !status;
@@ -602,6 +606,8 @@ namespace DataTableConverter.View
             cbPadNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
             cbPadOldColumn.Checked = proc.CopyOldColumn;
             SetHeaderPadding(proc.GetAffectedHeaders());
+            SetDataSource(dgvPadColumns, proc.Columns);
+            SetDataSource(dgvPadConditions, proc.Conditions);
         }
 
         private void SetSubstringControls(WorkProc selectedProc)
@@ -614,7 +620,7 @@ namespace DataTableConverter.View
             nbSubstringStart.Value = proc.Start;
             nbSubstringEnd.Value = proc.End;
             cbSubstringOldColumn.Checked = proc.CopyOldColumn;
-            dgvSubstringColumns.DataSource = proc.Columns;
+            SetDataSource(dgvSubstringColumns, proc.Columns);
         }
 
         private void SetReplaceWholeControls(WorkProc selectedProc)
@@ -622,7 +628,7 @@ namespace DataTableConverter.View
             ProcReplaceWhole proc = selectedProc as ProcReplaceWhole;
             SetHeaderReplaceWhole(selectedProc.GetHeaders());
             lblOriginalNameText.Text = ProcReplaceWhole.ClassName;
-            dgvReplaceWhole.DataSource = proc.Columns;
+            SetDataSource(dgvReplaceWhole, proc.Columns);
 
         }
 
@@ -655,7 +661,7 @@ namespace DataTableConverter.View
         {
             lblOriginalNameText.Text = GetProcedureName(selectedProc.ProcedureId);
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
-            dgvColumns.DataSource = selectedProc.Columns;
+            SetDataSource(dgvColumns, selectedProc.Columns);
 
             SetHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
@@ -664,7 +670,7 @@ namespace DataTableConverter.View
         {
             lblOriginalNameText.Text = ProcRound.ClassName;
             cbNewColumnRound.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
-            dgvRound.DataSource = selectedProc.Columns;
+            SetDataSource(dgvRound, selectedProc.Columns);
             SetHeaderRound(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
 
@@ -688,7 +694,7 @@ namespace DataTableConverter.View
             {
                 table.Rows.Add(new object[] { firstColumn[i], selectedProc.DuplicateColumns[i] });
             }
-            dgColumnDefDuplicate.DataSource = table;
+            SetDataSource(dgColumnDefDuplicate, table);
             dgColumnDefDuplicate.Columns[0].ReadOnly = true;
         }
 
@@ -698,8 +704,7 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = ProcUpLowCase.ClassName;
             cbUpLow.Checked = selectedProc.AllColumns;
             cmbUpLow.SelectedIndex = selectedProc.Option;
-            dgUpLow.DataSource = null;
-            dgUpLow.DataSource = selectedProc.Columns;
+            SetDataSource(dgUpLow, selectedProc.Columns);
             SetUpLowEnabled(!selectedProc.AllColumns);
             SetHeaderUpLowCase(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
         }
@@ -717,8 +722,7 @@ namespace DataTableConverter.View
                 table.Columns[1].DataType = typeof(bool);
                 selectedProc.Columns = table;
             }
-            dgOrderColumns.DataSource = null;
-            dgOrderColumns.DataSource = selectedProc.Columns;
+            SetDataSource(dgOrderColumns, selectedProc.Columns);
 
             dgOrderColumns.Columns[1].Visible = false;
 
@@ -1055,7 +1059,7 @@ namespace DataTableConverter.View
             {
                 Tolerance selectedTolerance = (Tolerance)lbTolerances.SelectedItem;
                 txtToleranceName.Text = selectedTolerance.Name;
-                dgTolerance.DataSource = selectedTolerance.Columns;
+                SetDataSource(dgTolerance, selectedTolerance.Columns);
                 SetToleranceLock();
             }
         }
@@ -1156,7 +1160,7 @@ namespace DataTableConverter.View
                 txtCaseName.Text = selectedCase.Name;
                 txtShortcut.Text = selectedCase.Shortcut;
                 txtShortcutTotal.Text = selectedCase.ShortcutTotal;
-                dgCaseColumns.DataSource = selectedCase.Columns;
+                SetDataSource(dgCaseColumns, selectedCase.Columns);
                 if (ViewHelper != null)
                 {
                     ViewHelper.SelectedCase = selectedCase.Id;
@@ -1604,6 +1608,22 @@ namespace DataTableConverter.View
             if (!cbNewColumnAddTableColumn.Checked)
             {
                 (GetSelectedWorkProcedure() as ProcAddTableColumns).NewColumn = string.Empty;
+            }
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedIndex == 1)
+            {
+                lbWorkflows_SelectedIndexChanged(null, null);
+            }
+            else if (tabControl1.SelectedIndex == 2)
+            {
+                lbCases_SelectedIndexChanged(null, null);
+            }
+            else
+            {
+                ltbProcedures_SelectedIndexChanged(null, null);
             }
         }
     }

@@ -30,6 +30,7 @@ namespace DataTableConverter.View
             cbSplitPVM.Checked = Properties.Settings.Default.SplitPVM;
             cbHeaderUpperCase.Checked = Properties.Settings.Default.ImportHeaderUpperCase;
             cbPVMSaveFormat.SelectedIndex = Properties.Settings.Default.PVMSaveFormat;
+            txtOldAffix.Text = Properties.Settings.Default.OldAffix;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -46,6 +47,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.SplitPVM = cbSplitPVM.Checked;
                 Properties.Settings.Default.ImportHeaderUpperCase = cbHeaderUpperCase.Checked;
                 Properties.Settings.Default.PVMSaveFormat = cbPVMSaveFormat.SelectedIndex;
+                Properties.Settings.Default.OldAffix = txtOldAffix.Text;
                 Properties.Settings.Default.Save();
             }
             else
@@ -63,7 +65,8 @@ namespace DataTableConverter.View
                 txtRightAddress,
                 txtPVM,
                 txtFailAddressValue,
-                txtInvalidColumn
+                txtInvalidColumn,
+                txtOldAffix
             };
             foreach(TextBox textBox in textBoxes)
             {
