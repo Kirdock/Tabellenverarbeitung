@@ -38,6 +38,7 @@ namespace DataTableConverter.View
         internal Administration(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
+            SetSize();
             AssignGroupBoxToEnum();
             SetHeaders(headers);
             SetOrderList();
@@ -59,6 +60,11 @@ namespace DataTableConverter.View
             AddContextMenu();
             RestoreSplitterDistance();
             SetColors();
+        }
+
+        private void SetSize()
+        {
+            Size = Properties.Settings.Default.AdministrationWindowSize;
         }
 
         private void Administration_Load(object sender, EventArgs e)
@@ -85,7 +91,14 @@ namespace DataTableConverter.View
                 lblCaseName,
                 lblTotalShortcut,
                 lblPartialShortcut,
-                lblToleranceName
+                lblToleranceName,
+                lblNewColumnMerge,
+                lblUsedColumnsPadding,
+                lblHeaders,
+                lblUsedColumnsReplaceWhole,
+                lblUsedColumnsReplaceWhole,
+                lblUsedColumnsUpLowCase,
+                lblUsedColumnsRound
             };
             foreach (Label label in labels)
             {
@@ -220,12 +233,19 @@ namespace DataTableConverter.View
         {
             ViewHelper.Clear();
             SaveSplitterDistance();
-            
+            SaveSize();
+            Properties.Settings.Default.Save();
+
             if (ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
             {
                 DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
                 e.Cancel = result == DialogResult.No;
             }
+        }
+
+        private void SaveSize()
+        {
+            Properties.Settings.Default.AdministrationWindowSize = Size;
         }
 
         private void SaveSplitterDistance()
@@ -237,7 +257,6 @@ namespace DataTableConverter.View
             Properties.Settings.Default.splitWorkflow = splitWorkflow.SplitterDistance;
             Properties.Settings.Default.splitWorkflowProcProperties = splitWorkflowProcProperties.SplitterDistance;
             Properties.Settings.Default.splitWorkflowProperties = splitWorkflowProperties.SplitterDistance;
-            Properties.Settings.Default.Save();
         }
 
         
@@ -570,8 +589,6 @@ namespace DataTableConverter.View
         {
             view.DataSource = null;
             view.DataSource = table;
-            view.ClearSelection();
-            view.CurrentCell = null;
         }
 
         private Proc GetMergeProcedureIndexThroughId(int selectedId, Type type)
@@ -1608,22 +1625,6 @@ namespace DataTableConverter.View
             if (!cbNewColumnAddTableColumn.Checked)
             {
                 (GetSelectedWorkProcedure() as ProcAddTableColumns).NewColumn = string.Empty;
-            }
-        }
-
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (tabControl1.SelectedIndex == 1)
-            {
-                lbWorkflows_SelectedIndexChanged(null, null);
-            }
-            else if (tabControl1.SelectedIndex == 2)
-            {
-                lbCases_SelectedIndexChanged(null, null);
-            }
-            else
-            {
-                ltbProcedures_SelectedIndexChanged(null, null);
             }
         }
     }

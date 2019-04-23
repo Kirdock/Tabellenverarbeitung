@@ -31,7 +31,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
             StringBuilder builder = new StringBuilder();
 

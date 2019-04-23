@@ -405,5 +405,41 @@ namespace DataTableConverter.Properties {
                 this["OldAffix"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1156, 836")]
+        public global::System.Drawing.Size AdministrationWindowSize {
+            get {
+                return ((global::System.Drawing.Size)(this["AdministrationWindowSize"]));
+            }
+            set {
+                this["AdministrationWindowSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("920, 489")]
+        public global::System.Drawing.Size Form1Size {
+            get {
+                return ((global::System.Drawing.Size)(this["Form1Size"]));
+            }
+            set {
+                this["Form1Size"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("816, 615")]
+        public global::System.Drawing.Size TextFormatSize {
+            get {
+                return ((global::System.Drawing.Size)(this["TextFormatSize"]));
+            }
+            set {
+                this["TextFormatSize"] = value;
+            }
+        }
     }
 }

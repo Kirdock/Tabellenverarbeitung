@@ -33,13 +33,12 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath)
         {
             //I should first load the File (before workflow.start; right after header-check)
             //additional method in WorkProc and only this class overrides it
             //new SelectDuplicateColumns dialog only for second table
 
-            sortingOrder = string.Empty;
             if(string.IsNullOrWhiteSpace(IdentifyAppend) || string.IsNullOrWhiteSpace(IdentifySource))
             {
                 return;

@@ -67,7 +67,7 @@
             this.txtIdentifierSource = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.gbReplaceWhole = new System.Windows.Forms.GroupBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lblUsedColumnsReplaceWhole = new System.Windows.Forms.Label();
             this.dgvReplaceWhole = new System.Windows.Forms.DataGridView();
             this.label26 = new System.Windows.Forms.Label();
             this.gbPadding = new System.Windows.Forms.GroupBox();
@@ -79,7 +79,7 @@
             this.nbPadCount = new System.Windows.Forms.NumericUpDown();
             this.label23 = new System.Windows.Forms.Label();
             this.TxtCharacter = new System.Windows.Forms.TextBox();
-            this.label22 = new System.Windows.Forms.Label();
+            this.lblUsedColumnsPadding = new System.Windows.Forms.Label();
             this.cbPadNewColumn = new System.Windows.Forms.CheckBox();
             this.dgvPadColumns = new System.Windows.Forms.DataGridView();
             this.label19 = new System.Windows.Forms.Label();
@@ -93,7 +93,7 @@
             this.nbSubstringStart = new System.Windows.Forms.NumericUpDown();
             this.label29 = new System.Windows.Forms.Label();
             this.cbSubstringOldColumn = new System.Windows.Forms.CheckBox();
-            this.label32 = new System.Windows.Forms.Label();
+            this.lblUsedColumnsSubstring = new System.Windows.Forms.Label();
             this.cbSubstringNewColumn = new System.Windows.Forms.CheckBox();
             this.dgvSubstringColumns = new System.Windows.Forms.DataGridView();
             this.lblSubstringNewColumn = new System.Windows.Forms.Label();
@@ -111,7 +111,7 @@
             this.cbUpLow = new System.Windows.Forms.CheckBox();
             this.cmbUpLow = new System.Windows.Forms.ComboBox();
             this.lblUpLowCaseHeader = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
+            this.lblUsedColumnsUpLowCase = new System.Windows.Forms.Label();
             this.dgUpLow = new System.Windows.Forms.DataGridView();
             this.gbRound = new System.Windows.Forms.GroupBox();
             this.cbOldColumnRound = new System.Windows.Forms.CheckBox();
@@ -121,7 +121,7 @@
             this.numDec = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.lblNewColumnRound = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
+            this.lblUsedColumnsRound = new System.Windows.Forms.Label();
             this.txtNewColumnRound = new System.Windows.Forms.TextBox();
             this.cbNewColumnRound = new System.Windows.Forms.CheckBox();
             this.dgvRound = new System.Windows.Forms.DataGridView();
@@ -136,7 +136,7 @@
             this.gbMerge = new System.Windows.Forms.GroupBox();
             this.label18 = new System.Windows.Forms.Label();
             this.dgvMerge = new System.Windows.Forms.DataGridView();
-            this.label14 = new System.Windows.Forms.Label();
+            this.lblNewColumnMerge = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.txtFormula = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
@@ -266,7 +266,6 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1140, 797);
             this.tabControl1.TabIndex = 0;
-            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage1
             // 
@@ -743,7 +742,7 @@
             // 
             // gbReplaceWhole
             // 
-            this.gbReplaceWhole.Controls.Add(this.label6);
+            this.gbReplaceWhole.Controls.Add(this.lblUsedColumnsReplaceWhole);
             this.gbReplaceWhole.Controls.Add(this.dgvReplaceWhole);
             this.gbReplaceWhole.Controls.Add(this.cbHeadersReplaceWhole);
             this.gbReplaceWhole.Controls.Add(this.label26);
@@ -756,14 +755,14 @@
             this.gbReplaceWhole.Text = "Spaltenangabe";
             this.gbReplaceWhole.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
             // 
-            // label6
+            // lblUsedColumnsReplaceWhole
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(2, 69);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(121, 13);
-            this.label6.TabIndex = 12;
-            this.label6.Text = "Angewendeten Spalten:";
+            this.lblUsedColumnsReplaceWhole.AutoSize = true;
+            this.lblUsedColumnsReplaceWhole.Location = new System.Drawing.Point(2, 69);
+            this.lblUsedColumnsReplaceWhole.Name = "lblUsedColumnsReplaceWhole";
+            this.lblUsedColumnsReplaceWhole.Size = new System.Drawing.Size(121, 13);
+            this.lblUsedColumnsReplaceWhole.TabIndex = 12;
+            this.lblUsedColumnsReplaceWhole.Text = "Angewendeten Spalten:";
             // 
             // dgvReplaceWhole
             // 
@@ -797,7 +796,7 @@
             this.gbPadding.Controls.Add(this.nbPadCount);
             this.gbPadding.Controls.Add(this.label23);
             this.gbPadding.Controls.Add(this.TxtCharacter);
-            this.gbPadding.Controls.Add(this.label22);
+            this.gbPadding.Controls.Add(this.lblUsedColumnsPadding);
             this.gbPadding.Controls.Add(this.cbPadNewColumn);
             this.gbPadding.Controls.Add(this.dgvPadColumns);
             this.gbPadding.Controls.Add(this.label19);
@@ -908,14 +907,14 @@
             this.TxtCharacter.TabIndex = 13;
             this.TxtCharacter.TextChanged += new System.EventHandler(this.TxtCharacter_TextChanged);
             // 
-            // label22
+            // lblUsedColumnsPadding
             // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(2, 179);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(121, 13);
-            this.label22.TabIndex = 12;
-            this.label22.Text = "Angewendeten Spalten:";
+            this.lblUsedColumnsPadding.AutoSize = true;
+            this.lblUsedColumnsPadding.Location = new System.Drawing.Point(2, 179);
+            this.lblUsedColumnsPadding.Name = "lblUsedColumnsPadding";
+            this.lblUsedColumnsPadding.Size = new System.Drawing.Size(121, 13);
+            this.lblUsedColumnsPadding.TabIndex = 12;
+            this.lblUsedColumnsPadding.Text = "Angewendeten Spalten:";
             // 
             // cbPadNewColumn
             // 
@@ -1001,7 +1000,7 @@
             this.gbSubstring.Controls.Add(this.nbSubstringStart);
             this.gbSubstring.Controls.Add(this.label29);
             this.gbSubstring.Controls.Add(this.cbSubstringOldColumn);
-            this.gbSubstring.Controls.Add(this.label32);
+            this.gbSubstring.Controls.Add(this.lblUsedColumnsSubstring);
             this.gbSubstring.Controls.Add(this.cbSubstringNewColumn);
             this.gbSubstring.Controls.Add(this.dgvSubstringColumns);
             this.gbSubstring.Controls.Add(this.lblSubstringNewColumn);
@@ -1083,14 +1082,14 @@
             this.cbSubstringOldColumn.UseVisualStyleBackColor = true;
             this.cbSubstringOldColumn.CheckedChanged += new System.EventHandler(this.cbSubstringOldColumn_CheckedChanged);
             // 
-            // label32
+            // lblUsedColumnsSubstring
             // 
-            this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(2, 179);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(121, 13);
-            this.label32.TabIndex = 12;
-            this.label32.Text = "Angewendeten Spalten:";
+            this.lblUsedColumnsSubstring.AutoSize = true;
+            this.lblUsedColumnsSubstring.Location = new System.Drawing.Point(2, 179);
+            this.lblUsedColumnsSubstring.Name = "lblUsedColumnsSubstring";
+            this.lblUsedColumnsSubstring.Size = new System.Drawing.Size(121, 13);
+            this.lblUsedColumnsSubstring.TabIndex = 12;
+            this.lblUsedColumnsSubstring.Text = "Angewendeten Spalten:";
             // 
             // cbSubstringNewColumn
             // 
@@ -1255,7 +1254,7 @@
             this.gbUpLowCase.Controls.Add(this.cmbUpLow);
             this.gbUpLowCase.Controls.Add(this.lblUpLowCaseHeader);
             this.gbUpLowCase.Controls.Add(this.clbUpLowHeader);
-            this.gbUpLowCase.Controls.Add(this.label12);
+            this.gbUpLowCase.Controls.Add(this.lblUsedColumnsUpLowCase);
             this.gbUpLowCase.Controls.Add(this.dgUpLow);
             this.gbUpLowCase.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gbUpLowCase.Location = new System.Drawing.Point(0, 92);
@@ -1303,14 +1302,14 @@
             this.lblUpLowCaseHeader.TabIndex = 9;
             this.lblUpLowCaseHeader.Text = "Spalten aus geladener Tabelle hinzufügen:";
             // 
-            // label12
+            // lblUsedColumnsUpLowCase
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(3, 131);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(121, 13);
-            this.label12.TabIndex = 5;
-            this.label12.Text = "Angewendeten Spalten:";
+            this.lblUsedColumnsUpLowCase.AutoSize = true;
+            this.lblUsedColumnsUpLowCase.Location = new System.Drawing.Point(3, 131);
+            this.lblUsedColumnsUpLowCase.Name = "lblUsedColumnsUpLowCase";
+            this.lblUsedColumnsUpLowCase.Size = new System.Drawing.Size(121, 13);
+            this.lblUsedColumnsUpLowCase.TabIndex = 5;
+            this.lblUsedColumnsUpLowCase.Text = "Angewendeten Spalten:";
             // 
             // dgUpLow
             // 
@@ -1336,7 +1335,7 @@
             this.gbRound.Controls.Add(this.label9);
             this.gbRound.Controls.Add(this.clbHeadersRound);
             this.gbRound.Controls.Add(this.lblNewColumnRound);
-            this.gbRound.Controls.Add(this.label13);
+            this.gbRound.Controls.Add(this.lblUsedColumnsRound);
             this.gbRound.Controls.Add(this.txtNewColumnRound);
             this.gbRound.Controls.Add(this.cbNewColumnRound);
             this.gbRound.Controls.Add(this.dgvRound);
@@ -1418,14 +1417,14 @@
             this.lblNewColumnRound.Text = "Name der Spalte:";
             this.lblNewColumnRound.Visible = false;
             // 
-            // label13
+            // lblUsedColumnsRound
             // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(3, 186);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(121, 13);
-            this.label13.TabIndex = 5;
-            this.label13.Text = "Angewendeten Spalten:";
+            this.lblUsedColumnsRound.AutoSize = true;
+            this.lblUsedColumnsRound.Location = new System.Drawing.Point(3, 186);
+            this.lblUsedColumnsRound.Name = "lblUsedColumnsRound";
+            this.lblUsedColumnsRound.Size = new System.Drawing.Size(121, 13);
+            this.lblUsedColumnsRound.TabIndex = 5;
+            this.lblUsedColumnsRound.Text = "Angewendeten Spalten:";
             // 
             // txtNewColumnRound
             // 
@@ -1561,7 +1560,7 @@
             // 
             this.gbMerge.Controls.Add(this.label18);
             this.gbMerge.Controls.Add(this.dgvMerge);
-            this.gbMerge.Controls.Add(this.label14);
+            this.gbMerge.Controls.Add(this.lblNewColumnMerge);
             this.gbMerge.Controls.Add(this.cbHeaders);
             this.gbMerge.Controls.Add(this.label15);
             this.gbMerge.Controls.Add(this.txtFormula);
@@ -1599,14 +1598,14 @@
             this.dgvMerge.TabIndex = 8;
             this.dgvMerge.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
-            // label14
+            // lblNewColumnMerge
             // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(6, 19);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(122, 13);
-            this.label14.TabIndex = 7;
-            this.label14.Text = "Name der neuen Spalte:";
+            this.lblNewColumnMerge.AutoSize = true;
+            this.lblNewColumnMerge.Location = new System.Drawing.Point(6, 19);
+            this.lblNewColumnMerge.Name = "lblNewColumnMerge";
+            this.lblNewColumnMerge.Size = new System.Drawing.Size(122, 13);
+            this.lblNewColumnMerge.TabIndex = 7;
+            this.lblNewColumnMerge.Text = "Name der neuen Spalte:";
             // 
             // label15
             // 
@@ -2363,7 +2362,7 @@
         private System.Windows.Forms.GroupBox gbDefDuplicate;
         private System.Windows.Forms.DataGridView dgColumnDefDuplicate;
         private System.Windows.Forms.GroupBox gbMerge;
-        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label lblNewColumnMerge;
         private CheckComboBoxTest.CheckedComboBox cbHeaders;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox txtFormula;
@@ -2384,7 +2383,7 @@
         private System.Windows.Forms.ComboBox cmbUpLow;
         private System.Windows.Forms.Label lblUpLowCaseHeader;
         private CheckComboBoxTest.CheckedComboBox clbUpLowHeader;
-        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label lblUsedColumnsUpLowCase;
         private System.Windows.Forms.DataGridView dgUpLow;
         private System.Windows.Forms.CheckBox cbUpLow;
         private System.Windows.Forms.SplitContainer splitWorkflow;
@@ -2400,7 +2399,7 @@
         private System.Windows.Forms.Label label9;
         private CheckComboBoxTest.CheckedComboBox clbHeadersRound;
         private System.Windows.Forms.Label lblNewColumnRound;
-        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label lblUsedColumnsRound;
         private System.Windows.Forms.TextBox txtNewColumnRound;
         private System.Windows.Forms.CheckBox cbNewColumnRound;
         private System.Windows.Forms.DataGridView dgvRound;
@@ -2409,7 +2408,7 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.DataGridView dgvMerge;
         private System.Windows.Forms.GroupBox gbPadding;
-        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Label lblUsedColumnsPadding;
         private System.Windows.Forms.CheckBox cbPadNewColumn;
         private System.Windows.Forms.DataGridView dgvPadColumns;
         private System.Windows.Forms.Label label19;
@@ -2442,7 +2441,7 @@
         private System.Windows.Forms.Label lblNumberColumnName;
         private System.Windows.Forms.GroupBox gbSubstring;
         private System.Windows.Forms.CheckBox cbSubstringOldColumn;
-        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Label lblUsedColumnsSubstring;
         private System.Windows.Forms.CheckBox cbSubstringNewColumn;
         private System.Windows.Forms.DataGridView dgvSubstringColumns;
         private System.Windows.Forms.Label lblSubstringNewColumn;
@@ -2454,7 +2453,7 @@
         private System.Windows.Forms.NumericUpDown nbSubstringStart;
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.GroupBox gbReplaceWhole;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblUsedColumnsReplaceWhole;
         private System.Windows.Forms.DataGridView dgvReplaceWhole;
         private CheckComboBoxTest.CheckedComboBox cbHeadersReplaceWhole;
         private System.Windows.Forms.Label label26;

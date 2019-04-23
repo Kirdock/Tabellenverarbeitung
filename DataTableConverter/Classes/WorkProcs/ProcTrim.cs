@@ -27,9 +27,8 @@ namespace DataTableConverter.Classes.WorkProcs
             return;
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
-            sortingOrder = string.Empty;
             foreach (DataRow row in table.Rows)
             {
                 for (int i = 0; i < row.ItemArray.Length; i++)

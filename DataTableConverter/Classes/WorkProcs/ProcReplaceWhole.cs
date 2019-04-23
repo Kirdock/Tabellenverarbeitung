@@ -56,9 +56,8 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
-            sortingOrder = string.Empty;
             foreach (DataRow row in table.Rows)
             {
                 foreach(DataRow replaceRow in DataHelper.DataTableWithoutEmpty(Columns, (int)ColumnIndex.Column))

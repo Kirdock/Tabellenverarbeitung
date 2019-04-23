@@ -25,10 +25,16 @@ namespace DataTableConverter.View
         internal TextFormat(string path, bool multipleFiles)
         {
             InitializeComponent();
+            SetSize();
             this.path = path;
             setEncodingCmb();
             MultipleFiles = multipleFiles;
             cbTakeOver.Visible = multipleFiles;
+        }
+
+        private void SetSize()
+        {
+            Size = Properties.Settings.Default.TextFormatSize;
         }
 
         private void TextFormat_Load(object sender, EventArgs e)
@@ -172,6 +178,7 @@ namespace DataTableConverter.View
             Properties.Settings.Default.TextEnd = txtEnd.Text;
             Properties.Settings.Default.TakeOverAllFiles = cbTakeOver.Checked;
             Properties.Settings.Default.HeaderInFirstRow = cbContainsHeaders.Checked;
+            Properties.Settings.Default.TextFormatSize = Size;
             Properties.Settings.Default.Save();
         }
 

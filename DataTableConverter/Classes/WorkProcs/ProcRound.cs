@@ -47,11 +47,10 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
-            sortingOrder = string.Empty;
             bool intoNewCol = false;
 
             if (CopyOldColumn)

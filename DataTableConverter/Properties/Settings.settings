@@ -98,5 +98,14 @@
     <Setting Name="OldAffix" Type="System.String" Scope="User">
       <Value Profile="(Default)">_ALT</Value>
     </Setting>
+    <Setting Name="AdministrationWindowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">1156, 836</Value>
+    </Setting>
+    <Setting Name="Form1Size" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">920, 489</Value>
+    </Setting>
+    <Setting Name="TextFormatSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">816, 615</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

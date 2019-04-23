@@ -40,6 +40,7 @@ namespace DataTableConverter
             dictSorting = new Dictionary<string, SortOrder>();
             dictKeys = new List<string>();
             InitializeComponent();
+            SetSize();
             ExportHelper.CheckFolders();
             LoadProcedures();
             LoadWorkflows();
@@ -56,6 +57,11 @@ namespace DataTableConverter
                 AssignDataSource(table);
             }
             UpdateHelper.CheckUpdate(true, pgbLoading);
+        }
+
+        private void SetSize()
+        {
+            Size = Properties.Settings.Default.Form1Size;
         }
 
         private void SetSorting(string order)
@@ -544,11 +550,9 @@ namespace DataTableConverter
 
         private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp)
         {
-            wp.doWork(table, out string newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath);
-            if (newOrder != string.Empty)
-            {
-                SetSorting(newOrder);
-            }
+            string newOrder = GetSorting();
+            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath);
+            SetSorting(newOrder);
         }
 
         private Proc GetProcedure(int id)
@@ -571,7 +575,8 @@ namespace DataTableConverter
         {
             Thread.CurrentThread.IsBackground = true;
             ProcTrim proc = new ProcTrim();
-            proc.doWork(dt, out string sortingOrder, null, null, null, FilePath);
+            string order = GetSorting();
+            proc.doWork(dt, ref order, null, null, null, FilePath);
             dgTable.Invoke(new MethodInvoker(() =>
             {
                 AddDataSourceValueChange(dt);
@@ -1412,6 +1417,17 @@ namespace DataTableConverter
         {
             SettingForm form = new SettingForm();
             form.Show();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveSize();
+        }
+
+        private void SaveSize()
+        {
+            Properties.Settings.Default.Form1Size = Size;
+            Properties.Settings.Default.Save();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

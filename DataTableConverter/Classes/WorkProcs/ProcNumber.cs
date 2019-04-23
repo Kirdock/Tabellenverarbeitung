@@ -26,9 +26,8 @@ namespace DataTableConverter.Classes.WorkProcs
             Repeat = repeat;
         }
 
-        public override void doWork(DataTable table, out string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
-            sortingOrder = string.Empty;
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
                 int index = table.Columns.Count;
@@ -36,7 +35,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 int count = Start;
                 bool noEnd = End != 0;
-                foreach (DataRow row in table.Rows)
+                foreach (DataRow row in ViewHelper.GetSortedTable(sortingOrder, table))
                 {
                     row[index] = count;
                     count++;
