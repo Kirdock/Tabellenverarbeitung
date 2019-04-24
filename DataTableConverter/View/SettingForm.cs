@@ -31,6 +31,7 @@ namespace DataTableConverter.View
             cbHeaderUpperCase.Checked = Properties.Settings.Default.ImportHeaderUpperCase;
             cbPVMSaveFormat.SelectedIndex = Properties.Settings.Default.PVMSaveFormat;
             txtOldAffix.Text = Properties.Settings.Default.OldAffix;
+            cbAutoSavePVM.Checked = Properties.Settings.Default.AutoSavePVM;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -48,6 +49,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.ImportHeaderUpperCase = cbHeaderUpperCase.Checked;
                 Properties.Settings.Default.PVMSaveFormat = cbPVMSaveFormat.SelectedIndex;
                 Properties.Settings.Default.OldAffix = txtOldAffix.Text;
+                Properties.Settings.Default.AutoSavePVM = cbAutoSavePVM.Checked;
                 Properties.Settings.Default.Save();
             }
             else

@@ -490,6 +490,10 @@ namespace DataTableConverter.Assisstant
                         startindex += line;
                     }
                     dt.Rows.Add(row.ToArray());
+                    if (startindex < data.Length && data[startindex] == '\n')
+                    {
+                        startindex++;
+                    }
                 }
             }
             catch (IOException)

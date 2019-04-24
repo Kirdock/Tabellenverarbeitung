@@ -98,7 +98,10 @@ namespace DataTableConverter.View
                 lblUsedColumnsReplaceWhole,
                 lblUsedColumnsReplaceWhole,
                 lblUsedColumnsUpLowCase,
-                lblUsedColumnsRound
+                lblUsedColumnsRound,
+                lblCompareFirstColumn,
+                lblCompareSecondColumn,
+                lblCompareNewColumn
             };
             foreach (Label label in labels)
             {
@@ -191,7 +194,8 @@ namespace DataTableConverter.View
                 { gbNumber, typeof(ProcNumber) },
                 { gbSubstring, typeof(ProcSubstring) },
                 { gbReplaceWhole, typeof(ProcReplaceWhole) },
-                {gbAddTableColumns, typeof(ProcAddTableColumns) }
+                { gbAddTableColumns, typeof(ProcAddTableColumns) },
+                { gbCompare, typeof(ProcCompare) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -206,7 +210,8 @@ namespace DataTableConverter.View
                 { typeof(ProcNumber), SetNumberControls },
                 { typeof(ProcSubstring), SetSubstringControls },
                 { typeof(ProcReplaceWhole), SetReplaceWholeControls },
-                {typeof(ProcAddTableColumns), SetAddTableColumnsControls }
+                {typeof(ProcAddTableColumns), SetAddTableColumnsControls },
+                {typeof(ProcCompare), SetCompareControls }
             };
         }
 
@@ -223,7 +228,8 @@ namespace DataTableConverter.View
                 new Proc(ProcNumber.ClassName, null, 7),
                 new Proc(ProcSubstring.ClassName, null, 8),
                 new Proc(ProcReplaceWhole.ClassName, null, 9),
-                new Proc(ProcAddTableColumns.ClassName, null, 10)
+                new Proc(ProcAddTableColumns.ClassName, null, 10),
+                new Proc(ProcCompare.ClassName, null, 11)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -657,6 +663,17 @@ namespace DataTableConverter.View
             txtIdentifierAppend.Text = proc.IdentifyAppend;
             txtNewColumn.Text = proc.NewColumn;
             cbNewColumnAddTableColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
+        }
+
+        private void SetCompareControls(WorkProc selectedProc)
+        {
+            ProcCompare proc = selectedProc as ProcCompare;
+            lblOriginalNameText.Text = ProcCompare.ClassName;
+            txtCompareSourceColumn.Text = proc.SourceColumn;
+            txtCompareSecondColumn.Text = proc.CompareColumn;
+            txtNewColumn.Text = proc.NewColumn;
+            cbCompareNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
+            cbCompareOldColumn.Checked = proc.CopyOldColumn;
         }
 
         private void SetNumberControls(WorkProc selectedProc)
@@ -1626,6 +1643,31 @@ namespace DataTableConverter.View
             {
                 (GetSelectedWorkProcedure() as ProcAddTableColumns).NewColumn = string.Empty;
             }
+        }
+
+        private void cbCompareOldColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            GetSelectedWorkProcedure().CopyOldColumn = cbCompareOldColumn.Checked;
+        }
+
+        private void cbCompareNewColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            NewColumnChanged(cbCompareNewColumn, cbCompareOldColumn, lblCompareNewColumn, txtNewColumnCompare);
+        }
+
+        private void txtNewColumnCompare_TextChanged(object sender, EventArgs e)
+        {
+            GetSelectedWorkProcedure().NewColumn = ((TextBox)sender).Text;
+        }
+
+        private void txtCompareSourceColumn_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcCompare).SourceColumn = (sender as TextBox).Text;
+        }
+
+        private void txtCompareSecondColumn_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcCompare).CompareColumn = (sender as TextBox).Text;
         }
     }
 }

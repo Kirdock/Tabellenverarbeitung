@@ -881,7 +881,7 @@ namespace DataTableConverter
                     realCounter++;
                 }
 
-                cSVToolStripMenuItem_Click(null, null, table);
+                cSVToolStripMenuItem_Click(null, null, table, Properties.Settings.Default.AutoSavePVM ? Path.Combine(Path.GetDirectoryName(FilePath),Path.GetFileNameWithoutExtension(FilePath)) + Properties.Settings.Default.PVMAddressText + ".csv" : null);
             }
         }
 
@@ -1428,6 +1428,15 @@ namespace DataTableConverter
         {
             Properties.Settings.Default.Form1Size = Size;
             Properties.Settings.Default.Save();
+        }
+
+        private void spaltenVergleichenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CompareForm form = new CompareForm(DataHelper.HeadersOfDataTable(sourceTable));
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                StartSingleWorkflow(form.Procedure);
+            }
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

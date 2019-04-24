@@ -441,5 +441,17 @@ namespace DataTableConverter.Properties {
                 this["TextFormatSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoSavePVM {
+            get {
+                return ((bool)(this["AutoSavePVM"]));
+            }
+            set {
+                this["AutoSavePVM"] = value;
+            }
+        }
     }
 }

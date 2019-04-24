@@ -14,6 +14,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "Spalten zusammenfügen";
         internal enum ConditionColumn : int { Spalte = 0, Wert = 1, Format = 2 };
+        internal enum ConditionalText { Right, Left, None};
         internal DataTable Conditions;
 
         internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name) {
@@ -60,7 +61,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             for (int i = 0; i < matches.Count; i++)
             {
-                headers.Add(matches[i].Value.Substring(1, matches[i].Value.Length - 2));
+                headers.Add(matches[i].Groups[1].Value.Split(new char[] { '|' }).First());
             }
         }
 
@@ -122,15 +123,15 @@ namespace DataTableConverter.Classes.WorkProcs
             string[] columns = headers.ToArray();
             StringBuilder format = new StringBuilder();
             int counter = 0;
-            bool isStart = true;
             StringBuilder stringBetween = new StringBuilder();
-            bool emptyBefore = true;
+            bool emptyBefore = false;
             List<string[]> headersInBrackets = GetHeaderInBrackets(formula);
             if(headersInBrackets.Count == 0)
             {
                 headersInBrackets.Add(new string[0]); //to not enter an ArrayOutOfBoundsException
             }
             int bracketCount = 0;
+            ConditionalText directionBefore = ConditionalText.None;
             for (int i = 0; i < formula.Length; i++)
             {
                 char c = formula[i];
@@ -158,25 +159,27 @@ namespace DataTableConverter.Classes.WorkProcs
                     string value = row[header]?.ToString();
                     bool isEmpty = string.IsNullOrWhiteSpace(value);
 
-                    if (isStart)
+                    ConditionalText direction = GetDirection(formula, i + header.Length + 1, out int newIndex);
+
+                    if(    direction == ConditionalText.Left && isEmpty
+                        || directionBefore == ConditionalText.Right && emptyBefore
+                      )
                     {
-                        isStart = false;
-                        format.Append(stringBetween);
                         stringBetween.Clear();
                     }
 
+                    format.Append(stringBetween);
+
                     if (!isEmpty)
                     {
-                        if (!emptyBefore)
-                        {
-                            format.Append(stringBetween);
-                        }
                         format.Append(value);
                     }
+
                     stringBetween.Clear();
-                    i += (header.Length + 1);
+                    i = newIndex;
                     counter++;
-                    emptyBefore &= isEmpty;
+                    emptyBefore = isEmpty;
+                    directionBefore = direction;
                 }
                 else
                 {
@@ -184,6 +187,28 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
             }
             return stringBetween.Length != 0 ? format.Append(stringBetween).ToString() : format.ToString();
+        }
+
+        private ConditionalText GetDirection(string formula, int startindex, out int newIndex)
+        {
+            newIndex = formula.IndexOf(']', startindex);
+            string value = formula.Substring(startindex, newIndex - startindex).Trim().ToLower();
+            ConditionalText result;
+            switch (value)
+            {
+                case "|r":
+                    result = ConditionalText.Right;
+                    break;
+
+                case "|l":
+                    result = ConditionalText.Left;
+                    break;
+
+                default:
+                    result = ConditionalText.None;
+                    break;
+            }
+            return result;
         }
     }
 }

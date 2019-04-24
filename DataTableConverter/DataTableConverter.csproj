@@ -91,6 +91,7 @@
     <Compile Include="Classes\WorkProc.cs" />
     <Compile Include="Assisstant\ViewHelper.cs" />
     <Compile Include="Classes\WorkProcs\ProcAddTableColumns.cs" />
+    <Compile Include="Classes\WorkProcs\ProcCompare.cs" />
     <Compile Include="Classes\WorkProcs\ProcNumber.cs" />
     <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
     <Compile Include="Classes\WorkProcs\ProcPadding.cs" />
@@ -151,6 +152,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\WorkProcViews\CompareForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\CompareForm.Designer.cs">
+      <DependentUpon>CompareForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\WorkProcViews\ReplaceWholeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -271,6 +278,9 @@
     </Compile>
     <EmbeddedResource Include="View\SettingForm.resx">
       <DependentUpon>SettingForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\CompareForm.resx">
+      <DependentUpon>CompareForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\ReplaceWholeForm.resx">
       <DependentUpon>ReplaceWholeForm.cs</DependentUpon>

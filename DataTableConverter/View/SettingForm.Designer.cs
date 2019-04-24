@@ -49,14 +49,26 @@
             this.txtFailAddress = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.txtOldAffix = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label9 = new System.Windows.Forms.Label();
-            this.txtOldAffix = new System.Windows.Forms.TextBox();
+            this.cbAutoSavePVM = new System.Windows.Forms.CheckBox();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabSettings
@@ -64,6 +76,7 @@
             this.tabSettings.Controls.Add(this.tabPage1);
             this.tabSettings.Controls.Add(this.tpFileShortcuts);
             this.tabSettings.Controls.Add(this.tabPage2);
+            this.tabSettings.Controls.Add(this.tabPage3);
             this.tabSettings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabSettings.Location = new System.Drawing.Point(0, 0);
             this.tabSettings.Name = "tabSettings";
@@ -257,6 +270,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.cbAutoSavePVM);
             this.tabPage2.Controls.Add(this.txtOldAffix);
             this.tabPage2.Controls.Add(this.label9);
             this.tabPage2.Controls.Add(this.cbHeaderUpperCase);
@@ -267,6 +281,22 @@
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // txtOldAffix
+            // 
+            this.txtOldAffix.Location = new System.Drawing.Point(217, 42);
+            this.txtOldAffix.Name = "txtOldAffix";
+            this.txtOldAffix.Size = new System.Drawing.Size(100, 20);
+            this.txtOldAffix.TabIndex = 2;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(8, 49);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(169, 13);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "Alte Werte in ALT speichern. Affix:";
             // 
             // cbHeaderUpperCase
             // 
@@ -279,21 +309,117 @@
             this.cbHeaderUpperCase.Text = "Überschriften in Großbuchstaben einlesen";
             this.cbHeaderUpperCase.UseVisualStyleBackColor = true;
             // 
-            // label9
+            // cbAutoSavePVM
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(8, 49);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(169, 13);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "Alte Werte in ALT speichern. Affix:";
+            this.cbAutoSavePVM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cbAutoSavePVM.Location = new System.Drawing.Point(8, 87);
+            this.cbAutoSavePVM.Name = "cbAutoSavePVM";
+            this.cbAutoSavePVM.Size = new System.Drawing.Size(224, 17);
+            this.cbAutoSavePVM.TabIndex = 3;
+            this.cbAutoSavePVM.Text = "PVM automatisch speichern";
+            this.cbAutoSavePVM.UseVisualStyleBackColor = true;
             // 
-            // txtOldAffix
+            // tabPage3
             // 
-            this.txtOldAffix.Location = new System.Drawing.Point(217, 42);
-            this.txtOldAffix.Name = "txtOldAffix";
-            this.txtOldAffix.Size = new System.Drawing.Size(100, 20);
-            this.txtOldAffix.TabIndex = 2;
+            this.tabPage3.Controls.Add(this.label18);
+            this.tabPage3.Controls.Add(this.label17);
+            this.tabPage3.Controls.Add(this.label16);
+            this.tabPage3.Controls.Add(this.label15);
+            this.tabPage3.Controls.Add(this.label14);
+            this.tabPage3.Controls.Add(this.label13);
+            this.tabPage3.Controls.Add(this.label12);
+            this.tabPage3.Controls.Add(this.label11);
+            this.tabPage3.Controls.Add(this.label10);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(792, 424);
+            this.tabPage3.TabIndex = 3;
+            this.tabPage3.Text = "Hilfe";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(8, 14);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(72, 20);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Formular";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(9, 52);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(82, 13);
+            this.label11.TabIndex = 1;
+            this.label11.Text = "Spaltenangabe:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(9, 85);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(225, 13);
+            this.label12.TabIndex = 2;
+            this.label12.Text = "Bedingte Spalten (die erste nicht-leere Spalte):";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(291, 52);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(49, 13);
+            this.label13.TabIndex = 3;
+            this.label13.Text = "[Spalte1]";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(291, 85);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(145, 13);
+            this.label14.TabIndex = 4;
+            this.label14.Text = "([Spalte1] [Spalte2] [Spalte3])";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(9, 118);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(79, 13);
+            this.label15.TabIndex = 5;
+            this.label15.Text = "Bedingter Text:";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(291, 118);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(80, 13);
+            this.label16.TabIndex = 6;
+            this.label16.Text = "[Spalte1|R] abc";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(291, 147);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(78, 13);
+            this.label17.TabIndex = 7;
+            this.label17.Text = "abc [Spalte1|L]";
+            // 
+            // label18
+            // 
+            this.label18.Location = new System.Drawing.Point(466, 118);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(200, 42);
+            this.label18.TabIndex = 8;
+            this.label18.Text = "|R, |L: Text rechts bzw. links wird nicht dazugeschrieben, falls die Spalte leer " +
+    "ist";
+            this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // SettingForm
             // 
@@ -312,6 +438,8 @@
             this.tpFileShortcuts.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -343,5 +471,16 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtOldAffix;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.CheckBox cbAutoSavePVM;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
     }
 }

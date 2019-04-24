@@ -15,7 +15,7 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcAddTableColumns : WorkProc
     {
         internal string IdentifySource, IdentifyAppend;
-        internal static string ClassName = "PVM";
+        internal static string ClassName = "PVM Import";
         //internal bool ImportAll = true;
 
         public override string[] GetHeaders()
@@ -91,8 +91,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
                     if (notFoundHeaders.Count > 0)
                     {
-                        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders);
-                        form.Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden";
+                        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders)
+                        {
+                            Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
+                        };
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
