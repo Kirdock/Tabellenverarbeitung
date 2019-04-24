@@ -30,11 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.öffnenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.öffnenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.benutzerdefiniertesSpeichernToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.postwurfToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nachWertInSpalteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bearbeitenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rückgängigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wiederholenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,8 +39,9 @@
             this.zeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nummerierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rundenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spaltenAusTabelleHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rundenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.spaltenVergleichenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeilenZusammenfügenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.substringToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textErsetzenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -80,12 +76,17 @@
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblRows = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStrSum = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.spaltenVergleichenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrSumText = new System.Windows.Forms.ToolStripStatusLabel();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.öffnenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.benutzerdefiniertesSpeichernToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.pVMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.trennenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -97,7 +98,7 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.öffnenToolStripMenuItem,
+            this.öffnenToolStripMenuItem1,
             this.bearbeitenToolStripMenuItem,
             this.verwaltungToolStripMenuItem,
             this.funktionenToolStripMenuItem,
@@ -107,50 +108,13 @@
             this.sortierenToolStripMenuItem,
             this.updateToolStripMenuItem,
             this.speichernToolStripMenuItem2,
-            this.speichernAlsToolStripMenuItem});
+            this.speichernAlsToolStripMenuItem,
+            this.benutzerdefiniertesSpeichernToolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(904, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1056, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
-            // 
-            // öffnenToolStripMenuItem
-            // 
-            this.öffnenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.öffnenToolStripMenuItem1,
-            this.benutzerdefiniertesSpeichernToolStripMenuItem});
-            this.öffnenToolStripMenuItem.Name = "öffnenToolStripMenuItem";
-            this.öffnenToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
-            this.öffnenToolStripMenuItem.Text = "Datei";
-            // 
-            // öffnenToolStripMenuItem1
-            // 
-            this.öffnenToolStripMenuItem1.Name = "öffnenToolStripMenuItem1";
-            this.öffnenToolStripMenuItem1.Size = new System.Drawing.Size(230, 22);
-            this.öffnenToolStripMenuItem1.Text = "Öffnen";
-            // 
-            // benutzerdefiniertesSpeichernToolStripMenuItem
-            // 
-            this.benutzerdefiniertesSpeichernToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.postwurfToolStripMenuItem,
-            this.nachWertInSpalteToolStripMenuItem});
-            this.benutzerdefiniertesSpeichernToolStripMenuItem.Name = "benutzerdefiniertesSpeichernToolStripMenuItem";
-            this.benutzerdefiniertesSpeichernToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.benutzerdefiniertesSpeichernToolStripMenuItem.Text = "Benutzerdefiniertes Speichern";
-            // 
-            // postwurfToolStripMenuItem
-            // 
-            this.postwurfToolStripMenuItem.Name = "postwurfToolStripMenuItem";
-            this.postwurfToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
-            this.postwurfToolStripMenuItem.Text = "PVM";
-            this.postwurfToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
-            // 
-            // nachWertInSpalteToolStripMenuItem
-            // 
-            this.nachWertInSpalteToolStripMenuItem.Name = "nachWertInSpalteToolStripMenuItem";
-            this.nachWertInSpalteToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
-            this.nachWertInSpalteToolStripMenuItem.Text = "Trennen";
-            this.nachWertInSpalteToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 
             // bearbeitenToolStripMenuItem
             // 
@@ -234,6 +198,13 @@
             this.nummerierenToolStripMenuItem.Text = "Nummerieren";
             this.nummerierenToolStripMenuItem.Click += new System.EventHandler(this.nummerierenToolStripMenuItem_Click);
             // 
+            // spaltenAusTabelleHinzufügenToolStripMenuItem
+            // 
+            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Name = "spaltenAusTabelleHinzufügenToolStripMenuItem";
+            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Text = "PVM Import";
+            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabellenZusammenfügenToolStripMenuItem_Click);
+            // 
             // rundenToolStripMenuItem
             // 
             this.rundenToolStripMenuItem.Name = "rundenToolStripMenuItem";
@@ -241,12 +212,12 @@
             this.rundenToolStripMenuItem.Text = "Runden";
             this.rundenToolStripMenuItem.Click += new System.EventHandler(this.rundenToolStripMenuItem_Click);
             // 
-            // spaltenAusTabelleHinzufügenToolStripMenuItem
+            // spaltenVergleichenToolStripMenuItem
             // 
-            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Name = "spaltenAusTabelleHinzufügenToolStripMenuItem";
-            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Text = "PVM Import";
-            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabellenZusammenfügenToolStripMenuItem_Click);
+            this.spaltenVergleichenToolStripMenuItem.Name = "spaltenVergleichenToolStripMenuItem";
+            this.spaltenVergleichenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.spaltenVergleichenToolStripMenuItem.Text = "Spalten vergleichen";
+            this.spaltenVergleichenToolStripMenuItem.Click += new System.EventHandler(this.spaltenVergleichenToolStripMenuItem_Click);
             // 
             // zeilenZusammenfügenToolStripMenuItem1
             // 
@@ -355,19 +326,19 @@
             // cSVToolStripMenuItem
             // 
             this.cSVToolStripMenuItem.Name = "cSVToolStripMenuItem";
-            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cSVToolStripMenuItem.Text = "CSV";
             // 
             // dBASEToolStripMenuItem1
             // 
             this.dBASEToolStripMenuItem1.Name = "dBASEToolStripMenuItem1";
-            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
+            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.dBASEToolStripMenuItem1.Text = "DBASE";
             // 
             // excelToolStripMenuItem1
             // 
             this.excelToolStripMenuItem1.Name = "excelToolStripMenuItem1";
-            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
+            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.excelToolStripMenuItem1.Text = "Excel";
             // 
             // pgbLoading
@@ -377,7 +348,7 @@
             this.pgbLoading.Location = new System.Drawing.Point(0, 402);
             this.pgbLoading.MarqueeAnimationSpeed = 10;
             this.pgbLoading.Name = "pgbLoading";
-            this.pgbLoading.Size = new System.Drawing.Size(904, 23);
+            this.pgbLoading.Size = new System.Drawing.Size(1056, 23);
             this.pgbLoading.TabIndex = 2;
             // 
             // ctxBody
@@ -455,10 +426,12 @@
             this.lblFilename,
             this.toolStripStatusLabel3,
             this.lblRows,
-            this.StatusLabel});
+            this.StatusLabel,
+            this.toolStrSum,
+            this.toolStrSumText});
             this.statusStrip1.Location = new System.Drawing.Point(0, 426);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(904, 24);
+            this.statusStrip1.Size = new System.Drawing.Size(1056, 24);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -494,6 +467,16 @@
             this.StatusLabel.Name = "StatusLabel";
             this.StatusLabel.Size = new System.Drawing.Size(0, 19);
             // 
+            // toolStrSum
+            // 
+            this.toolStrSum.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.toolStrSum.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.toolStrSum.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.toolStrSum.Name = "toolStrSum";
+            this.toolStrSum.Size = new System.Drawing.Size(92, 19);
+            this.toolStrSum.Text = "Gesamtanzahl:";
+            this.toolStrSum.Visible = false;
+            // 
             // contextGlobal
             // 
             this.contextGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -521,12 +504,10 @@
             this.clipboardItem.Size = new System.Drawing.Size(209, 22);
             this.clipboardItem.Text = "Zwischenablage einfügen";
             // 
-            // spaltenVergleichenToolStripMenuItem
+            // toolStrSumText
             // 
-            this.spaltenVergleichenToolStripMenuItem.Name = "spaltenVergleichenToolStripMenuItem";
-            this.spaltenVergleichenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.spaltenVergleichenToolStripMenuItem.Text = "Spalten vergleichen";
-            this.spaltenVergleichenToolStripMenuItem.Click += new System.EventHandler(this.spaltenVergleichenToolStripMenuItem_Click);
+            this.toolStrSumText.Name = "toolStrSumText";
+            this.toolStrSumText.Size = new System.Drawing.Size(0, 19);
             // 
             // dgTable
             // 
@@ -539,7 +520,7 @@
             this.dgTable.Location = new System.Drawing.Point(0, 27);
             this.dgTable.Name = "dgTable";
             this.dgTable.RowHeadersWidth = 60;
-            this.dgTable.Size = new System.Drawing.Size(904, 369);
+            this.dgTable.Size = new System.Drawing.Size(1056, 369);
             this.dgTable.TabIndex = 0;
             this.dgTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellClick);
             this.dgTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgTable_CellPainting);
@@ -549,11 +530,40 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // öffnenToolStripMenuItem1
+            // 
+            this.öffnenToolStripMenuItem1.Name = "öffnenToolStripMenuItem1";
+            this.öffnenToolStripMenuItem1.Size = new System.Drawing.Size(56, 20);
+            this.öffnenToolStripMenuItem1.Text = "Öffnen";
+            // 
+            // benutzerdefiniertesSpeichernToolStripMenuItem1
+            // 
+            this.benutzerdefiniertesSpeichernToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.pVMToolStripMenuItem,
+            this.trennenToolStripMenuItem});
+            this.benutzerdefiniertesSpeichernToolStripMenuItem1.Name = "benutzerdefiniertesSpeichernToolStripMenuItem1";
+            this.benutzerdefiniertesSpeichernToolStripMenuItem1.Size = new System.Drawing.Size(175, 20);
+            this.benutzerdefiniertesSpeichernToolStripMenuItem1.Text = "Benutzerdefiniertes Speichern";
+            // 
+            // pVMToolStripMenuItem
+            // 
+            this.pVMToolStripMenuItem.Name = "pVMToolStripMenuItem";
+            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pVMToolStripMenuItem.Text = "PVM";
+            this.pVMToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
+            // 
+            // trennenToolStripMenuItem
+            // 
+            this.trennenToolStripMenuItem.Name = "trennenToolStripMenuItem";
+            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.trennenToolStripMenuItem.Text = "Trennen";
+            this.trennenToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(904, 450);
+            this.ClientSize = new System.Drawing.Size(1056, 450);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.pgbLoading);
             this.Controls.Add(this.dgTable);
@@ -581,7 +591,6 @@
 
         private DataGridViewDoubleBuffered dgTable;
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem öffnenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem funktionenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem trimToolStripMenuItem;
         private System.Windows.Forms.ProgressBar pgbLoading;
@@ -602,10 +611,6 @@
         private System.Windows.Forms.ToolStripMenuItem zeilenZusammenfügenToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem spalteHinzufügenToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem verwaltungToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem öffnenToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem benutzerdefiniertesSpeichernToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem postwurfToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem nachWertInSpalteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem duplikateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sortierenToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextGlobal;
@@ -636,6 +641,12 @@
         private System.Windows.Forms.ToolStripMenuItem zeilenAusTabelleHinzufügenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem zeilenZusammenfassenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem spaltenVergleichenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolStrSum;
+        private System.Windows.Forms.ToolStripStatusLabel toolStrSumText;
+        private System.Windows.Forms.ToolStripMenuItem öffnenToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem benutzerdefiniertesSpeichernToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem pVMToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem trennenToolStripMenuItem;
     }
 }
 

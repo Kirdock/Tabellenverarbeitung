@@ -35,11 +35,16 @@ namespace DataTableConverter
         private List<string> dictKeys;
         private string FilePath = string.Empty;
 
-        internal Form1(DataTable table = null)
+        internal Form1(DataTable table = null, int sum = 0)
         {
             dictSorting = new Dictionary<string, SortOrder>();
             dictKeys = new List<string>();
             InitializeComponent();
+            if(sum > 0)
+            {
+                toolStrSum.Visible = true;
+                toolStrSumText.Text = sum.ToString();
+            }
             SetSize();
             ExportHelper.CheckFolders();
             LoadProcedures();
@@ -165,7 +170,22 @@ namespace DataTableConverter
         {
             historyHelper.ResetHistory();
             SetSorting(string.Empty);
+
+            
+            ProcTrim proc = new ProcTrim();
+            string order = GetSorting();
+            proc.doWork(table, ref order, null, null, null, FilePath);
+
             AssignDataSource(table);
+            SetWidth();
+        }
+
+        private void SetWidth()
+        {
+            if (Properties.Settings.Default.FullWidthImport)
+            {
+                dgTable.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+            }
         }
 
         private void AddDataSourceAddHistory(List<CellMatrix> newEntry)
@@ -1057,7 +1077,7 @@ namespace DataTableConverter
                     }
                     BeginInvoke(new MethodInvoker(() =>
                     {
-                        Form1 form = new Form1(newTable);
+                        Form1 form = new Form1(newTable, table.Rows.Count);
                         form.Show();
                     }));
                     StopLoadingBar();

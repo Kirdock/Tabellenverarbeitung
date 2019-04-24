@@ -173,6 +173,7 @@ namespace DataTableConverter
                 Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rows + 1, columns];
                 Microsoft.Office.Interop.Excel.Range sheetData = worksheet.Range[beginWrite, endWrite];
                 sheetData.Value2 = data;
+                sheetData.NumberFormat = "@";
 
                 worksheet.Select();
                 sheetData.Worksheet.ListObjects.Add(Microsoft.Office.Interop.Excel.XlListObjectSourceType.xlSrcRange,

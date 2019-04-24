@@ -42,7 +42,12 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return new string[0];
+        }
+
+        private IEnumerable<DataRow> GetFoundRows(DataColumnCollection columns)
+        {
+            return Columns.Rows.Cast<DataRow>().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr.ItemArray[0].ToString()));
         }
 
         public override void renameHeaders(string oldName, string newName)
@@ -58,9 +63,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
+            IEnumerable<DataRow> distinctDataTale = GetFoundRows(table.Columns);
             foreach (DataRow row in table.Rows)
             {
-                foreach(DataRow replaceRow in DataHelper.DataTableWithoutEmpty(Columns, (int)ColumnIndex.Column))
+                foreach(DataRow replaceRow in distinctDataTale)
                 {
                     row[replaceRow[(int)ColumnIndex.Column].ToString()] = replaceRow[(int)ColumnIndex.Value].ToString();
                 }

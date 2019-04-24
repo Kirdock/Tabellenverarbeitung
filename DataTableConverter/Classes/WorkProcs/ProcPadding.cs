@@ -78,14 +78,14 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     bool valid = Conditions.Rows.Count == 0;
                     int index = intoNewCol ? lastCol : table.Columns.IndexOf(col);
-                    bool result = !valid;
+                    bool result = false;
                     foreach (DataRow rep in Conditions.Rows)
                     {
                         string column = rep[(int)ConditionColumn.Spalte].ToString();
                         string value = rep[(int)ConditionColumn.Wert].ToString();
                         if (!string.IsNullOrWhiteSpace(column))
                         {
-                            result = result && row[column].ToString() == value;
+                            result |= row[column].ToString() == value;
                         }
                     }
                     if (valid || result)

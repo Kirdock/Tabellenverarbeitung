@@ -453,5 +453,17 @@ namespace DataTableConverter.Properties {
                 this["AutoSavePVM"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FullWidthImport {
+            get {
+                return ((bool)(this["FullWidthImport"]));
+            }
+            set {
+                this["FullWidthImport"] = value;
+            }
+        }
     }
 }

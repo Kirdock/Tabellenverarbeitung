@@ -64,6 +64,7 @@
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
+            this.cbFullWidthImport = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -270,6 +271,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.cbFullWidthImport);
             this.tabPage2.Controls.Add(this.cbAutoSavePVM);
             this.tabPage2.Controls.Add(this.txtOldAffix);
             this.tabPage2.Controls.Add(this.label9);
@@ -421,6 +423,16 @@
     "ist";
             this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // cbFullWidthImport
+            // 
+            this.cbFullWidthImport.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cbFullWidthImport.Location = new System.Drawing.Point(11, 125);
+            this.cbFullWidthImport.Name = "cbFullWidthImport";
+            this.cbFullWidthImport.Size = new System.Drawing.Size(224, 17);
+            this.cbFullWidthImport.TabIndex = 4;
+            this.cbFullWidthImport.Text = "Optimale Breite beim Einlesen";
+            this.cbFullWidthImport.UseVisualStyleBackColor = true;
+            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -482,5 +494,6 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox cbFullWidthImport;
     }
 }
