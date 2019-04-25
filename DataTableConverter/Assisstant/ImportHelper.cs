@@ -79,7 +79,12 @@ namespace DataTableConverter.Assisstant
                     }
                 }
             }
-            CheckDataTableColumnHeader(table);
+            if(table != null)
+            {
+                CheckDataTableColumnHeader(table);
+                DataHelper.RemoveEmptyRows(ref table);
+                DataHelper.RemoveNull(table);
+            }            
             return table;
         }
 
@@ -311,7 +316,7 @@ namespace DataTableConverter.Assisstant
 
         private static void CheckDataTableColumnHeader(DataTable table)
         {
-            if (table != null)
+            if (Properties.Settings.Default.ImportHeaderUpperCase)
             {
                 foreach (DataColumn col in table.Columns)
                 {
@@ -399,6 +404,7 @@ namespace DataTableConverter.Assisstant
                     Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[noofrow, 1];
                     Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rows, cols];
                     Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
+                    range.NumberFormat = "@";
 
                     object[,] values = (object[,])range.Value2;
 

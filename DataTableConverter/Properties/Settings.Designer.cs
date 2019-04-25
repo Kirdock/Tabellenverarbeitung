@@ -348,7 +348,7 @@ namespace DataTableConverter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Ungültig")]
+        [global::System.Configuration.DefaultSettingValueAttribute("UNGÜLTIG")]
         public string InvalidColumnName {
             get {
                 return ((string)(this["InvalidColumnName"]));

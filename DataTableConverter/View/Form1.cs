@@ -85,7 +85,6 @@ namespace DataTableConverter
             int scrollBarHorizontal = dgTable.FirstDisplayedScrollingColumnIndex;
             int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
 
-            dgTable.DataSource = null;
             dgTable.DataSource = ViewHelper.GetSortedView(SortingOrder, sourceTable);
             if (scrollBarHorizontal != -1)
             {
@@ -455,7 +454,6 @@ namespace DataTableConverter
         {
             StopLoadingBar();
             if(table != null) {
-                DataHelper.RemoveNull(table);
                 switch (state)
                 {
                     case ImportState.Merge:
@@ -497,7 +495,20 @@ namespace DataTableConverter
                         DataHelper.AddColumnsOfDataTable(importTable, sourceTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, SortColumn, orderColumnName, pgbLoading);
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            DataHelper.SplitDataTable(sourceTable, FilePath);
+                            string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
+                            if (!sourceTable.Columns.Contains(invalidColumnName))
+                            {
+                                SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, DataHelper.HeadersOfDataTable(sourceTable));
+                                if (f.ShowDialog() == DialogResult.OK)
+                                {
+                                    invalidColumnName = f.Table.Rows.Cast<DataRow>().First()[1].ToString();
+                                    DataHelper.SplitDataTable(sourceTable, FilePath, invalidColumnName);
+                                }
+                            }
+                            else
+                            {
+                                DataHelper.SplitDataTable(sourceTable, FilePath, invalidColumnName);
+                            }
                         }
 
                         dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(sourceTable); }));

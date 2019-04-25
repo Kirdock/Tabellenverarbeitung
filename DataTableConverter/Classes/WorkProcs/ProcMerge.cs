@@ -99,20 +99,27 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
         {
-            int column = table.Columns.Count;
-            DataHelper.AddColumn(NewColumn, table);
-
-            foreach (DataRow row in table.Rows)
+            if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                string formula = Formula;
-                foreach(DataRow condition in Conditions.Rows)
+                int column = table.Columns.Count;
+                DataHelper.AddColumn(NewColumn, table);
+
+                foreach (DataRow row in table.Rows)
                 {
-                    if(row[condition[(int)ConditionColumn.Spalte].ToString()].ToString() == condition[(int)ConditionColumn.Wert].ToString())
+                    string formula = Formula;
+                    foreach (DataRow condition in Conditions.Rows)
                     {
-                        formula = condition[(int)ConditionColumn.Format].ToString();
+                        if (row[condition[(int)ConditionColumn.Spalte].ToString()].ToString() == condition[(int)ConditionColumn.Wert].ToString())
+                        {
+                            formula = condition[(int)ConditionColumn.Format].ToString();
+                        }
                     }
+                    row[column] = GetFormat(row, formula);
                 }
-                row[column] = GetFormat(row, formula);
+            }
+            else
+            {
+                MessageHandler.MessagesOK(System.Windows.Forms.MessageBoxIcon.Warning, $"{ClassName}: Der Name der neu anzulegenden Spalte darf nicht leer sein!");
             }
         }
 
@@ -155,7 +162,13 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
                 else if (c == '[') //insert column value
                 {
+                    if(counter > columns.Length)
+                    {
+                        ErrorHelper.LogMessage($"Ungültiges Format? Format:{formula}");
+                        continue;
+                    }
                     string header = columns[counter];
+
                     string value = row[header]?.ToString();
                     bool isEmpty = string.IsNullOrWhiteSpace(value);
 

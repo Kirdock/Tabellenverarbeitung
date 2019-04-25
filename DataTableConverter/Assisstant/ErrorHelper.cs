@@ -14,9 +14,14 @@ namespace DataTableConverter.Assisstant
 
         internal static void LogMessage(Exception exception, bool showMessage = true)
         {
+            LogMessage(exception.ToString(), showMessage);
+        }
+
+        internal static void LogMessage(string text, bool showMessage = true)
+        {
             try
             {
-                File.AppendAllText(path, exception.ToString() + Environment.NewLine);
+                File.AppendAllText(path, $"{DateTime.Today} {text}{Environment.NewLine}");
                 if (showMessage)
                 {
                     ShowError(ErrorMessage);
@@ -24,9 +29,8 @@ namespace DataTableConverter.Assisstant
             }
             catch (Exception ex)
             {
-                ShowError(ErrorMessage + '\n' +ex.ToString());
+                ShowError(ErrorMessage + '\n' + ex.ToString());
             }
-
         }
 
         private static void ShowError(string Message)
