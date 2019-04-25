@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
@@ -40,7 +41,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
         {
             Hashtable hTable = new Hashtable();
             Hashtable totalTable = new Hashtable();

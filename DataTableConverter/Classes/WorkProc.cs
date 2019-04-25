@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace DataTableConverter.Classes
 {
@@ -54,6 +55,6 @@ namespace DataTableConverter.Classes
 
         abstract public void renameHeaders(string oldName, string newName);
 
-        abstract public void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath);
+        abstract public void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow);
     }
 }

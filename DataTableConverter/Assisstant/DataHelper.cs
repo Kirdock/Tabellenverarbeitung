@@ -155,23 +155,19 @@ namespace DataTableConverter.Assisstant
                     row[colIndex] = originalFilename;
                 }
             }
+            bool containsName = table.Columns.Contains(FileName);
 
             foreach (DataRow row in table.Rows)
             {
                 object[] itemArray = new object[originalTable.Columns.Count];
                 int count = 0;
-                string secondName = secondFilename;
-                try
-                {
-                    secondName = row[FileName]?.ToString() ?? secondFilename;
-                }
-                catch { }
+                
                 foreach (int index in ColumnIndizes)
                 {
                     itemArray[index] = row.ItemArray[count];
                     count++;
                 }
-                itemArray[filenameColumnIndex] = secondName;
+                itemArray[filenameColumnIndex] = containsName ? row[FileName]?.ToString() : secondFilename;
                 originalTable.Rows.Add(itemArray);
             }
         }

@@ -35,16 +35,11 @@ namespace DataTableConverter
         private List<string> dictKeys;
         private string FilePath = string.Empty;
 
-        internal Form1(DataTable table = null, int sum = 0)
+        internal Form1(DataTable table = null)
         {
             dictSorting = new Dictionary<string, SortOrder>();
             dictKeys = new List<string>();
             InitializeComponent();
-            if(sum > 0)
-            {
-                toolStrSum.Visible = true;
-                toolStrSumText.Text = sum.ToString();
-            }
             SetSize();
             ExportHelper.CheckFolders();
             LoadProcedures();
@@ -173,7 +168,7 @@ namespace DataTableConverter
             
             ProcTrim proc = new ProcTrim();
             string order = GetSorting();
-            proc.doWork(table, ref order, null, null, null, FilePath);
+            proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal);
 
             AssignDataSource(table);
             SetWidth();
@@ -418,7 +413,7 @@ namespace DataTableConverter
                         {
 
                             string filename = Path.GetFileName(file);
-                            DataTable table = ImportHelper.ImportFile(file, this, multipleFiles, fileImportSettings);
+                            DataTable table = ImportHelper.ImportFile(file, this, multipleFiles, fileImportSettings, contextGlobal);
                             if (table != null)
                             {
                                 if (newTable != null)
@@ -582,7 +577,7 @@ namespace DataTableConverter
         private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp)
         {
             string newOrder = GetSorting();
-            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath);
+            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal);
             SetSorting(newOrder);
         }
 
@@ -607,7 +602,7 @@ namespace DataTableConverter
             Thread.CurrentThread.IsBackground = true;
             ProcTrim proc = new ProcTrim();
             string order = GetSorting();
-            proc.doWork(dt, ref order, null, null, null, FilePath);
+            proc.doWork(dt, ref order, null, null, null, FilePath, contextGlobal);
             dgTable.Invoke(new MethodInvoker(() =>
             {
                 AddDataSourceValueChange(dt);
@@ -1027,7 +1022,7 @@ namespace DataTableConverter
         {
             ExportCount form = new ExportCount(DataHelper.HeadersOfDataTable(GetDataSource()));
             form.FormClosed += new FormClosedEventHandler(CountContendClosed);
-            form.ShowDialog();
+            form.Show();
         }
 
         private void CountContendClosed(object sender, FormClosedEventArgs e)
@@ -1086,9 +1081,11 @@ namespace DataTableConverter
                             }
                         }
                     }
+                    newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
+
                     BeginInvoke(new MethodInvoker(() =>
                     {
-                        Form1 form = new Form1(newTable, table.Rows.Count);
+                        Form1 form = new Form1(newTable);
                         form.Show();
                     }));
                     StopLoadingBar();

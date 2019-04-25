@@ -270,7 +270,7 @@ namespace DataTableConverter
                 DeleteRowItem.Click -= CtxRowDeleteRowHandler;
                 InsertRowItem.Click -= CtxRowInsertRowHandler;
             }
-            
+
             if (CtxRowClipboard != null)
             {
                 ClipboardItem.Click -= CtxRowClipboard;
@@ -290,8 +290,8 @@ namespace DataTableConverter
             if (view.Name == "dgCaseColumns")
             {
                 WorkflowHelper.RemoveRowThroughCaseChange(Workflows, rowIndizes, SelectedCase);
-                MyFunction(null, null);
             }
+            MyFunction?.Invoke(null, null);
         }
 
         private void InsertRowClick(DataGridView view, int rowIndex)
@@ -305,8 +305,8 @@ namespace DataTableConverter
             if (view.Name == "dgCaseColumns")
             {
                 WorkflowHelper.InsertRowThroughCaseChange(Workflows, rowIndex, SelectedCase);
-                MyFunction(null, null);
             }
+            MyFunction?.Invoke(null, null);
         }
 
 

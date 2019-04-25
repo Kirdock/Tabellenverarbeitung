@@ -62,6 +62,7 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dgvHeaders = new System.Windows.Forms.DataGridView();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             this.gbFixed.SuspendLayout();
@@ -70,6 +71,7 @@
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPreview)).BeginInit();
             this.ctxRow.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
             this.SuspendLayout();
             // 
             // rbSeparated
@@ -144,6 +146,7 @@
             this.gbSeparated.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbSeparated.Controls.Add(this.dgvHeaders);
             this.gbSeparated.Controls.Add(this.cbContainsHeaders);
             this.gbSeparated.Controls.Add(this.label4);
             this.gbSeparated.Controls.Add(this.txtEnd);
@@ -434,13 +437,24 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
+            // dgvHeaders
+            // 
+            this.dgvHeaders.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvHeaders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvHeaders.Location = new System.Drawing.Point(394, 31);
+            this.dgvHeaders.Name = "dgvHeaders";
+            this.dgvHeaders.Size = new System.Drawing.Size(240, 237);
+            this.dgvHeaders.TabIndex = 11;
+            this.dgvHeaders.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvHeaders_CellEndEdit);
+            this.dgvHeaders.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgvHeaders_RowPostPaint);
+            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 576);
-            this.Controls.Add(this.gbFixed);
             this.Controls.Add(this.gbSeparated);
+            this.Controls.Add(this.gbFixed);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.MinimumSize = new System.Drawing.Size(816, 615);
@@ -460,6 +474,7 @@
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPreview)).EndInit();
             this.ctxRow.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -499,5 +514,6 @@
         private System.Windows.Forms.CheckBox cbTakeOver;
         private System.Windows.Forms.Button BtnRenamePreset;
         private System.Windows.Forms.CheckBox cbContainsHeaders;
+        private System.Windows.Forms.DataGridView dgvHeaders;
     }
 }

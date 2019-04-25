@@ -33,7 +33,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow)
         {
             //I should first load the File (before workflow.start; right after header-check)
             //additional method in WorkProc and only this class overrides it
@@ -55,7 +55,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             if (!string.IsNullOrWhiteSpace(path))
             {
-                DataTable newTable = ImportHelper.ImportFile(path, null, false, null); //load file
+                DataTable newTable = ImportHelper.ImportFile(path, null, false, null, ctxRow); //load file
                 if (newTable != null) {
                     object[] ImportHeaders = DataHelper.HeadersOfDataTable(newTable);
                     List<string> selectedImportHeaders = DataHelper.HeadersOfDataTable(Columns).Cast<string>().ToList();

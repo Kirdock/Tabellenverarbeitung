@@ -16,19 +16,21 @@ namespace DataTableConverter.Classes
         internal List<string> Headers = null;
         internal bool ContainsHeaders;
 
-        internal ImportSettings(int codePage, string textBegin, string textEnd, bool containsHeaders)
+        internal ImportSettings(int codePage, string textBegin, string textEnd, bool containsHeaders, object[] headers)
         {
             CodePage = codePage;
             TextBegin = textBegin;
             TextEnd = textEnd;
             ContainsHeaders = containsHeaders;
+            Headers = headers.Cast<string>().ToList();
         }
 
-        internal ImportSettings(string separator, int codePage, bool containsHeaders)
+        internal ImportSettings(string separator, int codePage, bool containsHeaders, object[] headers)
         {
             CodePage = codePage;
             Separator = separator;
             ContainsHeaders = containsHeaders;
+            Headers = headers.Cast<string>().ToList();
         }
 
         internal ImportSettings(List<int> values, List<string> headers, int codePage)

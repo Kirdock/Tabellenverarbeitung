@@ -29,7 +29,7 @@ namespace DataTableConverter.Assisstant
         internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
 
 
-        internal static DataTable ImportFile(string file, Form1 mainform, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings)
+        internal static DataTable ImportFile(string file, Form1 mainform, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow)
         {
             string filename = Path.GetFileName(file);
             string extension = Path.GetExtension(file).ToLower();
@@ -58,17 +58,17 @@ namespace DataTableConverter.Assisstant
                     }
                     else if (settings.Separator != null)
                     {
-                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders);
+                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray());
                     }
                     else
                     {
-                        table = OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders);
+                        table = OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders, settings.Headers.ToArray());
                     }
 
                 }
                 else
                 {
-                    TextFormat form = new TextFormat(file, multipleFiles);
+                    TextFormat form = new TextFormat(file, multipleFiles, ctxRow);
                     if (form.ShowDialog() == DialogResult.OK)
                     {
                         if (form.TakeOver && fileImportSettings != null)
@@ -104,7 +104,7 @@ namespace DataTableConverter.Assisstant
             };
         }
 
-        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, bool isPreview = false)
+        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, object[] headers, bool isPreview = false)
         {
             DataTable dt = new DataTable();
 
@@ -121,6 +121,13 @@ namespace DataTableConverter.Assisstant
                     foreach (string column in list)
                     {
                         DataHelper.AddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? column.ToUpper() : column).Trim(), dt);
+                    }
+                }
+                else
+                {
+                    foreach (string column in headers)
+                    {
+                        DataHelper.AddColumn(column, dt);
                     }
                 }
 
@@ -166,7 +173,7 @@ namespace DataTableConverter.Assisstant
                     });
         }
 
-        internal static DataTable OpenTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, bool isPreview = false)
+        internal static DataTable OpenTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview = false)
         {
             DataTable dt = new DataTable();
             try
@@ -181,6 +188,13 @@ namespace DataTableConverter.Assisstant
                     foreach (string field in headerRow)
                     {
                         DataHelper.AddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? field.ToUpper() : field).Trim(), dt);
+                    }
+                }
+                else
+                {
+                    foreach (string column in headers)
+                    {
+                        DataHelper.AddColumn(column, dt);
                     }
                 }
 
@@ -488,12 +502,22 @@ namespace DataTableConverter.Assisstant
                 while (startindex < data.Length && (!isPreview || dt.Rows.Count < 3))
                 {
                     List<string> row = new List<string>();
-
-                    foreach (int line in config)
+                    bool abort = false;
+                    for (int i = 0; i < config.Count && !abort; i++)
                     {
-                        int temp = line + startindex > data.Length ? data.Length - startindex : line;
+                        int temp;
+                        if(config[i] + startindex > data.Length)
+                        {
+                            temp = data.Length - startindex;
+                            abort = true;
+                        }
+                        else
+                        {
+                            temp = config[i];
+                        }
+
                         row.Add(data.Substring(startindex, temp));
-                        startindex += line;
+                        startindex += config[i];
                     }
                     dt.Rows.Add(row.ToArray());
                     if (startindex < data.Length && data[startindex] == '\n')
