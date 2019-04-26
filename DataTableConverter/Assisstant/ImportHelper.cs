@@ -8,9 +8,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
@@ -373,11 +375,7 @@ namespace DataTableConverter.Assisstant
                 } while (hasPassword);
 
                 string[] selectedSheets = SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray());
-                //    (string[])mainform.Invoke(
-                //    new Func<string[]>(() =>
-                //    SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray())
-                //    )
-                //);
+                
                 bool fileNameColumn;
                 if(fileNameColumn = (data.Columns.IndexOf(DataHelper.FileName) == -1 && selectedSheets.Length > 1))
                 {
@@ -398,84 +396,24 @@ namespace DataTableConverter.Assisstant
                         continue;
                     }
 
-                    int[] columns = new int[cols];
-                    int noofrow = 1;
-
-
-                    //Get ColumnName from first Row
-                    for (int c = 1; c <= cols; c++)
-                    {
-                        string colname = objSHT.Cells[1, c].Text;
-                        if (!data.Columns.Contains(colname))
-                        {
-                            data.Columns.Add(colname);
-                        }
-                        columns[c - 1] = data.Columns.IndexOf(colname);
-                        noofrow = 2;
-                    }
-                    //END
-
-                    Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[noofrow, 1];
+                    Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[1, 1];
                     Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rows, cols];
                     Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
-                    range.NumberFormat = "@";
-
-                    object[,] values = (object[,])range.Value2;
-
-
-                    for (int i = 1; i <= values.GetLength(0); i++)
-                    {
-                        DataRow dr = data.NewRow();
-                        for (int j = 1; j <= values.GetLength(1); j++)
-                        {
-                            
-                            string[] subValues = values[i, j]?.ToString()?.Split('\n') ?? new string[0];
-                            if (subValues.Length < 2)
-                            {
-                                dr[columns[j - 1]] = values[i, j];
-                            }
-                            else
-                            {
-                                #region split \n into several columns
-
-                                int[] newColIndizes = new int[subValues.Length];
-                                string colName = data.Columns[columns[j - 1]].ColumnName;
-
-                                newColIndizes[0] = columns[j - 1];
-                                for(int col = 1; col < subValues.Length; col++)
-                                {
-                                    string newColName = colName + col;
-                                    int index = data.Columns.IndexOf(newColName);
-                                    if(index == -1)
-                                    {
-                                        newColIndizes[col] = data.Columns.Count;
-                                        data.Columns.Add(newColName);
-                                    }
-                                    else
-                                    {
-                                        newColIndizes[col] = index;
-                                    }
-                                }
-                                for(int index = 0; index < subValues.Length; index++)
-                                {
-                                    dr[newColIndizes[index]] = subValues[index];
-                                }
-                                #endregion
-                            }
-                        }
-                        if(selectedSheets.Length > 1)
-                        {
-                            dr[DataHelper.FileName] = Path.GetFileName(path) + "; " + sheetName;
-                        }
-                        data.Rows.Add(dr);
-                    }
+                    
+                    RangeToDataTable(range, data, selectedSheets.Length > 1 ? Path.GetFileName(path) + "; " + sheetName : null);
+                    Marshal.ReleaseComObject(objSHT);
                 }
                 if (fileNameColumn)
                 {
                     data.Columns[DataHelper.FileName].SetOrdinal(data.Columns.Count - 1);
                 }
+                objXL.CutCopyMode = Microsoft.Office.Interop.Excel.XlCutCopyMode.xlCopy;
+                objXL.DisplayAlerts = false;
                 objWB.Close();
                 objXL.Quit();
+                Marshal.ReleaseComObject(objWB);
+                Marshal.ReleaseComObject(objXL);
+                Marshal.FinalReleaseComObject(objXL);
             }
             catch (Exception ex)
             {
@@ -485,6 +423,97 @@ namespace DataTableConverter.Assisstant
             }
 
             return data;
+        }
+
+        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Range range, DataTable table, string fileName)
+        {
+            string backup = Clipboard.GetText();
+
+            
+            range.Copy();
+            IDataObject data = Clipboard.GetDataObject();
+            string content = (string)data.GetData(DataFormats.Text);
+            string[] stringRows = content.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            string[] headers = stringRows.First().Split('\t');
+            int[] columns = new int[headers.Length];
+            //header
+            for(int i = 0; i < headers.Length; i++)
+            {
+                int index;
+                if((index = table.Columns.IndexOf(headers[i])) == -1)
+                {
+                    index = table.Columns.Count;
+                    table.Columns.Add(headers[i]);
+                }
+                columns[i] = index;
+            }
+
+            //content
+            foreach (string stringRow in stringRows.Skip(1))
+            {
+                var values = stringRow.Split('\t');
+                DataRow dr = table.NewRow();
+                for (int i = 0; i < values.Length; i++)
+                {
+
+                    string[] subValues = values[i].Split('\n') ?? new string[0];
+                    if (subValues.Length < 2)
+                    {
+                        dr[columns[i]] = values[i];
+                    }
+                    else
+                    {
+                        #region split \n into several columns
+
+                        int[] newColIndizes = new int[subValues.Length];
+                        string colName = table.Columns[columns[i]].ColumnName;
+
+                        newColIndizes[0] = columns[i];
+                        for (int col = 1; col < subValues.Length; col++)
+                        {
+                            string newColName = colName + col;
+                            int index = table.Columns.IndexOf(newColName);
+                            if (index == -1)
+                            {
+                                newColIndizes[col] = table.Columns.Count;
+                                table.Columns.Add(newColName);
+                            }
+                            else
+                            {
+                                newColIndizes[col] = index;
+                            }
+                        }
+
+                        //format is "myText\nSecondText" with quotation marks
+                        subValues[0] = subValues[0].TrimStart('"');
+                        subValues[subValues.Length - 1] = subValues[subValues.Length - 1].TrimEnd('"');
+
+                        for (int index = 0; index < subValues.Length; index++)
+                        {
+                            dr[newColIndizes[index]] = subValues[index];
+                        }
+                        #endregion
+                    }
+                }
+                if (fileName != null)
+                {
+                    dr[DataHelper.FileName] = fileName;
+                }
+                table.Rows.Add(dr);
+            }
+
+            Clipboard.Clear();
+            if (!string.IsNullOrEmpty(backup))
+            {
+                //idk why but the Clipboard text is not set when I do it immediately
+                Thread thread = new Thread(() =>
+                {
+                    Thread.Sleep(100);
+                    Clipboard.SetText(backup);
+                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+            }
         }
 
         internal static DataTable OpenTextFixed(string data, string path, List<int> config, List<string> header, bool isPreview = false)
