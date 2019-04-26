@@ -96,5 +96,10 @@ namespace DataTableConverter.View
                 sender.BackColor = colorDialog1.Color;
             }
         }
+
+        private void llSourceCode_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/Kirdock/Tabellenverarbeitung");
+        }
     }
 }
