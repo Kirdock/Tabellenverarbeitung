@@ -24,7 +24,7 @@ namespace DataTableConverter
         internal static readonly string ProjectTolerance = Path.Combine(ProjectPath,"Toleranzen.bin");
         internal static readonly string ProjectCases = Path.Combine(ProjectPath,"Fälle.bin");
         internal static readonly string ProjectWorkflows = Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
-        internal static readonly string ProjectHeaderPresets = Path.Combine(ProjectPath, "Vorlagen überschriften");
+        internal static readonly string ProjectHeaderPresets = Path.Combine(ProjectPath, "Vorlagen Überschriften");
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
@@ -177,8 +177,8 @@ namespace DataTableConverter
                 Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, 1];
                 Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rows + 1, columns];
                 Microsoft.Office.Interop.Excel.Range sheetData = worksheet.Range[beginWrite, endWrite];
-                sheetData.Value2 = data;
                 sheetData.NumberFormat = "@";
+                sheetData.Value2 = data;
 
                 worksheet.Select();
                 sheetData.Worksheet.ListObjects.Add(Microsoft.Office.Interop.Excel.XlListObjectSourceType.xlSrcRange,

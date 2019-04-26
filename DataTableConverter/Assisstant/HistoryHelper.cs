@@ -131,11 +131,11 @@ namespace DataTableConverter.Assisstant
                     {
                         if (i == his.ColumnIndex)
                         {
-                            newTable.Columns.Add(his.Column[0].ColumnName);
+                            newTable.Columns.Add(his.Column[0].ColumnName, typeof(string));
                         }
                         if (i < table.Columns.Count)
                         {
-                            newTable.Columns.Add(table.Columns[i].ColumnName);
+                            newTable.Columns.Add(table.Columns[i].ColumnName, typeof(string));
                         }
                     }
 
@@ -249,7 +249,7 @@ namespace DataTableConverter.Assisstant
 
                     for (int i = 0; his.Column != null && i < his.Column.Length; i++)
                     {
-                        table.Columns.Add(his.Column[i].ColumnName);
+                        table.Columns.Add(his.Column[i].ColumnName, typeof(string));
                     }
 
                     his.Column = null;

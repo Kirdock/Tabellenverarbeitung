@@ -716,8 +716,8 @@ namespace DataTableConverter.View
             DataTable table = new DataTable { TableName = "WorkDuplicates" };
             object[] firstColumn = temp.Rows.Cast<DataRow>().Select(dc => dc.ItemArray[0]).ToArray();
 
-            table.Columns.Add("Bezeichnung");
-            table.Columns.Add("Zuweisung");
+            table.Columns.Add("Bezeichnung", typeof(string));
+            table.Columns.Add("Zuweisung", typeof(string));
 
             if (selectedProc.DuplicateColumns.Length < firstColumn.Length)
             {
@@ -751,8 +751,8 @@ namespace DataTableConverter.View
             if (selectedProc.Columns.Columns.Count <= 1)
             {
                 DataTable table = new DataTable { TableName = "Order" };
-                table.Columns.Add("Spalte");
-                table.Columns.Add("Sortierung");
+                table.Columns.Add("Spalte", typeof(string));
+                table.Columns.Add("Sortierung", typeof(string));
                 table.Columns[1].DataType = typeof(bool);
                 selectedProc.Columns = table;
             }

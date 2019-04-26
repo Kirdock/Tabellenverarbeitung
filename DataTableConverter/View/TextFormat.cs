@@ -38,7 +38,7 @@ namespace DataTableConverter.View
         private void SetHeaderDataGridView()
         {
             DataTable table = new DataTable { TableName = "Columns" };
-            table.Columns.Add("Überschrift");
+            table.Columns.Add("Überschrift", typeof(string));
             dgvHeaders.DataSource = table;
             ViewHelper.AddContextMenuToDataGridView(dgvHeaders, true);
         }

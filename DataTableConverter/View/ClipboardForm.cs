@@ -92,7 +92,7 @@ namespace DataTableConverter.View
                 {
                     dgTable.ColumnDisplayIndexChanged -= dgTable_ColumnDisplayIndexChanged;
                     DataTable table = getTable();
-                    DataColumn col = table.Columns.Add(newColumn);
+                    DataColumn col = table.Columns.Add(newColumn, typeof(string));
                     col.SetOrdinal(selectedColumn == -1 ? 0 : selectedColumn);
                     dgTable.DataSource = null;
                     dgTable.DataSource = table.DefaultView;

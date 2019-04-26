@@ -33,8 +33,8 @@ namespace DataTableConverter.Classes.WorkProcs
         private void InitConditions()
         {
             Conditions = new DataTable();
-            Conditions.Columns.Add("Spalte");
-            Conditions.Columns.Add("Wert");
+            Conditions.Columns.Add("Spalte", typeof(string));
+            Conditions.Columns.Add("Wert", typeof(string));
         }
 
         public override string[] GetHeaders()

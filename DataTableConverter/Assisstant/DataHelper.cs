@@ -78,7 +78,7 @@ namespace DataTableConverter.Assisstant
             else
             {
                 result = name;
-                data.Columns.Add(name);
+                data.Columns.Add(name, typeof(string));
             }
             return result;
         }
@@ -99,7 +99,7 @@ namespace DataTableConverter.Assisstant
             var columnNames = dict.Keys;
             if (showFromTo)
             {
-                result.Columns.AddRange(new string[] { columnName, "Anzahl", "Von", "Bis" }.Select(c => new DataColumn(c)).ToArray());
+                result.Columns.AddRange(new string[] { columnName, "Anzahl", "Von", "Bis" }.Select(c => new DataColumn(c,typeof(string))).ToArray());
                 int count = 1;
                 foreach (KeyValuePair<string, int> item in dict)
                 {
@@ -110,7 +110,7 @@ namespace DataTableConverter.Assisstant
             }
             else
             {
-                result.Columns.AddRange(new string[] { columnName, "Anzahl" }.Select(c => new DataColumn(c)).ToArray());
+                result.Columns.AddRange(new string[] { columnName, "Anzahl" }.Select(c => new DataColumn(c, typeof(string))).ToArray());
                 foreach (KeyValuePair<string, int> item in dict)
                 {
                     result.Rows.Add(new object[] { item.Key, item.Value.ToString()});
@@ -190,7 +190,7 @@ namespace DataTableConverter.Assisstant
             DataTable table2;
             foreach (DataColumn column in table.Columns)
             {
-                table1.Columns.Add(column.ColumnName);
+                table1.Columns.Add(column.ColumnName, typeof(string));
             }
             table2 = table1.Copy();
             table2.TableName = AppendFileName(path, Properties.Settings.Default.RightAddressText);

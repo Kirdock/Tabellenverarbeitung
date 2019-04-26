@@ -30,9 +30,9 @@ namespace DataTableConverter.Classes.WorkProcs
         private void InitConditions()
         {
             Conditions = new DataTable();
-            Conditions.Columns.Add("Spalte");
-            Conditions.Columns.Add("Wert");
-            Conditions.Columns.Add("Format");
+            Conditions.Columns.Add("Spalte", typeof(string));
+            Conditions.Columns.Add("Wert", typeof(string));
+            Conditions.Columns.Add("Format", typeof(string));
         }
 
         internal ProcMerge(string formula, DataTable conditions)

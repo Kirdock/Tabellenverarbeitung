@@ -381,7 +381,7 @@ namespace DataTableConverter.Assisstant
                 bool fileNameColumn;
                 if(fileNameColumn = (data.Columns.IndexOf(DataHelper.FileName) == -1 && selectedSheets.Length > 1))
                 {
-                    data.Columns.Add(DataHelper.FileName);
+                    data.Columns.Add(DataHelper.FileName, typeof(string));
                 }
                 foreach (string sheetName in selectedSheets)
                 {
@@ -454,7 +454,7 @@ namespace DataTableConverter.Assisstant
                 if((index = table.Columns.IndexOf(headers[i])) == -1)
                 {
                     index = table.Columns.Count;
-                    table.Columns.Add(headers[i]);
+                    table.Columns.Add(headers[i], typeof(string));
                 }
                 columns[i] = index;
             }
@@ -487,7 +487,7 @@ namespace DataTableConverter.Assisstant
                             if (index == -1)
                             {
                                 newColIndizes[col] = table.Columns.Count;
-                                table.Columns.Add(newColName);
+                                table.Columns.Add(newColName, typeof(string));
                             }
                             else
                             {
@@ -525,7 +525,7 @@ namespace DataTableConverter.Assisstant
             }
             try
             {
-                header.ForEach(x => dt.Columns.Add(x.ToString()));
+                header.ForEach(x => dt.Columns.Add(x.ToString(), typeof(string)));
 
                 int startindex = 0;
                 while (startindex < data.Length && (!isPreview || dt.Rows.Count < 3))

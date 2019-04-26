@@ -116,7 +116,7 @@ namespace DataTableConverter
                         string[] pastedRowCells = pastedRow.Split(new char[] { '\t' });
                         for (int i = clipboardTable.Columns.Count; i < pastedRowCells.Length; i++)
                         {
-                            clipboardTable.Columns.Add($"Spalte{i + 1}");
+                            clipboardTable.Columns.Add($"Spalte{i + 1}", typeof(string));
                         }
                         clipboardTable.Rows.Add(pastedRowCells);
                     }
