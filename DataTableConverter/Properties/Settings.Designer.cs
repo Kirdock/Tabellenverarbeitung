@@ -465,5 +465,17 @@ namespace DataTableConverter.Properties {
                 this["FullWidthImport"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CountFromTo {
+            get {
+                return ((bool)(this["CountFromTo"]));
+            }
+            set {
+                this["CountFromTo"] = value;
+            }
+        }
     }
 }

@@ -88,7 +88,7 @@ namespace DataTableConverter.Assisstant
             return table.Rows.Cast<DataRow>().Where(dr => dr.ItemArray.Length > 0 && !string.IsNullOrWhiteSpace(dr.ItemArray[column]?.ToString()));
         }
 
-        internal static DataTable DictionaryToDataTable(Dictionary<string, int> dict, string columnName)
+        internal static DataTable DictionaryToDataTable(Dictionary<string, int> dict, string columnName, bool showFromTo)
         {
             DataTable result = new DataTable();
             if (dict.Count == 0)
@@ -97,13 +97,24 @@ namespace DataTableConverter.Assisstant
             }
 
             var columnNames = dict.Keys;
-            result.Columns.AddRange(new string[] { columnName, "Anzahl", "Von", "Bis" }.Select(c => new DataColumn(c)).ToArray());
-            int count = 1;
-            foreach (KeyValuePair<string, int> item in dict)
+            if (showFromTo)
             {
-                int newCount = count + item.Value;
-                result.Rows.Add(new object[] { item.Key, item.Value.ToString(), count.ToString(), (newCount - 1).ToString() });
-                count = newCount;
+                result.Columns.AddRange(new string[] { columnName, "Anzahl", "Von", "Bis" }.Select(c => new DataColumn(c)).ToArray());
+                int count = 1;
+                foreach (KeyValuePair<string, int> item in dict)
+                {
+                    int newCount = count + item.Value;
+                    result.Rows.Add(new object[] { item.Key, item.Value.ToString(), count.ToString(), (newCount - 1).ToString() });
+                    count = newCount;
+                }
+            }
+            else
+            {
+                result.Columns.AddRange(new string[] { columnName, "Anzahl" }.Select(c => new DataColumn(c)).ToArray());
+                foreach (KeyValuePair<string, int> item in dict)
+                {
+                    result.Rows.Add(new object[] { item.Key, item.Value.ToString()});
+                }
             }
 
             return result;

@@ -32,6 +32,7 @@
             this.btnConfirm = new System.Windows.Forms.Button();
             this.cbCount = new System.Windows.Forms.CheckBox();
             this.nbCount = new System.Windows.Forms.NumericUpDown();
+            this.cbShowFromTo = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nbCount)).BeginInit();
             this.SuspendLayout();
             // 
@@ -57,7 +58,7 @@
             // cbCount
             // 
             this.cbCount.AutoSize = true;
-            this.cbCount.Location = new System.Drawing.Point(12, 53);
+            this.cbCount.Location = new System.Drawing.Point(12, 85);
             this.cbCount.Name = "cbCount";
             this.cbCount.Size = new System.Drawing.Size(58, 17);
             this.cbCount.TabIndex = 2;
@@ -67,7 +68,7 @@
             // 
             // nbCount
             // 
-            this.nbCount.Location = new System.Drawing.Point(91, 52);
+            this.nbCount.Location = new System.Drawing.Point(91, 84);
             this.nbCount.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -88,11 +89,22 @@
             0});
             this.nbCount.Visible = false;
             // 
+            // cbShowFromTo
+            // 
+            this.cbShowFromTo.AutoSize = true;
+            this.cbShowFromTo.Location = new System.Drawing.Point(12, 52);
+            this.cbShowFromTo.Name = "cbShowFromTo";
+            this.cbShowFromTo.Size = new System.Drawing.Size(131, 17);
+            this.cbShowFromTo.TabIndex = 4;
+            this.cbShowFromTo.Text = "\"Von\", \"Bis\" anzeigen";
+            this.cbShowFromTo.UseVisualStyleBackColor = true;
+            // 
             // ExportCount
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(291, 82);
+            this.ClientSize = new System.Drawing.Size(291, 118);
+            this.Controls.Add(this.cbShowFromTo);
             this.Controls.Add(this.nbCount);
             this.Controls.Add(this.cbCount);
             this.Controls.Add(this.btnConfirm);
@@ -101,6 +113,7 @@
             this.Name = "ExportCount";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Zählen";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ExportCount_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.nbCount)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -113,5 +126,6 @@
         private System.Windows.Forms.Button btnConfirm;
         private System.Windows.Forms.CheckBox cbCount;
         private System.Windows.Forms.NumericUpDown nbCount;
+        private System.Windows.Forms.CheckBox cbShowFromTo;
     }
 }

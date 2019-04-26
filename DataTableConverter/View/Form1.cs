@@ -1022,7 +1022,7 @@ namespace DataTableConverter
         {
             ExportCount form = new ExportCount(DataHelper.HeadersOfDataTable(GetDataSource()));
             form.FormClosed += new FormClosedEventHandler(CountContendClosed);
-            form.Show();
+            form.ShowDialog();
         }
 
         private void CountContendClosed(object sender, FormClosedEventArgs e)
@@ -1033,6 +1033,7 @@ namespace DataTableConverter
                 string selectedValue = export.getSelectedValue();
                 int columnIndex = export.getColumnIndex();
                 int count = export.CountChecked ? export.Count : 0;
+                bool showFromTo = export.ShowFromTo;
                 DataTable oldTable = GetDataSource();
 
                 new Thread(() =>
@@ -1056,7 +1057,8 @@ namespace DataTableConverter
                                 pair.Add(item, 1);
                             }
                         }
-                        newTable = DataHelper.DictionaryToDataTable(pair, selectedValue);
+                        newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
+                        newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
                     }
                     else
                     {
@@ -1081,7 +1083,6 @@ namespace DataTableConverter
                             }
                         }
                     }
-                    newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
 
                     BeginInvoke(new MethodInvoker(() =>
                     {
