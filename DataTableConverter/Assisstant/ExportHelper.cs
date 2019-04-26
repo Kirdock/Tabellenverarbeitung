@@ -24,6 +24,7 @@ namespace DataTableConverter
         internal static readonly string ProjectTolerance = Path.Combine(ProjectPath,"Toleranzen.bin");
         internal static readonly string ProjectCases = Path.Combine(ProjectPath,"Fälle.bin");
         internal static readonly string ProjectWorkflows = Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
+        internal static readonly string ProjectHeaderPresets = Path.Combine(ProjectPath, "Vorlagen überschriften");
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
@@ -35,6 +36,10 @@ namespace DataTableConverter
             {
                 Directory.CreateDirectory(ProjectPath);
                 Directory.CreateDirectory(ProjectPresets);
+            }
+            if (!Directory.Exists(ProjectHeaderPresets))
+            {
+                Directory.CreateDirectory(ProjectHeaderPresets);
             }
         }
         

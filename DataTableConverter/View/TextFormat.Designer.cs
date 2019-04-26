@@ -36,6 +36,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cmbEncoding = new System.Windows.Forms.ComboBox();
             this.gbSeparated = new System.Windows.Forms.GroupBox();
+            this.dgvHeaders = new System.Windows.Forms.DataGridView();
             this.cbContainsHeaders = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtEnd = new System.Windows.Forms.TextBox();
@@ -62,16 +63,21 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dgvHeaders = new System.Windows.Forms.DataGridView();
+            this.cmbHeaderPresets = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.btnHeaderLoad = new System.Windows.Forms.Button();
+            this.btnHeaderDelete = new System.Windows.Forms.Button();
+            this.btnHeaderSave = new System.Windows.Forms.Button();
+            this.btnHeaderRename = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
             this.gbFixed.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSetting)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPreview)).BeginInit();
             this.ctxRow.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
             this.SuspendLayout();
             // 
             // rbSeparated
@@ -146,6 +152,12 @@
             this.gbSeparated.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbSeparated.Controls.Add(this.btnHeaderRename);
+            this.gbSeparated.Controls.Add(this.btnHeaderSave);
+            this.gbSeparated.Controls.Add(this.btnHeaderDelete);
+            this.gbSeparated.Controls.Add(this.btnHeaderLoad);
+            this.gbSeparated.Controls.Add(this.label5);
+            this.gbSeparated.Controls.Add(this.cmbHeaderPresets);
             this.gbSeparated.Controls.Add(this.dgvHeaders);
             this.gbSeparated.Controls.Add(this.cbContainsHeaders);
             this.gbSeparated.Controls.Add(this.label4);
@@ -164,6 +176,17 @@
             this.gbSeparated.TabStop = false;
             this.gbSeparated.Text = "Getrennt";
             this.gbSeparated.Visible = false;
+            // 
+            // dgvHeaders
+            // 
+            this.dgvHeaders.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvHeaders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvHeaders.Location = new System.Drawing.Point(345, 31);
+            this.dgvHeaders.Name = "dgvHeaders";
+            this.dgvHeaders.Size = new System.Drawing.Size(240, 237);
+            this.dgvHeaders.TabIndex = 11;
+            this.dgvHeaders.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvHeaders_CellEndEdit);
+            this.dgvHeaders.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgvHeaders_RowPostPaint);
             // 
             // cbContainsHeaders
             // 
@@ -437,16 +460,63 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
-            // dgvHeaders
+            // cmbHeaderPresets
             // 
-            this.dgvHeaders.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvHeaders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvHeaders.Location = new System.Drawing.Point(394, 31);
-            this.dgvHeaders.Name = "dgvHeaders";
-            this.dgvHeaders.Size = new System.Drawing.Size(240, 237);
-            this.dgvHeaders.TabIndex = 11;
-            this.dgvHeaders.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvHeaders_CellEndEdit);
-            this.dgvHeaders.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgvHeaders_RowPostPaint);
+            this.cmbHeaderPresets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbHeaderPresets.FormattingEnabled = true;
+            this.cmbHeaderPresets.Location = new System.Drawing.Point(591, 48);
+            this.cmbHeaderPresets.Name = "cmbHeaderPresets";
+            this.cmbHeaderPresets.Size = new System.Drawing.Size(191, 21);
+            this.cmbHeaderPresets.TabIndex = 12;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(591, 29);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(52, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "Vorlagen:";
+            // 
+            // btnHeaderLoad
+            // 
+            this.btnHeaderLoad.Location = new System.Drawing.Point(591, 85);
+            this.btnHeaderLoad.Name = "btnHeaderLoad";
+            this.btnHeaderLoad.Size = new System.Drawing.Size(94, 23);
+            this.btnHeaderLoad.TabIndex = 14;
+            this.btnHeaderLoad.Text = "Laden";
+            this.btnHeaderLoad.UseVisualStyleBackColor = true;
+            this.btnHeaderLoad.Click += new System.EventHandler(this.btnHeaderLoad_Click);
+            // 
+            // btnHeaderDelete
+            // 
+            this.btnHeaderDelete.Location = new System.Drawing.Point(691, 85);
+            this.btnHeaderDelete.Name = "btnHeaderDelete";
+            this.btnHeaderDelete.Size = new System.Drawing.Size(91, 23);
+            this.btnHeaderDelete.TabIndex = 15;
+            this.btnHeaderDelete.Text = "Löschen";
+            this.btnHeaderDelete.UseVisualStyleBackColor = true;
+            this.btnHeaderDelete.Click += new System.EventHandler(this.btnHeaderDelete_Click);
+            // 
+            // btnHeaderSave
+            // 
+            this.btnHeaderSave.Location = new System.Drawing.Point(591, 133);
+            this.btnHeaderSave.Name = "btnHeaderSave";
+            this.btnHeaderSave.Size = new System.Drawing.Size(94, 23);
+            this.btnHeaderSave.TabIndex = 16;
+            this.btnHeaderSave.Text = "Speichern";
+            this.btnHeaderSave.UseVisualStyleBackColor = true;
+            this.btnHeaderSave.Click += new System.EventHandler(this.btnHeaderSave_Click);
+            // 
+            // btnHeaderRename
+            // 
+            this.btnHeaderRename.Location = new System.Drawing.Point(690, 133);
+            this.btnHeaderRename.Name = "btnHeaderRename";
+            this.btnHeaderRename.Size = new System.Drawing.Size(92, 23);
+            this.btnHeaderRename.TabIndex = 17;
+            this.btnHeaderRename.Text = "Umbenennen";
+            this.btnHeaderRename.UseVisualStyleBackColor = true;
+            this.btnHeaderRename.Click += new System.EventHandler(this.btnHeaderRename_Click);
             // 
             // TextFormat
             // 
@@ -467,6 +537,7 @@
             this.groupBox1.PerformLayout();
             this.gbSeparated.ResumeLayout(false);
             this.gbSeparated.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).EndInit();
             this.gbFixed.ResumeLayout(false);
             this.gbFixed.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -474,7 +545,6 @@
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPreview)).EndInit();
             this.ctxRow.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -515,5 +585,11 @@
         private System.Windows.Forms.Button BtnRenamePreset;
         private System.Windows.Forms.CheckBox cbContainsHeaders;
         private System.Windows.Forms.DataGridView dgvHeaders;
+        private System.Windows.Forms.Button btnHeaderLoad;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox cmbHeaderPresets;
+        private System.Windows.Forms.Button btnHeaderRename;
+        private System.Windows.Forms.Button btnHeaderSave;
+        private System.Windows.Forms.Button btnHeaderDelete;
     }
 }

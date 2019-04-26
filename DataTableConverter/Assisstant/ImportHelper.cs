@@ -347,6 +347,8 @@ namespace DataTableConverter.Assisstant
             
             Microsoft.Office.Interop.Excel.Application objXL = null;
             Microsoft.Office.Interop.Excel.Workbook objWB = null;
+            string clipboardBefore = Clipboard.GetText();
+            Clipboard.Clear();
 
             try
             {
@@ -381,7 +383,6 @@ namespace DataTableConverter.Assisstant
                 {
                     data.Columns.Add(DataHelper.FileName);
                 }
-                
                 foreach (string sheetName in selectedSheets)
                 {
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
@@ -407,8 +408,7 @@ namespace DataTableConverter.Assisstant
                 {
                     data.Columns[DataHelper.FileName].SetOrdinal(data.Columns.Count - 1);
                 }
-                objXL.CutCopyMode = Microsoft.Office.Interop.Excel.XlCutCopyMode.xlCopy;
-                objXL.DisplayAlerts = false;
+                objXL.CutCopyMode = 0;
                 objWB.Close();
                 objXL.Quit();
                 Marshal.ReleaseComObject(objWB);
@@ -421,15 +421,26 @@ namespace DataTableConverter.Assisstant
                 objXL?.Quit();
                 ErrorHelper.LogMessage(ex);
             }
+            finally
+            {
+                if (!string.IsNullOrEmpty(clipboardBefore))
+                {
+                    //idk why but the Clipboard text is not set when I do it immediately
+                    Thread thread = new Thread(() =>
+                    {
+                        Thread.Sleep(100);
+                        Clipboard.SetText(clipboardBefore);
+                    });
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                }
+            }
 
             return data;
         }
 
         private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Range range, DataTable table, string fileName)
         {
-            string backup = Clipboard.GetText();
-
-            
             range.Copy();
             IDataObject data = Clipboard.GetDataObject();
             string content = (string)data.GetData(DataFormats.Text);
@@ -503,17 +514,6 @@ namespace DataTableConverter.Assisstant
             }
 
             Clipboard.Clear();
-            if (!string.IsNullOrEmpty(backup))
-            {
-                //idk why but the Clipboard text is not set when I do it immediately
-                Thread thread = new Thread(() =>
-                {
-                    Thread.Sleep(100);
-                    Clipboard.SetText(backup);
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
-            }
         }
 
         internal static DataTable OpenTextFixed(string data, string path, List<int> config, List<string> header, bool isPreview = false)

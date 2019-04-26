@@ -57,7 +57,8 @@ namespace DataTableConverter.View
             }
             else
             {
-                loadPresets();
+                LoadPresets();
+                LoadHeaderPresets();
                 cmbVariant.SelectedIndex = 0;
                 adjustSettingsDataGrid();
                 dgvSetting.CellValueChanged += new DataGridViewCellEventHandler(dgvSetting_CellValueChanged);
@@ -147,7 +148,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private void loadPresets()
+        private void LoadPresets()
         {
             try
             {
@@ -155,7 +156,26 @@ namespace DataTableConverter.View
                 cmbPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectPresets, "*.xml")
                                          .Select(Path.GetFileNameWithoutExtension)
                                          .ToArray());
-                cmbPresets.SelectedIndex = 0;
+                if (cmbPresets.Items.Count > 0)
+                {
+                    cmbPresets.SelectedIndex = 0;
+                }
+            }
+            catch (Exception) { }
+        }
+
+        private void LoadHeaderPresets()
+        {
+            try
+            {
+                cmbHeaderPresets.Items.Clear();
+                cmbHeaderPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectHeaderPresets, "*.xml")
+                                         .Select(Path.GetFileNameWithoutExtension)
+                                         .ToArray());
+                if (cmbHeaderPresets.Items.Count > 0)
+                {
+                    cmbHeaderPresets.SelectedIndex = 0;
+                }
             }
             catch (Exception) { }
         }
@@ -300,7 +320,7 @@ namespace DataTableConverter.View
             string filename = Microsoft.VisualBasic.Interaction.InputBox("Bitte Name der Vorlage eingeben", "Vorlage speichern", string.Empty);
             if (!string.IsNullOrWhiteSpace(filename))
             {
-                string path = $@"{ ExportHelper.ProjectPresets }\{ filename}.xml";
+                string path = Path.Combine(ExportHelper.ProjectPresets, $"{filename}.xml");
                 if (File.Exists(path))
                 {
                     MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Datei mit demselben Namen!");
@@ -309,7 +329,7 @@ namespace DataTableConverter.View
                 else
                 {
                     ((DataTable)dgvSetting.DataSource).WriteXml(path, XmlWriteMode.WriteSchema);
-                    loadPresets();
+                    LoadPresets();
                 }
             }
         }
@@ -318,15 +338,16 @@ namespace DataTableConverter.View
         {
             if(cmbPresets.SelectedIndex != -1)
             {
-                try
-                {
+                string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.xml");
+                if (File.Exists(path))
+                { 
                     cmbVariant.SelectedIndex = 0;
                     DataTable data = new DataTable();
-                    data.ReadXml($@"{ExportHelper.ProjectPresets}\{cmbPresets.SelectedItem.ToString()}.xml");
+                    data.ReadXml(path);
                     dgvSetting.DataSource = data;
                     dgvSetting_CellValueChanged(null, null);
                 }
-                catch (IOException)
+                else
                 {
                     MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gefunden werden");
                 }
@@ -365,11 +386,11 @@ namespace DataTableConverter.View
                 DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
                 if (result == DialogResult.Yes)
                 {
-                    string path = $@"{ ExportHelper.ProjectPresets }\{cmbPresets.SelectedItem.ToString()}.xml";
+                    string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.xml");
                     if (File.Exists(path))
                     {
                         File.Delete(path);
-                        loadPresets();
+                        LoadPresets();
                     }
                 }
             }
@@ -576,7 +597,7 @@ namespace DataTableConverter.View
                         string newPath = Path.Combine(ExportHelper.ProjectPresets,$"{newName}.xml");
 
                         File.Move(path, newPath);
-                        loadPresets();
+                        LoadPresets();
                     }
                 }
             }
@@ -596,6 +617,87 @@ namespace DataTableConverter.View
         private void dgvHeaders_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
             ViewHelper.AddNumerationToDataGridView(sender, e, Font);
+        }
+
+        private void btnHeaderSave_Click(object sender, EventArgs e)
+        {
+            string filename = Microsoft.VisualBasic.Interaction.InputBox("Bitte Name der Vorlage eingeben", "Vorlage speichern", string.Empty);
+            if (!string.IsNullOrWhiteSpace(filename))
+            {
+                string path = Path.Combine(ExportHelper.ProjectHeaderPresets, filename + ".xml");
+                if (File.Exists(path))
+                {
+                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Überschriftenvorlage mit demselben Namen!");
+                    btnHeaderSave_Click(sender, e);
+                }
+                else
+                {
+                    ((DataTable)dgvHeaders.DataSource).WriteXml(path, XmlWriteMode.WriteSchema);
+                    LoadHeaderPresets();
+                }
+            }
+        }
+
+        private void btnHeaderLoad_Click(object sender, EventArgs e)
+        {
+            if (cmbHeaderPresets.SelectedIndex != -1)
+            {
+                string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString() + ".xml");
+                if(File.Exists(path))
+                {
+                    DataTable data = new DataTable();
+                    data.ReadXml(path);
+                    dgvHeaders.DataSource = data;
+                    dgvHeaders_CellEndEdit(null, null);
+                }
+                else
+                {
+                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gefunden werden");
+                }
+            }
+        }
+
+        private void btnHeaderDelete_Click(object sender, EventArgs e)
+        {
+            if (cmbHeaderPresets.SelectedIndex != -1)
+            {
+                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
+                if (result == DialogResult.Yes)
+                {
+                    string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString()+".xml");
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                        LoadHeaderPresets();
+                    }
+                }
+            }
+        }
+
+        private void btnHeaderRename_Click(object sender, EventArgs e)
+        {
+            int index;
+            if ((index = cmbHeaderPresets.SelectedIndex) != -1)
+            {
+                string oldName = cmbHeaderPresets.SelectedItem.ToString();
+                string newName = Microsoft.VisualBasic.Interaction.InputBox("Bitte Vorlagenname eingeben", "Vorlage umbenennen", oldName);
+                if (!string.IsNullOrWhiteSpace(newName) && oldName != newName)
+                {
+                    if (cmbHeaderPresets.Items.Contains(newName))
+                    {
+                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Vorlage mit demselben Namen\nBitte wählen Sie einen anderen");
+                        btnHeaderRename_Click(sender, e);
+                    }
+                    else
+                    {
+                        string path = Path.Combine(ExportHelper.ProjectHeaderPresets, $"{oldName}.xml");
+                        string newPath = Path.Combine(ExportHelper.ProjectHeaderPresets, $"{newName}.xml");
+
+                        File.Move(path, newPath);
+                        LoadHeaderPresets();
+                    }
+                }
+            }
         }
 
 
