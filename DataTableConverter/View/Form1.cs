@@ -46,6 +46,7 @@ namespace DataTableConverter
             LoadWorkflows();
             LoadTolerances();
             LoadCases();
+            SetMenuEnabled(false);
             historyHelper = new HistoryHelper();
             öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click(sender, e);
             trimToolStripMenuItem.Click += (sender, e) => trimToolStripMenuItem_Click(sender, e);
@@ -54,9 +55,31 @@ namespace DataTableConverter
             excelToolStripMenuItem1.Click += (sender, e) => excelToolStripMenuItem_Click(sender, e);
             if (table != null)
             {
-                AssignDataSource(table);
+                AddDataSourceNewTable(table);
             }
             UpdateHelper.CheckUpdate(true, pgbLoading);
+        }
+
+        private void SetMenuEnabled(bool status)
+        {
+            foreach(ToolStripMenuItem item in new ToolStripMenuItem[] { speichernAlsToolStripMenuItem, benutzerdefiniertesSpeichernToolStripMenuItem1, arbeitsablaufToolStripMenuItem, funktionenToolStripMenuItem, ersetzenToolStripMenuItem, duplikateToolStripMenuItem })
+            {
+                SetSubItemEnabled(status, item);
+            }
+            
+            foreach(ToolStripMenuItem item in new ToolStripMenuItem[] { speichernToolStripMenuItem2 , sortierenToolStripMenuItem })
+            {
+                item.Enabled = status;
+            }
+
+        }
+
+        private void SetSubItemEnabled(bool status, ToolStripMenuItem menuItem)
+        {
+            foreach (ToolStripItem item in menuItem.DropDownItems)
+            {
+                item.Enabled = status;
+            }
         }
 
         private void SetSize()
@@ -172,6 +195,7 @@ namespace DataTableConverter
 
             AssignDataSource(table);
             SetWidth();
+            SetMenuEnabled(true);
         }
 
         private void SetWidth()
