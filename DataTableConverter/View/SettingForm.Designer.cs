@@ -55,6 +55,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.llSourceCode = new System.Windows.Forms.LinkLabel();
             this.label18 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
@@ -65,7 +66,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.llSourceCode = new System.Windows.Forms.LinkLabel();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -334,6 +336,8 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.label20);
+            this.tabPage3.Controls.Add(this.label19);
             this.tabPage3.Controls.Add(this.llSourceCode);
             this.tabPage3.Controls.Add(this.label18);
             this.tabPage3.Controls.Add(this.label17);
@@ -351,6 +355,17 @@
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "Hilfe";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // llSourceCode
+            // 
+            this.llSourceCode.AutoSize = true;
+            this.llSourceCode.Location = new System.Drawing.Point(9, 406);
+            this.llSourceCode.Name = "llSourceCode";
+            this.llSourceCode.Size = new System.Drawing.Size(55, 13);
+            this.llSourceCode.TabIndex = 9;
+            this.llSourceCode.TabStop = true;
+            this.llSourceCode.Text = "Quellcode";
+            this.llSourceCode.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llSourceCode_LinkClicked);
             // 
             // label18
             // 
@@ -435,16 +450,23 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Formular";
             // 
-            // llSourceCode
+            // label19
             // 
-            this.llSourceCode.AutoSize = true;
-            this.llSourceCode.Location = new System.Drawing.Point(9, 406);
-            this.llSourceCode.Name = "llSourceCode";
-            this.llSourceCode.Size = new System.Drawing.Size(55, 13);
-            this.llSourceCode.TabIndex = 9;
-            this.llSourceCode.TabStop = true;
-            this.llSourceCode.Text = "Quellcode";
-            this.llSourceCode.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llSourceCode_LinkClicked);
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(9, 206);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(171, 13);
+            this.label19.TabIndex = 10;
+            this.label19.Text = "Kürzel zum Bearbeiten der Tabelle:";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(291, 206);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(104, 13);
+            this.label20.TabIndex = 11;
+            this.label20.Text = "STRG + ALT + Klick";
             // 
             // SettingForm
             // 
@@ -452,6 +474,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.tabSettings);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "SettingForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Einstellungen";
@@ -509,5 +532,7 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.CheckBox cbFullWidthImport;
         private System.Windows.Forms.LinkLabel llSourceCode;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label label19;
     }
 }

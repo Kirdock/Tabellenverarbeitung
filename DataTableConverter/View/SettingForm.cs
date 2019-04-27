@@ -12,10 +12,13 @@ namespace DataTableConverter.View
 {
     public partial class SettingForm : Form
     {
-        public SettingForm()
+        internal enum Tabs { Color, Shortcut, Other, Help};
+
+        internal SettingForm(Tabs tab = Tabs.Color)
         {
             InitializeComponent();
             LoadSettings();
+            tabSettings.SelectedIndex = (int)tab;
         }
 
         private void LoadSettings()

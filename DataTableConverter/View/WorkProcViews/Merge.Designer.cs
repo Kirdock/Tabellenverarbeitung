@@ -37,6 +37,7 @@
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.label18 = new System.Windows.Forms.Label();
             this.dgvMerge = new System.Windows.Forms.DataGridView();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.SuspendLayout();
             // 
@@ -135,11 +136,23 @@
             this.dgvMerge.Size = new System.Drawing.Size(341, 246);
             this.dgvMerge.TabIndex = 3;
             // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Location = new System.Drawing.Point(118, 110);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(28, 13);
+            this.linkLabel1.TabIndex = 15;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "Hilfe";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
             // Merge
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(408, 452);
+            this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label18);
             this.Controls.Add(this.dgvMerge);
             this.Controls.Add(this.btnConfirm);
@@ -152,7 +165,6 @@
             this.Name = "Merge";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Formula";
-            this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Merge_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
             this.ResumeLayout(false);
@@ -171,5 +183,6 @@
         private System.Windows.Forms.Button btnConfirm;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.DataGridView dgvMerge;
+        private System.Windows.Forms.LinkLabel linkLabel1;
     }
 }

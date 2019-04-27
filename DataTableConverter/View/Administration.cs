@@ -1669,5 +1669,10 @@ namespace DataTableConverter.View
         {
             (GetSelectedWorkProcedure() as ProcCompare).CompareColumn = (sender as TextBox).Text;
         }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            new SettingForm(SettingForm.Tabs.Help).Show();
+        }
     }
 }

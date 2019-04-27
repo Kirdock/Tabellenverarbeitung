@@ -718,12 +718,11 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Merge formula = new Merge(DataHelper.HeadersOfDataTable(GetDataSource()), contextGlobal);
+            Merge formula = new Merge(DataHelper.HeadersOfDataTable(sourceTable), contextGlobal);
             if (formula.ShowDialog() == DialogResult.OK)
             {
                 StartSingleWorkflow(formula.Proc);
             }
-
         }
 
         private void dBASEToolStripMenuItem_Click(object sender, EventArgs e, string path = null)
