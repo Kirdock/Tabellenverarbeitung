@@ -105,7 +105,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static string GetCurrentDirectory()
+        internal static string GetCurrentDirectory()
         {
             return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         }

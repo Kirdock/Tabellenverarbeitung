@@ -17,6 +17,10 @@ namespace DataTableConverter
 {
     class ExportHelper : MessageHandler
     {
+        [DllImport("gdi32.dll", EntryPoint = "AddFontResourceW", SetLastError = true)]
+        public static extern int AddFontResource([In][MarshalAs(UnmanagedType.LPWStr)]
+                                         string lpFileName);
+
         internal static readonly string ProjectName = "Tabellenkonvertierung";
         internal static readonly string ProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),ProjectName);
         internal static readonly string ProjectPresets = Path.Combine(ProjectPath,"Vorlagen");
@@ -28,9 +32,16 @@ namespace DataTableConverter
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
+        private static readonly string FontFileName = "seguisym.ttf";
 
 
-        internal static void CheckFolders()
+        internal static void CheckRequired()
+        {
+            CheckFolders();
+            CheckFont();
+        }
+
+        private static void CheckFolders()
         {
             if (!Directory.Exists(ProjectPath))
             {
@@ -40,6 +51,28 @@ namespace DataTableConverter
             if (!Directory.Exists(ProjectHeaderPresets))
             {
                 Directory.CreateDirectory(ProjectHeaderPresets);
+            }
+        }
+
+        private static void CheckFont()
+        {
+            string fontName = "Segoe UI Symbol";
+            float fontSize = 12;
+
+            using (System.Drawing.Font fontTester = new System.Drawing.Font(
+                   fontName,
+                   fontSize,
+                   System.Drawing.FontStyle.Regular,
+                   System.Drawing.GraphicsUnit.Pixel))
+            {
+                if (fontTester.Name != fontName)
+                {
+                    string filePath = Path.Combine(UpdateHelper.GetCurrentDirectory(), FontFileName);
+                    if (File.Exists(filePath))
+                    {
+                        AddFontResource(filePath);
+                    }
+                }
             }
         }
         

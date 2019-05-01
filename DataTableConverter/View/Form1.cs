@@ -41,7 +41,7 @@ namespace DataTableConverter
             dictKeys = new List<string>();
             InitializeComponent();
             SetSize();
-            ExportHelper.CheckFolders();
+            ExportHelper.CheckRequired();
             LoadProcedures();
             LoadWorkflows();
             LoadTolerances();
