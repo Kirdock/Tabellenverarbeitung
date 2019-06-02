@@ -102,8 +102,17 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                int column = table.Columns.Count;
-                DataHelper.AddColumn(NewColumn, table);
+                int column;
+                if (CopyOldColumn && table.Columns.Contains(NewColumn))
+                {
+                    column = table.Columns.IndexOf(NewColumn);
+                    DataHelper.CopyColumns(new string[] { NewColumn }, table);
+                }
+                else
+                {
+                    column = table.Columns.Count;
+                    DataHelper.AddColumn(NewColumn, table);
+                }
 
                 foreach (DataRow row in table.Rows)
                 {
@@ -140,6 +149,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             int bracketCount = 0;
             ConditionalText directionBefore = ConditionalText.None;
+            ConditionalText condDefault = Properties.Settings.Default.DefaultFormular == 0 ? ConditionalText.None : Properties.Settings.Default.DefaultFormular == 1 ? ConditionalText.Left : ConditionalText.Right;
             for (int i = 0; i < formula.Length; i++)
             {
                 char c = formula[i];
@@ -173,7 +183,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     string value = row[header]?.ToString();
                     bool isEmpty = string.IsNullOrWhiteSpace(value);
 
-                    ConditionalText direction = GetDirection(formula, i + header.Length + 1, out int newIndex);
+                    ConditionalText direction = GetDirection(formula, i + header.Length + 1, out int newIndex, condDefault);
 
                     if(    direction == ConditionalText.Left && isEmpty
                         || directionBefore == ConditionalText.Right && emptyBefore
@@ -203,7 +213,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return stringBetween.Length != 0 ? format.Append(stringBetween).ToString() : format.ToString();
         }
 
-        private ConditionalText GetDirection(string formula, int startindex, out int newIndex)
+        private ConditionalText GetDirection(string formula, int startindex, out int newIndex, ConditionalText condDefault = ConditionalText.None)
         {
             newIndex = formula.IndexOf(']', startindex);
             string value = formula.Substring(startindex, newIndex - startindex).Trim().ToLower();
@@ -219,7 +229,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     break;
 
                 default:
-                    result = ConditionalText.None;
+                    result = condDefault;
                     break;
             }
             return result;

@@ -55,6 +55,8 @@
             this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
             this.llSourceCode = new System.Windows.Forms.LinkLabel();
             this.label18 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
@@ -66,13 +68,19 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbRight = new System.Windows.Forms.RadioButton();
+            this.rbLeft = new System.Windows.Forms.RadioButton();
+            this.rbNotChanged = new System.Windows.Forms.RadioButton();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabSettings
@@ -274,6 +282,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.groupBox1);
+            this.tabPage2.Controls.Add(this.label21);
             this.tabPage2.Controls.Add(this.cbFullWidthImport);
             this.tabPage2.Controls.Add(this.cbAutoSavePVM);
             this.tabPage2.Controls.Add(this.txtOldAffix);
@@ -355,6 +365,24 @@
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "Hilfe";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(291, 206);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(104, 13);
+            this.label20.TabIndex = 11;
+            this.label20.Text = "STRG + ALT + Klick";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(9, 206);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(171, 13);
+            this.label19.TabIndex = 10;
+            this.label19.Text = "Kürzel zum Bearbeiten der Tabelle:";
             // 
             // llSourceCode
             // 
@@ -450,23 +478,80 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Formular";
             // 
-            // label19
+            // label21
             // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(9, 206);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(171, 13);
-            this.label19.TabIndex = 10;
-            this.label19.Text = "Kürzel zum Bearbeiten der Tabelle:";
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F);
+            this.label21.Location = new System.Drawing.Point(8, 167);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(203, 20);
+            this.label21.TabIndex = 5;
+            this.label21.Text = "Formular (Spaltenangabe)";
             // 
-            // label20
+            // groupBox1
             // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(291, 206);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(104, 13);
-            this.label20.TabIndex = 11;
-            this.label20.Text = "STRG + ALT + Klick";
+            this.groupBox1.Controls.Add(this.label23);
+            this.groupBox1.Controls.Add(this.label22);
+            this.groupBox1.Controls.Add(this.rbNotChanged);
+            this.groupBox1.Controls.Add(this.rbLeft);
+            this.groupBox1.Controls.Add(this.rbRight);
+            this.groupBox1.Location = new System.Drawing.Point(12, 202);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(653, 73);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            // 
+            // rbRight
+            // 
+            this.rbRight.AutoSize = true;
+            this.rbRight.Location = new System.Drawing.Point(302, 19);
+            this.rbRight.Name = "rbRight";
+            this.rbRight.Size = new System.Drawing.Size(93, 17);
+            this.rbRight.TabIndex = 0;
+            this.rbRight.TabStop = true;
+            this.rbRight.Text = "[Spalte|R] sein";
+            this.rbRight.UseVisualStyleBackColor = true;
+            // 
+            // rbLeft
+            // 
+            this.rbLeft.AutoSize = true;
+            this.rbLeft.Location = new System.Drawing.Point(205, 19);
+            this.rbLeft.Name = "rbLeft";
+            this.rbLeft.Size = new System.Drawing.Size(91, 17);
+            this.rbLeft.TabIndex = 1;
+            this.rbLeft.TabStop = true;
+            this.rbLeft.Text = "[Spalte|L] sein";
+            this.rbLeft.UseVisualStyleBackColor = true;
+            // 
+            // rbNotChanged
+            // 
+            this.rbNotChanged.AutoSize = true;
+            this.rbNotChanged.Location = new System.Drawing.Point(410, 19);
+            this.rbNotChanged.Name = "rbNotChanged";
+            this.rbNotChanged.Size = new System.Drawing.Size(104, 17);
+            this.rbNotChanged.TabIndex = 2;
+            this.rbNotChanged.TabStop = true;
+            this.rbNotChanged.Text = "unverändert sein";
+            this.rbNotChanged.UseVisualStyleBackColor = true;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(6, 21);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(179, 13);
+            this.label22.TabIndex = 9;
+            this.label22.Text = "Standardformat von \"[Spalte]\" sollte:";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(6, 47);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(396, 13);
+            this.label23.TabIndex = 10;
+            this.label23.Text = "Das heißt, dass dann statt \"[Spalte]\" \"[Spalte|L]\" oder \"[Spalte|R]\" genommen wir" +
+    "d";
             // 
             // SettingForm
             // 
@@ -488,6 +573,8 @@
             this.tabPage2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -534,5 +621,12 @@
         private System.Windows.Forms.LinkLabel llSourceCode;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.RadioButton rbNotChanged;
+        private System.Windows.Forms.RadioButton rbLeft;
+        private System.Windows.Forms.RadioButton rbRight;
     }
 }

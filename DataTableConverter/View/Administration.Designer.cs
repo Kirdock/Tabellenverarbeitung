@@ -59,6 +59,16 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbMerge = new System.Windows.Forms.GroupBox();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.label18 = new System.Windows.Forms.Label();
+            this.dgvMerge = new System.Windows.Forms.DataGridView();
+            this.lblNewColumnMerge = new System.Windows.Forms.Label();
+            this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.txtFormula = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.txtNewColumnMerge = new System.Windows.Forms.TextBox();
             this.gbCompare = new System.Windows.Forms.GroupBox();
             this.lblCompareSecondColumn = new System.Windows.Forms.Label();
             this.txtCompareSecondColumn = new System.Windows.Forms.TextBox();
@@ -148,15 +158,6 @@
             this.txtNewColumn = new System.Windows.Forms.TextBox();
             this.cbNewColumn = new System.Windows.Forms.CheckBox();
             this.dgvColumns = new System.Windows.Forms.DataGridView();
-            this.gbMerge = new System.Windows.Forms.GroupBox();
-            this.label18 = new System.Windows.Forms.Label();
-            this.dgvMerge = new System.Windows.Forms.DataGridView();
-            this.lblNewColumnMerge = new System.Windows.Forms.Label();
-            this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.label15 = new System.Windows.Forms.Label();
-            this.txtFormula = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.txtNewColumnMerge = new System.Windows.Forms.TextBox();
             this.gbOrder = new System.Windows.Forms.GroupBox();
             this.label8 = new System.Windows.Forms.Label();
             this.clbHeaderOrder = new CheckComboBoxTest.CheckedComboBox();
@@ -193,7 +194,7 @@
             this.dgCaseColumns = new System.Windows.Forms.DataGridView();
             this.txtCaseName = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.cbMergeOldColumn = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -216,6 +217,8 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbMerge.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.gbCompare.SuspendLayout();
             this.gbAddTableColumns.SuspendLayout();
             this.gbReplaceWhole.SuspendLayout();
@@ -238,8 +241,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvRound)).BeginInit();
             this.gbProcedure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).BeginInit();
-            this.gbMerge.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.gbOrder.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).BeginInit();
             this.gbDefDuplicate.SuspendLayout();
@@ -674,6 +675,125 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // gbMerge
+            // 
+            this.gbMerge.Controls.Add(this.cbMergeOldColumn);
+            this.gbMerge.Controls.Add(this.linkLabel1);
+            this.gbMerge.Controls.Add(this.label18);
+            this.gbMerge.Controls.Add(this.dgvMerge);
+            this.gbMerge.Controls.Add(this.lblNewColumnMerge);
+            this.gbMerge.Controls.Add(this.cbHeaders);
+            this.gbMerge.Controls.Add(this.label15);
+            this.gbMerge.Controls.Add(this.txtFormula);
+            this.gbMerge.Controls.Add(this.label16);
+            this.gbMerge.Controls.Add(this.txtNewColumnMerge);
+            this.gbMerge.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbMerge.Location = new System.Drawing.Point(0, 92);
+            this.gbMerge.Name = "gbMerge";
+            this.gbMerge.Size = new System.Drawing.Size(282, 673);
+            this.gbMerge.TabIndex = 12;
+            this.gbMerge.TabStop = false;
+            this.gbMerge.Text = "Spaltenangabe";
+            this.gbMerge.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Location = new System.Drawing.Point(97, 106);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(28, 13);
+            this.linkLabel1.TabIndex = 10;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "Hilfe";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(7, 191);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(73, 13);
+            this.label18.TabIndex = 9;
+            this.label18.Text = "Bedingungen:";
+            // 
+            // dgvMerge
+            // 
+            this.dgvMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvMerge.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvMerge.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvMerge.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.dgvMerge.Location = new System.Drawing.Point(9, 207);
+            this.dgvMerge.Name = "dgvMerge";
+            this.dgvMerge.Size = new System.Drawing.Size(267, 436);
+            this.dgvMerge.TabIndex = 8;
+            this.dgvMerge.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            // 
+            // lblNewColumnMerge
+            // 
+            this.lblNewColumnMerge.AutoSize = true;
+            this.lblNewColumnMerge.Location = new System.Drawing.Point(6, 19);
+            this.lblNewColumnMerge.Name = "lblNewColumnMerge";
+            this.lblNewColumnMerge.Size = new System.Drawing.Size(122, 13);
+            this.lblNewColumnMerge.TabIndex = 7;
+            this.lblNewColumnMerge.Text = "Name der neuen Spalte:";
+            // 
+            // cbHeaders
+            // 
+            this.cbHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbHeaders.CheckOnClick = true;
+            this.cbHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cbHeaders.DropDownHeight = 1;
+            this.cbHeaders.FormattingEnabled = true;
+            this.cbHeaders.IntegralHeight = false;
+            this.cbHeaders.Location = new System.Drawing.Point(6, 78);
+            this.cbHeaders.Name = "cbHeaders";
+            this.cbHeaders.Size = new System.Drawing.Size(270, 21);
+            this.cbHeaders.TabIndex = 6;
+            this.cbHeaders.ValueSeparator = ", ";
+            this.cbHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeaders_ItemCheck);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(3, 60);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(107, 13);
+            this.label15.TabIndex = 5;
+            this.label15.Text = "Auswahl der Spalten:";
+            // 
+            // txtFormula
+            // 
+            this.txtFormula.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtFormula.Location = new System.Drawing.Point(6, 124);
+            this.txtFormula.Name = "txtFormula";
+            this.txtFormula.Size = new System.Drawing.Size(270, 20);
+            this.txtFormula.TabIndex = 4;
+            this.txtFormula.TextChanged += new System.EventHandler(this.txtFormula_TextChanged);
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(3, 107);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(88, 13);
+            this.label16.TabIndex = 3;
+            this.label16.Text = "Standard-Format:";
+            this.toolTip1.SetToolTip(this.label16, "[Spalte1][Spalte2]...");
+            // 
+            // txtNewColumnMerge
+            // 
+            this.txtNewColumnMerge.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtNewColumnMerge.Location = new System.Drawing.Point(6, 36);
+            this.txtNewColumnMerge.Name = "txtNewColumnMerge";
+            this.txtNewColumnMerge.Size = new System.Drawing.Size(270, 20);
+            this.txtNewColumnMerge.TabIndex = 2;
+            this.txtNewColumnMerge.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
             // 
             // gbCompare
             // 
@@ -1763,113 +1883,6 @@
             this.dgvColumns.TabIndex = 0;
             this.dgvColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
-            // gbMerge
-            // 
-            this.gbMerge.Controls.Add(this.linkLabel1);
-            this.gbMerge.Controls.Add(this.label18);
-            this.gbMerge.Controls.Add(this.dgvMerge);
-            this.gbMerge.Controls.Add(this.lblNewColumnMerge);
-            this.gbMerge.Controls.Add(this.cbHeaders);
-            this.gbMerge.Controls.Add(this.label15);
-            this.gbMerge.Controls.Add(this.txtFormula);
-            this.gbMerge.Controls.Add(this.label16);
-            this.gbMerge.Controls.Add(this.txtNewColumnMerge);
-            this.gbMerge.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbMerge.Location = new System.Drawing.Point(0, 92);
-            this.gbMerge.Name = "gbMerge";
-            this.gbMerge.Size = new System.Drawing.Size(282, 673);
-            this.gbMerge.TabIndex = 12;
-            this.gbMerge.TabStop = false;
-            this.gbMerge.Text = "Spaltenangabe";
-            this.gbMerge.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(6, 152);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(73, 13);
-            this.label18.TabIndex = 9;
-            this.label18.Text = "Bedingungen:";
-            // 
-            // dgvMerge
-            // 
-            this.dgvMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvMerge.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvMerge.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvMerge.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dgvMerge.Location = new System.Drawing.Point(9, 168);
-            this.dgvMerge.Name = "dgvMerge";
-            this.dgvMerge.Size = new System.Drawing.Size(267, 475);
-            this.dgvMerge.TabIndex = 8;
-            this.dgvMerge.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
-            // 
-            // lblNewColumnMerge
-            // 
-            this.lblNewColumnMerge.AutoSize = true;
-            this.lblNewColumnMerge.Location = new System.Drawing.Point(6, 19);
-            this.lblNewColumnMerge.Name = "lblNewColumnMerge";
-            this.lblNewColumnMerge.Size = new System.Drawing.Size(122, 13);
-            this.lblNewColumnMerge.TabIndex = 7;
-            this.lblNewColumnMerge.Text = "Name der neuen Spalte:";
-            // 
-            // cbHeaders
-            // 
-            this.cbHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbHeaders.CheckOnClick = true;
-            this.cbHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cbHeaders.DropDownHeight = 1;
-            this.cbHeaders.FormattingEnabled = true;
-            this.cbHeaders.IntegralHeight = false;
-            this.cbHeaders.Location = new System.Drawing.Point(6, 78);
-            this.cbHeaders.Name = "cbHeaders";
-            this.cbHeaders.Size = new System.Drawing.Size(270, 21);
-            this.cbHeaders.TabIndex = 6;
-            this.cbHeaders.ValueSeparator = ", ";
-            this.cbHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeaders_ItemCheck);
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(3, 60);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(107, 13);
-            this.label15.TabIndex = 5;
-            this.label15.Text = "Auswahl der Spalten:";
-            // 
-            // txtFormula
-            // 
-            this.txtFormula.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtFormula.Location = new System.Drawing.Point(6, 124);
-            this.txtFormula.Name = "txtFormula";
-            this.txtFormula.Size = new System.Drawing.Size(270, 20);
-            this.txtFormula.TabIndex = 4;
-            this.txtFormula.TextChanged += new System.EventHandler(this.txtFormula_TextChanged);
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(3, 107);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(88, 13);
-            this.label16.TabIndex = 3;
-            this.label16.Text = "Standard-Format:";
-            this.toolTip1.SetToolTip(this.label16, "[Spalte1][Spalte2]...");
-            // 
-            // txtNewColumnMerge
-            // 
-            this.txtNewColumnMerge.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtNewColumnMerge.Location = new System.Drawing.Point(6, 36);
-            this.txtNewColumnMerge.Name = "txtNewColumnMerge";
-            this.txtNewColumnMerge.Size = new System.Drawing.Size(270, 20);
-            this.txtNewColumnMerge.TabIndex = 2;
-            this.txtNewColumnMerge.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
-            // 
             // gbOrder
             // 
             this.gbOrder.Controls.Add(this.label8);
@@ -2319,16 +2332,16 @@
             this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTip1.ToolTipTitle = "Info";
             // 
-            // linkLabel1
+            // cbMergeOldColumn
             // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(97, 106);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(28, 13);
-            this.linkLabel1.TabIndex = 10;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "Hilfe";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.cbMergeOldColumn.AutoSize = true;
+            this.cbMergeOldColumn.Location = new System.Drawing.Point(7, 159);
+            this.cbMergeOldColumn.Name = "cbMergeOldColumn";
+            this.cbMergeOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbMergeOldColumn.TabIndex = 12;
+            this.cbMergeOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbMergeOldColumn.UseVisualStyleBackColor = true;
+            this.cbMergeOldColumn.CheckedChanged += new System.EventHandler(this.cbMergeOldColumn_CheckedChanged);
             // 
             // Administration
             // 
@@ -2365,6 +2378,9 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbMerge.ResumeLayout(false);
+            this.gbMerge.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
             this.gbCompare.ResumeLayout(false);
             this.gbCompare.PerformLayout();
             this.gbAddTableColumns.ResumeLayout(false);
@@ -2396,9 +2412,6 @@
             this.gbProcedure.ResumeLayout(false);
             this.gbProcedure.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).EndInit();
-            this.gbMerge.ResumeLayout(false);
-            this.gbMerge.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
             this.gbOrder.ResumeLayout(false);
             this.gbOrder.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).EndInit();
@@ -2599,5 +2612,6 @@
         private System.Windows.Forms.TextBox txtNewColumnCompare;
         private System.Windows.Forms.CheckBox cbCompareNewColumn;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.CheckBox cbMergeOldColumn;
     }
 }

@@ -1674,5 +1674,10 @@ namespace DataTableConverter.View
         {
             new SettingForm(SettingForm.Tabs.Help).Show();
         }
+
+        private void cbMergeOldColumn_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcMerge).CopyOldColumn = (sender as CheckBox).Checked;
+        }
     }
 }

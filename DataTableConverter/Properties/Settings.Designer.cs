@@ -477,5 +477,17 @@ namespace DataTableConverter.Properties {
                 this["CountFromTo"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int DefaultFormular {
+            get {
+                return ((int)(this["DefaultFormular"]));
+            }
+            set {
+                this["DefaultFormular"] = value;
+            }
+        }
     }
 }

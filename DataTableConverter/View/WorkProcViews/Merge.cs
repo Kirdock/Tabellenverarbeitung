@@ -64,7 +64,7 @@ namespace DataTableConverter.View
             {
                 MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
             }
-            else if (IsDuplicate(txtHeader.Text))
+            else if (!cbMergeOldColumn.Checked && IsDuplicate(txtHeader.Text))
             {
                 MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit diesem Namen.\nBitte geben Sie einen anderen an");
             }
@@ -72,6 +72,7 @@ namespace DataTableConverter.View
             {
                 Proc.NewColumn = txtHeader.Text;
                 Proc.Formula = txtFormula.Text;
+                Proc.CopyOldColumn = cbMergeOldColumn.Checked;
                 dgvMerge.BindingContext[dgvMerge.DataSource].EndCurrentEdit();
                 DialogResult = DialogResult.OK;
             }

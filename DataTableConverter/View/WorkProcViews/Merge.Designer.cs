@@ -38,6 +38,7 @@
             this.label18 = new System.Windows.Forms.Label();
             this.dgvMerge = new System.Windows.Forms.DataGridView();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.cbMergeOldColumn = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,7 +46,7 @@
             // 
             this.txtFormula.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtFormula.Location = new System.Drawing.Point(27, 126);
+            this.txtFormula.Location = new System.Drawing.Point(27, 141);
             this.txtFormula.Name = "txtFormula";
             this.txtFormula.Size = new System.Drawing.Size(341, 20);
             this.txtFormula.TabIndex = 2;
@@ -54,7 +55,7 @@
             // 
             this.txtHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtHeader.Location = new System.Drawing.Point(27, 81);
+            this.txtHeader.Location = new System.Drawing.Point(27, 76);
             this.txtHeader.Name = "txtHeader";
             this.txtHeader.Size = new System.Drawing.Size(343, 20);
             this.txtHeader.TabIndex = 1;
@@ -62,7 +63,7 @@
             // lblHeader
             // 
             this.lblHeader.AutoSize = true;
-            this.lblHeader.Location = new System.Drawing.Point(24, 65);
+            this.lblHeader.Location = new System.Drawing.Point(24, 60);
             this.lblHeader.Name = "lblHeader";
             this.lblHeader.Size = new System.Drawing.Size(122, 13);
             this.lblHeader.TabIndex = 5;
@@ -80,7 +81,7 @@
             // lblFormula
             // 
             this.lblFormula.AutoSize = true;
-            this.lblFormula.Location = new System.Drawing.Point(24, 110);
+            this.lblFormula.Location = new System.Drawing.Point(24, 125);
             this.lblFormula.Name = "lblFormula";
             this.lblFormula.Size = new System.Drawing.Size(88, 13);
             this.lblFormula.TabIndex = 9;
@@ -117,7 +118,7 @@
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(24, 149);
+            this.label18.Location = new System.Drawing.Point(24, 176);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(73, 13);
             this.label18.TabIndex = 14;
@@ -131,15 +132,15 @@
             this.dgvMerge.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvMerge.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvMerge.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dgvMerge.Location = new System.Drawing.Point(27, 165);
+            this.dgvMerge.Location = new System.Drawing.Point(27, 192);
             this.dgvMerge.Name = "dgvMerge";
-            this.dgvMerge.Size = new System.Drawing.Size(341, 246);
+            this.dgvMerge.Size = new System.Drawing.Size(341, 219);
             this.dgvMerge.TabIndex = 3;
             // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(118, 110);
+            this.linkLabel1.Location = new System.Drawing.Point(118, 125);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(28, 13);
             this.linkLabel1.TabIndex = 15;
@@ -147,11 +148,22 @@
             this.linkLabel1.Text = "Hilfe";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
+            // cbMergeOldColumn
+            // 
+            this.cbMergeOldColumn.AutoSize = true;
+            this.cbMergeOldColumn.Location = new System.Drawing.Point(27, 102);
+            this.cbMergeOldColumn.Name = "cbMergeOldColumn";
+            this.cbMergeOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbMergeOldColumn.TabIndex = 16;
+            this.cbMergeOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbMergeOldColumn.UseVisualStyleBackColor = true;
+            // 
             // Merge
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(408, 452);
+            this.Controls.Add(this.cbMergeOldColumn);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label18);
             this.Controls.Add(this.dgvMerge);
@@ -184,5 +196,6 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.DataGridView dgvMerge;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.CheckBox cbMergeOldColumn;
     }
 }
