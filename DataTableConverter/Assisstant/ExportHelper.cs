@@ -174,7 +174,8 @@ namespace DataTableConverter
                 {
                     DisplayAlerts = false,
                     Visible = false,
-                    ScreenUpdating = false
+                    ScreenUpdating = false,
+                    SheetsInNewWorkbook = 1
                 };
 
                 Microsoft.Office.Interop.Excel.Workbooks workbooks = excel.Workbooks;

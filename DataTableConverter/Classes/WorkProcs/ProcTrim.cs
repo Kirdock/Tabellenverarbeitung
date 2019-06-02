@@ -30,11 +30,15 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
         {
+            RegexOptions options = RegexOptions.None;
+            Regex regex = new Regex("[ ]{2,}", options);
+
             foreach (DataRow row in table.Rows)
             {
                 for (int i = 0; i < row.ItemArray.Length; i++)
                 {
-                    row.SetField(i, row.ItemArray[i].ToString().Trim());
+
+                    row[i] = regex.Replace(row[i].ToString().Trim()," ");
                 }
             }
             foreach (DataColumn col in table.Columns)

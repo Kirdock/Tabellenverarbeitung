@@ -35,10 +35,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.CmBFormat = new System.Windows.Forms.ComboBox();
             this.cmbFiles = new System.Windows.Forms.ComboBox();
-            this.clbValues = new System.Windows.Forms.CheckedListBox();
             this.btnDeleteFile = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.gbFiles = new System.Windows.Forms.GroupBox();
+            this.clbValues = new DataTableConverter.View.CustomControls.CountListbox();
             this.gbFiles.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -115,16 +115,6 @@
             this.cmbFiles.TextChanged += new System.EventHandler(this.cmbFiles_TextChanged);
             this.cmbFiles.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbFiles_KeyDown);
             // 
-            // clbValues
-            // 
-            this.clbValues.CheckOnClick = true;
-            this.clbValues.FormattingEnabled = true;
-            this.clbValues.Location = new System.Drawing.Point(25, 69);
-            this.clbValues.Name = "clbValues";
-            this.clbValues.Size = new System.Drawing.Size(244, 274);
-            this.clbValues.TabIndex = 10;
-            this.clbValues.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbValues_ItemCheck);
-            // 
             // btnDeleteFile
             // 
             this.btnDeleteFile.Location = new System.Drawing.Point(194, 37);
@@ -156,6 +146,16 @@
             this.gbFiles.TabIndex = 14;
             this.gbFiles.TabStop = false;
             this.gbFiles.Text = "Dateien";
+            // 
+            // clbValues
+            // 
+            this.clbValues.CheckOnClick = true;
+            this.clbValues.FormattingEnabled = true;
+            this.clbValues.Location = new System.Drawing.Point(25, 69);
+            this.clbValues.Name = "clbValues";
+            this.clbValues.Size = new System.Drawing.Size(244, 274);
+            this.clbValues.TabIndex = 14;
+            this.clbValues.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbValues_ItemCheck);
             // 
             // ExportCustom
             // 
@@ -190,9 +190,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox CmBFormat;
         private System.Windows.Forms.ComboBox cmbFiles;
-        private System.Windows.Forms.CheckedListBox clbValues;
         private System.Windows.Forms.Button btnDeleteFile;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox gbFiles;
+        private CustomControls.CountListbox clbValues;
     }
 }

@@ -391,5 +391,23 @@ namespace DataTableConverter.Assisstant
                 pgbLoading?.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
             }
         }
+
+        internal static Dictionary<string, int> GroupCountOfColumn(DataTable table, int columnIndex)
+        {
+            Dictionary<string, int> pair = new Dictionary<string, int>();
+            foreach (DataRow row in table.Rows)
+            {
+                string item = row[columnIndex].ToString();
+                if (pair.ContainsKey(item))
+                {
+                    pair[item] = pair[item] + 1;
+                }
+                else
+                {
+                    pair.Add(item, 1);
+                }
+            }
+            return pair;
+        }
     }
 }

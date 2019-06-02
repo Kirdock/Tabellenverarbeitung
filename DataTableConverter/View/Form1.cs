@@ -1067,19 +1067,8 @@ namespace DataTableConverter
 
                     if (count == 0)
                     {
-                        Dictionary<string, int> pair = new Dictionary<string, int>();
-                        foreach (DataRow row in table.Rows)
-                        {
-                            string item = row[columnIndex].ToString();
-                            if (pair.ContainsKey(item))
-                            {
-                                pair[item] = pair[item] + 1;
-                            }
-                            else
-                            {
-                                pair.Add(item, 1);
-                            }
-                        }
+                        Dictionary<string, int> pair = DataHelper.GroupCountOfColumn(table, columnIndex);
+                        
                         newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
                         newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
                     }

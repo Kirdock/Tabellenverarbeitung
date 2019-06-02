@@ -10,17 +10,17 @@ using System.Windows.Forms.VisualStyles;
 
 namespace DataTableConverter.View.CustomControls
 {
-    class PlusListbox : CheckedListBox
+    class CountListbox : CheckedListBox
     {
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
             e.DrawBackground();
-            if (e.Index > -1 && Items != null && e.Index+1 <= Items.Count)
+            if (e.Index > -1 && Items != null && e.Index + 1 <= Items.Count)
             {
                 string text = Items[e.Index].ToString();
-                if ((Items[e.Index] is PlusListboxItem) && (Items[e.Index] as PlusListboxItem).Checked)
+                if ((Items[e.Index] is CountListboxItem))
                 {
-                    text += " +";
+                    text += $" (Anzahl: {(Items[e.Index] as CountListboxItem).Count})";
                 }
                 CheckBoxState state = GetItemChecked(e.Index) ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
                 Size glyphSize = CheckBoxRenderer.GetGlyphSize(e.Graphics, state);

@@ -78,6 +78,7 @@
     <Compile Include="Assisstant\WorkflowHelper.cs" />
     <Compile Include="Classes\CellMatrix.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
+    <Compile Include="Classes\CountListboxItem.cs" />
     <Compile Include="Classes\DataRowArray.cs" />
     <Compile Include="Classes\History.cs" />
     <Compile Include="Classes\HistoryStates.cs" />
@@ -117,6 +118,9 @@
     </Compile>
     <Compile Include="View\ClipboardForm.Designer.cs">
       <DependentUpon>ClipboardForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\CustomControls\CountListbox.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="View\CustomControls\DataGridViewDoubleBuffered.cs">
       <SubType>Component</SubType>

@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -81,7 +82,14 @@ namespace DataTableConverter.View
         private void cmbColumn_SelectedIndexChanged(object sender, EventArgs e)
         {
             clbValues.Items.Clear();
-            clbValues.Items.AddRange(DataHelper.GetValuesOfColumnDistrinct(cmbColumn.SelectedItem.ToString(), Table));
+            
+            Dictionary<string, int> pair = DataHelper.GroupCountOfColumn(Table, Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
+            foreach (string key in pair.Keys)
+            {
+                if (pair.TryGetValue(key, out int value)) {
+                    clbValues.Items.Add(new CountListboxItem(value, key));
+                }
+            }
 
             foreach(List<string> value in Files.Values)
             {
