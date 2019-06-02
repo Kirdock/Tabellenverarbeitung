@@ -33,6 +33,11 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
+        public override void removeHeader(string colName)
+        {
+            IdentifySource = null;
+        }
+
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow)
         {
             //I should first load the File (before workflow.start; right after header-check)
@@ -58,7 +63,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 DataTable newTable = ImportHelper.ImportFile(path, null, false, null, ctxRow); //load file
                 if (newTable != null) {
                     object[] ImportHeaders = DataHelper.HeadersOfDataTable(newTable);
-                    List<string> selectedImportHeaders = DataHelper.HeadersOfDataTable(Columns).Cast<string>().ToList();
+                    //List<string> selectedImportHeaders = DataHelper.HeadersOfDataTable(Columns).Cast<string>().ToList();
                     List<string> notFoundHeaders = new List<string>();
                     string[] importColumns = new string[0];
                     //if (!ImportAll)
@@ -91,7 +96,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                     if (notFoundHeaders.Count > 0)
                     {
-                        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders)
+                        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders, true)
                         {
                             Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
                         };
@@ -110,11 +115,11 @@ namespace DataTableConverter.Classes.WorkProcs
                                 {
                                     IdentifyAppend = to[i];
                                 }
-                                int index;
-                                if((index = selectedImportHeaders.IndexOf(from[i])) > -1)
-                                {
-                                    selectedImportHeaders[index] = to[i];
-                                }
+                                //int index;
+                                //if((index = selectedImportHeaders.IndexOf(from[i])) > -1)
+                                //{
+                                //    selectedImportHeaders[index] = to[i];
+                                //}
                             }
                             notFoundHeaders.Clear();
                             //if (ImportAll)

@@ -13,25 +13,40 @@ namespace DataTableConverter.View
     public partial class SelectDuplicateColumns : Form
     {
         internal DataTable Table { get; set; }
+        internal static readonly string IgnoreColumn = "Ignorieren";
         private int ComboBoxIndex;
-        internal SelectDuplicateColumns(string[] caseHeaders, object[] headers)
+        internal SelectDuplicateColumns(string[] caseHeaders, object[] headers, bool mustBeAssigned)
         {
             InitializeComponent();
-            setDataGridView(caseHeaders, headers);
+            setDataGridView(caseHeaders, headers, mustBeAssigned);
             ViewHelper.AdjustComboBoxGridView(dgDuplicate, ComboBoxIndex, headers);
         }
 
-        private void setDataGridView(string[] caseHeaders, object[] headers)
+        private void setDataGridView(string[] caseHeaders, object[] headers, bool mustBeAssigned)
         {
             DataTable table = new DataTable { TableName = "Duplicates" };
             table.Columns.Add("Spalte");
             table.Columns.Add("Zuweisung");
+            object[] newHeaders;
+            if (mustBeAssigned)
+            {
+                newHeaders = headers;
+            }
+            else
+            {
+                newHeaders = new object[headers.Length + 1];
+                newHeaders[0] = IgnoreColumn;
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    newHeaders[i + 1] = headers[i];
+                }
+            }
 
             dgDuplicate.DataSource = table;
 
             DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
             {
-                DataSource = headers,
+                DataSource = newHeaders,
                 DataPropertyName = "Zuweisung",
                 HeaderText = "Zuweisung "
             };

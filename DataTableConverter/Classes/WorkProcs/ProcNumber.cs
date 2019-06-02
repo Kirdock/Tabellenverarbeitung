@@ -64,5 +64,10 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             return;
         }
+
+        public override void removeHeader(string colName)
+        {
+            return;
+        }
     }
 }

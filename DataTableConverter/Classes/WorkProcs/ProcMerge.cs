@@ -93,6 +93,11 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
+        public override void removeHeader(string colName)
+        {
+            return;
+        }
+
         private string ReplaceHeader(string source, string oldName, string newName)
         {
             return source.Replace($"[{oldName}]", $"[{newName}]");

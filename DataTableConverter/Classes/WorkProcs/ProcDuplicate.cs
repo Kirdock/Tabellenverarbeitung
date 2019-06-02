@@ -41,6 +41,11 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
+        public override void removeHeader(string colName)
+        {
+            DuplicateColumns = DuplicateColumns.Where(x => x != colName).ToArray();
+        }
+
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
         {
             Hashtable hTable = new Hashtable();

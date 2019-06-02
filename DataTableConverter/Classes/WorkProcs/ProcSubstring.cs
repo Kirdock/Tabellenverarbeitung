@@ -50,6 +50,11 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
+        public override void removeHeader(string colName)
+        {
+            Columns = DataHelper.QueryTable(Columns, Columns.AsEnumerable().Where(row => row[0].ToString() != colName));
+        }
+
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
         {
             int lastCol = table.Columns.Count;

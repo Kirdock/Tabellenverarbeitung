@@ -187,6 +187,10 @@ namespace DataTableConverter.Assisstant
         {
             DataTable table1 = new DataTable() { TableName = AppendFileName(path, Properties.Settings.Default.FailAddressText) };
             string invalidColumnName = columnName ?? Properties.Settings.Default.InvalidColumnName;
+            if (!table.Columns.Contains(invalidColumnName))
+            {
+                return;
+            }
             DataTable table2;
             foreach (DataColumn column in table.Columns)
             {
@@ -408,6 +412,11 @@ namespace DataTableConverter.Assisstant
                 }
             }
             return pair;
+        }
+
+        internal static DataTable QueryTable(DataTable table, EnumerableRowCollection<DataRow> rows)
+        {
+            return rows.Any() ? rows.CopyToDataTable() : table.Clone();
         }
     }
 }

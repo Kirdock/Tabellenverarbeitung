@@ -345,11 +345,12 @@ namespace DataTableConverter
                 HashSet<string> columns = new HashSet<string>();
                 foreach (NotFoundHeaders nf in notFound)
                 {
-                    foreach (string col in nf.Headers) {
+                    foreach (string col in nf.Headers)
+                    {
                         columns.Add(col);
                     }
                 }
-                SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), DataHelper.HeadersOfDataTable(table));
+                SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), DataHelper.HeadersOfDataTable(table), false);
                 if (form.ShowDialog() == DialogResult.OK) {
                     string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
                     string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
@@ -361,7 +362,11 @@ namespace DataTableConverter
                         {
                             for (int i = 0; i < from.Length; i++)
                             {
-                                if (wpHeaders[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
+                                if(to[i] == SelectDuplicateColumns.IgnoreColumn)
+                                {
+                                    nf.Wp.removeHeader(from[i]);
+                                }
+                                else if (wpHeaders[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
                                 {
                                     nf.Wp.renameHeaders(from[i], to[i]);
                                 }
@@ -517,7 +522,7 @@ namespace DataTableConverter
                             string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
                             if (!sourceTable.Columns.Contains(invalidColumnName))
                             {
-                                SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, DataHelper.HeadersOfDataTable(sourceTable));
+                                SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, DataHelper.HeadersOfDataTable(sourceTable), true);
                                 if (f.ShowDialog() == DialogResult.OK)
                                 {
                                     invalidColumnName = f.Table.Rows.Cast<DataRow>().First()[1].ToString();

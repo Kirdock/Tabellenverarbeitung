@@ -132,5 +132,11 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
             }
         }
+
+        public override void removeHeader(string colName)
+        {
+            Columns = DataHelper.QueryTable(Columns, Columns.AsEnumerable().Where(row => row[0].ToString() != colName));
+            Conditions = DataHelper.QueryTable(Conditions,Conditions.AsEnumerable().Where(row => row[(int)ConditionColumn.Spalte].ToString() != colName));
+        }
     }
 }

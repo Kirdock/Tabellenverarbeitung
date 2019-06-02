@@ -28,6 +28,11 @@ namespace DataTableConverter.Classes.WorkProcs
             return;
         }
 
+        public override void removeHeader(string colName)
+        {
+            return;
+        }
+
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
         {
             RegexOptions options = RegexOptions.None;

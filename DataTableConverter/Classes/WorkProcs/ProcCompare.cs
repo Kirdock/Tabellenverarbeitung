@@ -28,6 +28,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow)
         {
+            if(string.IsNullOrWhiteSpace(SourceColumn) || string.IsNullOrWhiteSpace(CompareColumn))
+            {
+                return;
+            }
             int lastCol = table.Columns.Count;
             bool intoNewCol = false;
 
@@ -67,6 +71,11 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 CompareColumn = newName;
             }
+        }
+
+        public override void removeHeader(string colName)
+        {
+            CompareColumn = SourceColumn = null; 
         }
 
     }
