@@ -118,18 +118,15 @@ namespace DataTableConverter.Classes.WorkProcs
                     column = table.Columns.Count;
                     DataHelper.AddColumn(NewColumn, table);
                 }
+                var temp = Conditions.AsEnumerable().Where(condition => table.Columns.Contains(condition[(int)ConditionColumn.Spalte].ToString()));
+                Conditions = temp.Any() ? temp.CopyToDataTable() : Conditions.Clone();
 
                 foreach (DataRow row in table.Rows)
                 {
-                    string formula = Formula;
-                    foreach (DataRow condition in Conditions.Rows)
-                    {
-                        if (row[condition[(int)ConditionColumn.Spalte].ToString()].ToString() == condition[(int)ConditionColumn.Wert].ToString())
-                        {
-                            formula = condition[(int)ConditionColumn.Format].ToString();
-                        }
-                    }
-                    row[column] = GetFormat(row, formula);
+                    var match = Conditions.AsEnumerable().FirstOrDefault(condition => row[condition[(int)ConditionColumn.Spalte].ToString()].ToString() == condition[(int)ConditionColumn.Wert].ToString());
+                    string formula = match == null ? Formula : match[(int)ConditionColumn.Format].ToString();
+                    
+                    row[column] = GetFormat(row, formula, table.Columns);
                 }
             }
             else
@@ -138,7 +135,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        private string GetFormat(DataRow row, string formula)
+        private string GetFormat(DataRow row, string formula, DataColumnCollection tableColumns)
         {
             List<string> headers = new List<string>();
             GetHeaderOfFormula(formula, headers);
@@ -161,16 +158,8 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 if (c == '(')
                 {
-                    string value = string.Empty;
-                    foreach (string header in headersInBrackets[bracketCount])
-                    {
-                        string result;
-                        if (!string.IsNullOrWhiteSpace((result = row[header]?.ToString())))
-                        {
-                            value = result;
-                            break;
-                        }
-                    }
+                    string value = headersInBrackets[bracketCount].FirstOrDefault(h => tableColumns.Contains(h) && !string.IsNullOrWhiteSpace(row[h]?.ToString())) ?? string.Empty;
+
                     format.Append(value);
                     counter += headersInBrackets[bracketCount].Length;
                     i = formula.IndexOf(')', i);
@@ -185,7 +174,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
                     string header = columns[counter];
 
-                    string value = row[header]?.ToString();
+                    string value = tableColumns.Contains(header) ? row[header]?.ToString() : string.Empty;
                     bool isEmpty = string.IsNullOrWhiteSpace(value);
 
                     ConditionalText direction = GetDirection(formula, i + header.Length + 1, out int newIndex, condDefault);

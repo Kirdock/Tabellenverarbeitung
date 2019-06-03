@@ -63,7 +63,8 @@ namespace DataTableConverter.Assisstant
 
         internal static void RemoveEmptyRows(ref DataTable table)
         {
-            table = table.AsEnumerable().Where(row => row.ItemArray.Any(item => !string.IsNullOrWhiteSpace(item?.ToString()))).CopyToDataTable();
+            var temp = table.AsEnumerable().Where(row => row.ItemArray.Any(item => !string.IsNullOrWhiteSpace(item?.ToString())));
+            table = temp.Any() ? temp.CopyToDataTable() : table.Clone();
         }
 
         internal static string AddColumn(string headerName, DataTable data, int counter = 0)

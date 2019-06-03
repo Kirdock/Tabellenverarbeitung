@@ -150,17 +150,15 @@ namespace DataTableConverter
 
         internal static void ExportCsv(DataTable dt, string directory, string filename)
         {
-            StringBuilder sb = new StringBuilder();
-
-            IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
-            sb.AppendLine(string.Join(CSVSeparator, columnNames));
-
+            var writer = File.CreateText(Path.Combine(directory, filename + ".csv"));
+            
+            writer.WriteLine(string.Join(CSVSeparator, dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName)));
             foreach (DataRow row in dt.Rows)
             {
-                IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                sb.AppendLine(string.Join(CSVSeparator, fields));
+                writer.WriteLine(string.Join(CSVSeparator, row.ItemArray.Select(field => field.ToString())));
             }
-            File.WriteAllText(Path.Combine(directory,filename+".csv"), sb.ToString());
+            writer.Close();
+            
         }
 
         internal static string ExportExcel(DataTable dt, string directory, string filename)
@@ -273,7 +271,15 @@ namespace DataTableConverter
 
 
             int[] max = MaxLengthOfColumns(dataTable);
-            CreateTable(dataTable, max, path, fileName);
+            try
+            {
+                CreateTable(dataTable, max, path, fileName);
+            }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine}    path: {path}; fileName: {fileName}");
+                return;
+            }
 
             try
             {
@@ -283,7 +289,6 @@ namespace DataTableConverter
                 byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
                 byte[] bytes = new byte[1] { 0x1A };
 
-                string text = JoinTable(dataTable, max);
                 stream.Position = 4;
                 stream.Write(records, 0, records.Length);
 
@@ -294,7 +299,18 @@ namespace DataTableConverter
                     stream.Position--;
                 }
                 
-                stream.Write(DbaseEncoding.GetBytes(text), 0, text.Length);
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    StringBuilder builder = new StringBuilder();
+                    builder.Append(" ");
+                    for (int y = 0; y < dataTable.Columns.Count; y++)
+                    {
+                        string temp = y >= row.ItemArray.Length ? string.Empty : row[y].ToString();
+                        builder.Append(temp.PadRight(max[y]));
+                    }
+                    stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                }
+
                 stream.Write(bytes, 0, bytes.Length);
                 stream.Close();
                 File.Move(fullpath, fullPathOriginal);
@@ -329,21 +345,6 @@ namespace DataTableConverter
             cmd.CommandText = csb.ToString();
             cmd.ExecuteNonQuery();
             con.Close();
-        }
-
-        private static string JoinTable(DataTable table, int[] max)
-        {
-            StringBuilder builder = new StringBuilder();
-            foreach(DataRow row in table.Rows)
-            {
-                builder.Append(" ");
-                for (int y = 0; y < table.Columns.Count; y++)
-                {
-                    string text = y >= row.ItemArray.Length ? string.Empty : row[y].ToString();
-                    builder.Append(text.PadRight(max[y]));
-                }
-            }
-            return builder.ToString();
         }
 
         private static int[] MaxLengthOfColumns(DataTable dataTable)
