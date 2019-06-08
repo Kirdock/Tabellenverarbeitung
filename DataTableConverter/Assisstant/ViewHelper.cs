@@ -165,48 +165,7 @@ namespace DataTableConverter
             thread.Start();
             
         }
-
-        internal static OrderedEnumerableRowCollection<DataRow> GetSortedTable(string order, DataTable table)
-        {
-            Dictionary<string, SortOrder> dict = GenerateSortingList(order);
-            if (dict.Count == 0)
-            {
-                return table.AsEnumerable().OrderBy(field => true);
-            }
-            else
-            {
-                var enumerable = table.AsEnumerable();
-                var firstElement = dict.First();
-                var enum2 = enumerable.OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
-                dict.Remove(firstElement.Key);
-                foreach (var column in dict)
-                {
-                    enum2 = enum2.ThenBy(field => field.Field<string>(column.Key), new NaturalStringComparer(column.Value));
-                }
-                return enum2;
-            }
-        }
-
-        internal static DataView GetSortedView(string order, DataTable table)
-        {
-            Dictionary<string, SortOrder> dict = GenerateSortingList(order);
-            if (dict.Count == 0)
-            {
-                return table.DefaultView;
-            }
-            else
-            {
-                var enumerable = table.AsEnumerable();
-                var firstElement = dict.First();
-                var enum2 = enumerable.OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
-                dict.Remove(firstElement.Key);
-                foreach (var column in dict)
-                {
-                    enum2 = enum2.ThenBy(field => field.Field<string>(column.Key), new NaturalStringComparer(column.Value));
-                }
-                return enum2.AsDataView();
-            }
-        }
+        
 
         internal static Dictionary<string, SortOrder> GenerateSortingList(string orderBefore)
         {

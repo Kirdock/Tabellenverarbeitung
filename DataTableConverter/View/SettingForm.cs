@@ -100,7 +100,6 @@ namespace DataTableConverter.View
             {
                 txtFailAddress,
                 txtRightAddress,
-                txtPVM,
                 txtFailAddressValue,
                 txtInvalidColumn,
                 txtOldAffix

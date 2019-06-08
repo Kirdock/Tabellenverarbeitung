@@ -35,6 +35,10 @@
             this.btnBottom = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
             this.lBoxSelectedHeaders = new System.Windows.Forms.ListBox();
+            this.rbWindows = new System.Windows.Forms.RadioButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbReverse = new System.Windows.Forms.RadioButton();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // clBoxHeaders
@@ -109,11 +113,45 @@
             this.lBoxSelectedHeaders.DoubleClick += new System.EventHandler(this.lBoxSelectedHeaders_DoubleClick);
             this.lBoxSelectedHeaders.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lBoxSelectedHeaders_MouseDown);
             // 
+            // rbWindows
+            // 
+            this.rbWindows.AutoSize = true;
+            this.rbWindows.Location = new System.Drawing.Point(21, 19);
+            this.rbWindows.Name = "rbWindows";
+            this.rbWindows.Size = new System.Drawing.Size(58, 17);
+            this.rbWindows.TabIndex = 10;
+            this.rbWindows.TabStop = true;
+            this.rbWindows.Text = "Normal";
+            this.rbWindows.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rbReverse);
+            this.groupBox1.Controls.Add(this.rbWindows);
+            this.groupBox1.Location = new System.Drawing.Point(672, 51);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(176, 97);
+            this.groupBox1.TabIndex = 11;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Sortierung";
+            // 
+            // rbReverse
+            // 
+            this.rbReverse.AutoSize = true;
+            this.rbReverse.Location = new System.Drawing.Point(21, 53);
+            this.rbReverse.Name = "rbReverse";
+            this.rbReverse.Size = new System.Drawing.Size(131, 17);
+            this.rbReverse.TabIndex = 11;
+            this.rbReverse.TabStop = true;
+            this.rbReverse.Text = "Vorderseite/Rückseite";
+            this.rbReverse.UseVisualStyleBackColor = true;
+            // 
             // SortForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(860, 450);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.lBoxSelectedHeaders);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnBottom);
@@ -121,9 +159,12 @@
             this.Controls.Add(this.btnDown);
             this.Controls.Add(this.btnUp);
             this.Controls.Add(this.clBoxHeaders);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "SortForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SortForm";
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -137,5 +178,8 @@
         private System.Windows.Forms.Button btnBottom;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.ListBox lBoxSelectedHeaders;
+        private System.Windows.Forms.RadioButton rbWindows;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton rbReverse;
     }
 }

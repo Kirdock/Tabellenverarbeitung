@@ -1,5 +1,6 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -246,7 +247,7 @@ namespace DataTableConverter.View
 
         private object[] GetHeaders()
         {
-            return DataHelper.ColumnValues(dgvHeaders.DataSource as DataTable, 0).Where(element => !string.IsNullOrWhiteSpace(element?.ToString())).ToArray();
+            return (dgvHeaders.DataSource as DataTable)?.ColumnValues(0).Where(element => !string.IsNullOrWhiteSpace(element?.ToString())).ToArray() ?? new object[0];
         }
 
         private void btnAcceptFixed_Click(object sender, EventArgs e)
@@ -490,7 +491,7 @@ namespace DataTableConverter.View
             dgvPreview.DataSource = null;
             if (txtSeparator.ReadOnly = txtBegin.ReadOnly = txtEnd.ReadOnly = rbTab.Checked)
             {
-                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, DataHelper.ColumnValues(dgvHeaders.DataSource as DataTable,0), true);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true);
             }
             
             else if ((txtBegin.ReadOnly = txtEnd.ReadOnly = rbSep.Checked))

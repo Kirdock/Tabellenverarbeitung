@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -49,7 +50,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetAffectedHeaders();
@@ -64,12 +65,12 @@ namespace DataTableConverter.Classes.WorkProcs
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
-                DataHelper.CopyColumns(columns, table);
+                table.CopyColumns(columns);
             }
 
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                DataHelper.AddColumn(NewColumn, table);
+                table.TryAddColumn(NewColumn);
                 intoNewCol = true;
             }
 
@@ -135,8 +136,8 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void removeHeader(string colName)
         {
-            Columns = DataHelper.QueryTable(Columns, Columns.AsEnumerable().Where(row => row[0].ToString() != colName));
-            Conditions = DataHelper.QueryTable(Conditions,Conditions.AsEnumerable().Where(row => row[(int)ConditionColumn.Spalte].ToString() != colName));
+            Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
+            Conditions =Conditions.AsEnumerable().Where(row => row[(int)ConditionColumn.Spalte].ToString() != colName).ToTable(Conditions);
         }
     }
 }

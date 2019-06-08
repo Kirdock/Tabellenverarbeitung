@@ -1,5 +1,6 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -76,14 +77,14 @@ namespace DataTableConverter.View
         }
 
         internal List<string> ValuesOfColumn (){
-            return clbValues.Items.Cast<string>().ToList();
+            return clbValues.Items.Cast<CountListboxItem>().Select(item => item.Value?.ToString()).ToList();
         }
 
         private void cmbColumn_SelectedIndexChanged(object sender, EventArgs e)
         {
             clbValues.Items.Clear();
             
-            Dictionary<string, int> pair = DataHelper.GroupCountOfColumn(Table, Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
+            Dictionary<string, int> pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
             foreach (string key in pair.Keys)
             {
                 if (pair.TryGetValue(key, out int value)) {
@@ -136,6 +137,7 @@ namespace DataTableConverter.View
                     cmbFiles.Text = string.Empty;
                 }
             }
+            
         }
 
         private void clbValues_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -157,6 +159,7 @@ namespace DataTableConverter.View
                 AddFile(cmbFiles.Text);
                 clbValues_ItemCheck(sender, e);
             }
+            SetSumCount((e.NewValue == CheckState.Checked ? 1 : -1)*( clbValues.Items[e.Index] as CountListboxItem).Count);
         }
 
         private void cmbFiles_SelectedIndexChanged(object sender, EventArgs e)
@@ -167,13 +170,19 @@ namespace DataTableConverter.View
                 clbValues.ItemCheck -= clbValues_ItemCheck;
                 foreach (string value in values) {
                     int index;
-                    if((index = clbValues.Items.IndexOf(value)) > -1)
+                    if((index = clbValues.Items.IndexOf(new CountListboxItem(0,value))) > -1)
                     {
                         clbValues.SetItemChecked(index, true);
                     }
                 }
                 clbValues.ItemCheck += clbValues_ItemCheck;
             }
+            SetSumCount();
+        }
+
+        private void SetSumCount(int add = 0)
+        {
+            lblSumCount.Text = (clbValues.CheckedItems.Cast<CountListboxItem>().Sum(item => item.Count) + add).ToString();
         }
 
         private void ResetCheckedListBoxValues(CheckedListBox box, ItemCheckEventHandler handler)

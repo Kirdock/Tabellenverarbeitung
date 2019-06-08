@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using DataTableConverter.View;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace DataTableConverter.Classes.WorkProcs
             IdentifySource = null;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
         {
             //I should first load the File (before workflow.start; right after header-check)
             //additional method in WorkProc and only this class overrides it
@@ -62,7 +63,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 DataTable newTable = ImportHelper.ImportFile(path, null, false, null, ctxRow); //load file
                 if (newTable != null) {
-                    object[] ImportHeaders = DataHelper.HeadersOfDataTable(newTable);
+                    object[] ImportHeaders = newTable.HeadersOfDataTable();
                     //List<string> selectedImportHeaders = DataHelper.HeadersOfDataTable(Columns).Cast<string>().ToList();
                     List<string> notFoundHeaders = new List<string>();
                     string[] importColumns = new string[0];
@@ -134,10 +135,10 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
                     if(notFoundHeaders.Count == 0)
                     {
-                        DataHelper.AddColumnsOfDataTable(newTable, table, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), !string.IsNullOrWhiteSpace(NewColumn), NewColumn, null);
+                        table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), !string.IsNullOrWhiteSpace(NewColumn), NewColumn, null);
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            DataHelper.SplitDataTable(table, path, invalidColumnName);
+                            table.SplitDataTable(path, invalidColumnName);
                         }
                     }
                 }

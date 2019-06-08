@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -49,14 +50,14 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void removeHeader(string colName)
         {
-            Columns = DataHelper.QueryTable(Columns, Columns.AsEnumerable().Where(row => row[0].ToString() != colName));
+            Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
         {
 
             string[] columns = GetHeaders();
-            List<int> headerIndices = DataHelper.HeaderIndices(table, columns);
+            List<int> headerIndices = table.HeaderIndices(columns);
 
             foreach (DataRow row in table.Rows)
             {
@@ -85,7 +86,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                             //Erste Buchstaben groß
                             default:
-                                value = firstLettersUpperCase(value);
+                                value = FirstLettersUpperCase(value);
                                 break;
                         }
                         row.SetField(i, value);
@@ -94,7 +95,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        private string firstLettersUpperCase(string value)
+        private string FirstLettersUpperCase(string value)
         {
             char[] array = value.ToCharArray();
             // Handle the first letter in the string.

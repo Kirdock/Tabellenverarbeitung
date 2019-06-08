@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ namespace DataTableConverter.Classes.WorkProcs
             DuplicateColumns = DuplicateColumns.Where(x => x != colName).ToArray();
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
         {
             Hashtable hTable = new Hashtable();
             Hashtable totalTable = new Hashtable();
@@ -60,7 +61,7 @@ namespace DataTableConverter.Classes.WorkProcs
             if (columnAdded = lastIndex == -1)
             {
                 lastIndex = table.Columns.Count;
-                DataHelper.AddColumn("Duplikat", table);
+                table.TryAddColumn("Duplikat");
 
             }
 

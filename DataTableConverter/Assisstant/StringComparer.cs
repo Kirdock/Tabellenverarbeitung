@@ -26,7 +26,7 @@ namespace DataTableConverter.Assisstant
 
     class NaturalStringComparer : IComparer<string>
     {
-        private int mySortFlipper = 1;
+        private readonly int mySortFlipper = 1;
 
         internal NaturalStringComparer()
         {
@@ -40,7 +40,7 @@ namespace DataTableConverter.Assisstant
 
         public int Compare(string x, string y)
         {
-            return (mySortFlipper * StringComparer.Compare(x ?? string.Empty, y ?? string.Empty));
+            return mySortFlipper * StringComparer.Compare(x ?? string.Empty, y ?? string.Empty);
         }
     }
 }

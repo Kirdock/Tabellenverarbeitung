@@ -104,6 +104,8 @@
     <Compile Include="Classes\WorkProcs\ProcDuplicate.cs" />
     <Compile Include="Classes\WorkProcs\ProcUpLowCase.cs" />
     <Compile Include="Classes\WorkProcs\ProcUser.cs" />
+    <Compile Include="Extensions\DataTableExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="View\Administration.cs">
       <SubType>Form</SubType>
     </Compile>

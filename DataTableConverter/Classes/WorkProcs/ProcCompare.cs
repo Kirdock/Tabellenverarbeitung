@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,7 +27,7 @@ namespace DataTableConverter.Classes.WorkProcs
             CompareColumn = compareColumn;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
         {
             if(string.IsNullOrWhiteSpace(SourceColumn) || string.IsNullOrWhiteSpace(CompareColumn))
             {
@@ -37,11 +38,11 @@ namespace DataTableConverter.Classes.WorkProcs
 
             if (CopyOldColumn)
             {
-                DataHelper.CopyColumns(new string[] { SourceColumn }, table);
+                table.CopyColumns(new string[] { SourceColumn });
             }
             else if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                DataHelper.AddColumn(NewColumn, table);
+                table.TryAddColumn(NewColumn);
                 intoNewCol = true;
             }
 

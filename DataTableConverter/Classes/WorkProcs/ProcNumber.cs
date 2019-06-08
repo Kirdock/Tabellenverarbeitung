@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,16 +28,16 @@ namespace DataTableConverter.Classes.WorkProcs
             Repeat = repeat;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType)
         {
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
                 int index = table.Columns.Count;
-                DataHelper.AddColumn(NewColumn, table);
+                table.TryAddColumn(NewColumn);
 
                 int count = Start;
                 bool noEnd = End != 0;
-                foreach (DataRow row in ViewHelper.GetSortedTable(sortingOrder, table))
+                foreach (DataRow row in table.GetSortedView(sortingOrder,orderType))
                 {
                     row[index] = count;
                     count++;

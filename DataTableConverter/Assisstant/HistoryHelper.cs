@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Classes;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -167,7 +168,7 @@ namespace DataTableConverter.Assisstant
 
                 case State.HeadersChange:
                     object[] oldHeaders = his.Row[0];
-                    object[] newHeaders = DataHelper.HeadersOfDataTable(table);
+                    object[] newHeaders = table.HeadersOfDataTable();
                     for (int i = 0; i < oldHeaders.Length; i++)
                     {
                         int index;
@@ -186,7 +187,7 @@ namespace DataTableConverter.Assisstant
                     col[0] = table.Columns[his.ColumnIndex];
                     his.Column = col;
                     object[][] newValues = new object[1][];
-                    newValues[0] = DataHelper.ColumnValues(table, his.ColumnIndex);
+                    newValues[0] = table.ColumnValues(his.ColumnIndex);
                     his.ColumnValues = newValues;
                     table.Columns.RemoveAt(his.ColumnIndex);
                     his.State = State.DeleteColumn;

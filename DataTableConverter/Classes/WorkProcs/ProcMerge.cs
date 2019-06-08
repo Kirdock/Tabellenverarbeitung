@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,7 +16,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "Spalten zusammenfügen";
         internal enum ConditionColumn : int { Spalte = 0, Wert = 1, Format = 2 };
-        internal enum ConditionalText { Right, Left, None};
+        internal enum ConditionalText { Right, Left, Both, None};
         internal DataTable Conditions;
 
         internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name) {
@@ -95,7 +96,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void removeHeader(string colName)
         {
-            return;
+            Conditions = Conditions.AsEnumerable().Where(condition => condition[(int)ConditionColumn.Spalte].ToString() != colName).ToTable(Conditions);
         }
 
         private string ReplaceHeader(string source, string oldName, string newName)
@@ -103,23 +104,20 @@ namespace DataTableConverter.Classes.WorkProcs
             return source.Replace($"[{oldName}]", $"[{newName}]");
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType)
         {
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                int column;
-                if (CopyOldColumn && table.Columns.Contains(NewColumn))
+                int column = table.Columns.IndexOf(NewColumn);
+                if (CopyOldColumn && column > -1)
                 {
-                    column = table.Columns.IndexOf(NewColumn);
-                    DataHelper.CopyColumns(new string[] { NewColumn }, table);
+                    table.CopyColumns(new string[] { NewColumn });
                 }
-                else
+                else if(!CopyOldColumn && column == -1)
                 {
                     column = table.Columns.Count;
-                    DataHelper.AddColumn(NewColumn, table);
+                    table.TryAddColumn(NewColumn);
                 }
-                var temp = Conditions.AsEnumerable().Where(condition => table.Columns.Contains(condition[(int)ConditionColumn.Spalte].ToString()));
-                Conditions = temp.Any() ? temp.CopyToDataTable() : Conditions.Clone();
 
                 foreach (DataRow row in table.Rows)
                 {
@@ -179,8 +177,16 @@ namespace DataTableConverter.Classes.WorkProcs
 
                     ConditionalText direction = GetDirection(formula, i + header.Length + 1, out int newIndex, condDefault);
 
-                    if(    direction == ConditionalText.Left && isEmpty
-                        || directionBefore == ConditionalText.Right && emptyBefore
+                    //if ((directionBefore == ConditionalText.Right || directionBefore == ConditionalText.Both) && (direction == ConditionalText.Left || direction == ConditionalText.Both))
+                    //{
+                    //    if (emptyBefore && isEmpty)
+                    //    {
+                    //        stringBetween.Clear();
+                    //    }
+                    //}
+                    if ((    (direction == ConditionalText.Left || direction == ConditionalText.Both) && isEmpty
+                        || (directionBefore == ConditionalText.Right || directionBefore == ConditionalText.Both )&& emptyBefore
+                        )
                       )
                     {
                         stringBetween.Clear();
@@ -222,6 +228,10 @@ namespace DataTableConverter.Classes.WorkProcs
                     result = ConditionalText.Left;
                     break;
 
+                case "|lr":
+                case "|rl":
+                    result = ConditionalText.Both;
+                    break;
                 default:
                     result = condDefault;
                     break;

@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -44,10 +45,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void removeHeader(string colName)
         {
-            Columns = DataHelper.QueryTable(Columns, Columns.AsEnumerable().Where(row => row[0].ToString() != colName));
+            Columns =  Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
@@ -56,11 +57,11 @@ namespace DataTableConverter.Classes.WorkProcs
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
-                DataHelper.CopyColumns(columns, table);
+                table.CopyColumns(columns);
             }
             else if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                DataHelper.AddColumn(NewColumn, table);
+                table.TryAddColumn(NewColumn);
                 intoNewCol = true;
             }
             foreach (DataRow row in table.Rows)

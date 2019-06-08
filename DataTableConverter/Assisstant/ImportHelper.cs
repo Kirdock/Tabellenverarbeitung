@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Classes;
+using DataTableConverter.Extensions;
 using DataTableConverter.View;
 using System;
 using System.Collections.Generic;
@@ -84,8 +85,8 @@ namespace DataTableConverter.Assisstant
             if(table != null)
             {
                 CheckDataTableColumnHeader(table);
-                DataHelper.RemoveEmptyRows(ref table);
-                DataHelper.RemoveNull(table);
+                table = table.RemoveEmptyRows();
+                table.RemoveNull();
             }            
             return table;
         }
@@ -122,14 +123,14 @@ namespace DataTableConverter.Assisstant
 
                     foreach (string column in list)
                     {
-                        DataHelper.AddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? column.ToUpper() : column).Trim(), dt);
+                        dt.TryAddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? column.ToUpper() : column).Trim());
                     }
                 }
                 else
                 {
                     foreach (string column in headers)
                     {
-                        DataHelper.AddColumn(column, dt);
+                        dt.TryAddColumn(column);
                     }
                 }
 
@@ -169,7 +170,7 @@ namespace DataTableConverter.Assisstant
                         int count = temp.Count();
                         while (count > dt.Columns.Count)
                         {
-                            DataHelper.AddColumn("Spalte" + dt.Columns.Count, dt);
+                            dt.TryAddColumn("Spalte" + dt.Columns.Count);
                         }
                         dt.Rows.Add(temp);
                     });
@@ -189,14 +190,14 @@ namespace DataTableConverter.Assisstant
 
                     foreach (string field in headerRow)
                     {
-                        DataHelper.AddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? field.ToUpper() : field).Trim(), dt);
+                        dt.TryAddColumn((Properties.Settings.Default.ImportHeaderUpperCase ? field.ToUpper() : field).Trim());
                     }
                 }
                 else
                 {
                     foreach (string column in headers)
                     {
-                        DataHelper.AddColumn(column, dt);
+                        dt.TryAddColumn(column);
                     }
                 }
 
@@ -215,7 +216,7 @@ namespace DataTableConverter.Assisstant
                     string[] row = createRow(line, begin, end);
                     while(row.Length > dt.Columns.Count)
                     {
-                        DataHelper.AddColumn("Spalte" + dt.Columns.Count, dt);
+                        dt.TryAddColumn("Spalte" + dt.Columns.Count);
                     }
                     dt.Rows.Add(row);
                 }
@@ -317,7 +318,7 @@ namespace DataTableConverter.Assisstant
                             string fileName = Path.GetFileName(path) + "; " + tableName;
                             DataTable temp = new DataTable();
                             dbAdapter.Fill(temp);
-                            DataHelper.ConcatTables(Table, temp, fileName, fileName);
+                            Table.ConcatTable(temp, fileName, fileName);
                         }
                     }
                 }
@@ -379,9 +380,9 @@ namespace DataTableConverter.Assisstant
                 string[] selectedSheets = SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray());
                 
                 bool fileNameColumn;
-                if(fileNameColumn = (data.Columns.IndexOf(DataHelper.FileName) == -1 && selectedSheets.Length > 1))
+                if(fileNameColumn = (data.Columns.IndexOf(Extensions.DataTableExtensions.FileName) == -1 && selectedSheets.Length > 1))
                 {
-                    data.Columns.Add(DataHelper.FileName, typeof(string));
+                    data.Columns.Add(Extensions.DataTableExtensions.FileName, typeof(string));
                 }
                 foreach (string sheetName in selectedSheets)
                 {
@@ -406,7 +407,7 @@ namespace DataTableConverter.Assisstant
                 }
                 if (fileNameColumn)
                 {
-                    data.Columns[DataHelper.FileName].SetOrdinal(data.Columns.Count - 1);
+                    data.Columns[Extensions.DataTableExtensions.FileName].SetOrdinal(data.Columns.Count - 1);
                 }
                 objXL.CutCopyMode = 0;
                 objWB.Close();
@@ -508,7 +509,7 @@ namespace DataTableConverter.Assisstant
                 }
                 if (fileName != null)
                 {
-                    dr[DataHelper.FileName] = fileName;
+                    dr[Extensions.DataTableExtensions.FileName] = fileName;
                 }
                 table.Rows.Add(dr);
             }

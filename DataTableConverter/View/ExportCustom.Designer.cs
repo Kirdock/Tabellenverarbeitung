@@ -38,6 +38,8 @@
             this.btnDeleteFile = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.gbFiles = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.lblSumCount = new System.Windows.Forms.Label();
             this.clbValues = new DataTableConverter.View.CustomControls.CountListbox();
             this.gbFiles.SuspendLayout();
             this.SuspendLayout();
@@ -136,6 +138,8 @@
             // 
             // gbFiles
             // 
+            this.gbFiles.Controls.Add(this.lblSumCount);
+            this.gbFiles.Controls.Add(this.label4);
             this.gbFiles.Controls.Add(this.clbValues);
             this.gbFiles.Controls.Add(this.label3);
             this.gbFiles.Controls.Add(this.cmbFiles);
@@ -147,13 +151,31 @@
             this.gbFiles.TabStop = false;
             this.gbFiles.Text = "Dateien";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(22, 335);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(77, 13);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Gesamtanzahl:";
+            // 
+            // lblSumCount
+            // 
+            this.lblSumCount.AutoSize = true;
+            this.lblSumCount.Location = new System.Drawing.Point(105, 335);
+            this.lblSumCount.Name = "lblSumCount";
+            this.lblSumCount.Size = new System.Drawing.Size(13, 13);
+            this.lblSumCount.TabIndex = 16;
+            this.lblSumCount.Text = "0";
+            // 
             // clbValues
             // 
             this.clbValues.CheckOnClick = true;
             this.clbValues.FormattingEnabled = true;
             this.clbValues.Location = new System.Drawing.Point(25, 69);
             this.clbValues.Name = "clbValues";
-            this.clbValues.Size = new System.Drawing.Size(244, 274);
+            this.clbValues.Size = new System.Drawing.Size(244, 244);
             this.clbValues.TabIndex = 14;
             this.clbValues.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbValues_ItemCheck);
             // 
@@ -194,5 +216,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox gbFiles;
         private CustomControls.CountListbox clbValues;
+        private System.Windows.Forms.Label lblSumCount;
+        private System.Windows.Forms.Label label4;
     }
 }

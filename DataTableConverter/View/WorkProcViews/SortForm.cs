@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataTableConverter.Classes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,13 +18,44 @@ namespace DataTableConverter.View
         private readonly string DescString = "↓";
         private readonly string AscString = "↑";
         private Dictionary<string, string> Orders;
+        internal OrderType OrderType => GetOrderType();
 
-        internal SortForm(object[] items, string orderBefore)
+        internal SortForm(object[] items, string orderBefore, OrderType orderType)
         {
             InitializeComponent();
             Orders = new Dictionary<string, string>();
             clBoxHeaders.Items.AddRange(items);
             adjustListBox(orderBefore);
+            SetOrderType(orderType);
+        }
+
+        private void SetOrderType(OrderType orderType)
+        {
+            switch (orderType)
+            {
+                case OrderType.Reverse:
+                    rbReverse.Checked = true;
+                    break;
+
+                case OrderType.Windows:
+                default:
+                    rbWindows.Checked = true;
+                    break;
+            }
+        }
+
+        private OrderType GetOrderType()
+        {
+            OrderType type;
+            if (rbWindows.Checked)
+            {
+                type = OrderType.Windows;
+            }
+            else
+            {
+                type = OrderType.Reverse;
+            }
+            return type;
         }
 
         private void adjustListBox(string orderBefore)
@@ -69,7 +101,7 @@ namespace DataTableConverter.View
         {
             StringBuilder builder = new StringBuilder();
             lBoxSelectedHeaders.Items.Cast<object>().ToList().ForEach(x => builder.Append("[").Append(x).Append("] ").Append(Orders[x.ToString()] == AscString ? "ASC" : "DESC").Append(", "));
-            SortString = builder.ToString().Substring(0,builder.Length-2);
+            SortString = builder.Length >= 2 ? builder.ToString().Substring(0,builder.Length-2) : string.Empty;
             DialogResult = DialogResult.OK;
         }
 
