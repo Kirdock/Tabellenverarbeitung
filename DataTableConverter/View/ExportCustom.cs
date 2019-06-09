@@ -18,13 +18,13 @@ namespace DataTableConverter.View
         internal int SelectedFormat { get { return CmBFormat.SelectedIndex; } }
         private readonly DataTable Table;
         internal Dictionary<string, List<string>> Files { get; set; }
+        internal int ColumnIndex => cmbColumn.SelectedIndex;
         internal ExportCustom(object[] headers, DataTable table)
         {
             InitializeComponent();
             Files = new Dictionary<string, List<string>>();
             Table = table;
             cmbColumn.Items.AddRange(headers);
-            cmbColumn.SelectedIndex = 0;
             SetData();
         }
 
@@ -33,11 +33,6 @@ namespace DataTableConverter.View
             CmBFormat.SelectedIndex = Properties.Settings.Default.ExportCustomFormat;
             CbSaveAll.Checked = Properties.Settings.Default.ExportCustomCheck;
             CbSaveAll_CheckedChanged(null, null);
-        }
-
-        internal int getColumnIndex()
-        {
-            return cmbColumn.SelectedIndex;
         }
 
         private void txtSearch_KeyDown(object sender, KeyEventArgs e)

@@ -349,7 +349,7 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static OrderedEnumerableRowCollection<DataRow> GetSortedTable(this DataTable table, string order, OrderType orderType)
+        internal static OrderedEnumerableRowCollection<DataRow> GetSortedTable(this DataTable table, string order, OrderType orderType, Action addHistory = null)
         {
             Dictionary<string, SortOrder> dict = ViewHelper.GenerateSortingList(order);
             if (dict.Count == 0)
@@ -358,9 +358,15 @@ namespace DataTableConverter.Extensions
             }
             else
             {
-                var enumerable = table.AsEnumerable();
                 var firstElement = dict.First();
-
+                if (orderType != OrderType.Windows && table.Rows.Count % 2 == 1)
+                {
+                    DataRow row = table.NewRow();
+                    row[firstElement.Key] = "0";
+                    table.Rows.Add(row);
+                    addHistory?.Invoke();
+                }
+                var enumerable = table.AsEnumerable();
                 var enum2 = enumerable.OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
                 dict.Remove(firstElement.Key);
                 foreach (var column in dict)
@@ -371,23 +377,31 @@ namespace DataTableConverter.Extensions
                 if (orderType != OrderType.Windows)
                 {
                     DataRow[] rows = enum2.ToArray();
-
+                    DataTable resultTable = table.Clone();
                     int firstHalf = 0;
-                    int secondHalf = rows.Length %2 == 0 ? rows.Length/2 : rows.Length/2+1;
+                    
+                    int secondHalf = rows.Length/2;
+                    bool flag = true;
                     var end = secondHalf;
                     
-                    bool flag = true;
-                    DataTable resultTable = table.Clone();
-                    while (firstHalf < end)
+                    while (firstHalf < end || secondHalf < rows.Length)
                     {
                         if (flag)
                         {
-                            resultTable.ImportRow(rows[firstHalf]);
+                            try
+                            {
+                                resultTable.ImportRow(rows[firstHalf]);
+                            }
+                            catch { }
                             firstHalf++;
                         }
                         else
                         {
-                            resultTable.ImportRow(rows[secondHalf]);
+                            try
+                            {
+                                resultTable.ImportRow(rows[secondHalf]);
+                            }
+                            catch { }
                             secondHalf++;
                         }
                         
@@ -399,9 +413,9 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static DataView GetSortedView(this DataTable table, string order, OrderType orderType)
+        internal static DataView GetSortedView(this DataTable table, string order, OrderType orderType, Action addHistory = null)
         {
-            return table.GetSortedTable(order, orderType).AsDataView();
+            return table.GetSortedTable(order, orderType, addHistory).AsDataView();
         }
     }
 }

@@ -104,8 +104,10 @@ namespace DataTableConverter
             
             int scrollBarHorizontal = dgTable.FirstDisplayedScrollingColumnIndex;
             int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
+            int rowCount = sourceTable.Rows.Count;
+            OrderType orderType = OrderType;
 
-            dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType);
+            dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
             if (scrollBarHorizontal != -1)
             {
                 dgTable.FirstDisplayedScrollingColumnIndex = scrollBarHorizontal;
@@ -223,9 +225,9 @@ namespace DataTableConverter
             historyHelper.AddHistory(new History { State = State.AddColumnsAndRows, ColumnIndex = columnIndex, RowIndex = rowIndex }, GetSorting());
         }
 
-        private void AddDataSourceAddRow(int rowIndex)
+        void AddDataSourceAddRow(int rowIndex, OrderType orderType = OrderType.Windows)
         {
-            historyHelper.AddHistory(new History { State = State.InsertRow, RowIndex = rowIndex }, GetSorting());
+            historyHelper.AddHistory(new History { State = State.InsertRow, RowIndex = rowIndex, OrderType = orderType }, GetSorting());
         }
 
         private void AddDataSourceHeaderChange(int columnIndex, string text)
@@ -952,7 +954,7 @@ namespace DataTableConverter
         {
             DataTable originalTable = GetDataSource(true);
             ExportCustom export = (ExportCustom)sender;
-            if (export.DialogResult == DialogResult.OK)
+            if (export.DialogResult == DialogResult.OK && export.ColumnIndex > -1)
             {
                 Dictionary<string, List<DataTable>> Dict = new Dictionary<string, List<DataTable>>();
                 DataTable tableSkeleton = new DataTable() { TableName = null };
@@ -984,7 +986,7 @@ namespace DataTableConverter
                 }
                 for (int i = 0; i < originalTable.Rows.Count; i++)
                 {
-                    if(Dict.TryGetValue(originalTable.Rows[i][export.getColumnIndex()].ToString(),out List<DataTable> tables))
+                    if(Dict.TryGetValue(originalTable.Rows[i][export.ColumnIndex].ToString(),out List<DataTable> tables))
                     {
                         tables.ForEach(table => table.ImportRow(originalTable.Rows[i]));
                     }

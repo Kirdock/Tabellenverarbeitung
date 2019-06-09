@@ -184,10 +184,14 @@ namespace DataTableConverter.View
         {
             if (e.Button == MouseButtons.Right)
             {
-                lBoxSelectedHeaders.SelectedIndex = lBoxSelectedHeaders.IndexFromPoint(e.Location);
-                string value = lBoxSelectedHeaders.SelectedItem.ToString();
-                Orders[value] = Orders[value] == AscString ? DescString : AscString;
-                lBoxSelectedHeaders.Refresh();
+                int index = lBoxSelectedHeaders.IndexFromPoint(e.Location);
+                if(index > -1)
+                {
+                    lBoxSelectedHeaders.SelectedIndex = index;
+                    string value = lBoxSelectedHeaders.SelectedItem.ToString();
+                    Orders[value] = Orders[value] == AscString ? DescString : AscString;
+                    lBoxSelectedHeaders.Refresh();
+                }
             }
         }
     }

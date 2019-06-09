@@ -93,6 +93,10 @@ namespace DataTableConverter.Assisstant
             {
                 his = history[historyPointer];
             }
+            if(his.OrderType != OrderType.Windows)
+            {
+                his.Order = string.Empty;
+            }
             switch (his.State)
             {
                 case State.CellValueChange:
