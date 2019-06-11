@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using static DataTableConverter.Classes.PlusListboxItem;
 
 namespace DataTableConverter.View.CustomControls
 {
@@ -18,9 +19,19 @@ namespace DataTableConverter.View.CustomControls
             if (e.Index > -1 && Items != null && e.Index+1 <= Items.Count)
             {
                 string text = Items[e.Index].ToString();
-                if ((Items[e.Index] is PlusListboxItem) && (Items[e.Index] as PlusListboxItem).Checked)
+                if ((Items[e.Index] is PlusListboxItem))
                 {
-                    text += " +";
+                    switch((Items[e.Index] as PlusListboxItem).State)
+                    {
+                        case RowMergeState.Sum:
+                            text += " (Summe)";
+                            break;
+
+                        case RowMergeState.Count:
+                            text += " (Anzahl)";
+                            break;
+
+                    }
                 }
                 CheckBoxState state = GetItemChecked(e.Index) ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
                 Size glyphSize = CheckBoxRenderer.GetGlyphSize(e.Graphics, state);

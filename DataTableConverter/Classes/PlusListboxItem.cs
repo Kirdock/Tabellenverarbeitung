@@ -8,18 +8,34 @@ namespace DataTableConverter.Classes
 {
     class PlusListboxItem
     {
-        internal bool Checked;
+        public enum RowMergeState { Sum, Count, Nothing}
+        internal RowMergeState State = RowMergeState.Nothing;
         internal object value;
 
-        public PlusListboxItem(bool @checked, object value)
+        public PlusListboxItem(object value)
         {
-            Checked = @checked;
             this.value = value;
         }
 
         public override string ToString()
         {
             return value.ToString();
+        }
+
+        internal void Next()
+        {
+            if(State == RowMergeState.Nothing)
+            {
+                State = RowMergeState.Sum;
+            }
+            else if(State == RowMergeState.Sum)
+            {
+                State = RowMergeState.Count;
+            }
+            else
+            {
+                State = RowMergeState.Nothing;
+            }
         }
 
 

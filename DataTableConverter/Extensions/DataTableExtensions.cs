@@ -24,17 +24,29 @@ namespace DataTableConverter.Extensions
             return table.Columns.Cast<DataColumn>().Select(dt => dt.ColumnName.ToLower()).ToList();
         }
 
-        internal static void OverrideHeaders(this DataTable table, DataTable oldTable)
+        internal static string[] HeadersOfDataTableAsString(this DataTable table)
         {
-            string[] newHeaders = table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToArray();
-            for (int i = 0; i < newHeaders.Length && i < oldTable.Columns.Count; i++)
+            return table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToArray();
+        }
+
+        internal static void OverrideHeaders(this DataTable sourceTable, DataTable table)
+        {
+            OverrideHeaders(sourceTable, table.HeadersOfDataTableAsString());
+        }
+
+        internal static void OverrideHeaders(this DataTable table, string[] headers)
+        {
+            for (int i = 0; i < headers.Length && i < table.Columns.Count; i++)
             {
                 int index;
-                if ((index = oldTable.Columns.IndexOf(newHeaders[i])) != -1)
+
+                if ((index = table.Columns.IndexOf(headers[i])) != -1)
                 {
-                    oldTable.Columns[index].ColumnName = oldTable.Columns[index].ColumnName + "1";
+                    int counter = 1;
+                    for (; table.Columns.IndexOf(headers[i] + counter) != -1; counter++) { }
+                    table.Columns[index].ColumnName = table.Columns[index].ColumnName + counter;
                 }
-                oldTable.Columns[i].ColumnName = newHeaders[i];
+                table.Columns[i].ColumnName = headers[i];
             }
         }
 

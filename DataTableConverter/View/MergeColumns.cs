@@ -28,7 +28,7 @@ namespace DataTableConverter.View
             List<PlusListboxItem> list = new List<PlusListboxItem>();
             foreach(object header in headers)
             {
-                list.Add(new PlusListboxItem(false, header));
+                list.Add(new PlusListboxItem(header));
             }
             ClBHeaders.Items.AddRange(list.ToArray());
             CmBHeaders.SelectedIndex = 0;
@@ -69,7 +69,7 @@ namespace DataTableConverter.View
                 int index = ClBHeaders.IndexFromPoint(e.Location);
                 if (index != -1)
                 {
-                    ((PlusListboxItem)ClBHeaders.Items[index]).Checked = !((PlusListboxItem)ClBHeaders.Items[index]).Checked;
+                    (ClBHeaders.Items[index] as PlusListboxItem).Next();
                     ClBHeaders.Refresh();
                 }
             }

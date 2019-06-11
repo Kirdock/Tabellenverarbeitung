@@ -34,6 +34,7 @@
             this.BtnCheckAll = new System.Windows.Forms.Button();
             this.BtnUncheckAll = new System.Windows.Forms.Button();
             this.ClBHeaders = new DataTableConverter.View.CustomControls.PlusListbox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // CmBHeaders
@@ -94,11 +95,21 @@
             this.ClBHeaders.TabIndex = 6;
             this.ClBHeaders.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ClBHeaders_MouseDown);
             // 
+            // label2
+            // 
+            this.label2.Location = new System.Drawing.Point(450, 57);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(193, 48);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "Per Rechtsklick legt man bei einer Spalte fest, ob sie gezählt oder addiert werde" +
+    "n soll";
+            // 
             // MergeColumns
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.ClBHeaders);
             this.Controls.Add(this.BtnUncheckAll);
             this.Controls.Add(this.BtnCheckAll);
@@ -121,5 +132,6 @@
         private System.Windows.Forms.Button BtnCheckAll;
         private System.Windows.Forms.Button BtnUncheckAll;
         private CustomControls.PlusListbox ClBHeaders;
+        private System.Windows.Forms.Label label2;
     }
 }

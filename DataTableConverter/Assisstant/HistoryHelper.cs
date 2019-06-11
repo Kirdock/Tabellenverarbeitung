@@ -171,17 +171,9 @@ namespace DataTableConverter.Assisstant
                     break;
 
                 case State.HeadersChange:
-                    object[] oldHeaders = his.Row[0];
+                    string[] oldHeaders = his.Row[0].Cast<string>().ToArray();
                     object[] newHeaders = table.HeadersOfDataTable();
-                    for (int i = 0; i < oldHeaders.Length; i++)
-                    {
-                        int index;
-                        if ((index = table.Columns.IndexOf(oldHeaders[i].ToString())) != -1)
-                        {
-                            table.Columns[index].ColumnName = table.Columns[index].ColumnName + "1";
-                        }
-                        table.Columns[i].ColumnName = oldHeaders[i].ToString();
-                    }
+                    table.OverrideHeaders(oldHeaders);
                     his.Row[0] = newHeaders;
                     break;
 

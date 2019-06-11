@@ -37,7 +37,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 int count = Start;
                 bool noEnd = End != 0;
-                foreach (DataRow row in table.GetSortedView(sortingOrder,orderType))
+                foreach (DataRow row in table.GetSortedTable(sortingOrder,orderType))
                 {
                     row[index] = count;
                     count++;

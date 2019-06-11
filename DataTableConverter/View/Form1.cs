@@ -106,7 +106,7 @@ namespace DataTableConverter
             int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
             int rowCount = sourceTable.Rows.Count;
             OrderType orderType = OrderType;
-
+            dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
             dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
             if (scrollBarHorizontal != -1)
             {
@@ -117,7 +117,6 @@ namespace DataTableConverter
                 dgTable.FirstDisplayedScrollingRowIndex = scrollBarVertical;
             }
             RestoreDataGridSortMode();
-            dgTable.Columns.Cast<DataGridViewColumn>().Last().AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
         }
 
 
@@ -494,7 +493,7 @@ namespace DataTableConverter
 
                     case ImportState.Header:
                         object[] headers = oldTable.HeadersOfDataTable();
-                        table.OverrideHeaders(oldTable);
+                        oldTable.OverrideHeaders(table);
                         dgTable.BeginInvoke(new MethodInvoker(() => { AssignDataSource(oldTable); }));
                         AddDataSourceHeadersChange(headers);
                         break;
@@ -1310,6 +1309,8 @@ namespace DataTableConverter
                     //RowIdentifier, Values
                     string oldIdenfifier = table.Rows[0][identifierIndex].ToString();
                     int counter = 0;
+                    IEnumerable<PlusListboxItem> countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count);
+                    int countColumnsCount = countColumns.Count();
                     for (int i = 0; i < table.Rows.Count; i++)
                     {
                         DataRow oldRow = table.Rows[i];
@@ -1328,6 +1329,13 @@ namespace DataTableConverter
                         }
                         else
                         {
+                            if(countColumnsCount > 0)
+                            {
+                                foreach(PlusListboxItem item in countColumns)
+                                {
+                                    oldRow[item.ToString()] = 1;
+                                }
+                            }
                             dict.Add(newIdenfifier, new DataRowArray(oldRow, new List<string>()));
                         }
 
@@ -1345,7 +1353,7 @@ namespace DataTableConverter
                     SetStatusLabel("Neue Spalten werden hinzugefügt");
                     for (int i = 1; i <= newColumns; i++)
                     {
-                        foreach (PlusListboxItem additionalColumn in additionalColumns.Where(item => !item.Checked))
+                        foreach (PlusListboxItem additionalColumn in additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Nothing))
                         {
                             table.TryAddColumn(additionalColumn.ToString() + i);
                         }
@@ -1362,10 +1370,17 @@ namespace DataTableConverter
                             {
                                 for (int y = 0; y < dataRowArray.Values[i].Count; y++)
                                 {
-                                    //sum
-                                    if (additionalColumns[y].Checked)
+                                    if (additionalColumns[y].State == PlusListboxItem.RowMergeState.Sum)
                                     {
-                                        dataRowArray.DataRow[additionalColumns[y].ToString()] = DataHelper.AddStringAsFloat(dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(), dataRowArray.Values[i][y]);
+                                        dataRowArray.DataRow[additionalColumns[y].ToString()] = DataHelper.AddStringAsFloat(
+                                            dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(),
+                                            dataRowArray.Values[i][y]);
+                                    }
+                                    else if(additionalColumns[y].State == PlusListboxItem.RowMergeState.Count)
+                                    {
+                                        if (int.TryParse(dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(), out int result)) {
+                                            dataRowArray.DataRow[additionalColumns[y].ToString()] = result+1;
+                                        }
                                     }
                                     //additional Column
                                     else
