@@ -43,4 +43,45 @@ namespace DataTableConverter.Assisstant
             return mySortFlipper * StringComparer.Compare(x ?? string.Empty, y ?? string.Empty);
         }
     }
+
+    class CustomSort: IComparer<CustomSortItem>
+    {
+        private readonly bool Flag = true;
+        internal CustomSort()
+        {
+
+        }
+
+        internal CustomSort(bool flag)
+        {
+            Flag = flag;
+        }
+
+        public int Compare(CustomSortItem x, CustomSortItem y)
+        {
+            int result = 0;
+            if (x.UpperHalf && y.UpperHalf || !x.UpperHalf && !y.UpperHalf)
+            {
+                result = x.Index.CompareTo(y.Index);
+            }
+            else
+            {
+                result = y.Index == x.Index && (Flag && y.UpperHalf || !Flag && x.UpperHalf) || y.Index > x.Index ? -1 : 1;
+            }
+            
+            return result;
+        }
+    }
+
+    class CustomSortItem
+    {
+        internal int Index;
+        internal bool UpperHalf;
+
+        public CustomSortItem(int index, bool flag)
+        {
+            Index = index;
+            UpperHalf = flag;
+        }
+    }
 }

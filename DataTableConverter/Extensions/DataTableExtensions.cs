@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Extensions
 {
     internal static class DataTableExtensions
     {
-        internal static readonly string TempSort = "[TEMP_SORT]";
+        private static readonly string TempSort = "[TEMP_SORT]";
         internal static readonly string FileName = "Dateiname";
 
         internal static DataTable RemoveEmptyRows(this DataTable table)
@@ -361,16 +362,18 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static OrderedEnumerableRowCollection<DataRow> GetSortedTable(this DataTable table, string order, OrderType orderType, Action addHistory = null)
+        internal static IEnumerable<DataRow> GetSortedTable(this DataTable table, string order, OrderType orderType, Action addHistory = null)
         {
+            IEnumerable<DataRow> result;
             Dictionary<string, SortOrder> dict = ViewHelper.GenerateSortingList(order);
             if (dict.Count == 0)
             {
-                return table.AsEnumerable().OrderBy(field => true);
+                result = table.AsEnumerable().OrderBy(field => true);
             }
             else
             {
                 var firstElement = dict.First();
+
                 if (orderType != OrderType.Windows && table.Rows.Count % 2 == 1)
                 {
                     DataRow row = table.NewRow();
@@ -378,56 +381,243 @@ namespace DataTableConverter.Extensions
                     table.Rows.Add(row);
                     addHistory?.Invoke();
                 }
-                var enumerable = table.AsEnumerable();
-                var enum2 = enumerable.OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
-                dict.Remove(firstElement.Key);
-                foreach (var column in dict)
+
+                var enum2 = table.AsEnumerable().OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
+
+                foreach (var column in dict.Skip(1))
                 {
                     enum2 = enum2.ThenBy(field => field.Field<string>(column.Key), new NaturalStringComparer(column.Value));
                 }
 
                 if (orderType != OrderType.Windows)
                 {
-                    DataRow[] rows = enum2.ToArray();
-                    DataTable resultTable = table.Clone();
-                    int firstHalf = 0;
-                    
-                    int secondHalf = rows.Length/2;
-                    bool flag = true;
-                    var end = secondHalf;
-                    
-                    while (firstHalf < end || secondHalf < rows.Length)
+                    bool flag = firstElement.Value == SortOrder.Ascending;
+                    int half = enum2.Count() / 2;
+
+                    IEnumerable<DataRow> one = enum2.Take(half);
+                    IEnumerable<DataRow> two = enum2.Skip(half);
+                    if (flag)
                     {
-                        if (flag)
-                        {
-                            try
-                            {
-                                resultTable.ImportRow(rows[firstHalf]);
-                            }
-                            catch { }
-                            firstHalf++;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                resultTable.ImportRow(rows[secondHalf]);
-                            }
-                            catch { }
-                            secondHalf++;
-                        }
-                        
-                        flag = !flag;
+                        result = one.InterleaveEnumerationsOfEqualLength(two);
                     }
-                    enum2 = resultTable.AsEnumerable().OrderBy(field => true);
+                    else
+                    {
+                        result = two.InterleaveEnumerationsOfEqualLength(one);
+                    }
                 }
-                return enum2;
+                else
+                {
+                    result = enum2;
+                }
             }
+            return result;
         }
 
         internal static DataView GetSortedView(this DataTable table, string order, OrderType orderType, Action addHistory = null)
         {
-            return table.GetSortedTable(order, orderType, addHistory).AsDataView();
+            DataView view;
+            table.AcceptChanges();
+            Dictionary<string, SortOrder> dict = ViewHelper.GenerateSortingList(order);
+            if (dict.Count == 0)
+            {
+                view = table.AsEnumerable().OrderBy(field => true).AsDataView();
+            }
+            else
+            {
+                var firstElement = dict.First();
+                string tempSortName = string.Empty;
+
+
+                if (orderType != OrderType.Windows)
+                {
+                    if (table.Rows.Count % 2 == 1)
+                    {
+                        DataRow row = table.NewRow();
+                        row[firstElement.Key] = "0";
+                        table.Rows.Add(row);
+                        addHistory?.Invoke();
+                    }
+
+                    tempSortName = table.TryAddColumn(TempSort);
+                }
+
+                var enumerable = table.AsEnumerable().OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
+
+                foreach (var column in dict.Skip(1))
+                {
+                    enumerable = enumerable.ThenBy(field => field.Field<string>(column.Key), new NaturalStringComparer(column.Value));
+                }
+
+                if (orderType != OrderType.Windows)
+                {
+                    int half = enumerable.Count() / 2;
+
+                    int count = 0;
+                    foreach (DataRow row in enumerable)//lazy loading. this does not always run before the next (enumerable.OrderBy...) statement
+                    {
+                        row[tempSortName] = count;
+                        count++;
+                    }
+
+
+                    enumerable = enumerable.OrderBy(row =>
+                    {
+                        if (int.TryParse(row[tempSortName]?.ToString(), out int res)) //everything here is triggered if row[tempSortName] is set... or before it is set... idk... wtf. so there is a new column but there are not any indices written (or just one)
+                        {
+                            int position = res + 1;
+
+                            bool upperHalf = position > half;
+                            if (upperHalf)
+                            {
+                                position -= half;
+                            }
+
+                            return new CustomSortItem(position, upperHalf);
+                        }
+                        else
+                        {
+                            return new CustomSortItem(0, false);
+                        }
+                    }, new CustomSort(firstElement.Value == SortOrder.Ascending));
+                }
+                view = enumerable.AsDataView();
+
+                if (tempSortName != string.Empty)
+                {
+                    view.Table.Columns.Remove(tempSortName);
+                }
+            }
+            return view;
+        }
+
+        internal static IEnumerable<DataRow> InterleaveEnumerationsOfEqualLength<DataRow>(this IEnumerable<DataRow> first, IEnumerable<DataRow> second)
+        {
+            using (IEnumerator<DataRow> enumerator1 = first.GetEnumerator(), enumerator2 = second.GetEnumerator())
+            {
+                while (enumerator1.MoveNext() && enumerator2.MoveNext())
+                {
+                    yield return enumerator1.Current;
+                    yield return enumerator2.Current;
+                }
+            }
+        }
+
+        internal static string AddTempNumeration(this DataTable table)
+        {
+            int lastIndex = table.Columns.Count;
+            string name = table.TryAddColumn(TempSort);
+            
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                table.Rows[i][lastIndex] = i;
+            }
+            return name;
+        }
+
+
+        internal static string MergeRows(this DataTable table, string identifier, int identifierIndex, List<PlusListboxItem> additionalColumns, OrderType orderType, Action<string> SetStatusLabel)
+        {
+            SetStatusLabel("Daten werden geladen");
+
+            string tempSortName = table.AddTempNumeration();
+            int rowCount = table.Rows.Count;
+            table = table.GetSortedView($"[{identifier}] asc", orderType).ToTable();
+            while (rowCount < table.Rows.Count)
+            {
+                table.Rows.RemoveAt(table.Rows.Count - 1);
+            }
+            table.AcceptChanges();
+
+            SetStatusLabel("Daten werden überprüft");
+            Dictionary<string, DataRowArray> dict = new Dictionary<string, DataRowArray>();
+            //RowIdentifier, Values
+            string oldIdenfifier = table.Rows[0][identifierIndex].ToString();
+            int counter = 0;
+            IEnumerable<PlusListboxItem> countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count);
+            int countColumnsCount = countColumns.Count();
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                DataRow oldRow = table.Rows[i];
+                string newIdenfifier = oldRow[identifier].ToString();
+
+                counter = newIdenfifier == oldIdenfifier ? counter + 1 : 1;
+
+                if (dict.ContainsKey(newIdenfifier) && dict.TryGetValue(newIdenfifier, out DataRowArray dataRowArray))
+                {
+                    List<string> values = new List<string>();
+                    foreach (PlusListboxItem additionalColumn in additionalColumns)
+                    {
+                        values.Add(oldRow[additionalColumn.ToString()].ToString());
+                    }
+                    dataRowArray.Add(values);
+                }
+                else
+                {
+                    if (countColumnsCount > 0)
+                    {
+                        foreach (PlusListboxItem item in countColumns)
+                        {
+                            oldRow[item.ToString()] = 1;
+                        }
+                    }
+                    dict.Add(newIdenfifier, new DataRowArray(oldRow, new List<string>()));
+                }
+
+
+                if (counter > 1)
+                {
+                    table.Rows[i].Delete();
+                }
+
+                oldIdenfifier = newIdenfifier;
+            }
+
+            int newColumns = dict.Values.Max(dataRowArray => dataRowArray.Values.Count) - 1;
+
+            SetStatusLabel("Neue Spalten werden hinzugefügt");
+            for (int i = 1; i <= newColumns; i++)
+            {
+                foreach (PlusListboxItem additionalColumn in additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Nothing))
+                {
+                    table.TryAddColumn(additionalColumn.ToString() + i);
+                }
+            }
+
+            int itemCount = dict.Values.Count;
+            counter = 0;
+            foreach (DataRowArray dataRowArray in dict.Values)
+            {
+                if (dataRowArray.Values.Count > 1)
+                {
+                    SetStatusLabel($"Daten werden geschrieben {counter}/{itemCount}");
+                    for (int i = 1; i < dataRowArray.Values.Count; i++) //except first one
+                    {
+                        for (int y = 0; y < dataRowArray.Values[i].Count; y++)
+                        {
+                            if (additionalColumns[y].State == PlusListboxItem.RowMergeState.Sum)
+                            {
+                                dataRowArray.DataRow[additionalColumns[y].ToString()] = DataHelper.AddStringAsFloat(
+                                    dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(),
+                                    dataRowArray.Values[i][y]);
+                            }
+                            else if (additionalColumns[y].State == PlusListboxItem.RowMergeState.Count)
+                            {
+                                if (int.TryParse(dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(), out int result))
+                                {
+                                    dataRowArray.DataRow[additionalColumns[y].ToString()] = result + 1;
+                                }
+                            }
+                            //additional Column
+                            else
+                            {
+                                dataRowArray.DataRow[additionalColumns[y].ToString() + i] = dataRowArray.Values[i][y];
+                            }
+                        }
+                    }
+                }
+                counter++;
+            }
+            return tempSortName;
         }
     }
 }

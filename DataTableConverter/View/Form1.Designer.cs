@@ -188,97 +188,97 @@
             // zeileToolStripMenuItem
             // 
             this.zeileToolStripMenuItem.Name = "zeileToolStripMenuItem";
-            this.zeileToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.zeileToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.zeileToolStripMenuItem.Text = "1 Zeile";
             this.zeileToolStripMenuItem.Click += new System.EventHandler(this.überschriftenEinlesenToolStripMenuItem_Click);
             // 
             // großKleinschreibungToolStripMenuItem
             // 
             this.großKleinschreibungToolStripMenuItem.Name = "großKleinschreibungToolStripMenuItem";
-            this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.großKleinschreibungToolStripMenuItem.Text = "Groß-/Kleinschreibung";
             this.großKleinschreibungToolStripMenuItem.Click += new System.EventHandler(this.großKleinschreibungToolStripMenuItem_Click);
             // 
             // nummerierenToolStripMenuItem
             // 
             this.nummerierenToolStripMenuItem.Name = "nummerierenToolStripMenuItem";
-            this.nummerierenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.nummerierenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.nummerierenToolStripMenuItem.Text = "Nummerieren";
             this.nummerierenToolStripMenuItem.Click += new System.EventHandler(this.nummerierenToolStripMenuItem_Click);
             // 
             // spaltenAusTabelleHinzufügenToolStripMenuItem
             // 
             this.spaltenAusTabelleHinzufügenToolStripMenuItem.Name = "spaltenAusTabelleHinzufügenToolStripMenuItem";
-            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.spaltenAusTabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.spaltenAusTabelleHinzufügenToolStripMenuItem.Text = "PVM Import";
             this.spaltenAusTabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabellenZusammenfügenToolStripMenuItem_Click);
             // 
             // rundenToolStripMenuItem
             // 
             this.rundenToolStripMenuItem.Name = "rundenToolStripMenuItem";
-            this.rundenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.rundenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.rundenToolStripMenuItem.Text = "Runden";
             this.rundenToolStripMenuItem.Click += new System.EventHandler(this.rundenToolStripMenuItem_Click);
             // 
             // spaltenVergleichenToolStripMenuItem
             // 
             this.spaltenVergleichenToolStripMenuItem.Name = "spaltenVergleichenToolStripMenuItem";
-            this.spaltenVergleichenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.spaltenVergleichenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.spaltenVergleichenToolStripMenuItem.Text = "Spalten vergleichen";
             this.spaltenVergleichenToolStripMenuItem.Click += new System.EventHandler(this.spaltenVergleichenToolStripMenuItem_Click);
             // 
             // zeilenZusammenfügenToolStripMenuItem1
             // 
             this.zeilenZusammenfügenToolStripMenuItem1.Name = "zeilenZusammenfügenToolStripMenuItem1";
-            this.zeilenZusammenfügenToolStripMenuItem1.Size = new System.Drawing.Size(230, 22);
+            this.zeilenZusammenfügenToolStripMenuItem1.Size = new System.Drawing.Size(229, 22);
             this.zeilenZusammenfügenToolStripMenuItem1.Text = "Spalten zusammenfügen";
             this.zeilenZusammenfügenToolStripMenuItem1.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click);
             // 
             // substringToolStripMenuItem
             // 
             this.substringToolStripMenuItem.Name = "substringToolStripMenuItem";
-            this.substringToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.substringToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.substringToolStripMenuItem.Text = "Substring";
             this.substringToolStripMenuItem.Click += new System.EventHandler(this.substringToolStripMenuItem_Click);
             // 
             // textErsetzenToolStripMenuItem1
             // 
             this.textErsetzenToolStripMenuItem1.Name = "textErsetzenToolStripMenuItem1";
-            this.textErsetzenToolStripMenuItem1.Size = new System.Drawing.Size(230, 22);
+            this.textErsetzenToolStripMenuItem1.Size = new System.Drawing.Size(229, 22);
             this.textErsetzenToolStripMenuItem1.Text = "Text ersetzen";
             this.textErsetzenToolStripMenuItem1.Click += new System.EventHandler(this.textErsetzenToolStripMenuItem1_Click);
             // 
             // trimToolStripMenuItem
             // 
             this.trimToolStripMenuItem.Name = "trimToolStripMenuItem";
-            this.trimToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.trimToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.trimToolStripMenuItem.Text = "Trim";
             // 
             // zählenToolStripMenuItem1
             // 
             this.zählenToolStripMenuItem1.Name = "zählenToolStripMenuItem1";
-            this.zählenToolStripMenuItem1.Size = new System.Drawing.Size(230, 22);
+            this.zählenToolStripMenuItem1.Size = new System.Drawing.Size(229, 22);
             this.zählenToolStripMenuItem1.Text = "Zählen";
             this.zählenToolStripMenuItem1.Click += new System.EventHandler(this.zählenToolStripMenuItem_Click);
             // 
             // zeichenAuffüllenToolStripMenuItem
             // 
             this.zeichenAuffüllenToolStripMenuItem.Name = "zeichenAuffüllenToolStripMenuItem";
-            this.zeichenAuffüllenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.zeichenAuffüllenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.zeichenAuffüllenToolStripMenuItem.Text = "Zeichen auffüllen";
             this.zeichenAuffüllenToolStripMenuItem.Click += new System.EventHandler(this.zeichenAuffüllenToolStripMenuItem_Click);
             // 
             // zeilenAusTabelleHinzufügenToolStripMenuItem
             // 
             this.zeilenAusTabelleHinzufügenToolStripMenuItem.Name = "zeilenAusTabelleHinzufügenToolStripMenuItem";
-            this.zeilenAusTabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.zeilenAusTabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.zeilenAusTabelleHinzufügenToolStripMenuItem.Text = "Zeilen aus Tabelle hinzufügen";
             this.zeilenAusTabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabelleHinzufügenToolStripMenuItem_Click);
             // 
             // zeilenZusammenfassenToolStripMenuItem
             // 
             this.zeilenZusammenfassenToolStripMenuItem.Name = "zeilenZusammenfassenToolStripMenuItem";
-            this.zeilenZusammenfassenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.zeilenZusammenfassenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.zeilenZusammenfassenToolStripMenuItem.Text = "Zeilen zusammenfassen";
             this.zeilenZusammenfassenToolStripMenuItem.Click += new System.EventHandler(this.zeilenZusammenfügenToolStripMenuItem_Click_1);
             // 
@@ -361,14 +361,14 @@
             // pVMToolStripMenuItem
             // 
             this.pVMToolStripMenuItem.Name = "pVMToolStripMenuItem";
-            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.pVMToolStripMenuItem.Text = "PVM";
             this.pVMToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
             // 
             // trennenToolStripMenuItem
             // 
             this.trennenToolStripMenuItem.Name = "trennenToolStripMenuItem";
-            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.trennenToolStripMenuItem.Text = "Trennen";
             this.trennenToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 

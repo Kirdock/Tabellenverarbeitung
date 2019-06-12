@@ -21,7 +21,7 @@ namespace DataTableConverter.Assisstant
         {
             try
             {
-                File.AppendAllText(path, $"{DateTime.Today} {text}{Environment.NewLine}");
+                File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Today} {text}{Environment.NewLine}");
                 if (showMessage)
                 {
                     ShowError(ErrorMessage);

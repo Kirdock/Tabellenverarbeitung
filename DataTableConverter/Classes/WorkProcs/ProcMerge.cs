@@ -121,7 +121,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 foreach (DataRow row in table.Rows)
                 {
-                    var match = Conditions.AsEnumerable().FirstOrDefault(condition => row[condition[(int)ConditionColumn.Spalte].ToString()].ToString() == condition[(int)ConditionColumn.Wert].ToString());
+                    var match = Conditions.AsEnumerable().FirstOrDefault(condition => !string.IsNullOrWhiteSpace(condition[(int)ConditionColumn.Spalte]?.ToString()) && row[condition[(int)ConditionColumn.Spalte].ToString()].ToString() == condition[(int)ConditionColumn.Wert].ToString());
                     string formula = match == null ? Formula : match[(int)ConditionColumn.Format].ToString();
                     
                     row[column] = GetFormat(row, formula, table.Columns);

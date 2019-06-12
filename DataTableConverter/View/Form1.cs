@@ -117,6 +117,7 @@ namespace DataTableConverter
                 dgTable.FirstDisplayedScrollingRowIndex = scrollBarVertical;
             }
             RestoreDataGridSortMode();
+            dgTable.Columns.Cast<DataGridViewColumn>().Last().AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
         }
 
 
@@ -1286,126 +1287,31 @@ namespace DataTableConverter
 
                 new Thread(() =>
                 {
-                    StartLoadingBar();
-
-                    SetStatusLabel("Daten werden geladen");
-
-                    int lastIndex = table.Columns.Count;
-                    table.Columns.Add(Extensions.DataTableExtensions.TempSort);
-                    for (int i = 0; i < table.Rows.Count; i++)
+                    try
                     {
-                        table.Rows[i][lastIndex] = i;
-                    }
-                    int rowCount = table.Rows.Count;
-                    table = table.GetSortedView($"[{identifier}] asc", OrderType).ToTable();
-                    while(rowCount < table.Rows.Count)
-                    {
-                        table.Rows.RemoveAt(table.Rows.Count - 1);
-                    }
-                    table.AcceptChanges();
+                        StartLoadingBar();
+                        string tempSortName = table.MergeRows(identifier, identifierIndex, additionalColumns, OrderType, SetStatusLabel);
 
-                    SetStatusLabel("Daten werden überprüft");
-                    Dictionary<string, DataRowArray> dict = new Dictionary<string, DataRowArray>();
-                    //RowIdentifier, Values
-                    string oldIdenfifier = table.Rows[0][identifierIndex].ToString();
-                    int counter = 0;
-                    IEnumerable<PlusListboxItem> countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count);
-                    int countColumnsCount = countColumns.Count();
-                    for (int i = 0; i < table.Rows.Count; i++)
-                    {
-                        DataRow oldRow = table.Rows[i];
-                        string newIdenfifier = oldRow[identifier].ToString();
-
-                        counter = newIdenfifier == oldIdenfifier ? counter + 1 : 1;
-
-                        if (dict.ContainsKey(newIdenfifier) && dict.TryGetValue(newIdenfifier, out DataRowArray dataRowArray))
+                        dgTable.Invoke(new MethodInvoker(() =>
                         {
-                            List<string> values = new List<string>();
-                            foreach (PlusListboxItem additionalColumn in additionalColumns)
-                            {
-                                values.Add(oldRow[additionalColumn.ToString()].ToString());
-                            }
-                            dataRowArray.Add(values);
-                        }
-                        else
-                        {
-                            if(countColumnsCount > 0)
-                            {
-                                foreach(PlusListboxItem item in countColumns)
-                                {
-                                    oldRow[item.ToString()] = 1;
-                                }
-                            }
-                            dict.Add(newIdenfifier, new DataRowArray(oldRow, new List<string>()));
-                        }
+                            DataTable originalSortTable = table.Copy().GetSortedView($"[{tempSortName}] asc", OrderType).ToTable();
 
+                            List<CellMatrix> oldValues = table.ChangesOfDataTable();
+                            historyHelper.AddHistory(new History { State = State.ValueChange, Table = oldValues }, GetSorting());
+                            originalSortTable.Columns.Remove(tempSortName);
 
-                        if (counter > 1)
-                        {
-                            table.Rows[i].Delete();
-                        }
-
-                        oldIdenfifier = newIdenfifier;
+                            AssignDataSource(originalSortTable);
+                        }));
                     }
-
-                    int newColumns = dict.Values.Max(dataRowArray => dataRowArray.Values.Count)-1;
-
-                    SetStatusLabel("Neue Spalten werden hinzugefügt");
-                    for (int i = 1; i <= newColumns; i++)
+                    catch(Exception ex)
                     {
-                        foreach (PlusListboxItem additionalColumn in additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Nothing))
-                        {
-                            table.TryAddColumn(additionalColumn.ToString() + i);
-                        }
+                        ErrorHelper.LogMessage(ex);
                     }
-
-                    int itemCount = dict.Values.Count;
-                    counter = 0;
-                    foreach (DataRowArray dataRowArray in dict.Values)
+                    finally
                     {
-                        if (dataRowArray.Values.Count > 1)
-                        {
-                            SetStatusLabel($"Daten werden geschrieben {counter}/{itemCount}");
-                            for (int i = 1; i < dataRowArray.Values.Count; i++) //except first one
-                            {
-                                for (int y = 0; y < dataRowArray.Values[i].Count; y++)
-                                {
-                                    if (additionalColumns[y].State == PlusListboxItem.RowMergeState.Sum)
-                                    {
-                                        dataRowArray.DataRow[additionalColumns[y].ToString()] = DataHelper.AddStringAsFloat(
-                                            dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(),
-                                            dataRowArray.Values[i][y]);
-                                    }
-                                    else if(additionalColumns[y].State == PlusListboxItem.RowMergeState.Count)
-                                    {
-                                        if (int.TryParse(dataRowArray.DataRow[additionalColumns[y].ToString()].ToString(), out int result)) {
-                                            dataRowArray.DataRow[additionalColumns[y].ToString()] = result+1;
-                                        }
-                                    }
-                                    //additional Column
-                                    else
-                                    {
-                                        dataRowArray.DataRow[additionalColumns[y].ToString() + i] = dataRowArray.Values[i][y];
-                                    }
-                                }
-                            }
-                        }
-                        counter++;
+                        SetStatusLabel(string.Empty);
+                        StopLoadingBar();
                     }
-
-
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        DataTable originalSortTable = table.Copy().GetSortedView($"[{Extensions.DataTableExtensions.TempSort}] asc", OrderType).ToTable();
-                        
-                        List<CellMatrix> oldValues = table.ChangesOfDataTable();
-                        historyHelper.AddHistory(new History { State = State.ValueChange, Table = oldValues }, GetSorting());
-                        originalSortTable.Columns.Remove(Extensions.DataTableExtensions.TempSort);
-
-                        AssignDataSource(originalSortTable);
-                    }));
-                    SetStatusLabel(string.Empty);
-                    StopLoadingBar();
 
                 }).Start();
             }
