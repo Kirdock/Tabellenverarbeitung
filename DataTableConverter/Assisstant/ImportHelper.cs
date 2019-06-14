@@ -302,7 +302,7 @@ namespace DataTableConverter.Assisstant
                 ConnectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={path};"
             };
             
-            DataTable Table = new DataTable();
+            DataTable table = new DataTable();
 
             try
             {
@@ -318,7 +318,8 @@ namespace DataTableConverter.Assisstant
                             string fileName = Path.GetFileName(path) + "; " + tableName;
                             DataTable temp = new DataTable();
                             dbAdapter.Fill(temp);
-                            Table.ConcatTable(temp, fileName, fileName);
+                            temp.SetColumnsTypeString();
+                            table.ConcatTable(temp, fileName, fileName);
                         }
                     }
                 }
@@ -328,7 +329,7 @@ namespace DataTableConverter.Assisstant
             {
                 ErrorHelper.LogMessage(ex);
             }
-            return Table;
+            return table;
         }
 
         private static void CheckDataTableColumnHeader(DataTable table)

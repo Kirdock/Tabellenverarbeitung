@@ -258,6 +258,14 @@ namespace DataTableConverter.Extensions
             return table.AsEnumerable().Select(row => row[column]).ToArray();
         }
 
+        internal static void SetColumnsTypeString(this DataTable table)
+        {
+            foreach(DataColumn col in table.Columns)
+            {
+                col.DataType = typeof(string);
+            }
+        }
+
         internal static void ConcatTable(this DataTable originalTable, DataTable table, string originalFilename, string secondFilename)
         {
             List<int> ColumnIndizes = new List<int>();
@@ -266,7 +274,7 @@ namespace DataTableConverter.Extensions
                 if (index == -1)
                 {
                     index = originalTable.Columns.Count;
-                    originalTable.Columns.Add(x);
+                    originalTable.TryAddColumn(x);
                 }
                 ColumnIndizes.Add(index);
             });
@@ -392,7 +400,7 @@ namespace DataTableConverter.Extensions
                 if (orderType != OrderType.Windows)
                 {
                     bool flag = firstElement.Value == SortOrder.Ascending;
-                    int half = enum2.Count() / 2;
+                    int half = table.Rows.Count / 2;
 
                     IEnumerable<DataRow> one = enum2.Take(half);
                     IEnumerable<DataRow> two = enum2.Skip(half);
@@ -455,14 +463,13 @@ namespace DataTableConverter.Extensions
                     int count = 0;
                     foreach (DataRow row in enumerable)//lazy loading. this does not always run before the next (enumerable.OrderBy...) statement
                     {
-                        row[tempSortName] = count;
-                        count++;
+                        row[tempSortName] = count++;
                     }
 
-
+                   
                     enumerable = enumerable.OrderBy(row =>
                     {
-                        if (int.TryParse(row[tempSortName]?.ToString(), out int res)) //everything here is triggered if row[tempSortName] is set... or before it is set... idk... wtf. so there is a new column but there are not any indices written (or just one)
+                        if (table.Columns.IndexOf(tempSortName) != -1 && int.TryParse(row[tempSortName]?.ToString(), out int res)) //everything here is triggered if row[tempSortName] is set... or before it is set... idk... wtf. so there is a new column but there are not any indices written (or just one)
                         {
                             int position = res + 1;
 
