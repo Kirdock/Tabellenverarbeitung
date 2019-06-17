@@ -15,7 +15,7 @@ namespace DataTableConverter.View
 {
     public partial class TextFormat : Form
     {
-        private string path, data;
+        private string path;
         private EventHandler ctxRowDeleteRowHandler;
         private EventHandler ctxRowClipboard;
         private bool MultipleFiles;
@@ -51,39 +51,15 @@ namespace DataTableConverter.View
 
         private void TextFormat_Load(object sender, EventArgs e)
         {
-            if (readData())
-            {
-                DialogResult = DialogResult.Abort;
-                Dispose();
-            }
-            else
-            {
-                LoadPresets();
-                LoadHeaderPresets();
-                cmbVariant.SelectedIndex = 0;
-                adjustSettingsDataGrid();
-                dgvSetting.CellValueChanged += new DataGridViewCellEventHandler(dgvSetting_CellValueChanged);
-                loadSettings();
-                radioButton_CheckedChanged(null, null);
-                cmbEncoding.SelectedIndexChanged += (sender2, e2) => cmbEncoding_SelectedIndexChanged(sender2, e2);
-            }
+            LoadPresets();
+            LoadHeaderPresets();
+            cmbVariant.SelectedIndex = 0;
+            adjustSettingsDataGrid();
+            dgvSetting.CellValueChanged += new DataGridViewCellEventHandler(dgvSetting_CellValueChanged);
+            loadSettings();
+            radioButton_CheckedChanged(null, null);
+            cmbEncoding.SelectedIndexChanged += (sender2, e2) => cmbEncoding_SelectedIndexChanged(sender2, e2);
         }
-
-        private bool readData()
-        {
-            bool error = false;
-            try
-            {
-                data = File.ReadAllText(path, Encoding.GetEncoding(((EncodingInfo)cmbEncoding.SelectedItem).CodePage));
-            }
-            catch
-            {
-                error = true;
-                MessageHandler.MessagesOK(MessageBoxIcon.Error, "Die Datei kann nicht geöffnet werden. Wird sie gerade benutzt?");
-            }
-            return error;
-        }
-
 
         private void setEncodingCmb()
         {
@@ -96,7 +72,6 @@ namespace DataTableConverter.View
 
         private void cmbEncoding_SelectedIndexChanged(object sender, EventArgs e)
         {
-            readData();
             radioButton_CheckedChanged(null, null);
         }
 
@@ -254,7 +229,7 @@ namespace DataTableConverter.View
         {
             getDataGridViewItems(out List<int> values, out List<string> headers);
             ImportSettings = new ImportSettings(values, headers, getCodePage());
-            DataTable = ImportHelper.OpenTextFixed(data, path, values, headers);
+            DataTable = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage);
         }
 
         private void dgvSetting_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -262,7 +237,7 @@ namespace DataTableConverter.View
             // sync preview
             dgvSetting.BindingContext[dgvSetting.DataSource].EndCurrentEdit();
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            dgvPreview.DataSource = ImportHelper.OpenTextFixed(data, path, values, headers, true);
+            dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, true);
         }
 
         private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)

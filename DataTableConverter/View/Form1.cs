@@ -418,8 +418,6 @@ namespace DataTableConverter
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e, ImportState state = ImportState.None)
         {
-
-
             OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state == ImportState.None || state == ImportState.Append);
             DataTable oldTable = GetDataSource();
             string mergePath = string.Empty;

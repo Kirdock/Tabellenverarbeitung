@@ -56,8 +56,7 @@ namespace DataTableConverter.Assisstant
                 {
                     if (settings.Values != null)
                     {
-                        string data = File.ReadAllText(file, Encoding.GetEncoding(settings.CodePage));
-                        table = OpenTextFixed(data, file, settings.Values, settings.Headers);
+                        table = OpenTextFixed(file, settings.Values, settings.Headers, settings.CodePage);
                     }
                     else if (settings.Separator != null)
                     {
@@ -518,7 +517,7 @@ namespace DataTableConverter.Assisstant
             Clipboard.Clear();
         }
 
-        internal static DataTable OpenTextFixed(string data, string path, List<int> config, List<string> header, bool isPreview = false)
+        internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview = false)
         {
             DataTable dt = new DataTable();
             if (header == null || config == null || header.Count == 0 || config.Count == 0)
@@ -527,35 +526,36 @@ namespace DataTableConverter.Assisstant
             }
             try
             {
-                header.ForEach(x => dt.Columns.Add(x.ToString(), typeof(string)));
+                header.ForEach(x => dt.TryAddColumn(x.ToString()));
 
-                int startindex = 0;
-                while (startindex < data.Length && (!isPreview || dt.Rows.Count < 3))
+                StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding));
+                
+                
+                while (!stream.EndOfStream && (!isPreview || dt.Rows.Count < 3))
                 {
-                    List<string> row = new List<string>();
-                    bool abort = false;
-                    for (int i = 0; i < config.Count && !abort; i++)
+                    string[] itemArray = new string[header.Count];
+
+                    for (int i = 0; i < config.Count && !stream.EndOfStream; i++)
                     {
-                        int temp;
-                        if(config[i] + startindex > data.Length)
+                        char[] body = new char[config[i]];
+                        
+                        for(int index = 0; index < config[i] && stream.Peek() != -1; index++)
                         {
-                            temp = data.Length - startindex;
-                            abort = true;
-                        }
-                        else
-                        {
-                            temp = config[i];
+                            body[index] = (char)stream.Read();
                         }
 
-                        row.Add(data.Substring(startindex, temp));
-                        startindex += config[i];
+                        itemArray[i] = new string(body);
                     }
-                    dt.Rows.Add(row.ToArray());
-                    if (startindex < data.Length && data[startindex] == '\n')
+                    
+                    dt.Rows.Add(itemArray);
+
+                    int charCode;
+                    while ((charCode = stream.Peek()) == '\r' || charCode == '\n')
                     {
-                        startindex++;
+                        stream.Read(); //stream.BaseStream.seek(2,SeekOrigin.Current) does not work; \r\n is still being read even if stream.BaseStream.Position is changed
                     }
                 }
+                stream.Close();
             }
             catch (IOException)
             {
