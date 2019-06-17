@@ -108,11 +108,11 @@ namespace DataTableConverter
             OrderType orderType = OrderType;
             dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
             dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
-            if (scrollBarHorizontal != -1)
+            if (scrollBarHorizontal != -1 && dgTable.Columns.Count > scrollBarHorizontal)
             {
                 dgTable.FirstDisplayedScrollingColumnIndex = scrollBarHorizontal;
             }
-            if (scrollBarVertical != -1)
+            if (scrollBarVertical != -1 && dgTable.Rows.Count > scrollBarVertical)
             {
                 dgTable.FirstDisplayedScrollingRowIndex = scrollBarVertical;
             }
@@ -517,7 +517,7 @@ namespace DataTableConverter
                 int ImportMergeIndex = form.getSelectedMerge();
                 bool SortColumn = form.OrderColumnName() != string.Empty;
                 string orderColumnName = form.OrderColumnName();
-                new Thread(() =>
+                Thread thread = new Thread(() =>
                 {
                     try {
                         sourceTable.AddColumnsOfDataTable(importTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, SortColumn, orderColumnName, pgbLoading);
@@ -529,7 +529,7 @@ namespace DataTableConverter
                                 SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, sourceTable.HeadersOfDataTable(), true);
                                 if (f.ShowDialog() == DialogResult.OK)
                                 {
-                                    invalidColumnName = f.Table.Rows.Cast<DataRow>().First()[1].ToString();
+                                    invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
                                     sourceTable.SplitDataTable(FilePath, invalidColumnName);
                                 }
                             }
@@ -546,7 +546,9 @@ namespace DataTableConverter
                     {
                         ErrorHelper.LogMessage(ex);
                     }
-                }).Start();
+                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
             }
         }
 

@@ -332,7 +332,7 @@ namespace DataTableConverter.Extensions
                             }.ToArray();
             }
 
-            pgbLoading?.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = importTable.Rows.Count; }));
+            pgbLoading?.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = sourceTable.Rows.Count; }));
 
 
             HashSet<int> hs = new HashSet<int>();
