@@ -405,7 +405,6 @@ namespace DataTableConverter.Assisstant
                     RangeToDataTable(range, data, selectedSheets.Length > 1 ? Path.GetFileName(path) + "; " + sheetName : null);
                     Marshal.ReleaseComObject(objSHT);
                 }
-                data = data.RemoveEmptyRows();
                 if (fileNameColumn)
                 {
                     data.Columns[Extensions.DataTableExtensions.FileName].SetOrdinal(data.Columns.Count - 1);
@@ -508,11 +507,14 @@ namespace DataTableConverter.Assisstant
                         #endregion
                     }
                 }
-                if (fileName != null)
+                if (dr.ItemArray.Any(value => !string.IsNullOrWhiteSpace(value?.ToString())))
                 {
-                    dr[Extensions.DataTableExtensions.FileName] = fileName;
+                    if (fileName != null)
+                    {
+                        dr[Extensions.DataTableExtensions.FileName] = fileName;
+                    }
+                    table.Rows.Add(dr);
                 }
-                table.Rows.Add(dr);
             }
 
             Clipboard.Clear();
