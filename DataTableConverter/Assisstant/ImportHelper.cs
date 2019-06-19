@@ -405,6 +405,7 @@ namespace DataTableConverter.Assisstant
                     RangeToDataTable(range, data, selectedSheets.Length > 1 ? Path.GetFileName(path) + "; " + sheetName : null);
                     Marshal.ReleaseComObject(objSHT);
                 }
+                data = data.RemoveEmptyRows();
                 if (fileNameColumn)
                 {
                     data.Columns[Extensions.DataTableExtensions.FileName].SetOrdinal(data.Columns.Count - 1);

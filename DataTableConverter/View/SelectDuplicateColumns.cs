@@ -55,7 +55,7 @@ namespace DataTableConverter.View
 
             foreach (string header in caseHeaders)
             {
-                table.Rows.Add(header);
+                table.Rows.Add(new object[] { header, newHeaders[0] });
             }
             dgDuplicate.Columns[0].ReadOnly = true;
             dgDuplicate.Columns[1].Visible = false;

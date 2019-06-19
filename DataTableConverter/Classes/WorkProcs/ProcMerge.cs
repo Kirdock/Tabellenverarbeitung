@@ -157,8 +157,10 @@ namespace DataTableConverter.Classes.WorkProcs
                 if (c == '(')
                 {
                     string value = headersInBrackets[bracketCount].FirstOrDefault(h => tableColumns.Contains(h) && !string.IsNullOrWhiteSpace(row[h]?.ToString())) ?? string.Empty;
-
-                    format.Append(value);
+                    if (value != string.Empty)
+                    {
+                        format.Append(row[value].ToString());
+                    }
                     counter += headersInBrackets[bracketCount].Length;
                     i = formula.IndexOf(')', i);
                     bracketCount++;
