@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
+using DataTableConverter.Extensions;
 
 namespace DataTableConverter
 {
@@ -277,7 +278,7 @@ namespace DataTableConverter
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine}    path: {path}; fileName: {fileName}");
+                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine}    path: {path}; fileName: {fileName}; headers:[{string.Join("; ",dataTable.HeadersOfDataTableAsString())}]");
                 return;
             }
 

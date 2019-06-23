@@ -62,6 +62,11 @@ namespace DataTableConverter.Classes.WorkProcs
             string[] columns = GetHeaders();
             bool intoNewCol = false;
 
+            if(Start > End && End != 0)
+            {
+                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Substring: Die Endposition darf nicht kleiner als die Startposition sein!");
+                return;
+            }
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)

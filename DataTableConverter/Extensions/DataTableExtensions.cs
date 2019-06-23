@@ -258,6 +258,11 @@ namespace DataTableConverter.Extensions
             return table.AsEnumerable().Select(row => row[column]).ToArray();
         }
 
+        internal static string[] ColumnValuesAsString(this DataTable table, int column)
+        {
+            return table.AsEnumerable().Select(row => row[column]?.ToString()).ToArray();
+        }
+
         internal static void SetColumnsTypeString(this DataTable table)
         {
             foreach(DataColumn col in table.Columns)

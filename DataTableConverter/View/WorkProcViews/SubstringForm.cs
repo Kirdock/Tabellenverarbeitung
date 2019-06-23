@@ -36,6 +36,10 @@ namespace DataTableConverter.View.WorkProcViews
             {
                 MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte wählen Sie zumindest eine Spatle aus, auf die der Vorgang angewendet werden soll.");
             }
+            else if(nbEnd.Value < nbStart.Value && nbEnd.Value != 0)
+            {
+                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Substring: Die Endposition darf nicht kleiner als die Startposition sein!");
+            }
             else
             {
                 Procedure = new ProcSubstring(cbHeaders.CheckedItems.Cast<string>().ToArray(), txtNewColumn.Text, cbOldColumn.Checked, (int)nbStart.Value, (int)nbEnd.Value);
