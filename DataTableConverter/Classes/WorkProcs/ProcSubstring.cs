@@ -16,12 +16,14 @@ namespace DataTableConverter.Classes.WorkProcs
         internal static readonly string ClassName = "Substring";
         internal int Start;
         internal int End;
+        internal string ReplaceText;
+        internal bool ReplaceChecked; //I need it because ReplaceText can also be empty
 
         public ProcSubstring(int ordinal, int id, string name) : base(ordinal, id, name) {
             Start = 1;
         }
 
-        public ProcSubstring(string[] columns, string header, bool copyOldColumn, int start, int end)
+        public ProcSubstring(string[] columns, string header, bool copyOldColumn, int start, int end, string replaceText, bool replaceChecked)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
@@ -33,6 +35,8 @@ namespace DataTableConverter.Classes.WorkProcs
             CopyOldColumn = copyOldColumn;
             Start = start;
             End = end;
+            ReplaceText = replaceText;
+            ReplaceChecked = replaceChecked;
         }
 
         public override string[] GetHeaders()
@@ -60,13 +64,8 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
-            bool intoNewCol = false;
+            string newColumn = null;
 
-            if(Start > End && End != 0)
-            {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Substring: Die Endposition darf nicht kleiner als die Startposition sein!");
-                return;
-            }
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
@@ -74,28 +73,45 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                table.TryAddColumn(NewColumn);
-                intoNewCol = true;
+                newColumn = table.TryAddColumn(NewColumn);
             }
-            List<int> headerIndices = table.HeaderIndices(columns);
-            foreach (DataRow row in table.Rows)
+
+            if (!ReplaceChecked)
             {
-                for (int i = 0; i < row.ItemArray.Length; i++)
+
+                foreach (DataRow row in table.Rows)
                 {
-                    if (headerIndices.Contains(i))
+                    foreach (string header in columns)
                     {
-                        int index = intoNewCol ? lastCol : i;
-                        string value = row[i].ToString();
+                        string value = row[header].ToString();
+                        string col = newColumn ?? header;
                         if (End == 0)
                         {
-                            row[index] = Start > value.Length ? string.Empty : value.Substring(Start - 1);
+                            row[col] = Start > value.Length ? string.Empty : value.Substring(Start - 1);
                         }
                         else
                         {
                             int length = (End - Start);
-                            row[index] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start - 1) : value.Substring(Start - 1, length + 1);
+                            row[col] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start - 1) : value.Substring(Start - 1, length + 1);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (DataRow row in table.Rows)
+                {
+                    foreach (string header in columns)
+                    {
+                        string value = row[header].ToString();
+                        string result = Start > value.Length ? string.Empty : value.Substring(0, Start-1) + ReplaceText;
+
+                        if (End < value.Length && End != 0 && Start <= value.Length)
+                        {
+                            result += value.Substring(End);
                         }
 
+                        row[newColumn ?? header] = result;
                     }
                 }
             }

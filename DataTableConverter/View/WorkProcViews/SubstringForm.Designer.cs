@@ -41,6 +41,8 @@
             this.label29 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
+            this.cbSubstringText = new System.Windows.Forms.CheckBox();
+            this.txtSubstringText = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.nbEnd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbStart)).BeginInit();
             this.SuspendLayout();
@@ -48,7 +50,7 @@
             // cbOldColumn
             // 
             this.cbOldColumn.AutoSize = true;
-            this.cbOldColumn.Location = new System.Drawing.Point(15, 140);
+            this.cbOldColumn.Location = new System.Drawing.Point(15, 189);
             this.cbOldColumn.Name = "cbOldColumn";
             this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
             this.cbOldColumn.TabIndex = 32;
@@ -58,7 +60,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 56);
+            this.label2.Location = new System.Drawing.Point(12, 105);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(107, 13);
             this.label2.TabIndex = 29;
@@ -67,7 +69,7 @@
             // cbNewColumn
             // 
             this.cbNewColumn.AutoSize = true;
-            this.cbNewColumn.Location = new System.Drawing.Point(15, 111);
+            this.cbNewColumn.Location = new System.Drawing.Point(15, 160);
             this.cbNewColumn.Name = "cbNewColumn";
             this.cbNewColumn.Size = new System.Drawing.Size(193, 17);
             this.cbNewColumn.TabIndex = 27;
@@ -78,7 +80,7 @@
             // lblNewColumn
             // 
             this.lblNewColumn.AutoSize = true;
-            this.lblNewColumn.Location = new System.Drawing.Point(12, 141);
+            this.lblNewColumn.Location = new System.Drawing.Point(12, 190);
             this.lblNewColumn.Name = "lblNewColumn";
             this.lblNewColumn.Size = new System.Drawing.Size(89, 13);
             this.lblNewColumn.TabIndex = 26;
@@ -86,14 +88,14 @@
             // 
             // txtNewColumn
             // 
-            this.txtNewColumn.Location = new System.Drawing.Point(107, 138);
+            this.txtNewColumn.Location = new System.Drawing.Point(107, 187);
             this.txtNewColumn.Name = "txtNewColumn";
             this.txtNewColumn.Size = new System.Drawing.Size(249, 20);
             this.txtNewColumn.TabIndex = 25;
             // 
             // btnConfirm
             // 
-            this.btnConfirm.Location = new System.Drawing.Point(107, 176);
+            this.btnConfirm.Location = new System.Drawing.Point(107, 225);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(150, 23);
             this.btnConfirm.TabIndex = 24;
@@ -112,6 +114,7 @@
             this.nbEnd.Name = "nbEnd";
             this.nbEnd.Size = new System.Drawing.Size(70, 20);
             this.nbEnd.TabIndex = 36;
+            this.nbEnd.ValueChanged += new System.EventHandler(this.nbEnd_ValueChanged);
             // 
             // label30
             // 
@@ -144,6 +147,7 @@
             0,
             0,
             0});
+            this.nbStart.ValueChanged += new System.EventHandler(this.nbStart_ValueChanged);
             // 
             // label29
             // 
@@ -165,17 +169,38 @@
             this.cbHeaders.DropDownHeight = 1;
             this.cbHeaders.FormattingEnabled = true;
             this.cbHeaders.IntegralHeight = false;
-            this.cbHeaders.Location = new System.Drawing.Point(15, 72);
+            this.cbHeaders.Location = new System.Drawing.Point(15, 121);
             this.cbHeaders.Name = "cbHeaders";
             this.cbHeaders.Size = new System.Drawing.Size(341, 21);
             this.cbHeaders.TabIndex = 28;
             this.cbHeaders.ValueSeparator = ", ";
             // 
+            // cbSubstringText
+            // 
+            this.cbSubstringText.AutoSize = true;
+            this.cbSubstringText.Location = new System.Drawing.Point(15, 59);
+            this.cbSubstringText.Name = "cbSubstringText";
+            this.cbSubstringText.Size = new System.Drawing.Size(229, 17);
+            this.cbSubstringText.TabIndex = 37;
+            this.cbSubstringText.Text = "Ausgewählten Bereich durch Text ersetzen";
+            this.cbSubstringText.UseVisualStyleBackColor = true;
+            this.cbSubstringText.CheckedChanged += new System.EventHandler(this.cbSubstringText_CheckedChanged);
+            // 
+            // txtSubstringText
+            // 
+            this.txtSubstringText.Location = new System.Drawing.Point(15, 82);
+            this.txtSubstringText.Name = "txtSubstringText";
+            this.txtSubstringText.Size = new System.Drawing.Size(341, 20);
+            this.txtSubstringText.TabIndex = 38;
+            this.txtSubstringText.Visible = false;
+            // 
             // SubstringForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(372, 220);
+            this.ClientSize = new System.Drawing.Size(372, 260);
+            this.Controls.Add(this.txtSubstringText);
+            this.Controls.Add(this.cbSubstringText);
             this.Controls.Add(this.nbEnd);
             this.Controls.Add(this.label30);
             this.Controls.Add(this.nbStart);
@@ -212,5 +237,7 @@
         private System.Windows.Forms.NumericUpDown nbStart;
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.CheckBox cbSubstringText;
+        private System.Windows.Forms.TextBox txtSubstringText;
     }
 }

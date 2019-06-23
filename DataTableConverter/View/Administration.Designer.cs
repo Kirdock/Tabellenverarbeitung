@@ -60,6 +60,7 @@
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.gbMerge = new System.Windows.Forms.GroupBox();
+            this.cbMergeOldColumn = new System.Windows.Forms.CheckBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label18 = new System.Windows.Forms.Label();
             this.dgvMerge = new System.Windows.Forms.DataGridView();
@@ -194,7 +195,8 @@
             this.dgCaseColumns = new System.Windows.Forms.DataGridView();
             this.txtCaseName = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.cbMergeOldColumn = new System.Windows.Forms.CheckBox();
+            this.cbSubstringText = new System.Windows.Forms.CheckBox();
+            this.txtSubstringText = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -498,12 +500,12 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCompare);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbReplaceWhole);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPadding);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbNumber);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbUpLowCase);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
@@ -696,6 +698,17 @@
             this.gbMerge.TabStop = false;
             this.gbMerge.Text = "Spaltenangabe";
             this.gbMerge.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            // 
+            // cbMergeOldColumn
+            // 
+            this.cbMergeOldColumn.AutoSize = true;
+            this.cbMergeOldColumn.Location = new System.Drawing.Point(7, 159);
+            this.cbMergeOldColumn.Name = "cbMergeOldColumn";
+            this.cbMergeOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbMergeOldColumn.TabIndex = 12;
+            this.cbMergeOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbMergeOldColumn.UseVisualStyleBackColor = true;
+            this.cbMergeOldColumn.CheckedChanged += new System.EventHandler(this.cbMergeOldColumn_CheckedChanged);
             // 
             // linkLabel1
             // 
@@ -1258,6 +1271,8 @@
             // 
             // gbSubstring
             // 
+            this.gbSubstring.Controls.Add(this.txtSubstringText);
+            this.gbSubstring.Controls.Add(this.cbSubstringText);
             this.gbSubstring.Controls.Add(this.nbSubstringEnd);
             this.gbSubstring.Controls.Add(this.label30);
             this.gbSubstring.Controls.Add(this.nbSubstringStart);
@@ -1337,7 +1352,7 @@
             // cbSubstringOldColumn
             // 
             this.cbSubstringOldColumn.AutoSize = true;
-            this.cbSubstringOldColumn.Location = new System.Drawing.Point(6, 98);
+            this.cbSubstringOldColumn.Location = new System.Drawing.Point(7, 153);
             this.cbSubstringOldColumn.Name = "cbSubstringOldColumn";
             this.cbSubstringOldColumn.Size = new System.Drawing.Size(165, 17);
             this.cbSubstringOldColumn.TabIndex = 20;
@@ -1348,7 +1363,7 @@
             // lblUsedColumnsSubstring
             // 
             this.lblUsedColumnsSubstring.AutoSize = true;
-            this.lblUsedColumnsSubstring.Location = new System.Drawing.Point(2, 179);
+            this.lblUsedColumnsSubstring.Location = new System.Drawing.Point(4, 226);
             this.lblUsedColumnsSubstring.Name = "lblUsedColumnsSubstring";
             this.lblUsedColumnsSubstring.Size = new System.Drawing.Size(121, 13);
             this.lblUsedColumnsSubstring.TabIndex = 12;
@@ -1357,7 +1372,7 @@
             // cbSubstringNewColumn
             // 
             this.cbSubstringNewColumn.AutoSize = true;
-            this.cbSubstringNewColumn.Location = new System.Drawing.Point(7, 66);
+            this.cbSubstringNewColumn.Location = new System.Drawing.Point(6, 121);
             this.cbSubstringNewColumn.Name = "cbSubstringNewColumn";
             this.cbSubstringNewColumn.Size = new System.Drawing.Size(193, 17);
             this.cbSubstringNewColumn.TabIndex = 11;
@@ -1372,16 +1387,16 @@
             this.dgvSubstringColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvSubstringColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvSubstringColumns.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dgvSubstringColumns.Location = new System.Drawing.Point(6, 197);
+            this.dgvSubstringColumns.Location = new System.Drawing.Point(6, 242);
             this.dgvSubstringColumns.Name = "dgvSubstringColumns";
-            this.dgvSubstringColumns.Size = new System.Drawing.Size(267, 464);
+            this.dgvSubstringColumns.Size = new System.Drawing.Size(267, 419);
             this.dgvSubstringColumns.TabIndex = 10;
             this.dgvSubstringColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
             // lblSubstringNewColumn
             // 
             this.lblSubstringNewColumn.AutoSize = true;
-            this.lblSubstringNewColumn.Location = new System.Drawing.Point(3, 86);
+            this.lblSubstringNewColumn.Location = new System.Drawing.Point(2, 141);
             this.lblSubstringNewColumn.Name = "lblSubstringNewColumn";
             this.lblSubstringNewColumn.Size = new System.Drawing.Size(122, 13);
             this.lblSubstringNewColumn.TabIndex = 7;
@@ -1397,7 +1412,7 @@
             this.cbSubstringHeaders.DropDownHeight = 1;
             this.cbSubstringHeaders.FormattingEnabled = true;
             this.cbSubstringHeaders.IntegralHeight = false;
-            this.cbSubstringHeaders.Location = new System.Drawing.Point(7, 145);
+            this.cbSubstringHeaders.Location = new System.Drawing.Point(6, 200);
             this.cbSubstringHeaders.Name = "cbSubstringHeaders";
             this.cbSubstringHeaders.Size = new System.Drawing.Size(270, 21);
             this.cbSubstringHeaders.TabIndex = 6;
@@ -1407,7 +1422,7 @@
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(3, 129);
+            this.label35.Location = new System.Drawing.Point(2, 184);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(209, 13);
             this.label35.TabIndex = 5;
@@ -1417,7 +1432,7 @@
             // 
             this.txtSubstringNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSubstringNewColumn.Location = new System.Drawing.Point(7, 106);
+            this.txtSubstringNewColumn.Location = new System.Drawing.Point(6, 161);
             this.txtSubstringNewColumn.Name = "txtSubstringNewColumn";
             this.txtSubstringNewColumn.Size = new System.Drawing.Size(270, 20);
             this.txtSubstringNewColumn.TabIndex = 2;
@@ -2332,16 +2347,27 @@
             this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTip1.ToolTipTitle = "Info";
             // 
-            // cbMergeOldColumn
+            // cbSubstringText
             // 
-            this.cbMergeOldColumn.AutoSize = true;
-            this.cbMergeOldColumn.Location = new System.Drawing.Point(7, 159);
-            this.cbMergeOldColumn.Name = "cbMergeOldColumn";
-            this.cbMergeOldColumn.Size = new System.Drawing.Size(165, 17);
-            this.cbMergeOldColumn.TabIndex = 12;
-            this.cbMergeOldColumn.Text = "Alte Werte in ALT speichern?";
-            this.cbMergeOldColumn.UseVisualStyleBackColor = true;
-            this.cbMergeOldColumn.CheckedChanged += new System.EventHandler(this.cbMergeOldColumn_CheckedChanged);
+            this.cbSubstringText.AutoSize = true;
+            this.cbSubstringText.Location = new System.Drawing.Point(7, 60);
+            this.cbSubstringText.Name = "cbSubstringText";
+            this.cbSubstringText.Size = new System.Drawing.Size(229, 17);
+            this.cbSubstringText.TabIndex = 25;
+            this.cbSubstringText.Text = "Ausgewählten Bereich durch Text ersetzen";
+            this.cbSubstringText.UseVisualStyleBackColor = true;
+            this.cbSubstringText.CheckedChanged += new System.EventHandler(this.cbSubstringText_CheckedChanged);
+            // 
+            // txtSubstringText
+            // 
+            this.txtSubstringText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtSubstringText.Location = new System.Drawing.Point(7, 81);
+            this.txtSubstringText.Name = "txtSubstringText";
+            this.txtSubstringText.Size = new System.Drawing.Size(269, 20);
+            this.txtSubstringText.TabIndex = 26;
+            this.txtSubstringText.Visible = false;
+            this.txtSubstringText.TextChanged += new System.EventHandler(this.txtSubstringText_TextChanged);
             // 
             // Administration
             // 
@@ -2613,5 +2639,7 @@
         private System.Windows.Forms.CheckBox cbCompareNewColumn;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.CheckBox cbMergeOldColumn;
+        private System.Windows.Forms.CheckBox cbSubstringText;
+        private System.Windows.Forms.TextBox txtSubstringText;
     }
 }

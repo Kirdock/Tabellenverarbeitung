@@ -36,13 +36,9 @@ namespace DataTableConverter.View.WorkProcViews
             {
                 MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte wählen Sie zumindest eine Spatle aus, auf die der Vorgang angewendet werden soll.");
             }
-            else if(nbEnd.Value < nbStart.Value && nbEnd.Value != 0)
-            {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Substring: Die Endposition darf nicht kleiner als die Startposition sein!");
-            }
             else
             {
-                Procedure = new ProcSubstring(cbHeaders.CheckedItems.Cast<string>().ToArray(), txtNewColumn.Text, cbOldColumn.Checked, (int)nbStart.Value, (int)nbEnd.Value);
+                Procedure = new ProcSubstring(cbHeaders.CheckedItems.Cast<string>().ToArray(), txtNewColumn.Text, cbOldColumn.Checked, (int)nbStart.Value, (int)nbEnd.Value, txtSubstringText.Text, cbSubstringText.Checked);
                 DialogResult = DialogResult.OK;
             }
         }
@@ -64,6 +60,32 @@ namespace DataTableConverter.View.WorkProcViews
         private void SetNewColumnVisibility(bool status)
         {
             lblNewColumn.Visible = txtNewColumn.Visible = status;
+        }
+
+        private void cbSubstringText_CheckedChanged(object s, EventArgs e)
+        {
+            var sender = s as CheckBox;
+            txtSubstringText.Visible = sender.Checked;
+            if (!sender.Checked)
+            {
+                txtSubstringText.Text = string.Empty;
+            }
+        }
+
+        private void nbStart_ValueChanged(object sender, EventArgs e)
+        {
+            if (nbEnd.Value < nbStart.Value && nbEnd.Value != 0)
+            {
+                nbStart.Value = nbEnd.Value;
+            }
+        }
+
+        private void nbEnd_ValueChanged(object sender, EventArgs e)
+        {
+            if (nbEnd.Value < nbStart.Value && nbEnd.Value != 0)
+            {
+                nbEnd.Value = Convert.ToInt32(nbEnd.Text) > nbEnd.Value ? 0 : nbStart.Value;
+            }
         }
     }
 }

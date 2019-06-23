@@ -642,6 +642,8 @@ namespace DataTableConverter.View
             txtSubstringNewColumn.Text = proc.NewColumn;
             nbSubstringStart.Value = proc.Start;
             nbSubstringEnd.Value = proc.End;
+            txtSubstringText.Text = proc.ReplaceText;
+            txtSubstringText.Visible = cbSubstringText.Checked = proc.ReplaceChecked;
             cbSubstringOldColumn.Checked = proc.CopyOldColumn;
             SetDataSource(dgvSubstringColumns, proc.Columns);
         }
@@ -1013,7 +1015,7 @@ namespace DataTableConverter.View
             {
                 GetSelectedWorkflow().Name = txtWorkflow.Text;
                 bindingWorkflow.ResetBindings();
-
+                SortWorkflowList(GetSelectedWorkflow().Id);
             }
         }
 
@@ -1561,15 +1563,11 @@ namespace DataTableConverter.View
 
         private void ndSubstringStart_ValueChanged(object sender, EventArgs e)
         {
-            if (nbSubstringEnd.Value > nbSubstringStart.Value)
+            if (nbSubstringEnd.Value < nbSubstringStart.Value && nbSubstringEnd.Value != 0)
             {
-                nbSubstringStart.Value = (GetSelectedWorkProcedure() as ProcSubstring).Start;
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Startposition darf nicht größer als Endposition sein!");
+                nbSubstringStart.Value = nbSubstringEnd.Value;
             }
-            else
-            {
-                (GetSelectedWorkProcedure() as ProcSubstring).Start = (int)nbSubstringStart.Value;
-            }
+            (GetSelectedWorkProcedure() as ProcSubstring).Start = (int)nbSubstringStart.Value;
         }
 
         private void txtSubstringNewColumn_TextChanged(object sender, EventArgs e)
@@ -1579,15 +1577,11 @@ namespace DataTableConverter.View
 
         private void nbSubstringEnd_ValueChanged(object sender, EventArgs e)
         {
-            if(nbSubstringEnd.Value > nbSubstringStart.Value)
+            if(nbSubstringEnd.Value < nbSubstringStart.Value && nbSubstringEnd.Value != 0)
             {
-                nbSubstringEnd.Value = (GetSelectedWorkProcedure() as ProcSubstring).End;
-                MessageHandler.MessagesOK(System.Windows.Forms.MessageBoxIcon.Warning, "Startposition darf nicht größer als Endposition sein!");
+                nbSubstringEnd.Value = Convert.ToInt32(nbSubstringEnd.Text) > nbSubstringEnd.Value ? 0 : nbSubstringStart.Value;
             }
-            else
-            {
-                (GetSelectedWorkProcedure() as ProcSubstring).End = (int)nbSubstringEnd.Value;
-            }
+            (GetSelectedWorkProcedure() as ProcSubstring).End = (int)nbSubstringEnd.Value;
         }
 
         private void cbSubstringOldColumn_CheckedChanged(object sender, EventArgs e)
@@ -1678,6 +1672,21 @@ namespace DataTableConverter.View
         private void cbMergeOldColumn_CheckedChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcMerge).CopyOldColumn = (sender as CheckBox).Checked;
+        }
+
+        private void cbSubstringText_CheckedChanged(object s, EventArgs e)
+        {
+            var sender = s as CheckBox;
+            txtSubstringText.Visible = (GetSelectedWorkProcedure() as ProcSubstring).ReplaceChecked = sender.Checked;
+            if (!sender.Checked)
+            {
+                txtSubstringText.Text = string.Empty;
+            }
+        }
+
+        private void txtSubstringText_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSubstring).ReplaceText = (sender as TextBox).Text;
         }
     }
 }
