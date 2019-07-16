@@ -57,7 +57,7 @@ namespace DataTableConverter.View
             GenerateProceduresForWorkflow();
             LoadProceduresWorkflow(false);
             SetGroupBoxVisibility(null);
-            AddContextMenu();
+            AddContextMenuAndDataGridViewStyle();
             RestoreSplitterDistance();
             SetColors();
         }
@@ -120,7 +120,7 @@ namespace DataTableConverter.View
             splitWorkflowProperties.SplitterDistance = Properties.Settings.Default.splitWorkflowProperties;
         }
 
-        private void AddContextMenu()
+        private void AddContextMenuAndDataGridViewStyle()
         {
             DataGridView[] dataGridViewsClipboard = new DataGridView[]
             {
@@ -145,11 +145,13 @@ namespace DataTableConverter.View
             foreach (DataGridView dataGridView in dataGridViewsClipboard)
             {
                 ViewHelper.AddContextMenuToDataGridView(dataGridView, true);
+                ViewHelper.SetDataGridViewStyle(dataGridView);
             }
             
             foreach(DataGridView dataGridView in dataGridViews)
             {
                 ViewHelper.AddContextMenuToDataGridView(dataGridView, false);
+                ViewHelper.SetDataGridViewStyle(dataGridView);
             }
         }
 

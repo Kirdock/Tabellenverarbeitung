@@ -116,8 +116,11 @@
     <Setting Name="CountFromTo" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="DefaultFormular" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">2</Value>
+    <Setting Name="RowHeight" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">22</Value>
+    </Setting>
+    <Setting Name="TableFontSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">8</Value>
     </Setting>
   </Settings>
 </SettingsFile>

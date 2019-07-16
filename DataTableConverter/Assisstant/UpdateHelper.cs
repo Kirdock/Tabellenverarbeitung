@@ -22,11 +22,11 @@ namespace DataTableConverter.Assisstant
         
         internal static void CheckUpdate(bool prompt, ProgressBar progressBar)
         {
-            try
+            if (!prompt || !Properties.Settings.Default.UpdateDialogShowed)
             {
-                if (!prompt || !Properties.Settings.Default.UpdateDialogShowed)
+                new Thread(() =>
                 {
-                    new Thread(() =>
+                    try
                     {
                         WebRequest request = WebRequest.Create(Tags);
                         WebResponse response = request.GetResponse();
@@ -59,12 +59,13 @@ namespace DataTableConverter.Assisstant
                         {
                             MessageHandler.MessagesOK(MessageBoxIcon.Information, "Sie besitzen bereits die aktuellste Version");
                         }
-                    }).Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorHelper.LogMessage(ex);
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorHelper.LogMessage(ex);
+                    }
+                }).Start();
+            
             }
         }
 
@@ -91,7 +92,7 @@ namespace DataTableConverter.Assisstant
                 foreach (ZipArchiveEntry file in archive.Entries)
                 {
                     string completeFileName = Path.Combine(path, file.FullName);
-                    if (file.Name == "")
+                    if (file.Name == string.Empty)
                     {// Assuming Empty for Directory
                         Directory.CreateDirectory(Path.GetDirectoryName(completeFileName));
                         continue;

@@ -20,6 +20,7 @@ namespace DataTableConverter.View
             InitializeComponent();
             setDataGridView(caseHeaders, headers, mustBeAssigned);
             ViewHelper.AdjustComboBoxGridView(dgDuplicate, ComboBoxIndex, headers);
+            ViewHelper.SetDataGridViewStyle(dgDuplicate);
         }
 
         private void setDataGridView(string[] caseHeaders, object[] headers, bool mustBeAssigned)

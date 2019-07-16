@@ -21,6 +21,7 @@ namespace DataTableConverter.View
             InitializeComponent();
             dgTable.DataSource = table.DefaultView;
             dgTable.ColumnDisplayIndexChanged += dgTable_ColumnDisplayIndexChanged;
+            ViewHelper.SetDataGridViewStyle(dgTable);
         }
 
         private void bestätigenToolStripMenuItem_Click(object sender, EventArgs e)

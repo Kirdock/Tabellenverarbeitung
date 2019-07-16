@@ -149,7 +149,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             int bracketCount = 0;
             ConditionalText directionBefore = ConditionalText.None;
-            ConditionalText condDefault = Properties.Settings.Default.DefaultFormular == 0 ? ConditionalText.None : Properties.Settings.Default.DefaultFormular == 1 ? ConditionalText.Left : ConditionalText.Right;
+            ConditionalText condDefault = ConditionalText.None;
             for (int i = 0; i < formula.Length; i++)
             {
                 char c = formula[i];

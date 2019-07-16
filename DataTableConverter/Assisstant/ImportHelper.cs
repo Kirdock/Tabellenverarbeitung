@@ -84,7 +84,7 @@ namespace DataTableConverter.Assisstant
             if(table != null)
             {
                 CheckDataTableColumnHeader(table);
-                table = table.RemoveEmptyRows();
+                table.RemoveEmptyRows();
                 table.RemoveNull();
             }            
             return table;
@@ -642,6 +642,27 @@ namespace DataTableConverter.Assisstant
                         BinaryFormatter bin = new BinaryFormatter();
 
                         data = (List<Case>)bin.Deserialize(stream);
+                    }
+                }
+                catch (IOException)
+                {
+                }
+            }
+            return data;
+        }
+
+        internal static TextImportTemplate LoadTextImportTemplate(string path)
+        {
+            TextImportTemplate data = new TextImportTemplate();
+            if (File.Exists(path))
+            {
+                try
+                {
+                    using (Stream stream = File.Open(path, FileMode.Open))
+                    {
+                        BinaryFormatter bin = new BinaryFormatter();
+
+                        data = (TextImportTemplate)bin.Deserialize(stream);
                     }
                 }
                 catch (IOException)

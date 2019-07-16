@@ -36,24 +36,8 @@ namespace DataTableConverter.View
             txtOldAffix.Text = Properties.Settings.Default.OldAffix;
             cbAutoSavePVM.Checked = Properties.Settings.Default.AutoSavePVM;
             cbFullWidthImport.Checked = Properties.Settings.Default.FullWidthImport;
-            switch (Properties.Settings.Default.DefaultFormular)
-            {
-                //not changed
-                case 0:
-                    rbNotChanged.Checked = true;
-                    break;
-
-                //left
-                case 1:
-                    rbLeft.Checked = true;
-                    break;
-
-                //right
-                case 2:
-                    rbRight.Checked = true;
-                    break;
-            }
-
+            NbFontSize.Value = Properties.Settings.Default.TableFontSize;
+            NbRowHeight.Value = Properties.Settings.Default.RowHeight;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -73,18 +57,8 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.OldAffix = txtOldAffix.Text;
                 Properties.Settings.Default.AutoSavePVM = cbAutoSavePVM.Checked;
                 Properties.Settings.Default.FullWidthImport = cbFullWidthImport.Checked;
-                if (rbNotChanged.Checked)
-                {
-                    Properties.Settings.Default.DefaultFormular = 0;
-                }
-                else if (rbLeft.Checked)
-                {
-                    Properties.Settings.Default.DefaultFormular = 1;
-                }
-                else
-                {
-                    Properties.Settings.Default.DefaultFormular = 2;
-                }
+                Properties.Settings.Default.TableFontSize = (int)NbFontSize.Value;
+                Properties.Settings.Default.RowHeight = (int)NbRowHeight.Value;
                 Properties.Settings.Default.Save();
             }
             else

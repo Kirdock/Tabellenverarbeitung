@@ -21,6 +21,7 @@ namespace DataTableConverter.View
             Proc = new ProcPadding();
             InitDataGridView(headers);
             SetNewColumnVisibility(false);
+            ViewHelper.SetDataGridViewStyle(dgvPadConditions);
         }
 
         private void InitDataGridView(object[] headers)

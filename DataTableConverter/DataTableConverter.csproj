@@ -87,6 +87,7 @@
     <Compile Include="Classes\PlusListboxItem.cs" />
     <Compile Include="Classes\Proc.cs" />
     <Compile Include="Classes\Case.cs" />
+    <Compile Include="Classes\TextImportTemplate.cs" />
     <Compile Include="Classes\Tolerance.cs" />
     <Compile Include="Classes\Work.cs" />
     <Compile Include="Classes\WorkProc.cs" />

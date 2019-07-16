@@ -59,6 +59,7 @@ namespace DataTableConverter
             {
                 AddDataSourceNewTable(table);
             }
+            ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading);
         }
 
@@ -101,7 +102,6 @@ namespace DataTableConverter
         {
             sourceTable = table ?? sourceTable;
 
-            
             int scrollBarHorizontal = dgTable.FirstDisplayedScrollingColumnIndex;
             int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
             int rowCount = sourceTable.Rows.Count;
@@ -1387,7 +1387,13 @@ namespace DataTableConverter
         private void einstellungenToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
             SettingForm form = new SettingForm();
+            form.FormClosed += SettingForm_FormClosed;
             form.Show();
+        }
+
+        private void SettingForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ViewHelper.SetDataGridViewStyle(dgTable);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

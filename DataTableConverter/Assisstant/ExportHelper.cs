@@ -113,6 +113,24 @@ namespace DataTableConverter
             return error;
         }
 
+        internal static bool SaveTextImportTemplate(TextImportTemplate template, string path)
+        {
+            bool error = false;
+            try
+            {
+                using (Stream stream = File.Open(path, FileMode.Create))
+                {
+                    BinaryFormatter bin = new BinaryFormatter();
+                    bin.Serialize(stream, template);
+                }
+            }
+            catch (IOException)
+            {
+                error = true;
+            }
+            return error;
+        }
+
         internal static bool SaveTolerances(List<Tolerance> tolerances)
         {
             bool error = false;

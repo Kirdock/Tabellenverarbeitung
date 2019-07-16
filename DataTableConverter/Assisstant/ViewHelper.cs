@@ -386,6 +386,40 @@ namespace DataTableConverter
         internal static void SetControlColor(Control control)
         {
             control.BackColor = control.Enabled ? Color.White : Properties.Settings.Default.Locked;
+            foreach (Control c in GetControlHierarchy(control))
+            {
+                c.ForeColor = SystemColors.ControlText;
+                Console.WriteLine(c.Text);
+            }
+        }
+
+        private static IEnumerable<Control> GetControlHierarchy(Control root)
+        {
+            Queue<Control> queue = new Queue<Control>();
+            queue.Enqueue(root);
+
+            do
+            {
+                Control control = queue.Dequeue();
+                yield return control;
+
+                foreach (Control child in control.Controls.OfType<Control>())
+                {
+                    queue.Enqueue(child);
+                }
+
+            } while (queue.Count > 0);
+
+        }
+
+        internal static void SetDataGridViewStyle(DataGridView table)
+        {
+            table.DefaultCellStyle.Font = new Font(table.DefaultCellStyle.Font.Name, Properties.Settings.Default.TableFontSize);
+            table.RowTemplate.Height = Properties.Settings.Default.RowHeight;
+            foreach(DataGridViewRow row in table.Rows)
+            {
+                row.Height = Properties.Settings.Default.RowHeight;
+            }
         }
     }
 }

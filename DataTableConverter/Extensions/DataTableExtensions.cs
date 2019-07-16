@@ -15,9 +15,15 @@ namespace DataTableConverter.Extensions
         private static readonly string TempSort = "[TEMP_SORT]";
         internal static readonly string FileName = "Dateiname";
 
-        internal static DataTable RemoveEmptyRows(this DataTable table)
+        internal static void RemoveEmptyRows(this DataTable table)
         {
-            return table.AsEnumerable().Where(row => row.ItemArray.Any(item => !string.IsNullOrWhiteSpace(item?.ToString()))).ToTable(table);
+            for(int i = 0; i < table.Rows.Count; i++)
+            {
+                if(table.Rows[i].ItemArray.All(item => string.IsNullOrWhiteSpace(item?.ToString())))
+                {
+                    table.Rows.RemoveAt(i--);
+                }
+            }
         }
 
         internal static List<string> HeadersToLower(this DataTable table)

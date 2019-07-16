@@ -49,19 +49,14 @@
             this.txtFailAddress = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label23 = new System.Windows.Forms.Label();
-            this.label22 = new System.Windows.Forms.Label();
-            this.rbNotChanged = new System.Windows.Forms.RadioButton();
-            this.rbLeft = new System.Windows.Forms.RadioButton();
-            this.rbRight = new System.Windows.Forms.RadioButton();
-            this.label21 = new System.Windows.Forms.Label();
             this.cbFullWidthImport = new System.Windows.Forms.CheckBox();
             this.cbAutoSavePVM = new System.Windows.Forms.CheckBox();
             this.txtOldAffix = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.llSourceCode = new System.Windows.Forms.LinkLabel();
@@ -75,20 +70,26 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label24 = new System.Windows.Forms.Label();
-            this.label25 = new System.Windows.Forms.Label();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.label21 = new System.Windows.Forms.Label();
+            this.label22 = new System.Windows.Forms.Label();
+            this.NbFontSize = new System.Windows.Forms.NumericUpDown();
+            this.NbRowHeight = new System.Windows.Forms.NumericUpDown();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NbFontSize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbRowHeight)).BeginInit();
             this.SuspendLayout();
             // 
             // tabSettings
             // 
             this.tabSettings.Controls.Add(this.tabPage1);
             this.tabSettings.Controls.Add(this.tpFileShortcuts);
+            this.tabSettings.Controls.Add(this.tabPage4);
             this.tabSettings.Controls.Add(this.tabPage2);
             this.tabSettings.Controls.Add(this.tabPage3);
             this.tabSettings.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -284,8 +285,6 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Controls.Add(this.label21);
             this.tabPage2.Controls.Add(this.cbFullWidthImport);
             this.tabPage2.Controls.Add(this.cbAutoSavePVM);
             this.tabPage2.Controls.Add(this.txtOldAffix);
@@ -298,81 +297,6 @@
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.label23);
-            this.groupBox1.Controls.Add(this.label22);
-            this.groupBox1.Controls.Add(this.rbNotChanged);
-            this.groupBox1.Controls.Add(this.rbLeft);
-            this.groupBox1.Controls.Add(this.rbRight);
-            this.groupBox1.Location = new System.Drawing.Point(12, 202);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(653, 73);
-            this.groupBox1.TabIndex = 8;
-            this.groupBox1.TabStop = false;
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(6, 47);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(396, 13);
-            this.label23.TabIndex = 10;
-            this.label23.Text = "Das heißt, dass dann statt \"[Spalte]\" \"[Spalte|L]\" oder \"[Spalte|R]\" genommen wir" +
-    "d";
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(6, 21);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(179, 13);
-            this.label22.TabIndex = 9;
-            this.label22.Text = "Standardformat von \"[Spalte]\" sollte:";
-            // 
-            // rbNotChanged
-            // 
-            this.rbNotChanged.AutoSize = true;
-            this.rbNotChanged.Location = new System.Drawing.Point(410, 19);
-            this.rbNotChanged.Name = "rbNotChanged";
-            this.rbNotChanged.Size = new System.Drawing.Size(104, 17);
-            this.rbNotChanged.TabIndex = 2;
-            this.rbNotChanged.TabStop = true;
-            this.rbNotChanged.Text = "unverändert sein";
-            this.rbNotChanged.UseVisualStyleBackColor = true;
-            // 
-            // rbLeft
-            // 
-            this.rbLeft.AutoSize = true;
-            this.rbLeft.Location = new System.Drawing.Point(205, 19);
-            this.rbLeft.Name = "rbLeft";
-            this.rbLeft.Size = new System.Drawing.Size(91, 17);
-            this.rbLeft.TabIndex = 1;
-            this.rbLeft.TabStop = true;
-            this.rbLeft.Text = "[Spalte|L] sein";
-            this.rbLeft.UseVisualStyleBackColor = true;
-            // 
-            // rbRight
-            // 
-            this.rbRight.AutoSize = true;
-            this.rbRight.Location = new System.Drawing.Point(302, 19);
-            this.rbRight.Name = "rbRight";
-            this.rbRight.Size = new System.Drawing.Size(93, 17);
-            this.rbRight.TabIndex = 0;
-            this.rbRight.TabStop = true;
-            this.rbRight.Text = "[Spalte|R] sein";
-            this.rbRight.UseVisualStyleBackColor = true;
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F);
-            this.label21.Location = new System.Drawing.Point(8, 167);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(203, 20);
-            this.label21.TabIndex = 5;
-            this.label21.Text = "Formular (Spaltenangabe)";
             // 
             // cbFullWidthImport
             // 
@@ -444,6 +368,25 @@
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "Hilfe";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // label25
+            // 
+            this.label25.Location = new System.Drawing.Point(466, 166);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(200, 42);
+            this.label25.TabIndex = 13;
+            this.label25.Text = "|LR, |RL: Text rechts und links wird nicht dazugeschrieben, falls die Spalte leer" +
+    " ist";
+            this.label25.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(291, 181);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(107, 13);
+            this.label24.TabIndex = 12;
+            this.label24.Text = "abc [Spalte1|LR] abc";
             // 
             // label20
             // 
@@ -557,24 +500,71 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Formular";
             // 
-            // label24
+            // tabPage4
             // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(291, 181);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(107, 13);
-            this.label24.TabIndex = 12;
-            this.label24.Text = "abc [Spalte1|LR] abc";
+            this.tabPage4.Controls.Add(this.NbRowHeight);
+            this.tabPage4.Controls.Add(this.NbFontSize);
+            this.tabPage4.Controls.Add(this.label22);
+            this.tabPage4.Controls.Add(this.label21);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(792, 424);
+            this.tabPage4.TabIndex = 4;
+            this.tabPage4.Text = "Tabellen";
+            this.tabPage4.UseVisualStyleBackColor = true;
             // 
-            // label25
+            // label21
             // 
-            this.label25.Location = new System.Drawing.Point(466, 166);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(200, 42);
-            this.label25.TabIndex = 13;
-            this.label25.Text = "|LR, |RL: Text rechts und links wird nicht dazugeschrieben, falls die Spalte leer" +
-    " ist";
-            this.label25.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(8, 45);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(60, 13);
+            this.label21.TabIndex = 0;
+            this.label21.Text = "Zeilenhöhe";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(8, 16);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(64, 13);
+            this.label22.TabIndex = 1;
+            this.label22.Text = "Schriftgröße";
+            // 
+            // NbFontSize
+            // 
+            this.NbFontSize.Location = new System.Drawing.Point(88, 14);
+            this.NbFontSize.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.NbFontSize.Name = "NbFontSize";
+            this.NbFontSize.Size = new System.Drawing.Size(54, 20);
+            this.NbFontSize.TabIndex = 2;
+            this.NbFontSize.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // NbRowHeight
+            // 
+            this.NbRowHeight.Location = new System.Drawing.Point(88, 43);
+            this.NbRowHeight.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.NbRowHeight.Name = "NbRowHeight";
+            this.NbRowHeight.Size = new System.Drawing.Size(54, 20);
+            this.NbRowHeight.TabIndex = 3;
+            this.NbRowHeight.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // SettingForm
             // 
@@ -594,10 +584,12 @@
             this.tpFileShortcuts.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NbFontSize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbRowHeight)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -644,14 +636,12 @@
         private System.Windows.Forms.LinkLabel llSourceCode;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.RadioButton rbNotChanged;
-        private System.Windows.Forms.RadioButton rbLeft;
-        private System.Windows.Forms.RadioButton rbRight;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.NumericUpDown NbRowHeight;
+        private System.Windows.Forms.NumericUpDown NbFontSize;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Label label21;
     }
 }

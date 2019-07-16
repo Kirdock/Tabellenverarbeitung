@@ -34,6 +34,21 @@ namespace DataTableConverter.View
             setEncodingCmb();
             MultipleFiles = multipleFiles;
             cbTakeOver.Visible = multipleFiles;
+            SetDataGridViewStyle();
+        }
+
+        private void SetDataGridViewStyle()
+        {
+            DataGridView[] dataGridViews = new DataGridView[]
+            {
+                dgvHeaders,
+                dgvPreview,
+                dgvSetting
+            };
+            foreach (DataGridView view in dataGridViews)
+            {
+                ViewHelper.SetDataGridViewStyle(view);
+            }
         }
 
         private void SetHeaderDataGridView()
@@ -67,7 +82,12 @@ namespace DataTableConverter.View
 
             cmbEncoding.DisplayMember = "DisplayName";
             cmbEncoding.ValueMember = "CodePage";
-            cmbEncoding.SelectedValue = Properties.Settings.Default.Encoding;
+            SetEncoding(Properties.Settings.Default.Encoding);
+        }
+
+        private void SetEncoding(int encoding)
+        {
+            cmbEncoding.SelectedValue = encoding;
         }
 
         private void cmbEncoding_SelectedIndexChanged(object sender, EventArgs e)
@@ -118,6 +138,11 @@ namespace DataTableConverter.View
             }
             dgvSetting.DataSource = table;
 
+            SetSortMode();
+        }
+
+        private void SetSortMode()
+        {
             foreach (DataGridViewColumn col in dgvSetting.Columns)
             {
                 col.SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -129,7 +154,7 @@ namespace DataTableConverter.View
             try
             {
                 cmbPresets.Items.Clear();
-                cmbPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectPresets, "*.xml")
+                cmbPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectPresets, "*.bin")
                                          .Select(Path.GetFileNameWithoutExtension)
                                          .ToArray());
                 if (cmbPresets.Items.Count > 0)
@@ -145,7 +170,7 @@ namespace DataTableConverter.View
             try
             {
                 cmbHeaderPresets.Items.Clear();
-                cmbHeaderPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectHeaderPresets, "*.xml")
+                cmbHeaderPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectHeaderPresets, "*.bin")
                                          .Select(Path.GetFileNameWithoutExtension)
                                          .ToArray());
                 if (cmbHeaderPresets.Items.Count > 0)
@@ -296,7 +321,7 @@ namespace DataTableConverter.View
             string filename = Microsoft.VisualBasic.Interaction.InputBox("Bitte Name der Vorlage eingeben", "Vorlage speichern", string.Empty);
             if (!string.IsNullOrWhiteSpace(filename))
             {
-                string path = Path.Combine(ExportHelper.ProjectPresets, $"{filename}.xml");
+                string path = Path.Combine(ExportHelper.ProjectPresets, $"{filename}.bin");
                 if (File.Exists(path))
                 {
                     MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Datei mit demselben Namen!");
@@ -304,7 +329,13 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    ((DataTable)dgvSetting.DataSource).WriteXml(path, XmlWriteMode.WriteSchema);
+                    TextImportTemplate template = new TextImportTemplate()
+                    {
+                        Encoding = ((EncodingInfo)cmbEncoding.SelectedItem).CodePage,
+                        Table = (dgvSetting.DataSource as DataTable),
+                        Variant = cmbVariant.SelectedIndex
+                    };
+                    ExportHelper.SaveTextImportTemplate(template, path);
                     LoadPresets();
                 }
             }
@@ -314,13 +345,16 @@ namespace DataTableConverter.View
         {
             if(cmbPresets.SelectedIndex != -1)
             {
-                string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.xml");
+                string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.bin");
                 if (File.Exists(path))
-                { 
-                    cmbVariant.SelectedIndex = 0;
-                    DataTable data = new DataTable();
-                    data.ReadXml(path);
-                    dgvSetting.DataSource = data;
+                {
+                    TextImportTemplate template = ImportHelper.LoadTextImportTemplate(path);
+
+                    cmbVariant.SelectedIndex = template.Variant;
+                    SetEncoding(template.Encoding);
+                    
+                    dgvSetting.DataSource = template.Table;
+                    SetSortMode();
                     dgvSetting_CellValueChanged(null, null);
                 }
                 else
@@ -362,7 +396,7 @@ namespace DataTableConverter.View
                 DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
                 if (result == DialogResult.Yes)
                 {
-                    string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.xml");
+                    string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.bin");
                     if (File.Exists(path))
                     {
                         File.Delete(path);
@@ -485,7 +519,6 @@ namespace DataTableConverter.View
                     dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true);
                 }
             }
-            dgvHeaders.Enabled = !cbContainsHeaders.Checked;
         }
 
         private void dgvSetting_MouseClick(object send, MouseEventArgs e)
@@ -569,8 +602,8 @@ namespace DataTableConverter.View
                     }
                     else
                     {
-                        string path = Path.Combine(ExportHelper.ProjectPresets, $"{oldName}.xml");
-                        string newPath = Path.Combine(ExportHelper.ProjectPresets,$"{newName}.xml");
+                        string path = Path.Combine(ExportHelper.ProjectPresets, $"{oldName}.bin");
+                        string newPath = Path.Combine(ExportHelper.ProjectPresets,$"{newName}.bin");
 
                         File.Move(path, newPath);
                         LoadPresets();
@@ -586,8 +619,11 @@ namespace DataTableConverter.View
 
         private void EndHeadersEdit(object sender, EventArgs e)
         {
-            dgvHeaders.BindingContext[dgvHeaders.DataSource].EndCurrentEdit();
-            radioButton2_CheckedChanged(null, null);
+            if (!cbContainsHeaders.Checked)
+            {
+                dgvHeaders.BindingContext[dgvHeaders.DataSource].EndCurrentEdit();
+                radioButton2_CheckedChanged(null, null);
+            }
         }
 
         private void dgvHeaders_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
@@ -600,7 +636,7 @@ namespace DataTableConverter.View
             string filename = Microsoft.VisualBasic.Interaction.InputBox("Bitte Name der Vorlage eingeben", "Vorlage speichern", string.Empty);
             if (!string.IsNullOrWhiteSpace(filename))
             {
-                string path = Path.Combine(ExportHelper.ProjectHeaderPresets, filename + ".xml");
+                string path = Path.Combine(ExportHelper.ProjectHeaderPresets, filename + ".bin");
                 if (File.Exists(path))
                 {
                     MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Überschriftenvorlage mit demselben Namen!");
@@ -608,7 +644,17 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    ((DataTable)dgvHeaders.DataSource).WriteXml(path, XmlWriteMode.WriteSchema);
+                    TextImportTemplate template = new TextImportTemplate()
+                    {
+                        Encoding = ((EncodingInfo)cmbEncoding.SelectedItem).CodePage,
+                        Table = (dgvHeaders.DataSource as DataTable),
+                        ContainsHeaders = cbContainsHeaders.Checked,
+                        BeginSeparator = txtBegin.Text,
+                        EndSeparator = txtEnd.Text,
+                        StringSeparator = txtSeparator.Text,
+                        SelectedSeparated = rbTab.Checked ? TextImportTemplate.SelectedSeparatedState.Tab : rbSep.Checked ? TextImportTemplate.SelectedSeparatedState.TabCharacter : TextImportTemplate.SelectedSeparatedState.Between
+                    };
+                    ExportHelper.SaveTextImportTemplate(template, path);
                     LoadHeaderPresets();
                 }
             }
@@ -618,13 +664,22 @@ namespace DataTableConverter.View
         {
             if (cmbHeaderPresets.SelectedIndex != -1)
             {
-                string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString() + ".xml");
+                string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString() + ".bin");
                 if(File.Exists(path))
                 {
-                    DataTable data = new DataTable();
-                    data.ReadXml(path);
-                    dgvHeaders.DataSource = data;
-                    dgvHeaders_CellEndEdit(null, null);
+                    TextImportTemplate template = ImportHelper.LoadTextImportTemplate(path);
+                    SetEncoding(template.Encoding);
+
+                    rbTab.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.Tab;
+                    rbSep.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.TabCharacter;
+                    rbBetween.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.Between;
+
+                    txtBegin.Text = template.BeginSeparator;
+                    txtEnd.Text = template.EndSeparator;
+                    txtSeparator.Text = template.StringSeparator;
+                    dgvHeaders.DataSource = template.Table;
+                    cbContainsHeaders.Checked = template.ContainsHeaders;
+                    radioButton2_CheckedChanged(null, null);
                 }
                 else
                 {
@@ -640,7 +695,7 @@ namespace DataTableConverter.View
                 DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
                 if (result == DialogResult.Yes)
                 {
-                    string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString()+".xml");
+                    string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString()+".bin");
                     if (File.Exists(path))
                     {
                         File.Delete(path);
@@ -666,8 +721,8 @@ namespace DataTableConverter.View
                     }
                     else
                     {
-                        string path = Path.Combine(ExportHelper.ProjectHeaderPresets, $"{oldName}.xml");
-                        string newPath = Path.Combine(ExportHelper.ProjectHeaderPresets, $"{newName}.xml");
+                        string path = Path.Combine(ExportHelper.ProjectHeaderPresets, $"{oldName}.bin");
+                        string newPath = Path.Combine(ExportHelper.ProjectHeaderPresets, $"{newName}.bin");
 
                         File.Move(path, newPath);
                         LoadHeaderPresets();

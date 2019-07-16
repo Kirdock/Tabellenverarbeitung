@@ -36,6 +36,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cmbEncoding = new System.Windows.Forms.ComboBox();
             this.gbSeparated = new System.Windows.Forms.GroupBox();
+            this.btnHeaderRename = new System.Windows.Forms.Button();
+            this.btnHeaderSave = new System.Windows.Forms.Button();
+            this.btnHeaderDelete = new System.Windows.Forms.Button();
+            this.btnHeaderLoad = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cmbHeaderPresets = new System.Windows.Forms.ComboBox();
             this.dgvHeaders = new System.Windows.Forms.DataGridView();
             this.cbContainsHeaders = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -63,12 +69,6 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmbHeaderPresets = new System.Windows.Forms.ComboBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.btnHeaderLoad = new System.Windows.Forms.Button();
-            this.btnHeaderDelete = new System.Windows.Forms.Button();
-            this.btnHeaderSave = new System.Windows.Forms.Button();
-            this.btnHeaderRename = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
@@ -176,6 +176,64 @@
             this.gbSeparated.TabStop = false;
             this.gbSeparated.Text = "Getrennt";
             this.gbSeparated.Visible = false;
+            // 
+            // btnHeaderRename
+            // 
+            this.btnHeaderRename.Location = new System.Drawing.Point(690, 133);
+            this.btnHeaderRename.Name = "btnHeaderRename";
+            this.btnHeaderRename.Size = new System.Drawing.Size(92, 23);
+            this.btnHeaderRename.TabIndex = 17;
+            this.btnHeaderRename.Text = "Umbenennen";
+            this.btnHeaderRename.UseVisualStyleBackColor = true;
+            this.btnHeaderRename.Click += new System.EventHandler(this.btnHeaderRename_Click);
+            // 
+            // btnHeaderSave
+            // 
+            this.btnHeaderSave.Location = new System.Drawing.Point(591, 133);
+            this.btnHeaderSave.Name = "btnHeaderSave";
+            this.btnHeaderSave.Size = new System.Drawing.Size(94, 23);
+            this.btnHeaderSave.TabIndex = 16;
+            this.btnHeaderSave.Text = "Speichern";
+            this.btnHeaderSave.UseVisualStyleBackColor = true;
+            this.btnHeaderSave.Click += new System.EventHandler(this.btnHeaderSave_Click);
+            // 
+            // btnHeaderDelete
+            // 
+            this.btnHeaderDelete.Location = new System.Drawing.Point(691, 85);
+            this.btnHeaderDelete.Name = "btnHeaderDelete";
+            this.btnHeaderDelete.Size = new System.Drawing.Size(91, 23);
+            this.btnHeaderDelete.TabIndex = 15;
+            this.btnHeaderDelete.Text = "Löschen";
+            this.btnHeaderDelete.UseVisualStyleBackColor = true;
+            this.btnHeaderDelete.Click += new System.EventHandler(this.btnHeaderDelete_Click);
+            // 
+            // btnHeaderLoad
+            // 
+            this.btnHeaderLoad.Location = new System.Drawing.Point(591, 85);
+            this.btnHeaderLoad.Name = "btnHeaderLoad";
+            this.btnHeaderLoad.Size = new System.Drawing.Size(94, 23);
+            this.btnHeaderLoad.TabIndex = 14;
+            this.btnHeaderLoad.Text = "Laden";
+            this.btnHeaderLoad.UseVisualStyleBackColor = true;
+            this.btnHeaderLoad.Click += new System.EventHandler(this.btnHeaderLoad_Click);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(591, 29);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(52, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "Vorlagen:";
+            // 
+            // cmbHeaderPresets
+            // 
+            this.cmbHeaderPresets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbHeaderPresets.FormattingEnabled = true;
+            this.cmbHeaderPresets.Location = new System.Drawing.Point(591, 48);
+            this.cmbHeaderPresets.Name = "cmbHeaderPresets";
+            this.cmbHeaderPresets.Size = new System.Drawing.Size(191, 21);
+            this.cmbHeaderPresets.TabIndex = 12;
             // 
             // dgvHeaders
             // 
@@ -460,71 +518,13 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
-            // cmbHeaderPresets
-            // 
-            this.cmbHeaderPresets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbHeaderPresets.FormattingEnabled = true;
-            this.cmbHeaderPresets.Location = new System.Drawing.Point(591, 48);
-            this.cmbHeaderPresets.Name = "cmbHeaderPresets";
-            this.cmbHeaderPresets.Size = new System.Drawing.Size(191, 21);
-            this.cmbHeaderPresets.TabIndex = 12;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(591, 29);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(52, 13);
-            this.label5.TabIndex = 13;
-            this.label5.Text = "Vorlagen:";
-            // 
-            // btnHeaderLoad
-            // 
-            this.btnHeaderLoad.Location = new System.Drawing.Point(591, 85);
-            this.btnHeaderLoad.Name = "btnHeaderLoad";
-            this.btnHeaderLoad.Size = new System.Drawing.Size(94, 23);
-            this.btnHeaderLoad.TabIndex = 14;
-            this.btnHeaderLoad.Text = "Laden";
-            this.btnHeaderLoad.UseVisualStyleBackColor = true;
-            this.btnHeaderLoad.Click += new System.EventHandler(this.btnHeaderLoad_Click);
-            // 
-            // btnHeaderDelete
-            // 
-            this.btnHeaderDelete.Location = new System.Drawing.Point(691, 85);
-            this.btnHeaderDelete.Name = "btnHeaderDelete";
-            this.btnHeaderDelete.Size = new System.Drawing.Size(91, 23);
-            this.btnHeaderDelete.TabIndex = 15;
-            this.btnHeaderDelete.Text = "Löschen";
-            this.btnHeaderDelete.UseVisualStyleBackColor = true;
-            this.btnHeaderDelete.Click += new System.EventHandler(this.btnHeaderDelete_Click);
-            // 
-            // btnHeaderSave
-            // 
-            this.btnHeaderSave.Location = new System.Drawing.Point(591, 133);
-            this.btnHeaderSave.Name = "btnHeaderSave";
-            this.btnHeaderSave.Size = new System.Drawing.Size(94, 23);
-            this.btnHeaderSave.TabIndex = 16;
-            this.btnHeaderSave.Text = "Speichern";
-            this.btnHeaderSave.UseVisualStyleBackColor = true;
-            this.btnHeaderSave.Click += new System.EventHandler(this.btnHeaderSave_Click);
-            // 
-            // btnHeaderRename
-            // 
-            this.btnHeaderRename.Location = new System.Drawing.Point(690, 133);
-            this.btnHeaderRename.Name = "btnHeaderRename";
-            this.btnHeaderRename.Size = new System.Drawing.Size(92, 23);
-            this.btnHeaderRename.TabIndex = 17;
-            this.btnHeaderRename.Text = "Umbenennen";
-            this.btnHeaderRename.UseVisualStyleBackColor = true;
-            this.btnHeaderRename.Click += new System.EventHandler(this.btnHeaderRename_Click);
-            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 576);
-            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.gbFixed);
+            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.MinimumSize = new System.Drawing.Size(816, 615);

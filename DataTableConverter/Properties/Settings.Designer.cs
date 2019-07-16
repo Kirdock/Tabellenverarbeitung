@@ -480,13 +480,25 @@ namespace DataTableConverter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public int DefaultFormular {
+        [global::System.Configuration.DefaultSettingValueAttribute("22")]
+        public int RowHeight {
             get {
-                return ((int)(this["DefaultFormular"]));
+                return ((int)(this["RowHeight"]));
             }
             set {
-                this["DefaultFormular"] = value;
+                this["RowHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public int TableFontSize {
+            get {
+                return ((int)(this["TableFontSize"]));
+            }
+            set {
+                this["TableFontSize"] = value;
             }
         }
     }

@@ -27,6 +27,7 @@ namespace DataTableConverter.View
             InitDataGridView(headers);
             UIHelper = new ViewHelper(ctxRow, null, null);
             UIHelper.AddContextMenuToDataGridView(dgvMerge, false);
+            ViewHelper.SetDataGridViewStyle(dgvMerge);
         }
 
         private void InitDataGridView(object[] headers)
