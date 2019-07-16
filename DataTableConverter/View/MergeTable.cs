@@ -10,7 +10,7 @@ namespace DataTableConverter.View
     {
         private object[] Headers;
 
-        internal MergeTable(object[] headersOriginal, object[] headersMerge)
+        internal MergeTable(object[] headersOriginal, object[] headersMerge, string filename, int sourceCount, int importCount)
         {
             InitializeComponent();
             Headers = headersOriginal;
@@ -19,6 +19,11 @@ namespace DataTableConverter.View
             setListItems(headersMerge);
             setSettings();
             setOrderVisibility(chbRememberOrder.Checked);
+            lblImportTable.Text = filename;
+
+            lblRowCountImport.ForeColor = lblRowCountSource.ForeColor = lblSourceTable.ForeColor = lblImportTableText.ForeColor = sourceCount == importCount ? System.Drawing.Color.Green : System.Drawing.Color.Red;
+            lblRowCountImport.Text = importCount.ToString();
+            lblRowCountSource.Text = sourceCount.ToString();
         }
 
         private void setSettings()

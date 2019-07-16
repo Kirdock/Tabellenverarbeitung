@@ -318,14 +318,14 @@ namespace DataTableConverter
         {
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
             DataTable table = GetDataSource();
-            List<string> headers = table.HeadersToLower();
+            List<string> headers = new List<string>(table.HeadersOfDataTableAsString());
             
 
             foreach (WorkProc wp in workflow.Procedures)
             {
                 List<string> notFoundColumns = new List<string>();
                 string[] wpHeaders = wp.GetHeaders();
-                WorkflowHelper.CheckHeaders(headers, notFoundColumns, wpHeaders);
+
                 if (!string.IsNullOrWhiteSpace(wp.NewColumn))
                 {
                     headers.Add(wp.NewColumn);
@@ -334,6 +334,9 @@ namespace DataTableConverter
                 {
                     headers.AddRange(wpHeaders.Select(header => header + Properties.Settings.Default.OldAffix));
                 }
+
+                WorkflowHelper.CheckHeaders(headers, notFoundColumns, wpHeaders);
+                
 
                 if(notFoundColumns.Count > 0)
                 {
@@ -483,7 +486,7 @@ namespace DataTableConverter
                 switch (state)
                 {
                     case ImportState.Merge:
-                        ShowMergeForm(table, oldTable);
+                        ShowMergeForm(table, oldTable, filename);
                         break;
 
                     case ImportState.Append:
@@ -505,9 +508,9 @@ namespace DataTableConverter
             }
         }
 
-        private void ShowMergeForm(DataTable importTable, DataTable sourceTable)
+        private void ShowMergeForm(DataTable importTable, DataTable sourceTable, string filename)
         {
-            MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable());
+            MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
             if (form.ShowDialog() == DialogResult.OK)
             {
                 string[] ImportColumns = form.getSelectedColumns();
@@ -1264,11 +1267,6 @@ namespace DataTableConverter
             }
         }
 
-        private void einstellungenToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            new SettingForm().Show();
-        }
-
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UpdateHelper.CheckUpdate(false, pgbLoading);
@@ -1387,13 +1385,20 @@ namespace DataTableConverter
         private void einstellungenToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
             SettingForm form = new SettingForm();
-            form.FormClosed += SettingForm_FormClosed;
+            int oldHeight = Properties.Settings.Default.RowHeight;
+            form.FormClosed += (s2, e2) => SettingForm_FormClosed(s2, e2, oldHeight);
             form.Show();
         }
 
-        private void SettingForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void SettingForm_FormClosed(object sender, FormClosedEventArgs e, int oldHeight)
         {
-            ViewHelper.SetDataGridViewStyle(dgTable);
+            dgTable.DefaultCellStyle.Font = new Font(dgTable.DefaultCellStyle.Font.Name, Properties.Settings.Default.TableFontSize);
+            dgTable.RowTemplate.Height = Properties.Settings.Default.RowHeight;
+
+            if (oldHeight != Properties.Settings.Default.RowHeight)
+            {
+                AssignDataSource();
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

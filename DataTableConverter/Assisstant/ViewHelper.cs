@@ -386,11 +386,10 @@ namespace DataTableConverter
         internal static void SetControlColor(Control control)
         {
             control.BackColor = control.Enabled ? Color.White : Properties.Settings.Default.Locked;
-            foreach (Control c in GetControlHierarchy(control))
-            {
-                c.ForeColor = SystemColors.ControlText;
-                Console.WriteLine(c.Text);
-            }
+            //foreach (Control c in GetControlHierarchy(control))
+            //{
+            //    c.ForeColor = SystemColors.ControlText;
+            //}
         }
 
         private static IEnumerable<Control> GetControlHierarchy(Control root)

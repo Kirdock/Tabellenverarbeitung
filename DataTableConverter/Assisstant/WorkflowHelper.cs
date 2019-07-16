@@ -71,7 +71,7 @@ namespace DataTableConverter.Assisstant
             for (int i = 0; i < headers.Length; i++)
             {
                 string headerText = headers[i];
-                if (!tableHeader.Contains(headerText.ToLower()))
+                if (!tableHeader.Contains(headerText))
                 {
                     notFoundColumns.Add(headerText);
                 }

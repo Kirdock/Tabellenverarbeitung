@@ -39,6 +39,11 @@
             this.chbRememberOrder = new System.Windows.Forms.CheckBox();
             this.txtOrder = new System.Windows.Forms.TextBox();
             this.lblOrder = new System.Windows.Forms.Label();
+            this.lblImportTable = new System.Windows.Forms.Label();
+            this.lblSourceTable = new System.Windows.Forms.Label();
+            this.lblImportTableText = new System.Windows.Forms.Label();
+            this.lblRowCountSource = new System.Windows.Forms.Label();
+            this.lblRowCountImport = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // cmbIdentifierOriginal
@@ -143,11 +148,61 @@
             this.lblOrder.TabIndex = 10;
             this.lblOrder.Text = "Name der Spalte:";
             // 
+            // lblImportTable
+            // 
+            this.lblImportTable.AutoSize = true;
+            this.lblImportTable.Location = new System.Drawing.Point(374, 9);
+            this.lblImportTable.Name = "lblImportTable";
+            this.lblImportTable.Size = new System.Drawing.Size(63, 13);
+            this.lblImportTable.TabIndex = 11;
+            this.lblImportTable.Text = "ImportTable";
+            // 
+            // lblSourceTable
+            // 
+            this.lblSourceTable.AutoSize = true;
+            this.lblSourceTable.Location = new System.Drawing.Point(12, 256);
+            this.lblSourceTable.Name = "lblSourceTable";
+            this.lblSourceTable.Size = new System.Drawing.Size(204, 13);
+            this.lblSourceTable.TabIndex = 12;
+            this.lblSourceTable.Text = "Anzahl der Zeilen, der geladenen Tabelle:";
+            // 
+            // lblImportTableText
+            // 
+            this.lblImportTableText.AutoSize = true;
+            this.lblImportTableText.Location = new System.Drawing.Point(12, 285);
+            this.lblImportTableText.Name = "lblImportTableText";
+            this.lblImportTableText.Size = new System.Drawing.Size(237, 13);
+            this.lblImportTableText.TabIndex = 13;
+            this.lblImportTableText.Text = "Anzahl der Zeilen, der zu importierenden Tabelle:";
+            // 
+            // lblRowCountSource
+            // 
+            this.lblRowCountSource.AutoSize = true;
+            this.lblRowCountSource.Location = new System.Drawing.Point(256, 256);
+            this.lblRowCountSource.Name = "lblRowCountSource";
+            this.lblRowCountSource.Size = new System.Drawing.Size(48, 13);
+            this.lblRowCountSource.TabIndex = 14;
+            this.lblRowCountSource.Text = "Anzahl 1";
+            // 
+            // lblRowCountImport
+            // 
+            this.lblRowCountImport.AutoSize = true;
+            this.lblRowCountImport.Location = new System.Drawing.Point(256, 285);
+            this.lblRowCountImport.Name = "lblRowCountImport";
+            this.lblRowCountImport.Size = new System.Drawing.Size(48, 13);
+            this.lblRowCountImport.TabIndex = 15;
+            this.lblRowCountImport.Text = "Anzahl 2";
+            // 
             // MergeTable
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(690, 365);
+            this.Controls.Add(this.lblRowCountImport);
+            this.Controls.Add(this.lblRowCountSource);
+            this.Controls.Add(this.lblImportTableText);
+            this.Controls.Add(this.lblSourceTable);
+            this.Controls.Add(this.lblImportTable);
             this.Controls.Add(this.lblOrder);
             this.Controls.Add(this.txtOrder);
             this.Controls.Add(this.chbRememberOrder);
@@ -182,5 +237,10 @@
         private System.Windows.Forms.CheckBox chbRememberOrder;
         private System.Windows.Forms.TextBox txtOrder;
         private System.Windows.Forms.Label lblOrder;
+        private System.Windows.Forms.Label lblImportTable;
+        private System.Windows.Forms.Label lblSourceTable;
+        private System.Windows.Forms.Label lblImportTableText;
+        private System.Windows.Forms.Label lblRowCountSource;
+        private System.Windows.Forms.Label lblRowCountImport;
     }
 }

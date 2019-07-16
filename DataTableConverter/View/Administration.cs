@@ -613,6 +613,7 @@ namespace DataTableConverter.View
         private void SetMergeControls( WorkProc selectedProc)
         {
             SetCmbHeader(selectedProc.Formula);
+            txtNewColumnMerge.Text = selectedProc.NewColumn;
             lblOriginalNameText.Text = ProcMerge.ClassName;
             SetDataSource(dgvMerge, ((ProcMerge)selectedProc).Conditions);
         }
@@ -817,7 +818,7 @@ namespace DataTableConverter.View
 
         private void SetNewColumnText(string text)
         {
-            txtNewColumn.Text = txtNewColumnMerge.Text = text;
+            txtNewColumn.Text = text;
         }
 
         private string GetProcedureName(int id)
@@ -976,12 +977,12 @@ namespace DataTableConverter.View
 
         private void txtNewColumn_TextChanged(object sender, EventArgs e)
         {
-            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].NewColumn = ((TextBox)sender).Text;
+            GetSelectedWorkProcedure().NewColumn = (sender as TextBox)?.Text;
         }
 
         private void txtFormula_TextChanged(object sender, EventArgs e)
         {
-            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Formula = txtFormula.Text;
+            GetSelectedWorkProcedure().Formula = (sender as TextBox)?.Text;
         }
 
         private void addColumnToFormula(string column)
