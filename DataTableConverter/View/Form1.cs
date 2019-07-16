@@ -948,92 +948,10 @@ namespace DataTableConverter
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCustom formula = new ExportCustom(sourceTable.HeadersOfDataTable(), sourceTable);
-            formula.FormClosed += new FormClosedEventHandler(saveExportClosed);
-            formula.Show();
-        }
-
-        private void saveExportClosed(object sender, FormClosedEventArgs e)
-        {
-            DataTable originalTable = GetDataSource(true);
-            ExportCustom export = (ExportCustom)sender;
-            if (export.DialogResult == DialogResult.OK && export.ColumnIndex > -1)
+            ExportCustom export = new ExportCustom(sourceTable.HeadersOfDataTable(), sourceTable);
+            if(export.ShowDialog() == DialogResult.OK)
             {
-                Dictionary<string, List<DataTable>> Dict = new Dictionary<string, List<DataTable>>();
-                DataTable tableSkeleton = new DataTable() { TableName = null };
-                originalTable.Columns.Cast<DataColumn>().Select(Column => Column.ColumnName).ToList().ForEach(Header => tableSkeleton.Columns.Add(Header));
-                if (export.AllValues())
-                {
-                    export.ValuesOfColumn().ForEach(value => Dict.Add(value, new List<DataTable> { tableSkeleton.Copy() }));
-                }
-                else
-                {
-                    foreach(string key in export.Files.Keys)
-                    {
-                        if(export.Files.TryGetValue(key,out List<string> values))
-                        {
-                            DataTable temp = tableSkeleton.Copy();
-                            temp.TableName = key;
-                            foreach (string value in values) {
-                                if (Dict.TryGetValue(value, out List<DataTable> tables))
-                                {
-                                    tables.Add(temp);
-                                }
-                                else
-                                {
-                                    Dict.Add(value, new List<DataTable> { temp });
-                                }
-                            }
-                        }
-                    }
-                }
-                for (int i = 0; i < originalTable.Rows.Count; i++)
-                {
-                    if(Dict.TryGetValue(originalTable.Rows[i][export.ColumnIndex].ToString(),out List<DataTable> tables))
-                    {
-                        tables.ForEach(table => table.ImportRow(originalTable.Rows[i]));
-                    }
-                }
-                StartLoadingBar();
-                int Format = export.SelectedFormat;
-                new Thread(() =>
-                {
-                    foreach (string Key in Dict.Keys)
-                    {
-                        if (Dict.TryGetValue(Key, out List<DataTable> tables))
-                        {
-                            foreach (DataTable Table in tables)
-                            {
-                                string FileName = Table.TableName == string.Empty ? $"{Path.GetFileNameWithoutExtension(FilePath)} {Key}" : Table.TableName;
-                                string path = Path.GetDirectoryName(FilePath);
-                                switch (Format)
-                                {
-                                    //CSV
-                                    case 0:
-                                        {
-                                            ExportHelper.ExportCsv(Table, path, FileName);
-                                        }
-                                        break;
-
-                                    //Dbase
-                                    case 1:
-                                        {
-                                            ExportHelper.ExportDbase(FileName, Table, path);
-                                        }
-                                        break;
-
-                                    //Excel
-                                    case 2:
-                                        {
-                                            ExportHelper.ExportExcel(Table, path, FileName);
-                                        }
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                    StopLoadingBar();
-                }).Start();
+                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath,StartLoadingBar, StopLoadingBar);
             }
         }
 

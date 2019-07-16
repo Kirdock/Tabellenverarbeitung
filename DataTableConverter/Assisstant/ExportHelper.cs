@@ -13,6 +13,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
 using DataTableConverter.Extensions;
+using System.Threading;
 
 namespace DataTableConverter
 {
@@ -390,6 +391,80 @@ namespace DataTableConverter
         private static string GetConnection(string path)
         {
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
+        }
+
+        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action startLoadingBar, Action stopLoadingBar)
+        {
+            startLoadingBar.Invoke();
+            new Thread(() =>
+            {
+
+                foreach (ExportCustomItem item in items)
+                {
+                    Dictionary<string, DataTable> Dict = new Dictionary<string, DataTable>();
+                    DataTable tableSkeleton = originalTable.Clone();
+                    if (item.CheckedAllValues)
+                    {
+                        foreach (string value in item.AllValues)
+                        {
+                            DataTable table = tableSkeleton.Copy();
+                            table.TableName = $"{item.Name}_{value}";
+                            Dict.Add(value, table);
+                        }
+                    }
+                    else
+                    {
+
+                        DataTable temp = tableSkeleton.Copy();
+                        temp.TableName = item.Name;
+                        foreach (string value in item.SelectedValues)
+                        {
+                            if (!Dict.TryGetValue(value, out DataTable tables))
+                            {   
+                                Dict.Add(value, temp);
+                            }
+                        }
+                    }
+                    foreach(DataRow row in originalTable.Rows)
+                    {
+                        if (Dict.TryGetValue(row[item.Column].ToString(), out DataTable table))
+                        {
+                            table.ImportRow(row);
+                        }
+                    }
+
+                    foreach (DataTable table in Dict.Values.Distinct())
+                    {
+                        string FileName = table.TableName;
+                        string path = Path.GetDirectoryName(filePath);
+                        switch (item.Format)
+                        {
+                            //CSV
+                            case 0:
+                                {
+                                    ExportCsv(table, path, FileName);
+                                }
+                                break;
+
+                            //Dbase
+                            case 1:
+                                {
+                                    ExportDbase(FileName, table, path);
+                                }
+                                break;
+
+                            //Excel
+                            case 2:
+                                {
+                                    ExportExcel(table, path, FileName);
+                                }
+                                break;
+                        }
+                    }
+                }
+                stopLoadingBar.Invoke();
+            }).Start();
+            
         }
     }
 }

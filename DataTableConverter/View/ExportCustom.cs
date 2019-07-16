@@ -15,163 +15,106 @@ namespace DataTableConverter.View
 {
     public partial class ExportCustom : Form
     {
-        internal int SelectedFormat { get { return CmBFormat.SelectedIndex; } }
+        internal IEnumerable<ExportCustomItem> Items => CmBFileNames.Items.Cast<ExportCustomItem>();
         private readonly DataTable Table;
-        internal Dictionary<string, List<string>> Files { get; set; }
-        internal int ColumnIndex => cmbColumn.SelectedIndex;
+        private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
         internal ExportCustom(object[] headers, DataTable table)
         {
             InitializeComponent();
-            Files = new Dictionary<string, List<string>>();
             Table = table;
             cmbColumn.Items.AddRange(headers);
-            SetData();
+            
+            SetEnabled();
         }
 
-        private void SetData()
+        private void SetEnabled()
         {
-            CmBFormat.SelectedIndex = Properties.Settings.Default.ExportCustomFormat;
-            CbSaveAll.Checked = Properties.Settings.Default.ExportCustomCheck;
-            CbSaveAll_CheckedChanged(null, null);
-        }
-
-        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
-        {
-            if(e.KeyCode == Keys.Enter)
+            bool enabled = CmBFileNames.SelectedIndex != -1;
+            Control[] controls = new Control[]
             {
-                closeConfirmed();
+                cmbColumn,
+                CmBFormat,
+                clbValues,
+                CbSaveAll,
+                CmBFileNames
+            };
+
+            foreach(Control control in controls)
+            {
+                control.Enabled = enabled;
             }
+            clbValues.Enabled = enabled && !CbSaveAll.Checked;
         }
 
-        private void closeConfirmed()
+        private void CloseConfirmed()
         {
             DialogResult = DialogResult.OK;
-            Close();
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            closeConfirmed();
+            CloseConfirmed();
         }
 
         private void CbSaveAll_CheckedChanged(object sender, EventArgs e)
         {
-            gbFiles.Enabled = !CbSaveAll.Checked;
-        }
-
-        internal bool AllValues()
-        {
-            return CbSaveAll.Checked;
-        }
-
-        private void ExportCustom_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            Properties.Settings.Default.ExportCustomFormat = CmBFormat.SelectedIndex;
-            Properties.Settings.Default.ExportCustomCheck = CbSaveAll.Checked;
-            Properties.Settings.Default.Save();
-        }
-
-        internal List<string> ValuesOfColumn (){
-            return clbValues.Items.Cast<CountListboxItem>().Select(item => item.Value?.ToString()).ToList();
+            SetEnabled();
+            SelectedItem.CheckedAllValues = CbSaveAll.Checked;
         }
 
         private void cmbColumn_SelectedIndexChanged(object sender, EventArgs e)
         {
             clbValues.Items.Clear();
-            
-            Dictionary<string, int> pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
-            foreach (string key in pair.Keys)
+            if (CmBFileNames.SelectedIndex > -1)
             {
-                if (pair.TryGetValue(key, out int value)) {
-                    clbValues.Items.Add(new CountListboxItem(value, key));
+                SelectedItem.Column = (sender as ComboBox).SelectedItem.ToString();
+
+                Dictionary<string, int> pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
+                foreach (string key in pair.Keys)
+                {
+                    clbValues.Items.Add(new CountListboxItem(pair[key], key));
                 }
+                SetValues();
             }
-
-            foreach(List<string> value in Files.Values)
-            {
-                value.Clear();
-            }
-        }
-
-        private void cmbFiles_KeyDown(object sender, KeyEventArgs e)
-        {
-            int index = -1;
-            if(e.KeyCode == Keys.Enter && !string.IsNullOrWhiteSpace(cmbFiles.Text) && !((index = cmbFiles.Items.IndexOf(cmbFiles.Text)) > -1))
-            {
-                AddFile(cmbFiles.Text);
-            }
-            if(index > -1)
-            {
-                cmbColumn.SelectedIndex = index;
-            }
-        }
-
-        private void AddFile(string name)
-        {
-            cmbFiles.Items.Add(name);
-            Files.Add(name, new List<string>());
-
-            cmbFiles.SelectedIndex = cmbFiles.Items.IndexOf(name);
         }
 
         private void btnDeleteFile_Click(object sender, EventArgs e)
         {
-            int index;
-            if((index = cmbFiles.Items.IndexOf(cmbFiles.Text)) != -1)
+            if(CmBFileNames.SelectedIndex != -1)
             {
-                Files.Remove(cmbFiles.Text);
-                cmbFiles.Items.RemoveAt(index);
-
-                ResetCheckedListBoxValues(clbValues, clbValues_ItemCheck);
-                if (cmbFiles.Items.Count > 0)
+                CmBFileNames.Items.RemoveAt(CmBFileNames.SelectedIndex);
+                if (CmBFileNames.Items.Count > 0)
                 {
-                    cmbFiles.SelectedIndex = 0;
+                    CmBFileNames.SelectedIndex = 0;
                 }
-                else
-                {
-                    cmbFiles.Text = string.Empty;
-                }
+                SetEnabled();
             }
-            
         }
 
         private void clbValues_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if(Files.TryGetValue(cmbFiles.Text, out List<string> values))
-            {
-                string changedValue = clbValues.Items[e.Index].ToString();
-                if (e.NewValue == CheckState.Checked)
-                {
-                    values.Add(changedValue);
-                }
-                else
-                {
-                    values.Remove(changedValue);
-                }
-            }
-            else if(!string.IsNullOrWhiteSpace(cmbFiles.Text))
-            {
-                AddFile(cmbFiles.Text);
-                clbValues_ItemCheck(sender, e);
-            }
+
+            string changedValue = clbValues.Items[e.Index].ToString();
+            SelectedItem.Values[changedValue] = e.NewValue == CheckState.Checked;
+
             SetSumCount((e.NewValue == CheckState.Checked ? 1 : -1)*( clbValues.Items[e.Index] as CountListboxItem).Count);
         }
 
-        private void cmbFiles_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmBFileNames_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ResetCheckedListBoxValues(clbValues, clbValues_ItemCheck);
-            if (Files.TryGetValue(cmbFiles.Text, out List<string> values))
+            cmbColumn.SelectedItem = SelectedItem.Column;
+            CmBFormat.SelectedIndex = SelectedItem.Format;
+            CbSaveAll.Checked = SelectedItem.CheckedAllValues;
+
+            clbValues.ItemCheck -= clbValues_ItemCheck;
+
+            for(int i = 0; i < clbValues.Items.Count; i++)
             {
-                clbValues.ItemCheck -= clbValues_ItemCheck;
-                foreach (string value in values) {
-                    int index;
-                    if((index = clbValues.Items.IndexOf(new CountListboxItem(0,value))) > -1)
-                    {
-                        clbValues.SetItemChecked(index, true);
-                    }
-                }
-                clbValues.ItemCheck += clbValues_ItemCheck;
+                clbValues.SetItemChecked(i, SelectedItem.Values[clbValues.Items[i].ToString()]);
             }
+            
+            clbValues.ItemCheck += clbValues_ItemCheck;
+
             SetSumCount();
         }
 
@@ -180,19 +123,59 @@ namespace DataTableConverter.View
             lblSumCount.Text = (clbValues.CheckedItems.Cast<CountListboxItem>().Sum(item => item.Count) + add).ToString();
         }
 
-        private void ResetCheckedListBoxValues(CheckedListBox box, ItemCheckEventHandler handler)
+        private void BtnAdd_Click(object sender, EventArgs e)
         {
-            box.ItemCheck -= handler;
-            foreach (int i in box.CheckedIndices)
+            string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte Dateinamen eingeben", "Dateiname", string.Empty);
+            if (!string.IsNullOrWhiteSpace(newText))
             {
-                box.SetItemChecked(i, false);
+                if (CmBFileNames.Items.Cast<ExportCustomItem>().Select(item => item.Name).Contains(newText))
+                {
+                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                    BtnAdd_Click(null, null);
+                }
+                else
+                {
+                    var item = new ExportCustomItem(newText, cmbColumn.Items[0].ToString());
+                    SetValues(item);
+                    int index = CmBFileNames.Items.Count;
+                    CmBFileNames.Items.Add(item);
+                    CmBFileNames.SelectedIndex = index;
+                    CmBFormat.SelectedIndex = cmbColumn.SelectedIndex = 0;
+                    SetEnabled();
+                }
             }
-            box.ItemCheck += handler;
         }
 
-        private void cmbFiles_TextChanged(object sender, EventArgs e)
+        private void SetValues(ExportCustomItem i = null)
         {
-            cmbFiles_SelectedIndexChanged(null, null);
+            ExportCustomItem item = i ?? SelectedItem;
+            item.SetValues(clbValues.Items.Cast<CountListboxItem>().Select(x => x.ToString()));
+        }
+
+        private void CmBFormat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SelectedItem.Format = (sender as ComboBox).SelectedIndex;
+        }
+
+        private void BtnRename_Click(object sender, EventArgs e)
+        {
+            if(CmBFileNames.SelectedIndex > -1)
+            {
+                string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte den Dateinamen eingeben", "Dateiname", SelectedItem.Name);
+                if (!string.IsNullOrWhiteSpace(newText))
+                {
+                    if (newText != SelectedItem.Name && CmBFileNames.Items.Cast<ExportCustomItem>().Select(item => item.Name).Contains(newText))
+                    {
+                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                        BtnRename_Click(null, null);
+                    }
+                    else
+                    {
+                        SelectedItem.Name = newText;
+                        CmBFileNames.Items[CmBFileNames.SelectedIndex] = SelectedItem;
+                    }
+                }
+            }
         }
     }
 }

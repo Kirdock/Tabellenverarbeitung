@@ -68,14 +68,7 @@ namespace DataTableConverter.Assisstant
 
         internal static void CheckHeaders(List<string> tableHeader, List<string> notFoundColumns, string[] headers)
         {
-            for (int i = 0; i < headers.Length; i++)
-            {
-                string headerText = headers[i];
-                if (!tableHeader.Contains(headerText))
-                {
-                    notFoundColumns.Add(headerText);
-                }
-            }
+            notFoundColumns.AddRange(headers.Where(header => !tableHeader.Contains(header, System.StringComparer.OrdinalIgnoreCase)));
         }
 
         internal static string[] RemoveEmptyHeaders(IEnumerable<string> headers)
