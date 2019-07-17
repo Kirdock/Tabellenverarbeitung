@@ -46,7 +46,7 @@ namespace DataTableConverter.View
             }
             else
             {
-                dgvPadConditions.BindingContext[dgvPadConditions.DataSource].EndCurrentEdit();
+                ViewHelper.EndDataGridViewEdit(dgvPadConditions);
                 Proc.Character = TxtCharacter.Text[0];
                 Proc.OperationSide = RbLeft.Checked ? ProcPadding.Side.Left : ProcPadding.Side.Right;
                 Proc.Counter = (int)nbPadCount.Value;

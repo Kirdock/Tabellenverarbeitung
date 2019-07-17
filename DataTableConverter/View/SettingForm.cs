@@ -12,13 +12,22 @@ namespace DataTableConverter.View
 {
     public partial class SettingForm : Form
     {
-        internal enum Tabs { Color, Shortcut, Other, Help};
+        internal enum Tabs { Color, Shortcut, Table, Other, Help};
 
         internal SettingForm(Tabs tab = Tabs.Color)
         {
             InitializeComponent();
             LoadSettings();
             tabSettings.SelectedIndex = (int)tab;
+            InitDataGridView();
+        }
+
+        private void InitDataGridView()
+        {
+            //column, text, empty, not empty
+            dgvFormat.Rows.Add(new object[] { "Anrede" });
+            dgvFormat.Rows.Add(new object[] { string.Empty, ", ",string.Empty, "[Anrede]" });
+            dgvFormat.Rows.Add(new object[] { "Titel3", string.Empty, "[Titel1] [Titel2]", string.Empty });
         }
 
         private void LoadSettings()

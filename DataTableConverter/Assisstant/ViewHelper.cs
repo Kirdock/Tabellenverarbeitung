@@ -102,7 +102,7 @@ namespace DataTableConverter
             Thread thread = new Thread(() =>
             {
                 bool errorMessageShown = false;
-                myDataGridView.BindingContext[myDataGridView.DataSource].EndCurrentEdit();
+                EndDataGridViewEdit(myDataGridView);
                 DataTable table = ((DataTable)myDataGridView.DataSource);
 
                 DataObject o = (DataObject)Clipboard.GetDataObject();
@@ -244,7 +244,7 @@ namespace DataTableConverter
             }
             if (view.DataSource != null)
             {
-                view.BindingContext[view.DataSource].EndCurrentEdit();
+                EndDataGridViewEdit(view);
             }
             if (view.Name == "dgCaseColumns")
             {
@@ -255,7 +255,7 @@ namespace DataTableConverter
 
         private void InsertRowClick(DataGridView view, int rowIndex)
         {
-            view.BindingContext?[view.DataSource].EndCurrentEdit();
+            EndDataGridViewEdit(view);
             DataTable table = (DataTable)view.DataSource;
             DataRow row = table.NewRow();
             table.Rows.InsertAt(row, rowIndex);
@@ -419,6 +419,11 @@ namespace DataTableConverter
             {
                 row.Height = Properties.Settings.Default.RowHeight;
             }
+        }
+
+        internal static void EndDataGridViewEdit(DataGridView dgTable)
+        {
+            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
         }
     }
 }

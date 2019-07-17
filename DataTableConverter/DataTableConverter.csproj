@@ -84,6 +84,7 @@
     <Compile Include="Classes\History.cs" />
     <Compile Include="Classes\HistoryStates.cs" />
     <Compile Include="Classes\ImportSettings.cs" />
+    <Compile Include="Classes\MergeFormat.cs" />
     <Compile Include="Classes\NotFoundHeaders.cs" />
     <Compile Include="Classes\PlusListboxItem.cs" />
     <Compile Include="Classes\Proc.cs" />
@@ -160,6 +161,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\MergeFormatView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\MergeFormatView.Designer.cs">
+      <DependentUpon>MergeFormatView.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\WorkProcViews\CompareForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -284,6 +291,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="View\MergeFormatView.resx">
+      <DependentUpon>MergeFormatView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="View\SettingForm.resx">
       <DependentUpon>SettingForm.cs</DependentUpon>
     </EmbeddedResource>

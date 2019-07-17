@@ -50,7 +50,7 @@ namespace DataTableConverter.View
 
         private void CloseForm()
         {
-            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgTable);
             DialogResult = DialogResult.OK;
         }
 

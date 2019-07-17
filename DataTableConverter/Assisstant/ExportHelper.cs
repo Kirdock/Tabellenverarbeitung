@@ -466,5 +466,49 @@ namespace DataTableConverter
             }).Start();
             
         }
+
+        internal static void ExportCount(string selectedValue, int columnIndex, int count, bool showFromTo, DataTable oldTable, OrderType orderType, Action startLoadingBar, Action stopLoadingBar)
+        {
+            new Thread(() =>
+            {
+                startLoadingBar();
+                DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", orderType).ToTable();
+                DataTable newTable = new DataTable();
+
+                if (count == 0)
+                {
+                    Dictionary<string, int> pair = table.GroupCountOfColumn(columnIndex);
+
+                    newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
+                    newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
+                }
+                else
+                {
+                    Dictionary<string, int> pair = new Dictionary<string, int>();
+                    foreach (string col in table.HeadersOfDataTable())
+                    {
+                        newTable.Columns.Add(col);
+                    }
+                    foreach (DataRow row in table.Rows)
+                    {
+                        string item = row[columnIndex].ToString();
+                        bool contains;
+                        if ((contains = pair.ContainsKey(item)) && pair[item] < count)
+                        {
+                            newTable.Rows.Add(row.ItemArray);
+                            pair[item] = pair[item] + 1;
+                        }
+                        else if (!contains)
+                        {
+                            pair.Add(item, 1);
+                            newTable.Rows.Add(row.ItemArray);
+                        }
+                    }
+                }
+
+                new Form1(newTable).Show();
+                stopLoadingBar();
+            }).Start();
+        }
     }
 }

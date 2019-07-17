@@ -260,7 +260,7 @@ namespace DataTableConverter.View
         private void dgvSetting_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             // sync preview
-            dgvSetting.BindingContext[dgvSetting.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgvSetting);
             getDataGridViewItems(out List<int> values, out List<string> headers);
             dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, true);
         }
@@ -621,7 +621,7 @@ namespace DataTableConverter.View
         {
             if (!cbContainsHeaders.Checked)
             {
-                dgvHeaders.BindingContext[dgvHeaders.DataSource].EndCurrentEdit();
+                ViewHelper.EndDataGridViewEdit(dgvHeaders);
                 radioButton2_CheckedChanged(null, null);
             }
         }

@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -24,7 +25,6 @@ namespace DataTableConverter.View
         private BindingList<Case> bindingCase;
         private Dictionary<GroupBox, Type> gbState;
         private List<KeyValuePair<string, bool>> OrderList;
-
         internal List<Proc> Procedures { get; set; }
         internal List<Proc> SystemProc { get; set; }
         internal List<Proc> DuplicateProc { get; set; }
@@ -69,10 +69,10 @@ namespace DataTableConverter.View
 
         private void Administration_Load(object sender, EventArgs e)
         {
-            ltbProcedures_SelectedIndexChanged(null, null);
-            lbWorkflows_SelectedIndexChanged(null, null);
-            lbTolerances_SelectedIndexChanged(null, null);
-            lbCases_SelectedIndexChanged(null, null);
+            //ltbProcedures_SelectedIndexChanged(null, null);
+            //lbWorkflows_SelectedIndexChanged(null, null);
+            //lbTolerances_SelectedIndexChanged(null, null);
+            //lbCases_SelectedIndexChanged(null, null);
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 
@@ -168,7 +168,6 @@ namespace DataTableConverter.View
         {
             CheckedComboBox[] checkedComboBoxes = new CheckedComboBox[]
             {
-                cbHeaders,
                 clbHeaderOrder,
                 clbHeaderProcedure,
                 clbHeadersRound,
@@ -610,17 +609,64 @@ namespace DataTableConverter.View
             return ((Work)lbWorkflows.SelectedItem);
         }
 
-        private void SetMergeControls( WorkProc selectedProc)
+        private void SetMergeControls( WorkProc proc)
         {
-            SetCmbHeader(selectedProc.Formula);
+            ProcMerge selectedProc = proc as ProcMerge;
             txtNewColumnMerge.Text = selectedProc.NewColumn;
+            txtFormula.Text = selectedProc.Format.ToString();
             lblOriginalNameText.Text = ProcMerge.ClassName;
-            SetDataSource(dgvMerge, ((ProcMerge)selectedProc).Conditions);
+
+            SetMergeDataGridView(selectedProc.Conditions);
+        }
+
+        private void SetMergeDataGridView(DataTable table)
+        {
+            dgvMerge.DataSource = null;
+            dgvMerge.Rows.Clear();
+            dgvMerge.Columns.Clear();
+            dgvMerge.DataSource = table.DefaultView;
+
+            DataGridViewButtonColumn boxCol = new DataGridViewButtonColumn
+            {
+                Text = "Format",
+                UseColumnTextForButtonValue = true
+            };
+            dgvMerge.Columns[(int)ProcMerge.ConditionColumn.Format].ReadOnly = true;
+            dgvMerge.Columns.Add(boxCol);
+        }
+
+        private void dgvMerge_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //Button clicked
+            if(e.ColumnIndex > -1 && e.RowIndex > -1 && dgvMerge[e.ColumnIndex, e.RowIndex] is DataGridViewButtonCell)
+            {
+                ViewHelper.EndDataGridViewEdit(dgvMerge);
+                DataTable table = (dgvMerge.DataSource as DataView).Table;
+                
+                var row = (dgvMerge.Rows[e.RowIndex].DataBoundItem as DataRowView).Row;
+                
+                if (!(row[(int)ProcMerge.ConditionColumn.Format] is MergeFormat))
+                {
+                    row[(int)ProcMerge.ConditionColumn.Format] = new MergeFormat();
+                }
+                
+                MergeFormatView view = new MergeFormatView(row[(int)ProcMerge.ConditionColumn.Format] as MergeFormat);
+                view.ShowDialog();
+                dgvMerge.Refresh();
+            }
+        }
+
+        private void dgvMerge_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.ColumnIndex > -1 && e.RowIndex > -1 && dgvMerge[e.ColumnIndex,e.RowIndex] is DataGridViewButtonCell && string.IsNullOrWhiteSpace(e.Value?.ToString()))
+            {
+                e.Value = "Format";
+            }
         }
 
         private void SetPaddingControls(WorkProc selectedProc)
         {
-            ProcPadding proc = (ProcPadding)selectedProc;
+            ProcPadding proc = selectedProc as ProcPadding;
             lblOriginalNameText.Text = ProcPadding.ClassName;
             nbPadCount.Value = proc.Counter;
             txtNewColumnPad.Text = proc.NewColumn;
@@ -781,7 +827,6 @@ namespace DataTableConverter.View
         private void SetProcValues(WorkProc selectedProc)
         {
             txtWorkProcName.Text = selectedProc.Name;
-            txtFormula.Text = selectedProc.Formula;
             SetNewColumnText(selectedProc.NewColumn);
             SetGroupBoxVisibility(selectedProc.GetType());
         }
@@ -834,29 +879,6 @@ namespace DataTableConverter.View
                 box.SetItemChecked(i, false);
             }
             box.ItemCheck += handler;
-        }
-
-        private void SetCmbHeader(string formula)
-        {
-            if (formula != null)
-            {
-                ResetHeader(cbHeaders, cbHeaders_ItemCheck);
-
-                cbHeaders.ItemCheck -= cbHeaders_ItemCheck;
-                Regex re = new Regex(@"\[(.*?)\]");
-                MatchCollection matches = re.Matches(formula);
-                string[] headers = new string[matches.Count];
-                for (int i = 0; i < matches.Count; i++)
-                {
-                    string header = matches[i].Value.Substring(1, matches[i].Value.Length - 2); //matches.Groups[1].Value
-                    int index;
-                    if ((index = cbHeaders.Items.IndexOf(header)) != -1)
-                    {
-                        cbHeaders.SetItemChecked(index, true);
-                    }
-                }
-                cbHeaders.ItemCheck += cbHeaders_ItemCheck;
-            }
         }
 
         private void SetHeaderProcedure(string[] headers)
@@ -997,19 +1019,6 @@ namespace DataTableConverter.View
         private void RemoveColumnOfFormula(string column)
         {
             txtFormula.Text = txtFormula.Text.Replace($" [{column}]", "");
-        }
-
-        private void cbHeaders_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            if (e.NewValue == CheckState.Checked)
-            {
-                addColumnToFormula(cbHeaders.Items[e.Index].ToString());
-            }
-            else
-            {
-                RemoveColumnOfFormula(cbHeaders.Items[e.Index].ToString());
-            }
-            GetSelectedWorkflow().Procedures[lbUsedProcedures.SelectedIndex].Formula = txtFormula.Text;
         }
 
         private void txtWorkflow_TextChanged(object sender, EventArgs e)
@@ -1275,7 +1284,7 @@ namespace DataTableConverter.View
 
         private void dgCaseColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            dgCaseColumns.BindingContext[dgCaseColumns.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgCaseColumns);
             WorkflowHelper.AdjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
@@ -1293,7 +1302,7 @@ namespace DataTableConverter.View
 
         private DataTable GetDataSource(DataGridView dgv)
         {
-            dgv.BindingContext[dgv.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgv);
             return ((DataTable)dgv.DataSource).Copy();
         }
 
@@ -1423,7 +1432,7 @@ namespace DataTableConverter.View
 
         private void DataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            ((DataGridView)sender).BindingContext[((DataGridView)sender).DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(sender as DataGridView);
         }
 
         private void txtNewColumnPad_TextChanged(object sender, EventArgs e)
@@ -1690,6 +1699,28 @@ namespace DataTableConverter.View
         private void txtSubstringText_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSubstring).ReplaceText = (sender as TextBox).Text;
+        }
+
+        private void BtnMergeDefaultFormat_Click(object sender, EventArgs e)
+        {
+            MergeFormat format = (GetSelectedWorkProcedure() as ProcMerge).Format;
+            MergeFormatView view = new MergeFormatView(format);
+            if(view.ShowDialog() == DialogResult.OK)
+            {
+                txtFormula.Text = format.ToString();
+            }
+
+        }
+
+        private void dgvMerge_UserAddedRow(object sender, DataGridViewRowEventArgs e)
+        {
+            if (dgvMerge.DataSource != null)
+            {
+                ViewHelper.EndDataGridViewEdit(dgvMerge);
+                DataTable table = (dgvMerge.DataSource as DataView).Table;
+
+                table.Rows[e.Row.Index - 1][(int)ProcMerge.ConditionColumn.Format] = new MergeFormat();
+            }
         }
     }
 }

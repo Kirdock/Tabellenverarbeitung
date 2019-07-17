@@ -83,13 +83,13 @@ namespace DataTableConverter.View
 
         private DataTable getDataSource()
         {
-            dgDuplicate.BindingContext[dgDuplicate.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgDuplicate);
             return ((DataTable)dgDuplicate.DataSource).Copy();
         }
 
         private void setDataTable()
         {
-            dgDuplicate.BindingContext[dgDuplicate.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgDuplicate);
             Table = ((DataTable)dgDuplicate.DataSource).Copy();
 
         }

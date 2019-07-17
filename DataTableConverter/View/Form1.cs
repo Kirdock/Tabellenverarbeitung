@@ -169,7 +169,7 @@ namespace DataTableConverter
 
         private void EndEdit()
         {
-            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgTable);
         }
 
         private DataView GetDataView()
@@ -973,66 +973,11 @@ namespace DataTableConverter
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCount form = new ExportCount(sourceTable.HeadersOfDataTable());
-            form.FormClosed += new FormClosedEventHandler(CountContendClosed);
-            form.ShowDialog();
-        }
-
-        private void CountContendClosed(object sender, FormClosedEventArgs e)
-        {
-            ExportCount export = (ExportCount)sender;
-            if (export.DialogResult == DialogResult.OK)
+            ExportCount export = new ExportCount(sourceTable.HeadersOfDataTable());
+            
+            if(export.ShowDialog() == DialogResult.OK)
             {
-                string selectedValue = export.getSelectedValue();
-                int columnIndex = export.getColumnIndex();
-                int count = export.CountChecked ? export.Count : 0;
-                bool showFromTo = export.ShowFromTo;
-                DataTable oldTable = GetDataSource();
-
-                new Thread(() =>
-                {
-                    StartLoadingBar();
-                    DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", OrderType).ToTable();
-                    DataTable newTable = new DataTable();
-
-                    if (count == 0)
-                    {
-                        Dictionary<string, int> pair = table.GroupCountOfColumn(columnIndex);
-                        
-                        newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
-                        newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
-                    }
-                    else
-                    {
-                        Dictionary<string, int> pair = new Dictionary<string, int>();
-                        foreach(string col in table.HeadersOfDataTable())
-                        {
-                            newTable.Columns.Add(col);
-                        }
-                        foreach (DataRow row in table.Rows)
-                        {
-                            string item = row[columnIndex].ToString();
-                            bool contains;
-                            if ((contains = pair.ContainsKey(item)) && pair[item] < count)
-                            {
-                                newTable.Rows.Add(row.ItemArray);
-                                pair[item] = pair[item] + 1;
-                            }
-                            else if(!contains)
-                            {
-                                pair.Add(item, 1);
-                                newTable.Rows.Add(row.ItemArray);
-                            }
-                        }
-                    }
-
-                    BeginInvoke(new MethodInvoker(() =>
-                    {
-                        Form1 form = new Form1(newTable);
-                        form.Show();
-                    }));
-                    StopLoadingBar();
-                }).Start();
+                ExportHelper.ExportCount(export.getSelectedValue(), export.getColumnIndex(), export.CountChecked ? export.Count : 0, export.ShowFromTo, GetDataSource(), OrderType, StartLoadingBar, StopLoadingBar);
             }
         }
 

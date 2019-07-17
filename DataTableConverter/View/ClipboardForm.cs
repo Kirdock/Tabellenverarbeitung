@@ -32,7 +32,7 @@ namespace DataTableConverter.View
 
         internal DataTable getTable()
         {
-            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgTable);
             return ((DataView)dgTable.DataSource).ToTable();
         }
 
@@ -53,7 +53,7 @@ namespace DataTableConverter.View
 
         private DataView getDataView()
         {
-            dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
+            ViewHelper.EndDataGridViewEdit(dgTable);
             return (DataView)dgTable.DataSource;
         }
 
