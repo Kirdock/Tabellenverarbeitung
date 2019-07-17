@@ -57,7 +57,14 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.RemoveEmptyHeaders(headers.Distinct());
         }
 
-        private void GetHeaderOfFormula(string formula, List<string> headers)
+        internal static List<string> GetHeaderOfFormula(string formula)
+        {
+            List<string> headers = new List<string>();
+            GetHeaderOfFormula(formula, headers);
+            return headers;
+        }
+
+        private static void GetHeaderOfFormula(string formula, List<string> headers)
         {
             string regularExpressionPattern = @"\[(.*?)\]";
             Regex re = new Regex(regularExpressionPattern);
@@ -66,7 +73,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             for (int i = 0; i < matches.Count; i++)
             {
-                headers.Add(matches[i].Groups[1].Value.Split(new char[] { '|' }).First());
+                headers.Add(matches[i].Groups[1].Value);
             }
         }
 

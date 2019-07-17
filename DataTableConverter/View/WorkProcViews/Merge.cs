@@ -15,19 +15,20 @@ namespace DataTableConverter.View
 {
     public partial class Merge : Form
     {
-        private object[] HeadersWithoutEmpty;
+        private object[] Headers;
         internal ProcMerge Proc;
         internal ViewHelper UIHelper;
 
         internal Merge(object[] headers, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
-            HeadersWithoutEmpty = headers;
+            Headers = headers;
             Proc = new ProcMerge();
             InitDataGridView(headers);
             UIHelper = new ViewHelper(ctxRow, null, null);
             UIHelper.AddContextMenuToDataGridView(dgvMerge, false);
             ViewHelper.SetDataGridViewStyle(dgvMerge);
+            
         }
 
         private void InitDataGridView(object[] headers)
@@ -45,7 +46,6 @@ namespace DataTableConverter.View
                 Text = "Format",
                 UseColumnTextForButtonValue = true
             };
-            col.Items.Add(string.Empty);
             col.Items.AddRange(headers);
 
             for (int i = 0; i < dgvMerge.Columns.Count; i++)
@@ -53,6 +53,7 @@ namespace DataTableConverter.View
                 dgvMerge.Columns[i].DisplayIndex = i;
             }
 
+            int comboBoxIndex = dgvMerge.Columns.Count;
             dgvMerge.Columns.Add(col);
             dgvMerge.Columns.Add(boxCol);
             dgvMerge.Columns[(int)ProcMerge.ConditionColumn.Spalte].Visible = false;
@@ -61,6 +62,8 @@ namespace DataTableConverter.View
 
             col.DisplayIndex = 0;
             boxCol.DisplayIndex = 5;
+
+            ViewHelper.AdjustComboBoxGridView(dgvMerge, 1, headers);
         }
 
         private void addColumn(string column)
@@ -98,7 +101,7 @@ namespace DataTableConverter.View
 
         private bool IsDuplicate(string text)
         {
-            return HeadersWithoutEmpty.Contains(text);
+            return Headers.Contains(text);
         }
 
 
@@ -119,7 +122,7 @@ namespace DataTableConverter.View
 
         private void BtnFormat_Click(object sender, EventArgs e)
         {
-            MergeFormatView view = new MergeFormatView(Proc.Format, HeadersWithoutEmpty);
+            MergeFormatView view = new MergeFormatView(Proc.Format, Headers);
             if(view.ShowDialog() == DialogResult.OK)
             {
                 txtFormula.Text = Proc.Format.ToString();
@@ -151,7 +154,7 @@ namespace DataTableConverter.View
                     row[(int)ProcMerge.ConditionColumn.Format] = new MergeFormat();
                 }
 
-                MergeFormatView view = new MergeFormatView(row[(int)ProcMerge.ConditionColumn.Format] as MergeFormat, HeadersWithoutEmpty);
+                MergeFormatView view = new MergeFormatView(row[(int)ProcMerge.ConditionColumn.Format] as MergeFormat, Headers);
                 view.ShowDialog();
                 dgvMerge.Refresh();
             }
@@ -161,10 +164,17 @@ namespace DataTableConverter.View
         {
             if (dgvMerge.DataSource != null)
             {
+                dgvMerge.CommitEdit(DataGridViewDataErrorContexts.CurrentCellChange);
                 ViewHelper.EndDataGridViewEdit(dgvMerge);
                 DataTable table = (dgvMerge.DataSource as DataView).Table;
-
                 table.Rows[e.Row.Index - 1][(int)ProcMerge.ConditionColumn.Format] = new MergeFormat();
+                if (dgvMerge.EditingControl is TextBox)
+                {
+                    TextBox box = ((TextBox)dgvMerge.EditingControl);
+                    box.SelectionStart = box.Text.Length;
+                    box.SelectionLength = 0;
+                }
+
             }
         }
     }

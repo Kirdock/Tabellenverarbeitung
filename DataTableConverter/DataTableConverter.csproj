@@ -173,6 +173,12 @@
     <Compile Include="View\WorkProcViews\CompareForm.Designer.cs">
       <DependentUpon>CompareForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\WorkProcViews\HeaderSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\HeaderSelect.Designer.cs">
+      <DependentUpon>HeaderSelect.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\WorkProcViews\ReplaceWholeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -299,6 +305,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\CompareForm.resx">
       <DependentUpon>CompareForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\HeaderSelect.resx">
+      <DependentUpon>HeaderSelect.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\ReplaceWholeForm.resx">
       <DependentUpon>ReplaceWholeForm.cs</DependentUpon>

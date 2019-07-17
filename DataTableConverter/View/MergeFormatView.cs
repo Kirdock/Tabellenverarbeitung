@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Classes;
+using DataTableConverter.View.WorkProcViews;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,8 +29,7 @@ namespace DataTableConverter.View
                 };
                 col.Items.Add(string.Empty);
                 col.Items.AddRange(headers);
-                dgTable.Columns[3].ReadOnly = true;
-                dgTable.Columns[5].ReadOnly = true;
+                
                 dgTable.Columns[0].Visible = false;
                 dgTable.Columns.Add(col);
 
@@ -57,6 +57,8 @@ namespace DataTableConverter.View
                 col.DisplayIndex = 0;
                 boxCol.DisplayIndex = 4;
                 boxCol2.DisplayIndex = 6;
+                dgTable.Columns[2].ReadOnly = true;
+                dgTable.Columns[3].ReadOnly = true;
 
                 Size = new Size(Size.Width+ 500,Size.Height+300);
             }
@@ -92,7 +94,21 @@ namespace DataTableConverter.View
                 //new Form: CheckedListBox with headers to select. additional parameter is the column "[Title1] [Title2]..." to set checked
                 //--> selected headders
                 //set Value after ShowDialog
-                dgTable.Refresh();
+                DataTable table = dgTable.DataSource as DataTable;
+                HeaderSelect form = new HeaderSelect(Headers, e.ColumnIndex == 0 ? table.Rows[e.RowIndex][2]?.ToString() : table.Rows[e.RowIndex][3].ToString());
+
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    if (e.ColumnIndex == 0) //Empty Column
+                    {
+                        table.Rows[e.RowIndex][2] = form.Headers;
+                    }
+                    else //Not Empty Column
+                    {
+                        table.Rows[e.RowIndex][3] = form.Headers;
+                    }
+                    dgTable.Refresh();
+                }
             }
         }
     }

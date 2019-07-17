@@ -42,7 +42,7 @@
             this.dgTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dgTable.Location = new System.Drawing.Point(12, 25);
+            this.dgTable.Location = new System.Drawing.Point(12, 73);
             this.dgTable.Name = "dgTable";
             this.dgTable.Size = new System.Drawing.Size(365, 251);
             this.dgTable.TabIndex = 0;
@@ -51,8 +51,7 @@
             // 
             // btnConfirm
             // 
-            this.btnConfirm.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnConfirm.Location = new System.Drawing.Point(15, 301);
+            this.btnConfirm.Location = new System.Drawing.Point(12, 35);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(75, 23);
             this.btnConfirm.TabIndex = 1;

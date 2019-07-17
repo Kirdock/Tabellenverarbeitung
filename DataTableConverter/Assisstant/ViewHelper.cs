@@ -29,7 +29,7 @@ namespace DataTableConverter
         }
         private static void dataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
         {
-            if (e.ColumnIndex == comboBoxIndex && e.Value?.ToString() == string.Empty)
+            if (e.ColumnIndex == comboBoxIndex && string.IsNullOrWhiteSpace(e.Value?.ToString()))
             {
                 e.Value = headers[0];
             }

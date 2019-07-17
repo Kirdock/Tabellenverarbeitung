@@ -1716,10 +1716,17 @@ namespace DataTableConverter.View
         {
             if (dgvMerge.DataSource != null)
             {
+                dgvMerge.CommitEdit(DataGridViewDataErrorContexts.CurrentCellChange);
                 ViewHelper.EndDataGridViewEdit(dgvMerge);
                 DataTable table = (dgvMerge.DataSource as DataView).Table;
 
                 table.Rows[e.Row.Index - 1][(int)ProcMerge.ConditionColumn.Format] = new MergeFormat();
+                if (dgvMerge.EditingControl is TextBox)
+                {
+                    TextBox box = ((TextBox)dgvMerge.EditingControl);
+                    box.SelectionStart = box.Text.Length;
+                    box.SelectionLength = 0;
+                }
             }
         }
     }
