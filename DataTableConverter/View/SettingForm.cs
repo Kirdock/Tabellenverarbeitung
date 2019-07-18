@@ -25,9 +25,13 @@ namespace DataTableConverter.View
         private void InitDataGridView()
         {
             //column, text, empty, not empty
-            dgvFormat.Rows.Add(new object[] { "Anrede" });
-            dgvFormat.Rows.Add(new object[] { string.Empty, ", ",string.Empty, "[Anrede]" });
-            dgvFormat.Rows.Add(new object[] { "Titel3", string.Empty, "[Titel1] [Titel2]", string.Empty });
+            dgvFormat.Rows.Add(new object[] { string.Empty, "Sehr_geehrter_" });
+            dgvFormat.Rows.Add(new object[] { "Anrede", "_"});
+            dgvFormat.Rows.Add(new object[] { "Titel 1", "_", "[Titel 2] [Titel 3]" });
+            dgvFormat.Rows.Add(new object[] { "Titel 2", "_", "[Titel 1] [Titel 3]" });
+            dgvFormat.Rows.Add(new object[] { "Titel 3", "_", "[Titel 1] [Titel 2]" });
+            dgvFormat.Rows.Add(new object[] { "Nachname"});
+            dgvFormat.Rows.Add(new object[] {});
         }
 
         private void LoadSettings()

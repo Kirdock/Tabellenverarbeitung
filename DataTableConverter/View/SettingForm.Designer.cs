@@ -61,6 +61,10 @@
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dgvFormat = new System.Windows.Forms.DataGridView();
+            this.Col = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TextCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColEmpty = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColNotEmpty = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.llSourceCode = new System.Windows.Forms.LinkLabel();
@@ -68,10 +72,9 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.Col = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TextCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColEmpty = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNotEmpty = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -411,6 +414,9 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.label15);
+            this.tabPage3.Controls.Add(this.label14);
+            this.tabPage3.Controls.Add(this.label12);
             this.tabPage3.Controls.Add(this.dgvFormat);
             this.tabPage3.Controls.Add(this.label20);
             this.tabPage3.Controls.Add(this.label19);
@@ -442,6 +448,36 @@
             this.dgvFormat.ReadOnly = true;
             this.dgvFormat.Size = new System.Drawing.Size(772, 285);
             this.dgvFormat.TabIndex = 12;
+            // 
+            // Col
+            // 
+            this.Col.FillWeight = 108.291F;
+            this.Col.HeaderText = "Spalte";
+            this.Col.Name = "Col";
+            this.Col.ReadOnly = true;
+            // 
+            // TextCol
+            // 
+            this.TextCol.FillWeight = 108.291F;
+            this.TextCol.HeaderText = "Text";
+            this.TextCol.Name = "TextCol";
+            this.TextCol.ReadOnly = true;
+            // 
+            // ColEmpty
+            // 
+            this.ColEmpty.FillWeight = 75.12691F;
+            this.ColEmpty.HeaderText = "Wenn Spalten leer";
+            this.ColEmpty.MinimumWidth = 150;
+            this.ColEmpty.Name = "ColEmpty";
+            this.ColEmpty.ReadOnly = true;
+            // 
+            // ColNotEmpty
+            // 
+            this.ColNotEmpty.FillWeight = 108.291F;
+            this.ColNotEmpty.HeaderText = "Wenn Spalten nicht leer";
+            this.ColNotEmpty.MinimumWidth = 150;
+            this.ColNotEmpty.Name = "ColNotEmpty";
+            this.ColNotEmpty.ReadOnly = true;
             // 
             // label20
             // 
@@ -475,7 +511,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(582, 91);
+            this.label13.Location = new System.Drawing.Point(595, 79);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(94, 13);
             this.label13.TabIndex = 3;
@@ -484,7 +520,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(440, 91);
+            this.label11.Location = new System.Drawing.Point(453, 79);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(136, 13);
             this.label11.TabIndex = 1;
@@ -496,39 +532,36 @@
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label10.Location = new System.Drawing.Point(6, 52);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(72, 20);
+            this.label10.Size = new System.Drawing.Size(117, 20);
             this.label10.TabIndex = 0;
-            this.label10.Text = "Formular";
+            this.label10.Text = "Formatbeispiel:";
             // 
-            // Col
+            // label12
             // 
-            this.Col.FillWeight = 108.291F;
-            this.Col.HeaderText = "Spalte";
-            this.Col.Name = "Col";
-            this.Col.ReadOnly = true;
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(193, 98);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(255, 13);
+            this.label12.TabIndex = 13;
+            this.label12.Text = "\"_\" Dient hier nur zur Visualisierung von Leerzeichen";
             // 
-            // TextCol
+            // label14
             // 
-            this.TextCol.FillWeight = 108.291F;
-            this.TextCol.HeaderText = "Text";
-            this.TextCol.Name = "TextCol";
-            this.TextCol.ReadOnly = true;
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(129, 57);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(173, 13);
+            this.label14.TabIndex = 14;
+            this.label14.Text = "\"Sehr geehrter Herr MSc Strießnig\"";
             // 
-            // ColEmpty
+            // label15
             // 
-            this.ColEmpty.FillWeight = 75.12691F;
-            this.ColEmpty.HeaderText = "Wenn Spalten leer";
-            this.ColEmpty.MinimumWidth = 150;
-            this.ColEmpty.Name = "ColEmpty";
-            this.ColEmpty.ReadOnly = true;
-            // 
-            // ColNotEmpty
-            // 
-            this.ColNotEmpty.FillWeight = 108.291F;
-            this.ColNotEmpty.HeaderText = "Wenn Spalten nicht leer";
-            this.ColNotEmpty.MinimumWidth = 150;
-            this.ColNotEmpty.Name = "ColNotEmpty";
-            this.ColNotEmpty.ReadOnly = true;
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(129, 79);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(148, 13);
+            this.label15.TabIndex = 15;
+            this.label15.Text = "\"Sehr geehrter Herr Strießnig\"";
             // 
             // SettingForm
             // 
@@ -605,5 +638,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn TextCol;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColEmpty;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColNotEmpty;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
     }
 }

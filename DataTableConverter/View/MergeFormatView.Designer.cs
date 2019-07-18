@@ -81,6 +81,7 @@
             this.Name = "MergeFormatView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Format";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MergeFormatView_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.dgTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

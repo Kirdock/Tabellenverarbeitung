@@ -18,6 +18,11 @@ namespace DataTableConverter.View
         internal MergeFormatView(MergeFormat format, object[] headers = null)
         {
             InitializeComponent();
+            try
+            {
+                format.Table.AcceptChanges();
+            }
+            catch { }
             dgTable.DataSource = format.Table;
             if(headers != null)
             {
@@ -64,6 +69,8 @@ namespace DataTableConverter.View
             }
         }
 
+
+
         private void btnConfirm_Click(object sender, EventArgs e)
         {
             ViewHelper.EndDataGridViewEdit(dgTable);
@@ -109,6 +116,27 @@ namespace DataTableConverter.View
                     }
                     dgTable.Refresh();
                 }
+            }
+        }
+
+        private void MergeFormatView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (DialogResult != DialogResult.OK)
+            {
+                DataTable table = (dgTable.DataSource as DataTable);
+                if (table.GetChanges() != null)
+                {
+                    DialogResult res = MessageHandler.MessagesYesNo(MessageBoxIcon.Information, "Möchten Sie die Änderung wirklich verwerfen?");
+                    e.Cancel = res == DialogResult.No;
+                    if (!e.Cancel)
+                    {
+                        table.RejectChanges();
+                    }
+                }
+            }
+            if (!e.Cancel)
+            {
+                dgTable.DataSource = null;
             }
         }
     }

@@ -1002,11 +1002,6 @@ namespace DataTableConverter.View
             GetSelectedWorkProcedure().NewColumn = (sender as TextBox)?.Text;
         }
 
-        private void txtFormula_TextChanged(object sender, EventArgs e)
-        {
-            GetSelectedWorkProcedure().Formula = (sender as TextBox)?.Text;
-        }
-
         private void addColumnToFormula(string column)
         {
             if (!txtFormula.Text.Contains(column))

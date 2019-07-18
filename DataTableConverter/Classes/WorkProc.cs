@@ -16,7 +16,6 @@ namespace DataTableConverter.Classes
         internal string[] DuplicateColumns { get; set; }
         internal int Ordinal { get; set; }
         virtual internal string NewColumn { get; set; }
-        internal string Formula { get; set; }
         public string Name { get; set; }
         internal bool CopyOldColumn { get; set; }
         internal WorkProc() { }

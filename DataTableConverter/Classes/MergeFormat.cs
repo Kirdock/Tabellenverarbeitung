@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataTableConverter.Classes.WorkProcs;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -37,6 +38,36 @@ namespace DataTableConverter.Classes
             }
 
             return builder.ToString();
+        }
+
+        internal IEnumerable<string> GetHeaders()
+        {
+            return GetColumn().Concat(GetHeadersEmpty()).Concat(GetHeadersNotEmpty()).Distinct();
+        }
+
+        internal IEnumerable<string> GetColumn()
+        {
+            return Table.AsEnumerable().Select(row => row[(int)MergeColumns.Column]?.ToString()).Distinct().Where(header => !string.IsNullOrWhiteSpace(header));
+        }
+
+        internal IEnumerable<string> GetHeadersEmpty()
+        {
+            return Table.AsEnumerable().SelectMany(row => ProcMerge.GetHeaderOfFormula(row[(int)MergeColumns.Empty]?.ToString())).Distinct().Where(header => !string.IsNullOrWhiteSpace(header));
+        }
+
+        internal IEnumerable<string> GetHeadersNotEmpty()
+        {
+            return Table.AsEnumerable().SelectMany(row => ProcMerge.GetHeaderOfFormula(row[(int)MergeColumns.NotEmpty]?.ToString())).Distinct().Where(header => !string.IsNullOrWhiteSpace(header));
+        }
+
+        internal void RenameHeaders(string oldName, string newName)
+        {
+            foreach(DataRow row in Table.Rows)
+            {
+                ProcMerge.RenameHeader(row, (int)MergeColumns.Column, oldName, newName);
+                ProcMerge.RenameFormatHeader(row, (int)MergeColumns.Empty, oldName, newName);
+                ProcMerge.RenameFormatHeader(row, (int)MergeColumns.NotEmpty, oldName, newName);
+            }
         }
     }
 }
