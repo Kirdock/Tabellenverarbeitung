@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -34,8 +37,9 @@ namespace DataTableConverter.View
         private Proc selectedProc;
         private ViewHelper ViewHelper;
         private Dictionary<Type, Action<WorkProc>> assignControls;
+        private MemoryStream ProceduresBefore, WorkflowsBefore, TolerancesBefore, CasesBefore;
 
-        internal Administration(object[] headers, ContextMenuStrip ctxRow)
+        internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances)
         {
             InitializeComponent();
             SetSize();
@@ -47,10 +51,12 @@ namespace DataTableConverter.View
             CmBRound.SelectedIndexChanged += CmBRound_SelectedIndexChanged;
             cmbProcedureType.SelectedIndex = 0;
 
-            LoadProcedures();
-            LoadTolerances();
-            LoadCases();
-            LoadWorkflows();
+            SetDataBefore(procedures, cases, workflows, tolerances);
+
+            LoadProcedures(procedures);
+            LoadTolerances(tolerances);
+            LoadCases(cases);
+            LoadWorkflows(workflows);
 
             ViewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
             
@@ -60,6 +66,50 @@ namespace DataTableConverter.View
             AddContextMenuAndDataGridViewStyle();
             RestoreSplitterDistance();
             SetColors();
+        }
+
+        private void SetDataBefore(List<Proc> procedures, List<Case> cases, List<Work> workflows, List<Tolerance> tolerances)
+        {
+            SetProceduresBefore(procedures);
+            SetCasesBefore(cases);
+            SetWorkflowsBefore(workflows);
+            SetTolerancesBefore(tolerances);
+        }
+
+        private MemoryStream GetMemoryStream(object data)
+        {
+            MemoryStream stream = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, data);
+            return stream;
+        }
+
+        private void SetProceduresBefore(List<Proc> procedures)
+        {
+            ProceduresBefore = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(ProceduresBefore, procedures);
+        }
+
+        private void SetCasesBefore(List<Case> cases)
+        {
+            CasesBefore = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(CasesBefore, cases);
+        }
+
+        private void SetTolerancesBefore(List<Tolerance> tolerances)
+        {
+            TolerancesBefore = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(TolerancesBefore, tolerances);
+        }
+
+        private void SetWorkflowsBefore(List<Work> workflows)
+        {
+            WorkflowsBefore = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(WorkflowsBefore, workflows);
         }
 
         private void SetSize()
@@ -243,7 +293,7 @@ namespace DataTableConverter.View
             SaveSize();
             Properties.Settings.Default.Save();
 
-            if (ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
+            if ((ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases)))
             {
                 DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
                 e.Cancel = result == DialogResult.No;
@@ -270,9 +320,9 @@ namespace DataTableConverter.View
 
         #region Procedures
 
-        private void LoadProcedures()
+        private void LoadProcedures(List<Proc> procedures)
         {
-            Procedures = ImportHelper.LoadProcedures();
+            Procedures = procedures;
             bindingProcedure = new BindingList<Proc>(Procedures);
             ltbProcedures.DataSource = bindingProcedure;
             ltbProcedures.DisplayMember = "Name";
@@ -432,9 +482,9 @@ namespace DataTableConverter.View
         #endregion
 
         #region Workflows
-        private void LoadWorkflows()
+        private void LoadWorkflows(List<Work> workflows)
         {
-            Workflows = ImportHelper.LoadWorkflows();
+            Workflows = workflows;
             bindingWorkflow = new BindingList<Work>(Workflows);
             lbWorkflows.DataSource = bindingWorkflow;
             lbWorkflows.DisplayMember = "Name";
@@ -1037,9 +1087,9 @@ namespace DataTableConverter.View
         #region Tolerances
 
 
-        private void LoadTolerances()
+        private void LoadTolerances(List<Tolerance> tolerances)
         {
-            Tolerances = ImportHelper.LoadTolerances();
+            Tolerances = tolerances;
             bindingTolerance = new BindingList<Tolerance>(Tolerances);
             lbTolerances.DataSource = bindingTolerance;
             lbTolerances.DisplayMember = "Name";
@@ -1153,9 +1203,9 @@ namespace DataTableConverter.View
             LoadProceduresWorkflow();
         }
 
-        private void LoadCases()
+        private void LoadCases(List<Case> cases)
         {
-            Cases = ImportHelper.LoadCases();
+            Cases = cases;
             bindingCase = new BindingList<Case>(Cases);
             lbCases.DataSource = bindingCase;
             lbCases.DisplayMember = "Name";
@@ -1689,6 +1739,59 @@ namespace DataTableConverter.View
             {
                 txtSubstringText.Text = string.Empty;
             }
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            if (ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
+            {
+                MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!");
+            }
+            else
+            {
+                SetDataBefore(Procedures, Cases, Workflows, Tolerances);
+                MessageHandler.MessagesOK(MessageBoxIcon.Information, "Gespeichert!");
+            }
+        }
+
+        private void BtnDiscard_Click(object sender, EventArgs e)
+        {
+            if (MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen sie die getätigten Änderungen wirklich verwerfen?") == DialogResult.Yes)
+            {
+                DiscardProcedures();
+                DiscardTolerances();
+                DiscardWorkflows();
+                DiscardCases();
+                MessageHandler.MessagesOK(MessageBoxIcon.Information, "Änderungen wurden verworfen");
+            }
+        }
+
+        private void DiscardProcedures()
+        {
+            IFormatter formatter = new BinaryFormatter();
+            ProceduresBefore.Seek(0, SeekOrigin.Begin);
+            LoadProcedures(formatter.Deserialize(ProceduresBefore) as List<Proc>);
+        }
+
+        private void DiscardWorkflows()
+        {
+            IFormatter formatter = new BinaryFormatter();
+            WorkflowsBefore.Seek(0, SeekOrigin.Begin);
+            LoadWorkflows(formatter.Deserialize(WorkflowsBefore) as List<Work>);
+        }
+
+        private void DiscardCases()
+        {
+            IFormatter formatter = new BinaryFormatter();
+            CasesBefore.Seek(0, SeekOrigin.Begin);
+            LoadCases(formatter.Deserialize(CasesBefore) as List<Case>);
+        }
+
+        private void DiscardTolerances()
+        {
+            IFormatter formatter = new BinaryFormatter();
+            TolerancesBefore.Seek(0, SeekOrigin.Begin);
+            LoadTolerances(formatter.Deserialize(TolerancesBefore) as List<Tolerance>);
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

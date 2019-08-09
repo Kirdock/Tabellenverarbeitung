@@ -12,6 +12,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -277,13 +279,25 @@ namespace DataTableConverter
             arbeitsablaufToolStripMenuItem.DropDownItems.Clear();
 
             workflows = work ?? ImportHelper.LoadWorkflows();
-            for (int i = 0; i < workflows.Count; i++)
+
+            List<Work> workflowsCopy = GetCopyOfWorkflows(workflows);
+
+            for (int i = 0; i < workflowsCopy.Count; i++)
             {
                 int index = i;
-                ToolStripMenuItem item = new ToolStripMenuItem(workflows[i].Name);
-                item.Click += (sender, e) => workflow_Click(sender, e, workflows[index]);
+                ToolStripMenuItem item = new ToolStripMenuItem(workflowsCopy[i].Name);
+                item.Click += (sender, e) => workflow_Click(sender, e, workflowsCopy[index]);
                 arbeitsablaufToolStripMenuItem.DropDownItems.Add(item);
             }
+        }
+
+        private List<Work> GetCopyOfWorkflows(List<Work> work)
+        {
+            MemoryStream stream = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, work);
+            stream.Seek(0, SeekOrigin.Begin);
+            return formatter.Deserialize(stream) as List<Work>;
         }
 
         private void LoadTolerances(List<Tolerance> tol = null)
@@ -876,18 +890,19 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(sourceTable?.HeadersOfDataTable() ?? new object[0], contextGlobal);
+            Administration form = new Administration(sourceTable?.HeadersOfDataTable() ?? new object[0], contextGlobal, procedures,workflows,cases,tolerances);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show();
         }
 
         private void administrationFormClosed(object sender, FormClosedEventArgs e)
         {
-            Administration admin = ((Administration)sender);
+            Administration admin = sender as Administration;
             LoadProcedures(admin.Procedures);
             LoadWorkflows(admin.Workflows);
             LoadTolerances(admin.Tolerances);
             LoadCases(admin.Cases);
+            SetMenuEnabled(sourceTable != null);
         }
 
         private void cSVToolStripMenuItem_Click(object sender, EventArgs e, DataTable dt = null, string path = null)
@@ -1223,7 +1238,16 @@ namespace DataTableConverter
 
         private void StartSingleWorkflow(WorkProc proc)
         {
-            workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { proc }, 0));
+            workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { GetCopyOfWorkProc(proc) }, 0));
+        }
+
+        private WorkProc GetCopyOfWorkProc(WorkProc proc)
+        {
+            MemoryStream stream = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, proc);
+            stream.Seek(0, SeekOrigin.Begin);
+            return formatter.Deserialize(stream) as WorkProc;
         }
 
         private void substringToolStripMenuItem_Click(object sender, EventArgs e)
