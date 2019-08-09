@@ -444,7 +444,7 @@ namespace DataTableConverter.Assisstant
         {
             range.Copy();
             IDataObject data = Clipboard.GetDataObject();
-            string content = (string)data.GetData(DataFormats.Text);
+            string content = (string)data.GetData(DataFormats.UnicodeText);
             string[] stringRows = content.Split(new string[] { "\r\n" }, StringSplitOptions.None);
             string[] headers = stringRows.First().Split('\t');
             int[] columns = new int[headers.Length];
