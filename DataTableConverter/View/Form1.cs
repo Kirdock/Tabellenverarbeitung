@@ -442,14 +442,11 @@ namespace DataTableConverter
             if (validMerge || dialog.ShowDialog() == DialogResult.OK)
             {
                 string[] filenames = validMerge ? new string[1] {mergePath} : dialog.FileNames;
-                if (state == ImportState.None)
-                {
-                    SetFileName(filenames[0]);
-                }
 
                 Thread thread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
+                    bool fileNameSet = false;
                     StartLoadingBar();
                     bool multipleFiles = filenames.Length > 1;
                     Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
@@ -473,6 +470,12 @@ namespace DataTableConverter
                                     newTable = table;
                                 }
                                 fileNameBefore = filename;
+                                if (!fileNameSet && state == ImportState.None)
+                                {
+                                    fileNameSet = true;
+                                    SetFileName(file);
+                                }
+
                             }
                         }
                         catch (Exception ex)
@@ -943,21 +946,7 @@ namespace DataTableConverter
             Formula formula = new Formula(FormulaState.Export, sourceTable.HeadersOfDataTable());
             if(formula.ShowDialog() == DialogResult.OK)
             {
-                DataTable table = GetDataSource(true);
-                HashSet<int> columns = new HashSet<int>(table.HeaderIndices(formula.SelectedHeaders()));
-
-                int realCounter = 0;
-                for (int i = 0; i < table.Columns.Count; i++)
-                {
-                    if (!columns.Contains(realCounter))
-                    {
-                        table.Columns.RemoveAt(i);
-                        i--;
-                    }
-                    realCounter++;
-                }
-
-                cSVToolStripMenuItem_Click(null, null, table, Properties.Settings.Default.AutoSavePVM ? Path.Combine(Path.GetDirectoryName(FilePath),Path.GetFileNameWithoutExtension(FilePath)) + Properties.Settings.Default.PVMAddressText + ".csv" : null);
+                new ProcPVMExport(formula.SelectedHeaders()).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType);
             }
         }
 

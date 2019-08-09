@@ -125,6 +125,10 @@ namespace DataTableConverter.Assisstant
                             newProc = new ProcCompare(ordinal, id, name);
                             break;
 
+                        case 12:
+                            newProc = new ProcPVMExport(ordinal, id, name);
+                            break;
+
                         case 1:
                         default:
                             newProc = new ProcTrim(ordinal, id, name);

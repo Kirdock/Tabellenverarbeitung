@@ -22,13 +22,18 @@ namespace DataTableConverter.Classes
 
         internal WorkProc(int ordinal, int id, string name)
         {
-            Columns = new DataTable { TableName = "Columnnames" };
-            Columns.Columns.Add("Spalten", typeof(string));
+            SetColumns();
             Ordinal = ordinal;
             ProcedureId = id;
             DuplicateColumns = new string[0];
             Name = name;
 
+        }
+
+        protected void SetColumns()
+        {
+            Columns = new DataTable { TableName = "Columnnames" };
+            Columns.Columns.Add("Spalten", typeof(string));
         }
 
         public int CompareTo(WorkProc other)

@@ -76,14 +76,6 @@ namespace DataTableConverter.View
             SetTolerancesBefore(tolerances);
         }
 
-        private MemoryStream GetMemoryStream(object data)
-        {
-            MemoryStream stream = new MemoryStream();
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, data);
-            return stream;
-        }
-
         private void SetProceduresBefore(List<Proc> procedures)
         {
             ProceduresBefore = new MemoryStream();
@@ -184,7 +176,8 @@ namespace DataTableConverter.View
                 dgvPadColumns,
                 dgvPadConditions,
                 dgvSubstringColumns,
-                dgvReplaceWhole
+                dgvReplaceWhole,
+                dgvPVMExport
             };
 
             DataGridView[] dataGridViews = new DataGridView[]
@@ -223,7 +216,8 @@ namespace DataTableConverter.View
                 clbHeadersRound,
                 clbUpLowHeader,
                 cbSubstringHeaders,
-                cbHeadersReplaceWhole
+                cbHeadersReplaceWhole,
+                cbHeadersPVMExport
             };
             foreach(CheckedComboBox checkedComboBox in checkedComboBoxes)
             {
@@ -246,7 +240,8 @@ namespace DataTableConverter.View
                 { gbSubstring, typeof(ProcSubstring) },
                 { gbReplaceWhole, typeof(ProcReplaceWhole) },
                 { gbAddTableColumns, typeof(ProcAddTableColumns) },
-                { gbCompare, typeof(ProcCompare) }
+                { gbCompare, typeof(ProcCompare) },
+                { gbPVMExport, typeof(ProcPVMExport) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -262,7 +257,8 @@ namespace DataTableConverter.View
                 { typeof(ProcSubstring), SetSubstringControls },
                 { typeof(ProcReplaceWhole), SetReplaceWholeControls },
                 {typeof(ProcAddTableColumns), SetAddTableColumnsControls },
-                {typeof(ProcCompare), SetCompareControls }
+                {typeof(ProcCompare), SetCompareControls },
+                {typeof(ProcPVMExport), SetPVMExportControls }
             };
         }
 
@@ -280,7 +276,8 @@ namespace DataTableConverter.View
                 new Proc(ProcSubstring.ClassName, null, 8),
                 new Proc(ProcReplaceWhole.ClassName, null, 9),
                 new Proc(ProcAddTableColumns.ClassName, null, 10),
-                new Proc(ProcCompare.ClassName, null, 11)
+                new Proc(ProcCompare.ClassName, null, 11),
+                new Proc(ProcPVMExport.ClassName, null, 12)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -872,6 +869,14 @@ namespace DataTableConverter.View
 
 
             dgOrderColumns.Columns.Add(cmb);
+        }
+
+        private void SetPVMExportControls(WorkProc selectedProc)
+        {
+            SetHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            lblOriginalNameText.Text = ProcPVMExport.ClassName;
+
+            SetDataSource(dgvPVMExport, selectedProc.Columns);
         }
 
         private void SetProcValues(WorkProc selectedProc)
@@ -1792,6 +1797,11 @@ namespace DataTableConverter.View
             IFormatter formatter = new BinaryFormatter();
             TolerancesBefore.Seek(0, SeekOrigin.Begin);
             LoadTolerances(formatter.Deserialize(TolerancesBefore) as List<Tolerance>);
+        }
+
+        private void cbHeadersPVMExport_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvPVMExport, e, (CheckedListBox)sender);
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

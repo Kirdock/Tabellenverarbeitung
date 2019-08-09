@@ -99,6 +99,7 @@
     <Compile Include="Classes\WorkProcs\ProcNumber.cs" />
     <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
     <Compile Include="Classes\WorkProcs\ProcPadding.cs" />
+    <Compile Include="Classes\WorkProcs\ProcPVMExport.cs" />
     <Compile Include="Classes\WorkProcs\ProcReplaceWhole.cs" />
     <Compile Include="Classes\WorkProcs\ProcRound.cs" />
     <Compile Include="Classes\WorkProcs\ProcSubstring.cs" />
