@@ -277,6 +277,21 @@ namespace DataTableConverter.Extensions
             }
         }
 
+        internal static DataTable SetColumnsTypeStringWithContainingData(this DataTable table)
+        {
+            DataTable dtCloned = table.Clone();
+            foreach (DataColumn col in dtCloned.Columns)
+            {
+                col.DataType = typeof(string);
+            }
+            
+            foreach (DataRow row in table.Rows)
+            {
+                dtCloned.ImportRow(row);
+            }
+            return dtCloned;
+        }
+
         internal static void ConcatTable(this DataTable originalTable, DataTable table, string originalFilename, string secondFilename)
         {
             List<int> ColumnIndizes = new List<int>();

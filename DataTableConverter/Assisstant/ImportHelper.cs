@@ -292,7 +292,7 @@ namespace DataTableConverter.Assisstant
             con.Open();
             OleDbDataAdapter da = new OleDbDataAdapter(cmd);
             da.Fill(data);
-            return data;
+            return data.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? data : data.SetColumnsTypeStringWithContainingData();
         }
 
         internal static DataTable OpenMSAccess(string path)

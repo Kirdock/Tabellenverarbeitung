@@ -119,7 +119,7 @@ namespace DataTableConverter
                 dgTable.FirstDisplayedScrollingRowIndex = scrollBarVertical;
             }
             RestoreDataGridSortMode();
-            dgTable.Columns.Cast<DataGridViewColumn>().Last().AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            SetWidth();
         }
 
 
@@ -200,7 +200,6 @@ namespace DataTableConverter
             proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType);
 
             AssignDataSource(table);
-            SetWidth();
             SetMenuEnabled(true);
         }
 
