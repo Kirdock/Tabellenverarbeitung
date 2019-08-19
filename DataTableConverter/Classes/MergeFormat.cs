@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DataTableConverter.Classes
 {
     [Serializable()]
-    internal class MergeFormat
+    public class MergeFormat
     {
         public enum MergeColumns:int { Column = 0, Text = 1, Empty = 2, NotEmpty = 3}
         public DataTable Table { get; set; }

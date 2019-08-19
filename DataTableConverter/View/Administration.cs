@@ -660,7 +660,7 @@ namespace DataTableConverter.View
         {
             ProcMerge selectedProc = proc as ProcMerge;
             txtNewColumnMerge.Text = selectedProc.NewColumn;
-            txtFormula.Text = selectedProc.Format.ToString();
+            txtFormula.Text = selectedProc?.Format?.ToString() ?? string.Empty;
             lblOriginalNameText.Text = ProcMerge.ClassName;
 
             SetMergeDataGridView(selectedProc.Conditions);
@@ -678,7 +678,10 @@ namespace DataTableConverter.View
                 Text = "Format",
                 UseColumnTextForButtonValue = true
             };
-            dgvMerge.Columns[(int)ProcMerge.ConditionColumn.Format].ReadOnly = true;
+            if (dgvMerge.Columns.Count > 3)
+            {
+                dgvMerge.Columns[(int)ProcMerge.ConditionColumn.Format].ReadOnly = true;
+            }
             dgvMerge.Columns.Add(boxCol);
         }
 
