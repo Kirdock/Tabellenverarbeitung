@@ -60,6 +60,9 @@
             this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.dgvFormat = new System.Windows.Forms.DataGridView();
             this.Col = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TextCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -72,9 +75,9 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.TxtSettingPath = new System.Windows.Forms.TextBox();
+            this.BtnSearchFolder = new System.Windows.Forms.Button();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -352,6 +355,9 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.BtnSearchFolder);
+            this.tabPage2.Controls.Add(this.TxtSettingPath);
+            this.tabPage2.Controls.Add(this.label16);
             this.tabPage2.Controls.Add(this.cbFullWidthImport);
             this.tabPage2.Controls.Add(this.cbAutoSavePVM);
             this.tabPage2.Controls.Add(this.txtOldAffix);
@@ -431,6 +437,33 @@
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "Hilfe";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(129, 79);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(148, 13);
+            this.label15.TabIndex = 15;
+            this.label15.Text = "\"Sehr geehrter Herr Strießnig\"";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(129, 57);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(173, 13);
+            this.label14.TabIndex = 14;
+            this.label14.Text = "\"Sehr geehrter Herr MSc Strießnig\"";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(193, 98);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(255, 13);
+            this.label12.TabIndex = 13;
+            this.label12.Text = "\"_\" Dient hier nur zur Visualisierung von Leerzeichen";
             // 
             // dgvFormat
             // 
@@ -536,32 +569,32 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Formatbeispiel:";
             // 
-            // label12
+            // label16
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(193, 98);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(255, 13);
-            this.label12.TabIndex = 13;
-            this.label12.Text = "\"_\" Dient hier nur zur Visualisierung von Leerzeichen";
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(8, 166);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(137, 13);
+            this.label16.TabIndex = 5;
+            this.label16.Text = "Dateipfad für Einstellungen:";
             // 
-            // label14
+            // TxtSettingPath
             // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(129, 57);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(173, 13);
-            this.label14.TabIndex = 14;
-            this.label14.Text = "\"Sehr geehrter Herr MSc Strießnig\"";
+            this.TxtSettingPath.Location = new System.Drawing.Point(217, 166);
+            this.TxtSettingPath.Name = "TxtSettingPath";
+            this.TxtSettingPath.ReadOnly = true;
+            this.TxtSettingPath.Size = new System.Drawing.Size(308, 20);
+            this.TxtSettingPath.TabIndex = 6;
             // 
-            // label15
+            // BtnSearchFolder
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(129, 79);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(148, 13);
-            this.label15.TabIndex = 15;
-            this.label15.Text = "\"Sehr geehrter Herr Strießnig\"";
+            this.BtnSearchFolder.Location = new System.Drawing.Point(544, 164);
+            this.BtnSearchFolder.Name = "BtnSearchFolder";
+            this.BtnSearchFolder.Size = new System.Drawing.Size(75, 23);
+            this.BtnSearchFolder.TabIndex = 7;
+            this.BtnSearchFolder.Text = "Suchen";
+            this.BtnSearchFolder.UseVisualStyleBackColor = true;
+            this.BtnSearchFolder.Click += new System.EventHandler(this.BtnSearchFolder_Click);
             // 
             // SettingForm
             // 
@@ -641,5 +674,8 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox TxtSettingPath;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Button BtnSearchFolder;
     }
 }

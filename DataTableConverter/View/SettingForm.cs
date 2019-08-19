@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,7 @@ namespace DataTableConverter.View
             cbFullWidthImport.Checked = Properties.Settings.Default.FullWidthImport;
             NbFontSize.Value = Properties.Settings.Default.TableFontSize;
             NbRowHeight.Value = Properties.Settings.Default.RowHeight;
+            TxtSettingPath.Text = ExportHelper.ProjectPath;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -119,6 +121,43 @@ namespace DataTableConverter.View
         private void llSourceCode_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/Kirdock/Tabellenverarbeitung");
+        }
+
+        private void BtnSearchFolder_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog folderBrowser = new OpenFileDialog
+            {
+                ValidateNames = false,
+                CheckFileExists = false,
+                CheckPathExists = true,
+                FileName = "Ordnerauswahl"
+            };
+            if (folderBrowser.ShowDialog() == DialogResult.OK)
+            {
+                string folderPath = Path.GetDirectoryName(folderBrowser.FileName);
+
+                foreach (string file in Directory.GetFiles(ExportHelper.ProjectPath))
+                {
+                    FileInfo mFile = new FileInfo(file);
+                    string path = Path.Combine(folderPath, mFile.Name);
+                    // to remove name collisions
+                    if (!File.Exists(path))
+                    {
+                        mFile.MoveTo(path);
+                    }
+                }
+                foreach (string directory in Directory.GetDirectories(ExportHelper.ProjectPath))
+                {
+                    string path = Path.Combine(folderPath, Path.GetFileName(directory));
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.Move(directory, path);
+                    }
+                }
+
+
+                Properties.Settings.Default.SettingPath = TxtSettingPath.Text = folderPath;
+            }
         }
     }
 }

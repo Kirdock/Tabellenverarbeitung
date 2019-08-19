@@ -477,5 +477,17 @@ namespace DataTableConverter.Properties {
                 this["TableFontSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SettingPath {
+            get {
+                return ((string)(this["SettingPath"]));
+            }
+            set {
+                this["SettingPath"] = value;
+            }
+        }
     }
 }

@@ -24,13 +24,17 @@ namespace DataTableConverter
                                          string lpFileName);
 
         internal static readonly string ProjectName = "Tabellenkonvertierung";
-        internal static readonly string ProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),ProjectName);
-        internal static readonly string ProjectPresets = Path.Combine(ProjectPath,"Vorlagen");
-        internal static readonly string ProjectProcedures = Path.Combine(ProjectPath,"Funktionen.bin");
-        internal static readonly string ProjectTolerance = Path.Combine(ProjectPath,"Toleranzen.bin");
-        internal static readonly string ProjectCases = Path.Combine(ProjectPath,"Fälle.bin");
-        internal static readonly string ProjectWorkflows = Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
-        internal static readonly string ProjectHeaderPresets = Path.Combine(ProjectPath, "Vorlagen Überschriften");
+        internal static string ProjectPath { get
+            {
+                return Properties.Settings.Default.SettingPath == string.Empty ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName) : Properties.Settings.Default.SettingPath;
+            } }
+        
+        internal static string ProjectPresets => Path.Combine(ProjectPath,"Vorlagen");
+        internal static string ProjectProcedures => Path.Combine(ProjectPath,"Funktionen.bin");
+        internal static string ProjectTolerance => Path.Combine(ProjectPath,"Toleranzen.bin");
+        internal static string ProjectCases => Path.Combine(ProjectPath,"Fälle.bin");
+        internal static string ProjectWorkflows => Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
+        internal static string ProjectHeaderPresets => Path.Combine(ProjectPath, "Vorlagen Überschriften");
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
