@@ -134,8 +134,11 @@ namespace DataTableConverter.View
             };
             if (folderBrowser.ShowDialog() == DialogResult.OK)
             {
-                string folderPath = Path.GetDirectoryName(folderBrowser.FileName);
-
+                string folderPath = Path.Combine(Path.GetDirectoryName(folderBrowser.FileName), ExportHelper.ProjectName);
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
                 foreach (string file in Directory.GetFiles(ExportHelper.ProjectPath))
                 {
                     FileInfo mFile = new FileInfo(file);
@@ -154,7 +157,6 @@ namespace DataTableConverter.View
                         Directory.Move(directory, path);
                     }
                 }
-
 
                 Properties.Settings.Default.SettingPath = TxtSettingPath.Text = folderPath;
             }
