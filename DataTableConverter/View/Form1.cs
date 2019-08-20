@@ -110,7 +110,8 @@ namespace DataTableConverter
             }
             int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
             OrderType orderType = OrderType;
-            
+            (dgTable.DataSource as DataView)?.Dispose(); //in hope to remove all remaining lazy loading
+            sourceTable?.Dispose(); //in hope to remove all remaining lazy loading
             dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
             sourceTable = table ?? sourceTable;
             int rowCount = sourceTable.Rows.Count;

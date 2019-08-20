@@ -465,6 +465,7 @@ namespace DataTableConverter.Extensions
         {
             DataView view;
             table.AcceptChanges();
+            table.BeginLoadData();
             Dictionary<string, SortOrder> dict = ViewHelper.GenerateSortingList(order);
             if (dict.Count == 0)
             {
@@ -489,7 +490,7 @@ namespace DataTableConverter.Extensions
                     tempSortName = table.TryAddColumn(TempSort);
                 }
 
-                var enumerable = table.AsEnumerable().OrderBy(field => field.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
+                OrderedEnumerableRowCollection<DataRow> enumerable = table.AsEnumerable().OrderBy(field => field?.Field<string>(firstElement.Key), new NaturalStringComparer(firstElement.Value));
 
                 foreach (var column in dict.Skip(1))
                 {
@@ -501,15 +502,13 @@ namespace DataTableConverter.Extensions
                     int half = enumerable.Count() / 2;
 
                     int count = 0;
-                    foreach (DataRow row in enumerable)//lazy loading. this does not always run before the next (enumerable.OrderBy...) statement
+                    foreach (DataRow row in enumerable.ToList())//lazy loading. this does not always run before the next (enumerable.OrderBy...) statement
                     {
                         row[tempSortName] = count++;
                     }
-
-                   
                     enumerable = enumerable.OrderBy(row =>
                     {
-                        if (table.Columns.IndexOf(tempSortName) != -1 && int.TryParse(row[tempSortName]?.ToString(), out int res)) //everything here is triggered if row[tempSortName] is set... or before it is set... idk... wtf. so there is a new column but there are not any indices written (or just one)
+                        if (row != null && table.Columns.IndexOf(tempSortName) != -1 && int.TryParse(row[tempSortName]?.ToString(), out int res)) //everything here is triggered if row[tempSortName] is set... or before it is set... idk... wtf. so there is a new column but there are not any indices written (or just one)
                         {
                             int position = res + 1;
 
@@ -526,14 +525,17 @@ namespace DataTableConverter.Extensions
                             return new CustomSortItem(0, false);
                         }
                     }, new CustomSort(firstElement.Value == SortOrder.Ascending));
+                    
                 }
                 view = enumerable.AsDataView();
-
+                
                 if (tempSortName != string.Empty)
                 {
-                    view.Table.Columns.Remove(tempSortName);
+                    table.Columns.Remove(tempSortName);
                 }
+                
             }
+            table.EndLoadData();
             return view;
         }
 
