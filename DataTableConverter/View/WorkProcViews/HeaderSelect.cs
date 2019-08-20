@@ -19,6 +19,12 @@ namespace DataTableConverter.View.WorkProcViews
             InitializeComponent();
             ClBHeaders.Items.AddRange(headers);
             SetChecked(oldHeaders);
+            SetListBoxStyle();
+        }
+
+        private void SetListBoxStyle()
+        {
+            ViewHelper.SetListBoxStyle(ClBHeaders);
         }
 
         private void SetChecked(string oldHeaders)

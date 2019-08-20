@@ -54,6 +54,9 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.BtnSearchFolder = new System.Windows.Forms.Button();
+            this.TxtSettingPath = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.cbFullWidthImport = new System.Windows.Forms.CheckBox();
             this.cbAutoSavePVM = new System.Windows.Forms.CheckBox();
             this.txtOldAffix = new System.Windows.Forms.TextBox();
@@ -75,9 +78,12 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label16 = new System.Windows.Forms.Label();
-            this.TxtSettingPath = new System.Windows.Forms.TextBox();
-            this.BtnSearchFolder = new System.Windows.Forms.Button();
+            this.NbRowHeightListBox = new System.Windows.Forms.NumericUpDown();
+            this.NbFontSizeListBox = new System.Windows.Forms.NumericUpDown();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -87,6 +93,8 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbRowHeightListBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbFontSizeListBox)).BeginInit();
             this.SuspendLayout();
             // 
             // tabSettings
@@ -289,6 +297,12 @@
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.label24);
+            this.tabPage4.Controls.Add(this.label23);
+            this.tabPage4.Controls.Add(this.NbRowHeightListBox);
+            this.tabPage4.Controls.Add(this.NbFontSizeListBox);
+            this.tabPage4.Controls.Add(this.label17);
+            this.tabPage4.Controls.Add(this.label18);
             this.tabPage4.Controls.Add(this.NbRowHeight);
             this.tabPage4.Controls.Add(this.NbFontSize);
             this.tabPage4.Controls.Add(this.label22);
@@ -298,12 +312,12 @@
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage4.Size = new System.Drawing.Size(792, 424);
             this.tabPage4.TabIndex = 4;
-            this.tabPage4.Text = "Tabellen";
+            this.tabPage4.Text = "Größen";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
             // NbRowHeight
             // 
-            this.NbRowHeight.Location = new System.Drawing.Point(88, 43);
+            this.NbRowHeight.Location = new System.Drawing.Point(88, 70);
             this.NbRowHeight.Minimum = new decimal(new int[] {
             1,
             0,
@@ -320,7 +334,7 @@
             // 
             // NbFontSize
             // 
-            this.NbFontSize.Location = new System.Drawing.Point(88, 14);
+            this.NbFontSize.Location = new System.Drawing.Point(88, 41);
             this.NbFontSize.Minimum = new decimal(new int[] {
             1,
             0,
@@ -338,7 +352,7 @@
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(8, 16);
+            this.label22.Location = new System.Drawing.Point(8, 43);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(64, 13);
             this.label22.TabIndex = 1;
@@ -347,7 +361,7 @@
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(8, 45);
+            this.label21.Location = new System.Drawing.Point(8, 72);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(60, 13);
             this.label21.TabIndex = 0;
@@ -370,6 +384,33 @@
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // BtnSearchFolder
+            // 
+            this.BtnSearchFolder.Location = new System.Drawing.Point(544, 164);
+            this.BtnSearchFolder.Name = "BtnSearchFolder";
+            this.BtnSearchFolder.Size = new System.Drawing.Size(75, 23);
+            this.BtnSearchFolder.TabIndex = 7;
+            this.BtnSearchFolder.Text = "Suchen";
+            this.BtnSearchFolder.UseVisualStyleBackColor = true;
+            this.BtnSearchFolder.Click += new System.EventHandler(this.BtnSearchFolder_Click);
+            // 
+            // TxtSettingPath
+            // 
+            this.TxtSettingPath.Location = new System.Drawing.Point(217, 166);
+            this.TxtSettingPath.Name = "TxtSettingPath";
+            this.TxtSettingPath.ReadOnly = true;
+            this.TxtSettingPath.Size = new System.Drawing.Size(308, 20);
+            this.TxtSettingPath.TabIndex = 6;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(8, 166);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(137, 13);
+            this.label16.TabIndex = 5;
+            this.label16.Text = "Dateipfad für Einstellungen:";
             // 
             // cbFullWidthImport
             // 
@@ -569,32 +610,77 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Formatbeispiel:";
             // 
-            // label16
+            // NbRowHeightListBox
             // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(8, 166);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(137, 13);
-            this.label16.TabIndex = 5;
-            this.label16.Text = "Dateipfad für Einstellungen:";
+            this.NbRowHeightListBox.Location = new System.Drawing.Point(338, 70);
+            this.NbRowHeightListBox.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.NbRowHeightListBox.Name = "NbRowHeightListBox";
+            this.NbRowHeightListBox.Size = new System.Drawing.Size(54, 20);
+            this.NbRowHeightListBox.TabIndex = 7;
+            this.NbRowHeightListBox.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
-            // TxtSettingPath
+            // NbFontSizeListBox
             // 
-            this.TxtSettingPath.Location = new System.Drawing.Point(217, 166);
-            this.TxtSettingPath.Name = "TxtSettingPath";
-            this.TxtSettingPath.ReadOnly = true;
-            this.TxtSettingPath.Size = new System.Drawing.Size(308, 20);
-            this.TxtSettingPath.TabIndex = 6;
+            this.NbFontSizeListBox.Location = new System.Drawing.Point(338, 41);
+            this.NbFontSizeListBox.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.NbFontSizeListBox.Name = "NbFontSizeListBox";
+            this.NbFontSizeListBox.Size = new System.Drawing.Size(54, 20);
+            this.NbFontSizeListBox.TabIndex = 6;
+            this.NbFontSizeListBox.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
-            // BtnSearchFolder
+            // label17
             // 
-            this.BtnSearchFolder.Location = new System.Drawing.Point(544, 164);
-            this.BtnSearchFolder.Name = "BtnSearchFolder";
-            this.BtnSearchFolder.Size = new System.Drawing.Size(75, 23);
-            this.BtnSearchFolder.TabIndex = 7;
-            this.BtnSearchFolder.Text = "Suchen";
-            this.BtnSearchFolder.UseVisualStyleBackColor = true;
-            this.BtnSearchFolder.Click += new System.EventHandler(this.BtnSearchFolder_Click);
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(258, 43);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(64, 13);
+            this.label17.TabIndex = 5;
+            this.label17.Text = "Schriftgröße";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(258, 72);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(60, 13);
+            this.label18.TabIndex = 4;
+            this.label18.Text = "Zeilenhöhe";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label23.Location = new System.Drawing.Point(8, 13);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(74, 16);
+            this.label23.TabIndex = 8;
+            this.label23.Text = "Tabellen:";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label24.Location = new System.Drawing.Point(258, 13);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(96, 16);
+            this.label24.TabIndex = 9;
+            this.label24.Text = "Auflistungen:";
             // 
             // SettingForm
             // 
@@ -621,6 +707,8 @@
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbRowHeightListBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbFontSizeListBox)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -677,5 +765,11 @@
         private System.Windows.Forms.TextBox TxtSettingPath;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button BtnSearchFolder;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.NumericUpDown NbRowHeightListBox;
+        private System.Windows.Forms.NumericUpDown NbFontSizeListBox;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label label18;
     }
 }

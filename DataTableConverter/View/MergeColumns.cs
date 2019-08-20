@@ -24,6 +24,7 @@ namespace DataTableConverter.View
         internal MergeColumns(object[] headers)
         {
             InitializeComponent();
+            SetListBoxStyle();
             CmBHeaders.Items.AddRange(headers);
             List<PlusListboxItem> list = new List<PlusListboxItem>();
             foreach(object header in headers)
@@ -33,6 +34,11 @@ namespace DataTableConverter.View
             ClBHeaders.Items.AddRange(list.ToArray());
             CmBHeaders.SelectedIndex = 0;
             SetChecked(true);
+        }
+
+        private void SetListBoxStyle()
+        {
+            ViewHelper.SetListBoxStyle(ClBHeaders);
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)

@@ -980,7 +980,7 @@ namespace DataTableConverter
             
             if(export.ShowDialog() == DialogResult.OK)
             {
-                ExportHelper.ExportCount(export.getSelectedValue(), export.getColumnIndex(), export.CountChecked ? export.Count : 0, export.ShowFromTo, GetDataSource(), OrderType, StartLoadingBar, StopLoadingBar);
+                ExportHelper.ExportCount(export.getSelectedValue(), export.getColumnIndex(), export.CountChecked ? export.Count : 0, export.ShowFromTo, GetDataSource(), OrderType, StartLoadingBar, StopLoadingBar, this);
             }
         }
 

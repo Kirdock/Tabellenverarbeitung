@@ -358,7 +358,14 @@ namespace DataTableConverter.Extensions
                             }.ToArray();
             }
 
-            pgbLoading?.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = sourceTable.Rows.Count; }));
+            try
+            {
+                pgbLoading?.Invoke(new MethodInvoker(() => { pgbLoading.Value = 0; pgbLoading.Maximum = sourceTable.Rows.Count; }));
+            }
+            catch(Exception ex)
+            {
+                ErrorHelper.LogMessage(ex, false);
+            }
 
 
             HashSet<int> hs = new HashSet<int>();
@@ -392,7 +399,14 @@ namespace DataTableConverter.Extensions
                     }
                 }
 
-                pgbLoading?.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
+                try
+                {
+                    pgbLoading?.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
+                }
+                catch(Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex, false);
+                }
             }
         }
 

@@ -13,6 +13,7 @@ namespace DataTableConverter.View
         internal MergeTable(object[] headersOriginal, object[] headersMerge, string filename, int sourceCount, int importCount)
         {
             InitializeComponent();
+            SetListBoxStyle();
             Headers = headersOriginal;
             setCmbItems(cmbIdentifierOriginal, headersOriginal);
             setCmbItems(cmbIdentifierMerge, headersMerge);
@@ -24,6 +25,11 @@ namespace DataTableConverter.View
             lblRowCountImport.ForeColor = lblRowCountSource.ForeColor = lblSourceTable.ForeColor = lblImportTableText.ForeColor = sourceCount == importCount ? System.Drawing.Color.Green : System.Drawing.Color.Red;
             lblRowCountImport.Text = importCount.ToString();
             lblRowCountSource.Text = sourceCount.ToString();
+        }
+
+        private void SetListBoxStyle()
+        {
+            ViewHelper.SetListBoxStyle(clbColumns);
         }
 
         private void setSettings()

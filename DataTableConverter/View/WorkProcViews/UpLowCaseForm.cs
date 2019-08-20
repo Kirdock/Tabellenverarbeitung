@@ -19,8 +19,13 @@ namespace DataTableConverter.View
             InitializeComponent();
             cmbOption.SelectedIndex = 0;
             clbHeaders.Items.AddRange(header);
+            SetListBoxStyle();
         }
 
+        private void SetListBoxStyle()
+        {
+            ViewHelper.SetListBoxStyle(clbHeaders);
+        }
 
         internal bool allColumns()
         {

@@ -23,10 +23,24 @@ namespace DataTableConverter.View
         internal SortForm(object[] items, string orderBefore, OrderType orderType)
         {
             InitializeComponent();
+            SetListBoxStyle();
             Orders = new Dictionary<string, string>();
             clBoxHeaders.Items.AddRange(items);
             adjustListBox(orderBefore);
             SetOrderType(orderType);
+        }
+
+        private void SetListBoxStyle()
+        {
+            ListBox[] listBoxes = new ListBox[]
+            {
+                clBoxHeaders,
+                lBoxSelectedHeaders
+            };
+            foreach (ListBox listBox in listBoxes)
+            {
+                ViewHelper.SetListBoxStyle(listBox);
+            }
         }
 
         private void SetOrderType(OrderType orderType)

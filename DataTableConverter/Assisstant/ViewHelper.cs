@@ -421,6 +421,12 @@ namespace DataTableConverter
             }
         }
 
+        internal static void SetListBoxStyle(ListBox listBox)
+        {
+            listBox.Font = new Font(listBox.Font.Name, Properties.Settings.Default.ListBoxFontSize);
+            listBox.ItemHeight = Properties.Settings.Default.ListBoxRowHeight;
+        }
+
         internal static void EndDataGridViewEdit(DataGridView dgTable)
         {
             dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();

@@ -46,6 +46,7 @@ namespace DataTableConverter.View
             AssignGroupBoxToEnum();
             SetHeaders(headers);
             SetOrderList();
+            SetListBoxStyle();
             
             CmBRound.SelectedIndex = 0;
             CmBRound.SelectedIndexChanged += CmBRound_SelectedIndexChanged;
@@ -66,6 +67,23 @@ namespace DataTableConverter.View
             AddContextMenuAndDataGridViewStyle();
             RestoreSplitterDistance();
             SetColors();
+        }
+
+        private void SetListBoxStyle()
+        {
+            ListBox[] listBoxes = new ListBox[]
+            {
+                lbCases,
+                lbProcedures,
+                lbTolerances,
+                lbUsedProcedures,
+                lbWorkflows,
+                ltbProcedures
+            };
+            foreach(ListBox listBox in listBoxes)
+            {
+                ViewHelper.SetListBoxStyle(listBox);
+            }
         }
 
         private void SetDataBefore(List<Proc> procedures, List<Case> cases, List<Work> workflows, List<Tolerance> tolerances)

@@ -18,6 +18,7 @@ namespace DataTableConverter.View
         internal MergeFormatView(MergeFormat format, object[] headers = null)
         {
             InitializeComponent();
+            ViewHelper.SetDataGridViewStyle(dgTable);
             try
             {
                 format.Table.AcceptChanges();

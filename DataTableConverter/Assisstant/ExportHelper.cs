@@ -38,6 +38,7 @@ namespace DataTableConverter
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
+        private static readonly int DbaseMaxCharacterLength = 254;
         private static readonly string FontFileName = "seguisym.ttf";
 
 
@@ -330,7 +331,7 @@ namespace DataTableConverter
                     for (int y = 0; y < dataTable.Columns.Count; y++)
                     {
                         string temp = y >= row.ItemArray.Length ? string.Empty : row[y].ToString();
-                        builder.Append(temp.PadRight(max[y]));
+                        builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[y]));
                     }
                     stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
                 }
@@ -387,6 +388,13 @@ namespace DataTableConverter
                     {
                         max[i] = length;
                     }
+                }
+            }
+            for (int i = 0; i < max.Length; i++)
+            {
+                if (max[i] > DbaseMaxCharacterLength)
+                {
+                    max[i] = DbaseMaxCharacterLength;
                 }
             }
             return max;
@@ -471,9 +479,9 @@ namespace DataTableConverter
             
         }
 
-        internal static void ExportCount(string selectedValue, int columnIndex, int count, bool showFromTo, DataTable oldTable, OrderType orderType, Action startLoadingBar, Action stopLoadingBar)
+        internal static void ExportCount(string selectedValue, int columnIndex, int count, bool showFromTo, DataTable oldTable, OrderType orderType, Action startLoadingBar, Action stopLoadingBar, Form1 main)
         {
-            new Thread(() =>
+            Thread thread = new Thread(() =>
             {
                 startLoadingBar();
                 DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", orderType).ToTable();
@@ -509,10 +517,15 @@ namespace DataTableConverter
                         }
                     }
                 }
-
-                new Form1(newTable).Show();
+                main.BeginInvoke(new MethodInvoker(() =>
+                {
+                    new Form1(newTable).Show();
+                }));
+                
                 stopLoadingBar();
-            }).Start();
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
     }
 }

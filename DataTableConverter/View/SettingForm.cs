@@ -53,6 +53,8 @@ namespace DataTableConverter.View
             NbFontSize.Value = Properties.Settings.Default.TableFontSize;
             NbRowHeight.Value = Properties.Settings.Default.RowHeight;
             TxtSettingPath.Text = ExportHelper.ProjectPath;
+            NbFontSizeListBox.Value = Properties.Settings.Default.ListBoxFontSize;
+            NbRowHeightListBox.Value = Properties.Settings.Default.ListBoxRowHeight;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -74,6 +76,8 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.FullWidthImport = cbFullWidthImport.Checked;
                 Properties.Settings.Default.TableFontSize = (int)NbFontSize.Value;
                 Properties.Settings.Default.RowHeight = (int)NbRowHeight.Value;
+                Properties.Settings.Default.ListBoxFontSize = (int)NbFontSizeListBox.Value;
+                Properties.Settings.Default.ListBoxRowHeight = (int)NbRowHeightListBox.Value;
                 Properties.Settings.Default.Save();
             }
             else

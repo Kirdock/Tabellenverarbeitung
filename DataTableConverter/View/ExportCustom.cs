@@ -21,10 +21,16 @@ namespace DataTableConverter.View
         internal ExportCustom(object[] headers, DataTable table)
         {
             InitializeComponent();
+            SetListBoxStyle();
             Table = table;
             cmbColumn.Items.AddRange(headers);
             
             SetEnabled();
+        }
+
+        private void SetListBoxStyle()
+        {
+            ViewHelper.SetListBoxStyle(clbValues);
         }
 
         private void SetEnabled()
