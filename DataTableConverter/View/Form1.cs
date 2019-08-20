@@ -38,10 +38,12 @@ namespace DataTableConverter
         private List<string> dictKeys;
         private string FilePath = string.Empty;
         private OrderType OrderType = OrderType.Windows;
+        private Dictionary<string, int> ColumnWidths;
 
         internal Form1(DataTable table = null)
         {
             dictSorting = new Dictionary<string, SortOrder>();
+            ColumnWidths = new Dictionary<string, int>();
             dictKeys = new List<string>();
             InitializeComponent();
             SetSize();
@@ -100,26 +102,24 @@ namespace DataTableConverter
         }
 
 
-        private void AssignDataSource(DataTable table = null)
+        private void AssignDataSource(DataTable table = null, bool isNewTable = false)
         {
-            sourceTable = table ?? sourceTable;
-
-            int scrollBarHorizontal = dgTable.FirstDisplayedScrollingColumnIndex;
-            int scrollBarVertical = dgTable.FirstDisplayedScrollingRowIndex;
-            int rowCount = sourceTable.Rows.Count;
+            if (!isNewTable)
+            {
+                SaveWidthOfDataGridViewColumns();
+            }
+            int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
             OrderType orderType = OrderType;
+            
             dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
+            sourceTable = table ?? sourceTable;
+            int rowCount = sourceTable.Rows.Count;
+
             dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
-            if (scrollBarHorizontal != -1 && dgTable.Columns.Count > scrollBarHorizontal)
-            {
-                dgTable.FirstDisplayedScrollingColumnIndex = scrollBarHorizontal;
-            }
-            if (scrollBarVertical != -1 && dgTable.Rows.Count > scrollBarVertical)
-            {
-                dgTable.FirstDisplayedScrollingRowIndex = scrollBarVertical;
-            }
             RestoreDataGridSortMode();
-            SetWidth();
+            SetWidth(isNewTable);
+
+            dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
         }
 
 
@@ -199,15 +199,44 @@ namespace DataTableConverter
             string order = GetSorting();
             proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType);
 
-            AssignDataSource(table);
+            AssignDataSource(table, true);
             SetMenuEnabled(true);
         }
 
-        private void SetWidth()
+        private void SetWidth(bool isNewTable)
         {
             if (Properties.Settings.Default.FullWidthImport)
             {
-                dgTable.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+                if (isNewTable)
+                {
+                    dgTable.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+                    SaveWidthOfDataGridViewColumns();
+                }
+                else
+                {
+                    foreach(string col in ColumnWidths.Keys)
+                    {
+                        if (dgTable.Columns.Contains(col))
+                        {
+                            dgTable.Columns[col].Width = ColumnWidths[col];
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SaveWidthOfDataGridViewColumns()
+        {
+            foreach (DataGridViewColumn col in dgTable.Columns)
+            {
+                if (!ColumnWidths.ContainsKey(col.Name))
+                {
+                    ColumnWidths.Add(col.Name, col.Width);
+                }
+                else
+                {
+                    ColumnWidths[col.Name] = col.Width;
+                }
             }
         }
 
@@ -996,7 +1025,7 @@ namespace DataTableConverter
                 DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
                 if (dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection == SortOrder.Descending)
                 {
-                    ResetSort(col);
+                    ResetSort();
                 }
                 else
                 {
@@ -1008,7 +1037,7 @@ namespace DataTableConverter
             }
         }
 
-        private void ResetSort(DataGridViewColumn col)
+        private void ResetSort()
         {
             SetSorting(string.Empty);
             AssignDataSource();
