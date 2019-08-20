@@ -150,7 +150,7 @@ namespace DataTableConverter.Classes.WorkProcs
             path = Path.Combine(
                 Path.GetDirectoryName(filePath),
                 Path.GetFileNameWithoutExtension(filePath) + Properties.Settings.Default.PVMAddressText + Path.GetExtension(filePath));
-            return File.Exists(path);
+            return Properties.Settings.Default.PVMAddressText != string.Empty && File.Exists(path);
         }
     }
 }

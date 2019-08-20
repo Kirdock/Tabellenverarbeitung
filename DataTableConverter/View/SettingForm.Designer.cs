@@ -84,6 +84,7 @@
             this.label18 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
+            this.CBPvmSaveTwice = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -369,6 +370,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.CBPvmSaveTwice);
             this.tabPage2.Controls.Add(this.BtnSearchFolder);
             this.tabPage2.Controls.Add(this.TxtSettingPath);
             this.tabPage2.Controls.Add(this.label16);
@@ -387,7 +389,7 @@
             // 
             // BtnSearchFolder
             // 
-            this.BtnSearchFolder.Location = new System.Drawing.Point(544, 164);
+            this.BtnSearchFolder.Location = new System.Drawing.Point(544, 201);
             this.BtnSearchFolder.Name = "BtnSearchFolder";
             this.BtnSearchFolder.Size = new System.Drawing.Size(75, 23);
             this.BtnSearchFolder.TabIndex = 7;
@@ -397,7 +399,7 @@
             // 
             // TxtSettingPath
             // 
-            this.TxtSettingPath.Location = new System.Drawing.Point(217, 166);
+            this.TxtSettingPath.Location = new System.Drawing.Point(217, 203);
             this.TxtSettingPath.Name = "TxtSettingPath";
             this.TxtSettingPath.ReadOnly = true;
             this.TxtSettingPath.Size = new System.Drawing.Size(308, 20);
@@ -406,7 +408,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(8, 166);
+            this.label16.Location = new System.Drawing.Point(8, 203);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(137, 13);
             this.label16.TabIndex = 5;
@@ -415,7 +417,7 @@
             // cbFullWidthImport
             // 
             this.cbFullWidthImport.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cbFullWidthImport.Location = new System.Drawing.Point(8, 125);
+            this.cbFullWidthImport.Location = new System.Drawing.Point(8, 157);
             this.cbFullWidthImport.Name = "cbFullWidthImport";
             this.cbFullWidthImport.Size = new System.Drawing.Size(224, 17);
             this.cbFullWidthImport.TabIndex = 4;
@@ -682,6 +684,16 @@
             this.label24.TabIndex = 9;
             this.label24.Text = "Auflistungen:";
             // 
+            // CBPvmSaveTwice
+            // 
+            this.CBPvmSaveTwice.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBPvmSaveTwice.Location = new System.Drawing.Point(8, 122);
+            this.CBPvmSaveTwice.Name = "CBPvmSaveTwice";
+            this.CBPvmSaveTwice.Size = new System.Drawing.Size(224, 17);
+            this.CBPvmSaveTwice.TabIndex = 8;
+            this.CBPvmSaveTwice.Text = "PVM zwei Mal speichern";
+            this.CBPvmSaveTwice.UseVisualStyleBackColor = true;
+            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -771,5 +783,6 @@
         private System.Windows.Forms.NumericUpDown NbFontSizeListBox;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.CheckBox CBPvmSaveTwice;
     }
 }

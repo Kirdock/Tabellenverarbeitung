@@ -55,6 +55,7 @@ namespace DataTableConverter.View
             TxtSettingPath.Text = ExportHelper.ProjectPath;
             NbFontSizeListBox.Value = Properties.Settings.Default.ListBoxFontSize;
             NbRowHeightListBox.Value = Properties.Settings.Default.ListBoxRowHeight;
+            CBPvmSaveTwice.Checked = Properties.Settings.Default.PVMSaveTwice;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -78,6 +79,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.RowHeight = (int)NbRowHeight.Value;
                 Properties.Settings.Default.ListBoxFontSize = (int)NbFontSizeListBox.Value;
                 Properties.Settings.Default.ListBoxRowHeight = (int)NbRowHeightListBox.Value;
+                Properties.Settings.Default.PVMSaveTwice = CBPvmSaveTwice.Checked;
                 Properties.Settings.Default.Save();
             }
             else

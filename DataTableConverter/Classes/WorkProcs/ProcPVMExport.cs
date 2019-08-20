@@ -52,12 +52,24 @@ namespace DataTableConverter.Classes.WorkProcs
                 RestoreDirectory = true
             };
 
+            SaveFileDialog saveFileDialog2 = new SaveFileDialog
+            {
+                Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
             if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 path = path ?? saveFileDialog1.FileName;
                 try
                 {
                     ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                    if(Properties.Settings.Default.PVMSaveTwice && saveFileDialog2.ShowDialog() == DialogResult.OK)
+                    {
+                        path = saveFileDialog2.FileName;
+                        ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                    }
                 }
                 catch (Exception ex)
                 {

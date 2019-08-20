@@ -513,5 +513,17 @@ namespace DataTableConverter.Properties {
                 this["ListBoxRowHeight"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PVMSaveTwice {
+            get {
+                return ((bool)(this["PVMSaveTwice"]));
+            }
+            set {
+                this["PVMSaveTwice"] = value;
+            }
+        }
     }
 }
