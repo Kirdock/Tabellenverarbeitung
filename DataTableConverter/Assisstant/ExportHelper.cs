@@ -173,14 +173,15 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static void ExportCsv(DataTable dt, string directory, string filename)
+        internal static void ExportCsv(DataTable dt, string directory, string filename, Action updateLoadingBar = null)
         {
-            var writer = File.CreateText(Path.Combine(directory, filename + ".csv"));
+            StreamWriter writer = File.CreateText(Path.Combine(directory, filename + ".csv"));
             
             writer.WriteLine(string.Join(CSVSeparator, dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName)));
             foreach (DataRow row in dt.Rows)
             {
                 writer.WriteLine(string.Join(CSVSeparator, row.ItemArray.Select(field => field.ToString())));
+                updateLoadingBar?.Invoke();
             }
             writer.Close();
             
@@ -276,7 +277,7 @@ namespace DataTableConverter
             return path;
         }
 
-        internal static void ExportDbase(string originalFileName, DataTable dataTable, string originalPath)
+        internal static void ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Action updateLoadingBar = null)
         {
 
             string fileName = originalFileName.ToUpper();
@@ -334,6 +335,7 @@ namespace DataTableConverter
                         builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[y]));
                     }
                     stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                    updateLoadingBar?.Invoke();
                 }
 
                 stream.Write(bytes, 0, bytes.Length);
@@ -405,9 +407,8 @@ namespace DataTableConverter
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
-        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action startLoadingBar, Action stopLoadingBar)
+        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished)
         {
-            startLoadingBar.Invoke();
             new Thread(() =>
             {
 
@@ -475,6 +476,7 @@ namespace DataTableConverter
                     }
                 }
                 stopLoadingBar.Invoke();
+                saveFinished.Invoke();
             }).Start();
             
         }

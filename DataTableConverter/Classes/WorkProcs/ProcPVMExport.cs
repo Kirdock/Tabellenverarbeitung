@@ -15,10 +15,11 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcPVMExport : WorkProc
     {
         internal static readonly string ClassName = "PVM Export";
-
+        private Action UpdateLoadingBar;
         public ProcPVMExport(int ordinal, int id, string name) : base(ordinal, id, name) { }
-        public ProcPVMExport(string[] headers)
+        public ProcPVMExport(string[] headers, Action updateLoadingBar = null)
         {
+            UpdateLoadingBar = updateLoadingBar;
             SetColumns();
             AddColumns(headers);
         }
@@ -64,11 +65,11 @@ namespace DataTableConverter.Classes.WorkProcs
                 path = path ?? saveFileDialog1.FileName;
                 try
                 {
-                    ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                    ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
                     if(Properties.Settings.Default.PVMSaveTwice && saveFileDialog2.ShowDialog() == DialogResult.OK)
                     {
                         path = saveFileDialog2.FileName;
-                        ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                        ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
                     }
                 }
                 catch (Exception ex)

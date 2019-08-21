@@ -464,6 +464,7 @@ namespace DataTableConverter.Extensions
         internal static DataView GetSortedView(this DataTable table, string order, OrderType orderType, Action addHistory = null)
         {
             DataView view;
+            table.Dispose(); //in hope to remove all remaining lazy loading
             table.AcceptChanges();
             table.BeginLoadData();
             Dictionary<string, SortOrder> dict = ViewHelper.GenerateSortingList(order);

@@ -361,14 +361,14 @@
             // pVMToolStripMenuItem
             // 
             this.pVMToolStripMenuItem.Name = "pVMToolStripMenuItem";
-            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pVMToolStripMenuItem.Text = "PVM";
             this.pVMToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
             // 
             // trennenToolStripMenuItem
             // 
             this.trennenToolStripMenuItem.Name = "trennenToolStripMenuItem";
-            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.trennenToolStripMenuItem.Text = "Trennen";
             this.trennenToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 

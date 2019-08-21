@@ -111,7 +111,6 @@ namespace DataTableConverter
             int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
             OrderType orderType = OrderType;
             (dgTable.DataSource as DataView)?.Dispose(); //in hope to remove all remaining lazy loading
-            sourceTable?.Dispose(); //in hope to remove all remaining lazy loading
             dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
             sourceTable = table ?? sourceTable;
             int rowCount = sourceTable.Rows.Count;
@@ -452,6 +451,7 @@ namespace DataTableConverter
                     ErrorHelper.LogMessage(ex);
                 }
                 StopLoadingBar();
+                MessageHandler.MessagesOK(MessageBoxIcon.Information, "Arbeitsablauf ausgeführt!");
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -719,6 +719,7 @@ namespace DataTableConverter
                                 SetFileName(newPath);
                             }
                             StopLoadingBar();
+                            SaveFinished();
                         }
                         catch (Exception ex)
                         {
@@ -821,15 +822,16 @@ namespace DataTableConverter
                 if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
-                    StartLoadingBar();
                     DataTable table = GetDataSource(true);
+                    StartLoadingBarCount(table.Rows.Count);
                     new Thread(() =>
                     {
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path));
+                            ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path), UpdateLoadingBar);
                             StopLoadingBar();
+                            SaveFinished();
                         }
                         catch (Exception ex)
                         {
@@ -951,15 +953,16 @@ namespace DataTableConverter
                 
                 if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
-                    StartLoadingBar();
                     path = path ?? saveFileDialog1.FileName;
+                    StartLoadingBarCount(table.Rows.Count);
                     new Thread(() =>
                     {
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+                            ExportHelper.ExportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
                             StopLoadingBar();
+                            SaveFinished();
                         }
                         catch (Exception ex)
                         {
@@ -970,12 +973,42 @@ namespace DataTableConverter
             }
         }
 
+        private void UpdateLoadingBar()
+        {
+            try
+            {
+                pgbLoading.Invoke(new MethodInvoker(() =>
+                {
+                    pgbLoading.Value++;
+                }));
+            }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage(ex, false);
+            }
+        }
+
+        private void StartLoadingBarCount(int length)
+        {
+            pgbLoading.Maximum = length;
+            pgbLoading.Value = 0;
+            pgbLoading.Style = ProgressBarStyle.Continuous;
+        }
+
+        private void SaveFinished()
+        {
+            MessageHandler.MessagesOK(MessageBoxIcon.Information, "Gespeichert");
+        }
+
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Formula formula = new Formula(FormulaState.Export, sourceTable.HeadersOfDataTable());
             if(formula.ShowDialog() == DialogResult.OK)
             {
-                new ProcPVMExport(formula.SelectedHeaders()).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType);
+                StartLoadingBarCount(Properties.Settings.Default.PVMSaveTwice ? sourceTable.Rows.Count * 2 : sourceTable.Rows.Count);
+                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType);
+                StopLoadingBar();
+                SaveFinished();
             }
         }
 
@@ -984,7 +1017,8 @@ namespace DataTableConverter
             ExportCustom export = new ExportCustom(sourceTable.HeadersOfDataTable(), sourceTable);
             if(export.ShowDialog() == DialogResult.OK)
             {
-                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath,StartLoadingBar, StopLoadingBar);
+                StartLoadingBar();
+                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished);
             }
         }
 
@@ -1001,6 +1035,7 @@ namespace DataTableConverter
             pgbLoading.BeginInvoke(new MethodInvoker(() =>
             {
                 pgbLoading.Style = ProgressBarStyle.Blocks;
+                pgbLoading.Maximum = pgbLoading.Value = 0;
             }));
         }
 
