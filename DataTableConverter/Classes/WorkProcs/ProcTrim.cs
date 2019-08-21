@@ -33,7 +33,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             RegexOptions options = RegexOptions.None;
             Regex regex = new Regex("[ ]{2,}", options);

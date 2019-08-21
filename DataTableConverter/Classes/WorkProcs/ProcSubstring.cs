@@ -14,10 +14,10 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcSubstring : WorkProc
     {
         internal static readonly string ClassName = "Substring";
-        internal int Start;
-        internal int End;
-        internal string ReplaceText;
-        internal bool ReplaceChecked; //I need it because ReplaceText can also be empty
+        public int Start;
+        public int End;
+        public string ReplaceText;
+        public bool ReplaceChecked; //I need it because ReplaceText can also be empty
 
         public ProcSubstring(int ordinal, int id, string name) : base(ordinal, id, name) {
             Start = 1;
@@ -60,7 +60,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();

@@ -14,9 +14,9 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcPadding : WorkProc
     {
         internal static readonly string ClassName = "Zeichen auffüllen";
-        internal char? Character = null;
-        internal int Counter = 1;
-        internal DataTable Conditions;
+        public char? Character = null;
+        public int Counter = 1;
+        public DataTable Conditions;
         internal enum Side { Left, Right};
         internal Side OperationSide = Side.Right;
         private enum ConditionColumn : int { Spalte = 0, Wert = 1};
@@ -50,7 +50,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetAffectedHeaders();

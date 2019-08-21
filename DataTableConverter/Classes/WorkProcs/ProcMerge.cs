@@ -16,8 +16,8 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "Spalten zusammenfügen";
         internal enum ConditionColumn : int { Spalte = 0, Wert = 1, NichtLeer = 2, Format = 3 };
-        internal DataTable Conditions;
-        internal MergeFormat Format;
+        public DataTable Conditions;
+        public MergeFormat Format;
 
         internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name) {
             InitConditions();
@@ -90,7 +90,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Conditions = Conditions.AsEnumerable().Where(condition => condition[(int)ConditionColumn.Spalte].ToString() != colName).ToTable(Conditions);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {

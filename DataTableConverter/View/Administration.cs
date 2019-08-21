@@ -161,7 +161,8 @@ namespace DataTableConverter.View
                 lblUsedColumnsRound,
                 lblCompareFirstColumn,
                 lblCompareSecondColumn,
-                lblCompareNewColumn
+                lblCompareNewColumn,
+                lblCountColumn
             };
             foreach (Label label in labels)
             {
@@ -259,7 +260,8 @@ namespace DataTableConverter.View
                 { gbReplaceWhole, typeof(ProcReplaceWhole) },
                 { gbAddTableColumns, typeof(ProcAddTableColumns) },
                 { gbCompare, typeof(ProcCompare) },
-                { gbPVMExport, typeof(ProcPVMExport) }
+                { gbPVMExport, typeof(ProcPVMExport) },
+                { gbCount, typeof(ProcCount) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -274,9 +276,10 @@ namespace DataTableConverter.View
                 { typeof(ProcNumber), SetNumberControls },
                 { typeof(ProcSubstring), SetSubstringControls },
                 { typeof(ProcReplaceWhole), SetReplaceWholeControls },
-                {typeof(ProcAddTableColumns), SetAddTableColumnsControls },
-                {typeof(ProcCompare), SetCompareControls },
-                {typeof(ProcPVMExport), SetPVMExportControls }
+                { typeof(ProcAddTableColumns), SetAddTableColumnsControls },
+                { typeof(ProcCompare), SetCompareControls },
+                { typeof(ProcPVMExport), SetPVMExportControls },
+                { typeof(ProcCount), SetCountControls }
             };
         }
 
@@ -295,7 +298,8 @@ namespace DataTableConverter.View
                 new Proc(ProcReplaceWhole.ClassName, null, 9),
                 new Proc(ProcAddTableColumns.ClassName, null, 10),
                 new Proc(ProcCompare.ClassName, null, 11),
-                new Proc(ProcPVMExport.ClassName, null, 12)
+                new Proc(ProcPVMExport.ClassName, null, 12),
+                new Proc(ProcCount.ClassName, null, 13)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -604,7 +608,7 @@ namespace DataTableConverter.View
             {
                 groupBox.Enabled = enabled;
             }
-            gbTrim.Enabled = enabled;
+            gbMain.Enabled = enabled;
         }
 
         private void SetProcedureLock(Proc procedure = null)
@@ -900,6 +904,17 @@ namespace DataTableConverter.View
             SetDataSource(dgvPVMExport, selectedProc.Columns);
         }
 
+        private void SetCountControls(WorkProc selectedProc)
+        {
+            ProcCount proc = selectedProc as ProcCount;
+            lblOriginalNameText.Text = ProcCount.ClassName;
+            TxtCountColumn.Text = proc.Column;
+            cbShowFromTo.Checked = proc.ShowFromTo;
+            cbCount.Checked = proc.CountChecked;
+            nbCount.Value = proc.Count == 0 ? 1 : proc.Count;
+            nbCount.Visible = proc.CountChecked;
+        }
+
         private void SetProcValues(WorkProc selectedProc)
         {
             txtWorkProcName.Text = selectedProc.Name;
@@ -910,7 +925,7 @@ namespace DataTableConverter.View
 
         private void lbUsedProcedures_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (gbTrim.Enabled = (lbUsedProcedures.SelectedIndex != -1))
+            if (gbMain.Enabled = (lbUsedProcedures.SelectedIndex != -1))
             {
                 WorkProc selectedProc = GetSelectedWorkProcedure();
                 SetProcValues(selectedProc);
@@ -933,7 +948,7 @@ namespace DataTableConverter.View
                 {
                     box.Visible = gbState[box] == type;
                 }
-                gbTrim.Visible = type != null;
+                gbMain.Visible = type != null;
             }
         }
 
@@ -1823,6 +1838,26 @@ namespace DataTableConverter.View
         private void cbHeadersPVMExport_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvPVMExport, e, (CheckedListBox)sender);
+        }
+
+        private void cbShowFromTo_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcCount).ShowFromTo = cbShowFromTo.Checked;
+        }
+
+        private void cbCount_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcCount).CountChecked = nbCount.Visible = cbCount.Checked;
+        }
+
+        private void nbCount_ValueChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcCount).Count = (int)nbCount.Value;
+        }
+
+        private void TxtCountColumn_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcCount).Column = TxtCountColumn.Text;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

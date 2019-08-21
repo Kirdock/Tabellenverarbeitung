@@ -14,8 +14,8 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcRound : WorkProc
     {
         internal static readonly string ClassName = "Runden";
-        internal int Decimals;
-        internal int Type;
+        public int Decimals;
+        public int Type;
 
         public override string[] GetHeaders()
         {
@@ -54,7 +54,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();

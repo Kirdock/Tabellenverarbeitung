@@ -481,53 +481,43 @@ namespace DataTableConverter
             
         }
 
-        internal static void ExportCount(string selectedValue, int columnIndex, int count, bool showFromTo, DataTable oldTable, OrderType orderType, Action startLoadingBar, Action stopLoadingBar, Form1 main)
+        internal static DataTable ExportCount(string selectedValue, int count, bool showFromTo, DataTable oldTable, OrderType orderType)
         {
-            Thread thread = new Thread(() =>
+            DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", orderType).ToTable();
+            int columnIndex = table.Columns.IndexOf(selectedValue);
+            DataTable newTable = new DataTable();
+
+            if (count == 0)
             {
-                startLoadingBar();
-                DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", orderType).ToTable();
-                DataTable newTable = new DataTable();
+                Dictionary<string, int> pair = table.GroupCountOfColumn(columnIndex);
 
-                if (count == 0)
+                newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
+                newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
+            }
+            else
+            {
+                Dictionary<string, int> pair = new Dictionary<string, int>();
+                foreach (string col in table.HeadersOfDataTable())
                 {
-                    Dictionary<string, int> pair = table.GroupCountOfColumn(columnIndex);
-
-                    newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
-                    newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
+                    newTable.Columns.Add(col);
                 }
-                else
+                foreach (DataRow row in table.Rows)
                 {
-                    Dictionary<string, int> pair = new Dictionary<string, int>();
-                    foreach (string col in table.HeadersOfDataTable())
+                    string item = row[columnIndex].ToString();
+                    bool contains;
+                    if ((contains = pair.ContainsKey(item)) && pair[item] < count)
                     {
-                        newTable.Columns.Add(col);
+                        newTable.Rows.Add(row.ItemArray);
+                        pair[item] = pair[item] + 1;
                     }
-                    foreach (DataRow row in table.Rows)
+                    else if (!contains)
                     {
-                        string item = row[columnIndex].ToString();
-                        bool contains;
-                        if ((contains = pair.ContainsKey(item)) && pair[item] < count)
-                        {
-                            newTable.Rows.Add(row.ItemArray);
-                            pair[item] = pair[item] + 1;
-                        }
-                        else if (!contains)
-                        {
-                            pair.Add(item, 1);
-                            newTable.Rows.Add(row.ItemArray);
-                        }
+                        pair.Add(item, 1);
+                        newTable.Rows.Add(row.ItemArray);
                     }
                 }
-                main.BeginInvoke(new MethodInvoker(() =>
-                {
-                    new Form1(newTable).Show();
-                }));
-                
-                stopLoadingBar();
-            });
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }
+            return newTable;
         }
     }
 }

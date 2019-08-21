@@ -32,7 +32,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             DataTable saveTable = table.Copy().GetSortedView(sortingOrder, orderType).ToTable();
             IEnumerable<string> sourceColumns = saveTable.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray();

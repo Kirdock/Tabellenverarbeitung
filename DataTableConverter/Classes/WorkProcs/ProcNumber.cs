@@ -13,9 +13,9 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     class ProcNumber : WorkProc
     {
-        internal int Start;
-        internal int End;
-        internal bool Repeat;
+        public int Start;
+        public int End;
+        public bool Repeat;
         internal static readonly string ClassName = "Nummerierung";
 
         public ProcNumber(int ordinal, int id, string name) : base(ordinal, id, name){}
@@ -28,7 +28,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Repeat = repeat;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {

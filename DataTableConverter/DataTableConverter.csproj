@@ -96,6 +96,7 @@
     <Compile Include="Assisstant\ViewHelper.cs" />
     <Compile Include="Classes\WorkProcs\ProcAddTableColumns.cs" />
     <Compile Include="Classes\WorkProcs\ProcCompare.cs" />
+    <Compile Include="Classes\WorkProcs\ProcCount.cs" />
     <Compile Include="Classes\WorkProcs\ProcNumber.cs" />
     <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
     <Compile Include="Classes\WorkProcs\ProcPadding.cs" />

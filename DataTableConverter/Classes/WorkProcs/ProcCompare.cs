@@ -14,8 +14,8 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcCompare : WorkProc
     {
         internal static readonly string ClassName = "Spalten vergleichen";
-        internal string SourceColumn;
-        internal string CompareColumn;
+        public string SourceColumn;
+        public string CompareColumn;
 
         public ProcCompare(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
@@ -27,7 +27,7 @@ namespace DataTableConverter.Classes.WorkProcs
             CompareColumn = compareColumn;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             if(string.IsNullOrWhiteSpace(SourceColumn) || string.IsNullOrWhiteSpace(CompareColumn))
             {

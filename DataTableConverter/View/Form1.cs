@@ -197,7 +197,7 @@ namespace DataTableConverter
             
             ProcTrim proc = new ProcTrim();
             string order = GetSorting();
-            proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType);
+            proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
 
             AssignDataSource(table, true);
             SetMenuEnabled(true);
@@ -659,7 +659,7 @@ namespace DataTableConverter
         private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp)
         {
             string newOrder = GetSorting();
-            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType);
+            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this);
             SetSorting(newOrder);
         }
 
@@ -684,7 +684,7 @@ namespace DataTableConverter
             Thread.CurrentThread.IsBackground = true;
             ProcTrim proc = new ProcTrim();
             string order = GetSorting();
-            proc.doWork(dt, ref order, null, null, null, FilePath, contextGlobal, OrderType);
+            proc.doWork(dt, ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
             dgTable.Invoke(new MethodInvoker(() =>
             {
                 AddDataSourceValueChange(dt);
@@ -1006,7 +1006,7 @@ namespace DataTableConverter
             if(formula.ShowDialog() == DialogResult.OK)
             {
                 StartLoadingBarCount(Properties.Settings.Default.PVMSaveTwice ? sourceTable.Rows.Count * 2 : sourceTable.Rows.Count);
-                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType);
+                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType, this);
                 StopLoadingBar();
                 SaveFinished();
             }
@@ -1045,7 +1045,18 @@ namespace DataTableConverter
             
             if(export.ShowDialog() == DialogResult.OK)
             {
-                ExportHelper.ExportCount(export.getSelectedValue(), export.getColumnIndex(), export.CountChecked ? export.Count : 0, export.ShowFromTo, GetDataSource(), OrderType, StartLoadingBar, StopLoadingBar, this);
+                StartLoadingBar();
+                Thread thread = new Thread(() =>
+                {
+                    DataTable newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, GetDataSource(), OrderType);
+                    BeginInvoke(new MethodInvoker(() =>
+                    {
+                        new Form1(newTable).Show();
+                    }));
+                    StopLoadingBar();
+                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
             }
         }
 

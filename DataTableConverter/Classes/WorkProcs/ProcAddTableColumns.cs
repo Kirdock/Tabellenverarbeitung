@@ -39,7 +39,7 @@ namespace DataTableConverter.Classes.WorkProcs
             IdentifySource = null;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
         {
             //I should first load the File (before workflow.start; right after header-check)
             //additional method in WorkProc and only this class overrides it
