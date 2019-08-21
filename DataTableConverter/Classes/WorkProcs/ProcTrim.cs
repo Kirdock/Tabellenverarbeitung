@@ -57,8 +57,9 @@ namespace DataTableConverter.Classes.WorkProcs
             return;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
+            newOrderIndices = new int[0];
             char[] charArray = Characters.ToCharArray();
 
             if (DeleteDouble)

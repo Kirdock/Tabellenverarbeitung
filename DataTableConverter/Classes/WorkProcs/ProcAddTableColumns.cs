@@ -15,7 +15,7 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     class ProcAddTableColumns : WorkProc
     {
-        internal string IdentifySource, IdentifyAppend;
+        public string IdentifySource, IdentifyAppend;
         internal static string ClassName = "PVM Import";
         //internal bool ImportAll = true;
 
@@ -24,7 +24,10 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.RemoveEmptyHeaders(new string[] { IdentifySource });
         }
 
-        public ProcAddTableColumns(int ordinal, int id, string name) :base(ordinal, id, name) { }
+        public ProcAddTableColumns(int ordinal, int id, string name) :base(ordinal, id, name)
+        {
+            ReplacesTable = true;
+        }
 
         public override void renameHeaders(string oldName, string newName)
         {
@@ -39,13 +42,14 @@ namespace DataTableConverter.Classes.WorkProcs
             IdentifySource = null;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             //I should first load the File (before workflow.start; right after header-check)
             //additional method in WorkProc and only this class overrides it
             //new SelectDuplicateColumns dialog only for second table
+            newOrderIndices = new int[0];
 
-            if(string.IsNullOrWhiteSpace(IdentifyAppend) || string.IsNullOrWhiteSpace(IdentifySource))
+            if (string.IsNullOrWhiteSpace(IdentifyAppend) || string.IsNullOrWhiteSpace(IdentifySource))
             {
                 return;
             }
@@ -64,36 +68,20 @@ namespace DataTableConverter.Classes.WorkProcs
                 DataTable newTable = ImportHelper.ImportFile(path, null, false, null, ctxRow); //load file
                 if (newTable != null) {
                     object[] ImportHeaders = newTable.HeadersOfDataTable();
-                    //List<string> selectedImportHeaders = DataHelper.HeadersOfDataTable(Columns).Cast<string>().ToList();
                     List<string> notFoundHeaders = new List<string>();
                     string[] importColumns = new string[0];
-                    //if (!ImportAll)
-                    //{
-                    //    List<string> list = new List<string>(selectedImportHeaders) { IdentifyAppend, InvalidColumnName };
-
-                    //    foreach (string header in WorkflowHelper.RemoveEmptyHeaders(list))
-                    //    {
-                    //        if (newTable.Columns.IndexOf(header) == -1)
-                    //        {
-                    //            notFoundHeaders.Add(header);
-                    //        }
-                    //    }
-                    //}
-                    //else
-                    //{
-                        if (!newTable.Columns.Contains(IdentifyAppend))
-                        {
-                            notFoundHeaders.Add(IdentifyAppend);
-                        }
-                        else if (!newTable.Columns.Contains(invalidColumnName))
-                        {
-                            notFoundHeaders.Add(invalidColumnName);
-                        }
-                        else
-                        {
-                            importColumns = ImportHeaders.Cast<string>().ToArray();
-                        }
-                    //}
+                    if (!newTable.Columns.Contains(IdentifyAppend))
+                    {
+                        notFoundHeaders.Add(IdentifyAppend);
+                    }
+                    else if (!newTable.Columns.Contains(invalidColumnName))
+                    {
+                        notFoundHeaders.Add(invalidColumnName);
+                    }
+                    else
+                    {
+                        importColumns = ImportHeaders.Cast<string>().ToArray();
+                    }
 
                     if (notFoundHeaders.Count > 0)
                     {
@@ -116,26 +104,15 @@ namespace DataTableConverter.Classes.WorkProcs
                                 {
                                     IdentifyAppend = to[i];
                                 }
-                                //int index;
-                                //if((index = selectedImportHeaders.IndexOf(from[i])) > -1)
-                                //{
-                                //    selectedImportHeaders[index] = to[i];
-                                //}
                             }
                             notFoundHeaders.Clear();
-                            //if (ImportAll)
-                            //{
-                            importColumns = ImportHeaders.Cast<string>().ToArray(); //new List<string>(ImportHeaders.Cast<string>()) { IdentifyAppend }.ToArray();
-                            //}
-                            //else
-                            //{
-                            //    importColumns = selectedImportHeaders.ToArray();
-                            //}
+                            importColumns = ImportHeaders.Cast<string>().ToArray();
                         }
                     }
                     if(notFoundHeaders.Count == 0)
                     {
-                        table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), !string.IsNullOrWhiteSpace(NewColumn), NewColumn, null);
+                        table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
+                        newOrderIndices = newIndices;
                         if (Properties.Settings.Default.SplitPVM)
                         {
                             table.SplitDataTable(path, invalidColumnName);

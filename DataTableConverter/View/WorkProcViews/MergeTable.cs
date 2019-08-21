@@ -18,8 +18,6 @@ namespace DataTableConverter.View
             setCmbItems(cmbIdentifierOriginal, headersOriginal);
             setCmbItems(cmbIdentifierMerge, headersMerge);
             setListItems(headersMerge);
-            setSettings();
-            setOrderVisibility(chbRememberOrder.Checked);
             lblImportTable.Text = filename;
 
             lblRowCountImport.ForeColor = lblRowCountSource.ForeColor = lblSourceTable.ForeColor = lblImportTableText.ForeColor = sourceCount == importCount ? System.Drawing.Color.Green : System.Drawing.Color.Red;
@@ -30,21 +28,6 @@ namespace DataTableConverter.View
         private void SetListBoxStyle()
         {
             ViewHelper.SetListBoxStyle(clbColumns);
-        }
-
-        private void setSettings()
-        {
-            chbRememberOrder.Checked = Properties.Settings.Default.RememberOrder;
-        }
-
-        private void saveSettings()
-        {
-            Properties.Settings.Default.RememberOrder = chbRememberOrder.Checked;
-            if (chbRememberOrder.Checked)
-            {
-                Properties.Settings.Default.RememberOrderName = txtOrder.Text;
-            }
-            Properties.Settings.Default.Save();
         }
 
         private void setListItems(object[] items)
@@ -78,23 +61,7 @@ namespace DataTableConverter.View
 
         private void btnTakeOver_Click(object sender, EventArgs e)
         {
-            bool valid = true;
-            if (chbRememberOrder.Checked)
-            {
-                if (txtOrder.Text == string.Empty)
-                {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Spaltenname darf nicht leer sein!");
-                    valid = false;
-                }
-                else if (Headers.Any(s => s.ToString().Equals(txtOrder.Text, StringComparison.OrdinalIgnoreCase)) || getSelectedColumns().Any(s => s.Equals(txtOrder.Text, StringComparison.OrdinalIgnoreCase))){
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Dieser Spaltenname ist bereits vergeben.\nBitte wählen Sie einen anderen");
-                    valid = false;
-                }
-            }
-            if(valid)
-            {
-                closeForm();
-            }
+            closeForm();
         }
 
         private void closeForm()
@@ -119,34 +86,6 @@ namespace DataTableConverter.View
         private void btnRemoveAll_Click(object sender, EventArgs e)
         {
             markAll(false);
-        }
-
-        private void chbRememberOrder_CheckedChanged(object sender, EventArgs e)
-        {
-            setOrderVisibility(chbRememberOrder.Checked);
-            if (!chbRememberOrder.Checked)
-            {
-                txtOrder.Text = string.Empty;
-            }
-            else
-            {
-                txtOrder.Text = Properties.Settings.Default.RememberOrderName;
-            }
-        }
-
-        internal string OrderColumnName()
-        {
-            return txtOrder.Text;
-        }
-
-        private void setOrderVisibility(bool status)
-        {
-            lblOrder.Visible = txtOrder.Visible = status;
-        }
-
-        private void MergeTable_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            saveSettings();
         }
     }
 }

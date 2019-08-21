@@ -68,8 +68,9 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
+            newOrderIndices = new int[0];
             IEnumerable<DataRow> distinctDataTale = GetFoundRows(table.Columns);
             foreach (DataRow row in table.Rows)
             {

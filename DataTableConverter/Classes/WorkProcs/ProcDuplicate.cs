@@ -47,8 +47,9 @@ namespace DataTableConverter.Classes.WorkProcs
             DuplicateColumns = DuplicateColumns.Where(x => x != colName).ToArray();
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
+            newOrderIndices = new int[0];
             Hashtable hTable = new Hashtable();
             Hashtable totalTable = new Hashtable();
             ArrayList duplicateList = new ArrayList();

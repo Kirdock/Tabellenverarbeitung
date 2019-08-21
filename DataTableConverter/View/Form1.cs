@@ -197,7 +197,7 @@ namespace DataTableConverter
             
             ProcTrim proc = new ProcTrim();
             string order = GetSorting();
-            proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
+            proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this, out int[] newIndices);
 
             AssignDataSource(table, true);
             SetMenuEnabled(true);
@@ -438,7 +438,16 @@ namespace DataTableConverter
                     table.AcceptChanges();
                     foreach (WorkProc t in temp)
                     {
-                        ReplaceProcedure(table, null, t);
+                        if (t.ReplacesTable)
+                        {
+                            historyHelper.AddHistory(new History { State = State.ValueChange, Table = table.ChangesOfDataTable() }, GetSorting());
+                        }
+                        ReplaceProcedure(table, null, t, out int[] newIndices);
+
+                        if (t.ReplacesTable)
+                        {
+                            historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
+                        }
                     }
 
                     dgTable.Invoke(new MethodInvoker(() =>
@@ -562,12 +571,12 @@ namespace DataTableConverter
                 string[] ImportColumns = form.getSelectedColumns();
                 int SourceMergeIndex = form.getSelectedOriginal();
                 int ImportMergeIndex = form.getSelectedMerge();
-                bool SortColumn = form.OrderColumnName() != string.Empty;
-                string orderColumnName = form.OrderColumnName();
+
                 Thread thread = new Thread(() =>
                 {
                     try {
-                        sourceTable.AddColumnsOfDataTable(importTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, SortColumn, orderColumnName, pgbLoading);
+                        sourceTable.AddColumnsOfDataTable(importTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, out int[] newIndices, pgbLoading);
+
                         if (Properties.Settings.Default.SplitPVM)
                         {
                             string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
@@ -587,6 +596,7 @@ namespace DataTableConverter
                         }
 
                         dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(sourceTable); }));
+                        historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
                     }
                     catch (Exception ex)
@@ -624,7 +634,7 @@ namespace DataTableConverter
                         {
                             Thread.CurrentThread.IsBackground = true;
                             string order = GetSorting();
-                            form.Proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
+                            form.Proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this, out int[] newIndices);
                             dgTable.Invoke(new MethodInvoker(() =>
                             {
                                 AddDataSourceValueChange(table);
@@ -657,8 +667,16 @@ namespace DataTableConverter
                     {
                         try
                         {
-                            ReplaceProcedure(newTable, procedure, user);
-                            dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(newTable); }));
+                            ReplaceProcedure(newTable, procedure, user, out int[] newIndices);
+                            if (newIndices.Length == 0)
+                            {
+                                dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(newTable); }));
+                            }
+                            else
+                            {
+                                historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
+                                dgTable.Invoke(new MethodInvoker(() => { AssignDataSource(newTable); }));
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -669,10 +687,11 @@ namespace DataTableConverter
             }
         }
 
-        private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp)
+        private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp, out int[] newOrderIndices)
         {
             string newOrder = GetSorting();
-            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this);
+            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this, out int[] newIndices);
+            newOrderIndices = newIndices;
             SetSorting(newOrder);
         }
 
@@ -1006,7 +1025,7 @@ namespace DataTableConverter
             if(formula.ShowDialog() == DialogResult.OK)
             {
                 StartLoadingBarCount(Properties.Settings.Default.PVMSaveTwice ? sourceTable.Rows.Count * 2 : sourceTable.Rows.Count);
-                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType, this);
+                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType, this, out int[] newIndices);
                 StopLoadingBar();
                 SaveFinished();
             }

@@ -331,31 +331,17 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] ImportColumns, int SourceMergeIndex, int ImportMergeIndex, bool SortColumn, string orderColumnName, ProgressBar pgbLoading = null)
+        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] ImportColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, ProgressBar pgbLoading = null)
         {
             int oldCount = sourceTable.Columns.Count;
             int newColumnIndex = oldCount + ImportColumns.Length - 1; //-1: without identifier
+            int[] importIndices = new int[sourceTable.Rows.Count];
 
             for (int i = 0; i < ImportColumns.Length; i++)
             {
                 if (i == ImportMergeIndex) continue;
 
                 sourceTable.TryAddColumn(ImportColumns[i]);
-            }
-            if (SortColumn)
-            {
-                string SortColumnName = "[Sortierung]";
-                sourceTable.TryAddColumn(orderColumnName);
-                int LastIndex = importTable.Columns.Count;
-                importTable.TryAddColumn(SortColumnName);
-                for (int i = 0; i < importTable.Rows.Count; i++)
-                {
-                    importTable.Rows[i][LastIndex] = i.ToString();
-                }
-                ImportColumns = new List<string>(ImportColumns)
-                            {
-                                SortColumnName
-                            }.ToArray();
             }
 
             try
@@ -368,45 +354,61 @@ namespace DataTableConverter.Extensions
             }
 
 
-            HashSet<int> hs = new HashSet<int>();
-
-
-            for (int y = 0; y < sourceTable.Rows.Count; y++)
+            Dictionary<string, int> sourceValues = new Dictionary<string, int>();
+            for(int i = 0; i < sourceTable.Rows.Count; i++)
             {
-                DataRow source = sourceTable.Rows[y];
-
-                for (int rowIndex = 0; rowIndex < importTable.Rows.Count; rowIndex++)
+                string value = sourceTable.Rows[i][SourceMergeIndex].ToString();
+                if (!sourceValues.ContainsKey(value))
                 {
+                    sourceValues.Add(value, i);
+                }
+            }
 
-                    DataRow row = importTable.Rows[rowIndex];
-                    if (source.ItemArray[SourceMergeIndex].ToString() == row.ItemArray[ImportMergeIndex].ToString())
+            Dictionary<string, int> importValues = new Dictionary<string, int>();
+            for (int i = 0; i < sourceTable.Rows.Count; i++)
+            {
+                string value = importTable.Rows[i][ImportMergeIndex].ToString();
+                if (!importValues.ContainsKey(value))
+                {
+                    importValues.Add(value, i);
+                }
+            }
+
+            foreach(string key in sourceValues.Keys)
+            {
+                if (importValues.ContainsKey(key))
+                {
+                    importIndices[sourceValues[key]] = importValues[key];
+                    int offset = 0;
+                    for (int i = 0; i < ImportColumns.Length; i++)
                     {
-                        int Offset = 0;
-                        for (int i = 0; i < ImportColumns.Length; i++)
+                        if (i == ImportMergeIndex)
                         {
-                            if (i == ImportMergeIndex)
-                            {
-                                Offset++;
-                            }
-                            else
-                            {
-                                source.SetField(oldCount + i - Offset, row.ItemArray[i]);
-                            }
+                            offset++;
                         }
-                        importTable.Rows.RemoveAt(rowIndex);
-                        break;
-
+                        else
+                        {
+                            sourceTable.Rows[sourceValues[key]].SetField(oldCount + i - offset, importTable.Rows[importValues[key]][i]);
+                        }
                     }
                 }
-
                 try
                 {
                     pgbLoading?.BeginInvoke(new MethodInvoker(() => { pgbLoading.Value++; }));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ErrorHelper.LogMessage(ex, false);
                 }
+            }
+
+            newIndices = importIndices;
+            //set order of imported table
+            IEnumerable<DataRow> sortedTable = sourceTable.Copy().AsEnumerable().Select((row, i) => new { row, i }).OrderBy(r => importIndices[r.i]).Select(r => r.row);
+            sourceTable.Rows.Clear();
+            foreach(DataRow row in sortedTable)
+            {
+                sourceTable.ImportRow(row);
             }
         }
 

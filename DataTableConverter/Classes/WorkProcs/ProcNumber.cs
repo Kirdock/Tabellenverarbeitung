@@ -28,8 +28,9 @@ namespace DataTableConverter.Classes.WorkProcs
             Repeat = repeat;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
+            newOrderIndices = new int[0];
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
                 int index = table.Columns.Count;

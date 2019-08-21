@@ -99,6 +99,24 @@ namespace DataTableConverter.Assisstant
             }
             switch (his.State)
             {
+                case State.OrderIndexChange:
+                    {
+                        int[] reverse = new int[his.NewOrderIndices.Length];
+                        for (int i = 0; i < his.NewOrderIndices.Length; i++)
+                        {
+                            reverse[his.NewOrderIndices[i]] = i;
+                        }
+                        his.NewOrderIndices = reverse;
+
+                        IEnumerable<DataRow> sortedTable = table.Copy().AsEnumerable().Select((row, i) => new { row, i }).OrderBy(r => his.NewOrderIndices[r.i]).Select(r => r.row);
+                        table.Rows.Clear();
+                        foreach (DataRow row in sortedTable)
+                        {
+                            table.ImportRow(row);
+                        }
+                    }
+                    break;
+
                 case State.CellValueChange:
                     string textOld = his.NewText;
                     his.NewText = table.Rows[his.RowIndex].ItemArray[his.ColumnIndex]?.ToString();
@@ -157,11 +175,13 @@ namespace DataTableConverter.Assisstant
                     break;
 
                 case State.DeleteRow:
-                    DataRow row = table.NewRow();
-                    row.ItemArray = his.Row[0];
-                    his.State = State.InsertRow;
-                    table.Rows.InsertAt(row, his.RowIndex);
-                    his.Row = null;
+                    {
+                        DataRow row = table.NewRow();
+                        row.ItemArray = his.Row[0];
+                        his.State = State.InsertRow;
+                        table.Rows.InsertAt(row, his.RowIndex);
+                        his.Row = null;
+                    }
                     break;
 
                 case State.HeaderChange:

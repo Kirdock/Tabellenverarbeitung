@@ -20,6 +20,7 @@ namespace DataTableConverter.Classes
         public object[][] ColumnValues { get; set; }
         public string Order { get; set; }
         public OrderType OrderType { get; set; }
+        public int[] NewOrderIndices { get; set; }
         
 
         public History() { }

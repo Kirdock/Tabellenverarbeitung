@@ -36,9 +36,6 @@
             this.btnTakeOver = new System.Windows.Forms.Button();
             this.btnSelectAll = new System.Windows.Forms.Button();
             this.btnRemoveAll = new System.Windows.Forms.Button();
-            this.chbRememberOrder = new System.Windows.Forms.CheckBox();
-            this.txtOrder = new System.Windows.Forms.TextBox();
-            this.lblOrder = new System.Windows.Forms.Label();
             this.lblImportTable = new System.Windows.Forms.Label();
             this.lblSourceTable = new System.Windows.Forms.Label();
             this.lblImportTableText = new System.Windows.Forms.Label();
@@ -121,33 +118,6 @@
             this.btnRemoveAll.UseVisualStyleBackColor = true;
             this.btnRemoveAll.Click += new System.EventHandler(this.btnRemoveAll_Click);
             // 
-            // chbRememberOrder
-            // 
-            this.chbRememberOrder.AutoSize = true;
-            this.chbRememberOrder.Location = new System.Drawing.Point(15, 117);
-            this.chbRememberOrder.Name = "chbRememberOrder";
-            this.chbRememberOrder.Size = new System.Drawing.Size(118, 17);
-            this.chbRememberOrder.TabIndex = 8;
-            this.chbRememberOrder.Text = "Sortierung merken?";
-            this.chbRememberOrder.UseVisualStyleBackColor = true;
-            this.chbRememberOrder.CheckedChanged += new System.EventHandler(this.chbRememberOrder_CheckedChanged);
-            // 
-            // txtOrder
-            // 
-            this.txtOrder.Location = new System.Drawing.Point(15, 168);
-            this.txtOrder.Name = "txtOrder";
-            this.txtOrder.Size = new System.Drawing.Size(336, 20);
-            this.txtOrder.TabIndex = 9;
-            // 
-            // lblOrder
-            // 
-            this.lblOrder.AutoSize = true;
-            this.lblOrder.Location = new System.Drawing.Point(12, 146);
-            this.lblOrder.Name = "lblOrder";
-            this.lblOrder.Size = new System.Drawing.Size(89, 13);
-            this.lblOrder.TabIndex = 10;
-            this.lblOrder.Text = "Name der Spalte:";
-            // 
             // lblImportTable
             // 
             this.lblImportTable.AutoSize = true;
@@ -203,9 +173,6 @@
             this.Controls.Add(this.lblImportTableText);
             this.Controls.Add(this.lblSourceTable);
             this.Controls.Add(this.lblImportTable);
-            this.Controls.Add(this.lblOrder);
-            this.Controls.Add(this.txtOrder);
-            this.Controls.Add(this.chbRememberOrder);
             this.Controls.Add(this.btnRemoveAll);
             this.Controls.Add(this.btnSelectAll);
             this.Controls.Add(this.btnTakeOver);
@@ -218,7 +185,6 @@
             this.Name = "MergeTable";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "PVM";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MergeTable_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -234,9 +200,6 @@
         private System.Windows.Forms.Button btnTakeOver;
         private System.Windows.Forms.Button btnSelectAll;
         private System.Windows.Forms.Button btnRemoveAll;
-        private System.Windows.Forms.CheckBox chbRememberOrder;
-        private System.Windows.Forms.TextBox txtOrder;
-        private System.Windows.Forms.Label lblOrder;
         private System.Windows.Forms.Label lblImportTable;
         private System.Windows.Forms.Label lblSourceTable;
         private System.Windows.Forms.Label lblImportTableText;

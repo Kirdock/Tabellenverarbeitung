@@ -72,30 +72,6 @@ namespace DataTableConverter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool RememberOrder {
-            get {
-                return ((bool)(this["RememberOrder"]));
-            }
-            set {
-                this["RememberOrder"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RememberOrderName {
-            get {
-                return ((string)(this["RememberOrderName"]));
-            }
-            set {
-                this["RememberOrderName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("65001")]
         public int Encoding {
             get {

@@ -16,6 +16,7 @@ namespace DataTableConverter.View
         {
             InitializeComponent();
             cList.Items.AddRange(sheets);
+            ViewHelper.SetListBoxStyle(cList);
         }
 
         internal string[] GetSheets()

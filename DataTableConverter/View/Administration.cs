@@ -786,8 +786,6 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = ProcAddTableColumns.ClassName;
             txtIdentifierSource.Text = proc.IdentifySource;
             txtIdentifierAppend.Text = proc.IdentifyAppend;
-            txtNewColumn.Text = proc.NewColumn;
-            cbNewColumnAddTableColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
         }
 
         private void SetCompareControls(WorkProc selectedProc)
@@ -1741,20 +1739,6 @@ namespace DataTableConverter.View
         private void txtIdentifierAppend_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcAddTableColumns).IdentifyAppend = txtIdentifierAppend.Text;
-        }
-
-        private void txtNewColumnAddTableColumn_TextChanged(object sender, EventArgs e)
-        {
-            (GetSelectedWorkProcedure() as ProcAddTableColumns).NewColumn = txtNewColumnAddTableColumn.Text;
-        }
-
-        private void cbNewColumnAddTableColumn_CheckedChanged(object sender, EventArgs e)
-        {
-            txtNewColumnAddTableColumn.Visible = cbNewColumnAddTableColumn.Checked;
-            if (!cbNewColumnAddTableColumn.Checked)
-            {
-                (GetSelectedWorkProcedure() as ProcAddTableColumns).NewColumn = string.Empty;
-            }
         }
 
         private void cbCompareOldColumn_CheckedChanged(object sender, EventArgs e)
