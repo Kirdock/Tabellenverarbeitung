@@ -162,7 +162,8 @@ namespace DataTableConverter.View
                 lblCompareFirstColumn,
                 lblCompareSecondColumn,
                 lblCompareNewColumn,
-                lblCountColumn
+                lblCountColumn,
+                lblTrimCharacter
             };
             foreach (Label label in labels)
             {
@@ -261,7 +262,8 @@ namespace DataTableConverter.View
                 { gbAddTableColumns, typeof(ProcAddTableColumns) },
                 { gbCompare, typeof(ProcCompare) },
                 { gbPVMExport, typeof(ProcPVMExport) },
-                { gbCount, typeof(ProcCount) }
+                { gbCount, typeof(ProcCount) },
+                { gbTrim, typeof(ProcTrim) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -811,7 +813,25 @@ namespace DataTableConverter.View
 
         private void SetTrimControls(WorkProc selectedProc)
         {
+            ProcTrim proc = selectedProc as ProcTrim;
             lblOriginalNameText.Text = ProcTrim.ClassName;
+            TxtTrimText.Text = proc.Characters;
+            switch (proc.Type)
+            {
+                case ProcTrim.TrimType.Start:
+                    RbTrimStart.Checked = true;
+                    break;
+
+                case ProcTrim.TrimType.End:
+                    RbTrimEnd.Checked = true;
+                    break;
+
+                case ProcTrim.TrimType.Both:
+                default:
+                    RbTrimStartEnd.Checked = true;
+                    break;
+            }
+            CbTrimDeleteDouble.Checked = proc.DeleteDouble;
         }
 
         private void SetUserControls(WorkProc selectedProc)
@@ -1858,6 +1878,31 @@ namespace DataTableConverter.View
         private void TxtCountColumn_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcCount).Column = TxtCountColumn.Text;
+        }
+
+        private void TxtTrimText_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcTrim).Characters = TxtTrimText.Text;
+        }
+
+        private void RbTrimStart_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcTrim).Type = ProcTrim.TrimType.Start;
+        }
+
+        private void RbTrimEnd_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcTrim).Type = ProcTrim.TrimType.End;
+        }
+
+        private void RbTrimStartEnd_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcTrim).Type = ProcTrim.TrimType.Both;
+        }
+
+        private void CbTrimDeleteDouble_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcTrim).DeleteDouble = CbTrimDeleteDouble.Checked;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

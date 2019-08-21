@@ -265,6 +265,12 @@
     <Compile Include="View\WorkProcViews\SubstringForm.Designer.cs">
       <DependentUpon>SubstringForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\WorkProcViews\TrimForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\TrimForm.Designer.cs">
+      <DependentUpon>TrimForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\WorkProcViews\UpLowCaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -349,6 +355,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\SubstringForm.resx">
       <DependentUpon>SubstringForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\TrimForm.resx">
+      <DependentUpon>TrimForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\UpLowCaseForm.resx">
       <DependentUpon>UpLowCaseForm.cs</DependentUpon>

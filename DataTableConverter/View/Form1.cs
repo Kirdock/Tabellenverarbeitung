@@ -613,18 +613,31 @@ namespace DataTableConverter
         {
             if (dgTable.DataSource != null)
             {
-                StartLoadingBar();
-                new Thread(() =>
+                TrimForm form = new TrimForm();
+                if(form.ShowDialog() == DialogResult.OK)
                 {
-                    try
+                    StartLoadingBar();
+                    DataTable table = GetDataSource();
+                    new Thread(() =>
                     {
-                        TrimDataTable(GetDataSource());
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorHelper.LogMessage(ex);
-                    }
-                }).Start();
+                        try
+                        {
+                            Thread.CurrentThread.IsBackground = true;
+                            string order = GetSorting();
+                            form.Proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
+                            dgTable.Invoke(new MethodInvoker(() =>
+                            {
+                                AddDataSourceValueChange(table);
+                            }));
+                            
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex);
+                        }
+                        StopLoadingBar();
+                    }).Start();
+                }
             }
         }
 
@@ -677,19 +690,6 @@ namespace DataTableConverter
         {
             int index = cases.FindIndex(cs => cs.Id == id);
             return index != -1 ? cases[index] : null;
-        }
-
-        private void TrimDataTable(DataTable dt)
-        {
-            Thread.CurrentThread.IsBackground = true;
-            ProcTrim proc = new ProcTrim();
-            string order = GetSorting();
-            proc.doWork(dt, ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
-            dgTable.Invoke(new MethodInvoker(() =>
-            {
-                AddDataSourceValueChange(dt);
-            }));
-            StopLoadingBar();
         }
 
         private void excelToolStripMenuItem_Click(object sender, EventArgs e, string path = null)

@@ -59,6 +59,20 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbTrim = new System.Windows.Forms.GroupBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.CbTrimDeleteDouble = new System.Windows.Forms.CheckBox();
+            this.RbTrimStartEnd = new System.Windows.Forms.RadioButton();
+            this.RbTrimEnd = new System.Windows.Forms.RadioButton();
+            this.RbTrimStart = new System.Windows.Forms.RadioButton();
+            this.lblTrimCharacter = new System.Windows.Forms.Label();
+            this.TxtTrimText = new System.Windows.Forms.TextBox();
+            this.gbCount = new System.Windows.Forms.GroupBox();
+            this.lblCountColumn = new System.Windows.Forms.Label();
+            this.TxtCountColumn = new System.Windows.Forms.TextBox();
+            this.cbShowFromTo = new System.Windows.Forms.CheckBox();
+            this.nbCount = new System.Windows.Forms.NumericUpDown();
+            this.cbCount = new System.Windows.Forms.CheckBox();
             this.gbPVMExport = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
             this.dgvPVMExport = new System.Windows.Forms.DataGridView();
@@ -193,12 +207,6 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.gbCount = new System.Windows.Forms.GroupBox();
-            this.cbShowFromTo = new System.Windows.Forms.CheckBox();
-            this.nbCount = new System.Windows.Forms.NumericUpDown();
-            this.cbCount = new System.Windows.Forms.CheckBox();
-            this.TxtCountColumn = new System.Windows.Forms.TextBox();
-            this.lblCountColumn = new System.Windows.Forms.Label();
             this.cbHeadersPVMExport = new CheckComboBoxTest.CheckedComboBox();
             this.clbHeaderOrder = new CheckComboBoxTest.CheckedComboBox();
             this.clbHeaderProcedure = new CheckComboBoxTest.CheckedComboBox();
@@ -229,6 +237,9 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbTrim.SuspendLayout();
+            this.gbCount.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nbCount)).BeginInit();
             this.gbPVMExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).BeginInit();
             this.gbOrder.SuspendLayout();
@@ -279,8 +290,6 @@
             this.gbCaseShortcuts.SuspendLayout();
             this.gbCaseColumns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).BeginInit();
-            this.gbCount.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nbCount)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -516,6 +525,7 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCount);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbOrder);
@@ -695,6 +705,178 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // gbTrim
+            // 
+            this.gbTrim.Controls.Add(this.label10);
+            this.gbTrim.Controls.Add(this.CbTrimDeleteDouble);
+            this.gbTrim.Controls.Add(this.RbTrimStartEnd);
+            this.gbTrim.Controls.Add(this.RbTrimEnd);
+            this.gbTrim.Controls.Add(this.RbTrimStart);
+            this.gbTrim.Controls.Add(this.lblTrimCharacter);
+            this.gbTrim.Controls.Add(this.TxtTrimText);
+            this.gbTrim.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbTrim.Location = new System.Drawing.Point(0, 92);
+            this.gbTrim.Name = "gbTrim";
+            this.gbTrim.Size = new System.Drawing.Size(282, 643);
+            this.gbTrim.TabIndex = 25;
+            this.gbTrim.TabStop = false;
+            this.gbTrim.Text = "Spaltenangabe";
+            // 
+            // label10
+            // 
+            this.label10.Location = new System.Drawing.Point(25, 203);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(248, 49);
+            this.label10.TabIndex = 14;
+            this.label10.Text = "Wenn das Zeichen öfter als 1 Mal hintereinander vorkommt, wird es auf 1 gesetzt. " +
+    "Also zum Beispiel wird dann aus zwei Leerzeichen ein Leerzeichen";
+            // 
+            // CbTrimDeleteDouble
+            // 
+            this.CbTrimDeleteDouble.AutoSize = true;
+            this.CbTrimDeleteDouble.Location = new System.Drawing.Point(6, 177);
+            this.CbTrimDeleteDouble.Name = "CbTrimDeleteDouble";
+            this.CbTrimDeleteDouble.Size = new System.Drawing.Size(168, 17);
+            this.CbTrimDeleteDouble.TabIndex = 13;
+            this.CbTrimDeleteDouble.Text = "Doppelte Vorkommen löschen";
+            this.CbTrimDeleteDouble.UseVisualStyleBackColor = true;
+            this.CbTrimDeleteDouble.CheckedChanged += new System.EventHandler(this.CbTrimDeleteDouble_CheckedChanged);
+            // 
+            // RbTrimStartEnd
+            // 
+            this.RbTrimStartEnd.AutoSize = true;
+            this.RbTrimStartEnd.Location = new System.Drawing.Point(5, 138);
+            this.RbTrimStartEnd.Name = "RbTrimStartEnd";
+            this.RbTrimStartEnd.Size = new System.Drawing.Size(108, 17);
+            this.RbTrimStartEnd.TabIndex = 12;
+            this.RbTrimStartEnd.TabStop = true;
+            this.RbTrimStartEnd.Text = "Vorne und Hinten";
+            this.RbTrimStartEnd.UseVisualStyleBackColor = true;
+            this.RbTrimStartEnd.CheckedChanged += new System.EventHandler(this.RbTrimStartEnd_CheckedChanged);
+            // 
+            // RbTrimEnd
+            // 
+            this.RbTrimEnd.AutoSize = true;
+            this.RbTrimEnd.Location = new System.Drawing.Point(6, 107);
+            this.RbTrimEnd.Name = "RbTrimEnd";
+            this.RbTrimEnd.Size = new System.Drawing.Size(56, 17);
+            this.RbTrimEnd.TabIndex = 11;
+            this.RbTrimEnd.TabStop = true;
+            this.RbTrimEnd.Text = "Hinten";
+            this.RbTrimEnd.UseVisualStyleBackColor = true;
+            this.RbTrimEnd.CheckedChanged += new System.EventHandler(this.RbTrimEnd_CheckedChanged);
+            // 
+            // RbTrimStart
+            // 
+            this.RbTrimStart.AutoSize = true;
+            this.RbTrimStart.Location = new System.Drawing.Point(6, 76);
+            this.RbTrimStart.Name = "RbTrimStart";
+            this.RbTrimStart.Size = new System.Drawing.Size(53, 17);
+            this.RbTrimStart.TabIndex = 10;
+            this.RbTrimStart.TabStop = true;
+            this.RbTrimStart.Text = "Vorne";
+            this.RbTrimStart.UseVisualStyleBackColor = true;
+            this.RbTrimStart.CheckedChanged += new System.EventHandler(this.RbTrimStart_CheckedChanged);
+            // 
+            // lblTrimCharacter
+            // 
+            this.lblTrimCharacter.AutoSize = true;
+            this.lblTrimCharacter.Location = new System.Drawing.Point(2, 16);
+            this.lblTrimCharacter.Name = "lblTrimCharacter";
+            this.lblTrimCharacter.Size = new System.Drawing.Size(49, 13);
+            this.lblTrimCharacter.TabIndex = 9;
+            this.lblTrimCharacter.Text = "Zeichen:";
+            // 
+            // TxtTrimText
+            // 
+            this.TxtTrimText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtTrimText.Location = new System.Drawing.Point(5, 35);
+            this.TxtTrimText.Name = "TxtTrimText";
+            this.TxtTrimText.Size = new System.Drawing.Size(270, 20);
+            this.TxtTrimText.TabIndex = 8;
+            this.TxtTrimText.TextChanged += new System.EventHandler(this.TxtTrimText_TextChanged);
+            // 
+            // gbCount
+            // 
+            this.gbCount.Controls.Add(this.lblCountColumn);
+            this.gbCount.Controls.Add(this.TxtCountColumn);
+            this.gbCount.Controls.Add(this.cbShowFromTo);
+            this.gbCount.Controls.Add(this.nbCount);
+            this.gbCount.Controls.Add(this.cbCount);
+            this.gbCount.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbCount.Location = new System.Drawing.Point(0, 92);
+            this.gbCount.Name = "gbCount";
+            this.gbCount.Size = new System.Drawing.Size(282, 643);
+            this.gbCount.TabIndex = 24;
+            this.gbCount.TabStop = false;
+            this.gbCount.Text = "Spaltenangabe";
+            // 
+            // lblCountColumn
+            // 
+            this.lblCountColumn.AutoSize = true;
+            this.lblCountColumn.Location = new System.Drawing.Point(2, 16);
+            this.lblCountColumn.Name = "lblCountColumn";
+            this.lblCountColumn.Size = new System.Drawing.Size(40, 13);
+            this.lblCountColumn.TabIndex = 9;
+            this.lblCountColumn.Text = "Spalte:";
+            // 
+            // TxtCountColumn
+            // 
+            this.TxtCountColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtCountColumn.Location = new System.Drawing.Point(5, 35);
+            this.TxtCountColumn.Name = "TxtCountColumn";
+            this.TxtCountColumn.Size = new System.Drawing.Size(270, 20);
+            this.TxtCountColumn.TabIndex = 8;
+            this.TxtCountColumn.TextChanged += new System.EventHandler(this.TxtCountColumn_TextChanged);
+            // 
+            // cbShowFromTo
+            // 
+            this.cbShowFromTo.AutoSize = true;
+            this.cbShowFromTo.Location = new System.Drawing.Point(5, 74);
+            this.cbShowFromTo.Name = "cbShowFromTo";
+            this.cbShowFromTo.Size = new System.Drawing.Size(131, 17);
+            this.cbShowFromTo.TabIndex = 7;
+            this.cbShowFromTo.Text = "\"Von\", \"Bis\" anzeigen";
+            this.cbShowFromTo.UseVisualStyleBackColor = true;
+            this.cbShowFromTo.CheckedChanged += new System.EventHandler(this.cbShowFromTo_CheckedChanged);
+            // 
+            // nbCount
+            // 
+            this.nbCount.Location = new System.Drawing.Point(84, 106);
+            this.nbCount.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.nbCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nbCount.Name = "nbCount";
+            this.nbCount.Size = new System.Drawing.Size(71, 20);
+            this.nbCount.TabIndex = 6;
+            this.nbCount.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nbCount.Visible = false;
+            this.nbCount.ValueChanged += new System.EventHandler(this.nbCount_ValueChanged);
+            // 
+            // cbCount
+            // 
+            this.cbCount.AutoSize = true;
+            this.cbCount.Location = new System.Drawing.Point(5, 107);
+            this.cbCount.Name = "cbCount";
+            this.cbCount.Size = new System.Drawing.Size(58, 17);
+            this.cbCount.TabIndex = 5;
+            this.cbCount.Text = "Anzahl";
+            this.cbCount.UseVisualStyleBackColor = true;
+            this.cbCount.CheckedChanged += new System.EventHandler(this.cbCount_CheckedChanged);
             // 
             // gbPVMExport
             // 
@@ -2309,86 +2491,6 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // gbCount
-            // 
-            this.gbCount.Controls.Add(this.lblCountColumn);
-            this.gbCount.Controls.Add(this.TxtCountColumn);
-            this.gbCount.Controls.Add(this.cbShowFromTo);
-            this.gbCount.Controls.Add(this.nbCount);
-            this.gbCount.Controls.Add(this.cbCount);
-            this.gbCount.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbCount.Location = new System.Drawing.Point(0, 92);
-            this.gbCount.Name = "gbCount";
-            this.gbCount.Size = new System.Drawing.Size(282, 643);
-            this.gbCount.TabIndex = 24;
-            this.gbCount.TabStop = false;
-            this.gbCount.Text = "Spaltenangabe";
-            // 
-            // cbShowFromTo
-            // 
-            this.cbShowFromTo.AutoSize = true;
-            this.cbShowFromTo.Location = new System.Drawing.Point(5, 74);
-            this.cbShowFromTo.Name = "cbShowFromTo";
-            this.cbShowFromTo.Size = new System.Drawing.Size(131, 17);
-            this.cbShowFromTo.TabIndex = 7;
-            this.cbShowFromTo.Text = "\"Von\", \"Bis\" anzeigen";
-            this.cbShowFromTo.UseVisualStyleBackColor = true;
-            this.cbShowFromTo.CheckedChanged += new System.EventHandler(this.cbShowFromTo_CheckedChanged);
-            // 
-            // nbCount
-            // 
-            this.nbCount.Location = new System.Drawing.Point(84, 106);
-            this.nbCount.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.nbCount.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nbCount.Name = "nbCount";
-            this.nbCount.Size = new System.Drawing.Size(71, 20);
-            this.nbCount.TabIndex = 6;
-            this.nbCount.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nbCount.Visible = false;
-            this.nbCount.ValueChanged += new System.EventHandler(this.nbCount_ValueChanged);
-            // 
-            // cbCount
-            // 
-            this.cbCount.AutoSize = true;
-            this.cbCount.Location = new System.Drawing.Point(5, 107);
-            this.cbCount.Name = "cbCount";
-            this.cbCount.Size = new System.Drawing.Size(58, 17);
-            this.cbCount.TabIndex = 5;
-            this.cbCount.Text = "Anzahl";
-            this.cbCount.UseVisualStyleBackColor = true;
-            this.cbCount.CheckedChanged += new System.EventHandler(this.cbCount_CheckedChanged);
-            // 
-            // TxtCountColumn
-            // 
-            this.TxtCountColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtCountColumn.Location = new System.Drawing.Point(5, 35);
-            this.TxtCountColumn.Name = "TxtCountColumn";
-            this.TxtCountColumn.Size = new System.Drawing.Size(270, 20);
-            this.TxtCountColumn.TabIndex = 8;
-            this.TxtCountColumn.TextChanged += new System.EventHandler(this.TxtCountColumn_TextChanged);
-            // 
-            // lblCountColumn
-            // 
-            this.lblCountColumn.AutoSize = true;
-            this.lblCountColumn.Location = new System.Drawing.Point(2, 16);
-            this.lblCountColumn.Name = "lblCountColumn";
-            this.lblCountColumn.Size = new System.Drawing.Size(40, 13);
-            this.lblCountColumn.TabIndex = 9;
-            this.lblCountColumn.Text = "Spalte:";
-            // 
             // cbHeadersPVMExport
             // 
             this.cbHeadersPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -2554,6 +2656,11 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbTrim.ResumeLayout(false);
+            this.gbTrim.PerformLayout();
+            this.gbCount.ResumeLayout(false);
+            this.gbCount.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nbCount)).EndInit();
             this.gbPVMExport.ResumeLayout(false);
             this.gbPVMExport.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).EndInit();
@@ -2620,9 +2727,6 @@
             this.gbCaseShortcuts.PerformLayout();
             this.gbCaseColumns.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).EndInit();
-            this.gbCount.ResumeLayout(false);
-            this.gbCount.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nbCount)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -2807,5 +2911,13 @@
         private System.Windows.Forms.CheckBox cbShowFromTo;
         private System.Windows.Forms.NumericUpDown nbCount;
         private System.Windows.Forms.CheckBox cbCount;
+        private System.Windows.Forms.GroupBox gbTrim;
+        private System.Windows.Forms.RadioButton RbTrimStartEnd;
+        private System.Windows.Forms.RadioButton RbTrimEnd;
+        private System.Windows.Forms.RadioButton RbTrimStart;
+        private System.Windows.Forms.Label lblTrimCharacter;
+        private System.Windows.Forms.TextBox TxtTrimText;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox CbTrimDeleteDouble;
     }
 }
