@@ -11,7 +11,7 @@ namespace DataTableConverter.Classes
     [Serializable()]
     public class MergeFormat
     {
-        public enum MergeColumns:int { Column = 0, Text = 1, Empty = 2, NotEmpty = 3}
+        public enum MergeColumns:int { Column = 0, Text = 1, Empty = 3, NotEmpty = 5, EmptyAll = 2, NotEmptyAll = 4}
         public DataTable Table { get; set; }
 
         public MergeFormat()
@@ -22,19 +22,24 @@ namespace DataTableConverter.Classes
             };
             Table.Columns.Add("Spalte", typeof(string));
             Table.Columns.Add("Text", typeof(string));
+            Table.Columns.Add("Alle Spalten überprüfen", typeof(bool));
             Table.Columns.Add("Wenn Spalten leer", typeof(string));
+            Table.Columns.Add("Alle Spalten überprüfen ", typeof(bool));
             Table.Columns.Add("Wenn Spalten nicht leer", typeof(string));
         }
 
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
-            foreach(DataRow row in Table.Rows)
+            if (Table.Columns.Count > 4) //== new format
             {
-                builder.Append("([").Append(row[(int)MergeColumns.Column]?.ToString()).Append("]");
-                builder.Append(row[(int)MergeColumns.Text]?.ToString());
-                builder.Append(" WENN_NICHT_LEER[").Append(row[(int)MergeColumns.NotEmpty]?.ToString()).Append("]");
-                builder.Append(" WENN_LEER[").Append(row[(int)MergeColumns.NotEmpty]?.ToString()).Append("]").Append(");");
+                foreach (DataRow row in Table.Rows)
+                {
+                    builder.Append("([").Append(row[(int)MergeColumns.Column]?.ToString()).Append("]");
+                    builder.Append(row[(int)MergeColumns.Text]?.ToString());
+                    builder.Append(" WENN_NICHT_LEER[").Append(row[(int)MergeColumns.NotEmpty]?.ToString()).Append("]");
+                    builder.Append(" WENN_LEER[").Append(row[(int)MergeColumns.NotEmpty]?.ToString()).Append("]").Append(");");
+                }
             }
 
             return builder.ToString();

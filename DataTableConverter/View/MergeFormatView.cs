@@ -57,14 +57,13 @@ namespace DataTableConverter.View
                     dgTable.Columns[i].DisplayIndex = i;
                 }
                 
-                dgTable.Columns[0].DisplayIndex = 6;
-                dgTable.Columns[3].DisplayIndex = 5;
+                dgTable.Columns[0].DisplayIndex = 8;
                 
                 col.DisplayIndex = 0;
                 boxCol.DisplayIndex = 4;
-                boxCol2.DisplayIndex = 6;
-                dgTable.Columns[2].ReadOnly = true;
-                dgTable.Columns[3].ReadOnly = true;
+                boxCol2.DisplayIndex = 7;
+                dgTable.Columns[(int)MergeFormat.MergeColumns.Empty].ReadOnly = true;
+                dgTable.Columns[(int)MergeFormat.MergeColumns.NotEmpty].ReadOnly = true;
 
                 Size = new Size(Size.Width+ 500,Size.Height+300);
             }
@@ -103,17 +102,17 @@ namespace DataTableConverter.View
                 //--> selected headders
                 //set Value after ShowDialog
                 DataTable table = dgTable.DataSource as DataTable;
-                HeaderSelect form = new HeaderSelect(Headers, e.ColumnIndex == 0 ? table.Rows[e.RowIndex][2]?.ToString() : table.Rows[e.RowIndex][3].ToString());
+                HeaderSelect form = new HeaderSelect(Headers, e.ColumnIndex == 0 ? table.Rows[e.RowIndex][(int)MergeFormat.MergeColumns.Empty]?.ToString() : table.Rows[e.RowIndex][(int)MergeFormat.MergeColumns.NotEmpty].ToString());
 
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     if (e.ColumnIndex == 0) //Empty Column
                     {
-                        table.Rows[e.RowIndex][2] = form.Headers;
+                        table.Rows[e.RowIndex][(int)MergeFormat.MergeColumns.Empty] = form.Headers;
                     }
                     else //Not Empty Column
                     {
-                        table.Rows[e.RowIndex][3] = form.Headers;
+                        table.Rows[e.RowIndex][(int)MergeFormat.MergeColumns.NotEmpty] = form.Headers;
                     }
                     dgTable.Refresh();
                 }

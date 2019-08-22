@@ -153,12 +153,14 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     //could contain columns that are not in the table
                     IEnumerable<string> emptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.Empty]?.ToString()).Where(header => dict[header]);
-                    bool emptyFullFilled = emptyHeaderOfRow.All(header => string.IsNullOrWhiteSpace(sourceRow[header]?.ToString()));
+                    bool emptyAllChecked = row[(int)MergeFormat.MergeColumns.EmptyAll] == DBNull.Value ? false : (bool)row[(int)MergeFormat.MergeColumns.EmptyAll];
+                    bool emptyFullFilled = emptyHeaderOfRow.Count() == 0 || emptyAllChecked ? emptyHeaderOfRow.All(header => string.IsNullOrWhiteSpace(sourceRow[header]?.ToString())) : emptyHeaderOfRow.Any(header => string.IsNullOrWhiteSpace(sourceRow[header]?.ToString()));
 
                     if (emptyFullFilled)
                     {
                         IEnumerable<string> notEmptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.NotEmpty]?.ToString()).Where(header => dict[header]);
-                        bool notEmptyFullFilled = notEmptyHeaderOfRow.All(header => !string.IsNullOrWhiteSpace(sourceRow[header]?.ToString()));
+                        bool notEmptyAllChecked = row[(int)MergeFormat.MergeColumns.NotEmptyAll] == DBNull.Value ? false : (bool)row[(int)MergeFormat.MergeColumns.NotEmptyAll];
+                        bool notEmptyFullFilled = notEmptyHeaderOfRow.Count() == 0 || notEmptyAllChecked ? notEmptyHeaderOfRow.All(header => !string.IsNullOrWhiteSpace(sourceRow[header]?.ToString())) : notEmptyHeaderOfRow.Any(header => !string.IsNullOrWhiteSpace(sourceRow[header]?.ToString()));
                         if (notEmptyFullFilled)
                         {
                             if (!columnIsEmpty)
