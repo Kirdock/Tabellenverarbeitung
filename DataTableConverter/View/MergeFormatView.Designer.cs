@@ -44,7 +44,7 @@
             this.dgTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.dgTable.Location = new System.Drawing.Point(12, 73);
             this.dgTable.Name = "dgTable";
-            this.dgTable.Size = new System.Drawing.Size(365, 251);
+            this.dgTable.Size = new System.Drawing.Size(675, 343);
             this.dgTable.TabIndex = 0;
             this.dgTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellClick);
             this.dgTable.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgTable_CellFormatting);
@@ -74,7 +74,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(395, 336);
+            this.ClientSize = new System.Drawing.Size(705, 428);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.dgTable);

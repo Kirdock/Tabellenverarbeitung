@@ -18,6 +18,7 @@ namespace DataTableConverter.View
         internal MergeFormatView(MergeFormat format, object[] headers = null)
         {
             InitializeComponent();
+
             ViewHelper.SetDataGridViewStyle(dgTable);
             try
             {
@@ -25,7 +26,7 @@ namespace DataTableConverter.View
             }
             catch { }
             dgTable.DataSource = format.Table;
-            if(headers != null)
+            if (headers != null)
             {
                 Headers = headers;
                 DataGridViewComboBoxColumn col = new DataGridViewComboBoxColumn()
@@ -64,12 +65,16 @@ namespace DataTableConverter.View
                 boxCol2.DisplayIndex = 7;
                 dgTable.Columns[(int)MergeFormat.MergeColumns.Empty].ReadOnly = true;
                 dgTable.Columns[(int)MergeFormat.MergeColumns.NotEmpty].ReadOnly = true;
-
-                Size = new Size(Size.Width+ 500,Size.Height+300);
             }
+            dgTable.Refresh();
+            dgTable.Update();
+            SetSize();
         }
 
-
+        private void SetSize()
+        {
+            Size = Properties.Settings.Default.MergeFormatViewSize;
+        }
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
@@ -121,6 +126,8 @@ namespace DataTableConverter.View
 
         private void MergeFormatView_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.MergeFormatViewSize = Size;
+            Properties.Settings.Default.Save();
             if (DialogResult != DialogResult.OK)
             {
                 DataTable table = (dgTable.DataSource as DataTable);

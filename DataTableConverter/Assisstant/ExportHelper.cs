@@ -286,24 +286,34 @@ namespace DataTableConverter
                 fileName = fileName.Substring(0, DbaseMaxFileLength);
             }
             string path = Path.Combine(originalPath, "temp");
-            Directory.CreateDirectory(path);
+            try
+            {
+                Directory.CreateDirectory(path);
+            }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage(ex);
+                return;
+            }
             string fullpath = Path.Combine(path,fileName+".DBF");
             string fullPathOriginal = Path.Combine(originalPath, originalFileName + ".DBF");
 
-            if (File.Exists(fullPathOriginal))
+            if (File.Exists(fullpath))
             {
-                File.Delete(fullPathOriginal);
+                File.Delete(fullpath);
             }
 
 
             int[] max = MaxLengthOfColumns(dataTable);
+            string query = string.Empty;
             try
             {
-                CreateTable(dataTable, max, path, fileName);
+                CreateTable(dataTable, max, path, fileName, ref query);
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine}    path: {path}; fileName: {fileName}; headers:[{string.Join("; ",dataTable.HeadersOfDataTableAsString())}]");
+
+                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ",dataTable.HeadersOfDataTableAsString())}]");
                 return;
             }
 
@@ -340,18 +350,64 @@ namespace DataTableConverter
 
                 stream.Write(bytes, 0, bytes.Length);
                 stream.Close();
+                if (File.Exists(fullPathOriginal))
+                {
+                    File.Delete(fullPathOriginal);
+                }
                 File.Move(fullpath, fullPathOriginal);
-                Directory.Delete(path);
                 #endregion
             }
             catch (Exception ex)
             {
                 ErrorHelper.LogMessage(ex);
             }
-
+            finally
+            {
+                DeleteDirectory(path);
+            }
         }
 
-        private static void CreateTable(DataTable table, int[] max, string path, string filename)
+        /// <summary>
+        /// Depth-first recursive delete, with handling for descendant 
+        /// directories open in Windows Explorer.
+        /// </summary>
+        private static void DeleteDirectory(string path)
+        {
+            foreach (string directory in Directory.GetDirectories(path))
+            {
+                DeleteDirectory(directory);
+            }
+
+            try
+            {
+                Directory.Delete(path, true);
+            }
+            catch (IOException)
+            {
+                Directory.Delete(path, true);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
+        private static void CreateTable(DataTable table, int[] max, string path, string filename, ref string query)
+        {
+            query = CreateQuery(table, filename, max);
+            
+            OleDbConnection con = new OleDbConnection(GetConnection(path));
+            OleDbCommand cmd = new OleDbCommand
+            {
+                Connection = con
+            };
+            con.Open();
+            cmd.CommandText = query;
+            cmd.ExecuteNonQuery();
+            con.Close();
+        }
+
+        private static string CreateQuery(DataTable table, string filename, int[] max)
         {
             StringBuilder csb = new StringBuilder($"create table [{filename}] (");
             for (int i = 0; i < table.Columns.Count; i++)
@@ -360,18 +416,7 @@ namespace DataTableConverter
             }
 
             csb[csb.Length - 1] = ')';
-
-
-
-            OleDbConnection con = new OleDbConnection(GetConnection(path));
-            OleDbCommand cmd = new OleDbCommand
-            {
-                Connection = con
-            };
-            con.Open();
-            cmd.CommandText = csb.ToString();
-            cmd.ExecuteNonQuery();
-            con.Close();
+            return csb.ToString();
         }
 
         private static int[] MaxLengthOfColumns(DataTable dataTable)

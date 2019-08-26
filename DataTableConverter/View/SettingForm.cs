@@ -160,7 +160,8 @@ namespace DataTableConverter.View
                     string path = Path.Combine(folderPath, Path.GetFileName(directory));
                     if (!Directory.Exists(path))
                     {
-                        Directory.Move(directory, path);
+
+                        Microsoft.VisualBasic.FileIO.FileSystem.MoveDirectory(directory, path);
                     }
                 }
 

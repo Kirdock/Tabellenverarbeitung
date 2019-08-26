@@ -122,5 +122,8 @@
     <Setting Name="PVMSaveTwice" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="MergeFormatViewSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">721, 467</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

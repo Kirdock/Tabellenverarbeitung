@@ -501,5 +501,17 @@ namespace DataTableConverter.Properties {
                 this["PVMSaveTwice"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("721, 467")]
+        public global::System.Drawing.Size MergeFormatViewSize {
+            get {
+                return ((global::System.Drawing.Size)(this["MergeFormatViewSize"]));
+            }
+            set {
+                this["MergeFormatViewSize"] = value;
+            }
+        }
     }
 }

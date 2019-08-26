@@ -1003,15 +1003,16 @@ namespace DataTableConverter
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex, false);
+                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} Maximum:{pgbLoading.Maximum}; Minimum:{pgbLoading.Minimum} Value:{pgbLoading.Value}",false);
             }
         }
 
         private void StartLoadingBarCount(int length)
         {
-            pgbLoading.Maximum = length;
-            pgbLoading.Value = 0;
             pgbLoading.Style = ProgressBarStyle.Continuous;
+            pgbLoading.Maximum = length;
+            pgbLoading.Minimum = 0;
+            pgbLoading.Value = 0;
         }
 
         private void SaveFinished()
