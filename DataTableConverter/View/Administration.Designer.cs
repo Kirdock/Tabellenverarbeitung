@@ -59,6 +59,11 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
+            this.txtIdentifierAppend = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtIdentifierSource = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.gbTrim = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.CbTrimDeleteDouble = new System.Windows.Forms.CheckBox();
@@ -143,11 +148,6 @@
             this.dgvReplaceWhole = new System.Windows.Forms.DataGridView();
             this.cbHeadersReplaceWhole = new CheckComboBoxTest.CheckedComboBox();
             this.label26 = new System.Windows.Forms.Label();
-            this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
-            this.txtIdentifierAppend = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtIdentifierSource = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.gbCompare = new System.Windows.Forms.GroupBox();
             this.lblCompareSecondColumn = new System.Windows.Forms.Label();
             this.txtCompareSecondColumn = new System.Windows.Forms.TextBox();
@@ -235,6 +235,7 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbAddTableColumns.SuspendLayout();
             this.gbTrim.SuspendLayout();
             this.gbCount.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbCount)).BeginInit();
@@ -260,7 +261,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvPadConditions)).BeginInit();
             this.gbReplaceWhole.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReplaceWhole)).BeginInit();
-            this.gbAddTableColumns.SuspendLayout();
             this.gbCompare.SuspendLayout();
             this.gbSubstring.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringEnd)).BeginInit();
@@ -523,6 +523,7 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCount);
@@ -537,7 +538,6 @@
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbReplaceWhole);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCompare);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMain);
             this.splitWorkflowProcProperties.Size = new System.Drawing.Size(882, 735);
             this.splitWorkflowProcProperties.SplitterDistance = 596;
@@ -703,6 +703,59 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // gbAddTableColumns
+            // 
+            this.gbAddTableColumns.Controls.Add(this.txtIdentifierAppend);
+            this.gbAddTableColumns.Controls.Add(this.label3);
+            this.gbAddTableColumns.Controls.Add(this.txtIdentifierSource);
+            this.gbAddTableColumns.Controls.Add(this.label1);
+            this.gbAddTableColumns.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbAddTableColumns.Location = new System.Drawing.Point(0, 92);
+            this.gbAddTableColumns.Name = "gbAddTableColumns";
+            this.gbAddTableColumns.Size = new System.Drawing.Size(282, 643);
+            this.gbAddTableColumns.TabIndex = 21;
+            this.gbAddTableColumns.TabStop = false;
+            this.gbAddTableColumns.Text = "Spaltenangabe";
+            this.gbAddTableColumns.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            // 
+            // txtIdentifierAppend
+            // 
+            this.txtIdentifierAppend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtIdentifierAppend.Location = new System.Drawing.Point(6, 104);
+            this.txtIdentifierAppend.Name = "txtIdentifierAppend";
+            this.txtIdentifierAppend.Size = new System.Drawing.Size(270, 20);
+            this.txtIdentifierAppend.TabIndex = 3;
+            this.txtIdentifierAppend.TextChanged += new System.EventHandler(this.txtIdentifierAppend_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 81);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(202, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Identifizierung der einzulesenden Tabelle:";
+            // 
+            // txtIdentifierSource
+            // 
+            this.txtIdentifierSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtIdentifierSource.Location = new System.Drawing.Point(6, 42);
+            this.txtIdentifierSource.Name = "txtIdentifierSource";
+            this.txtIdentifierSource.Size = new System.Drawing.Size(270, 20);
+            this.txtIdentifierSource.TabIndex = 1;
+            this.txtIdentifierSource.TextChanged += new System.EventHandler(this.txtIdentifierSource_TextChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 19);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(231, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Identifizierung der bereits eingelesenen Tabelle:";
             // 
             // gbTrim
             // 
@@ -1756,59 +1809,6 @@
             this.label26.TabIndex = 5;
             this.label26.Text = "Spalten aus geladener Tabelle hinzufügen:";
             // 
-            // gbAddTableColumns
-            // 
-            this.gbAddTableColumns.Controls.Add(this.txtIdentifierAppend);
-            this.gbAddTableColumns.Controls.Add(this.label3);
-            this.gbAddTableColumns.Controls.Add(this.txtIdentifierSource);
-            this.gbAddTableColumns.Controls.Add(this.label1);
-            this.gbAddTableColumns.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbAddTableColumns.Location = new System.Drawing.Point(0, 92);
-            this.gbAddTableColumns.Name = "gbAddTableColumns";
-            this.gbAddTableColumns.Size = new System.Drawing.Size(282, 643);
-            this.gbAddTableColumns.TabIndex = 21;
-            this.gbAddTableColumns.TabStop = false;
-            this.gbAddTableColumns.Text = "Spaltenangabe";
-            this.gbAddTableColumns.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
-            // 
-            // txtIdentifierAppend
-            // 
-            this.txtIdentifierAppend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtIdentifierAppend.Location = new System.Drawing.Point(6, 104);
-            this.txtIdentifierAppend.Name = "txtIdentifierAppend";
-            this.txtIdentifierAppend.Size = new System.Drawing.Size(270, 20);
-            this.txtIdentifierAppend.TabIndex = 3;
-            this.txtIdentifierAppend.TextChanged += new System.EventHandler(this.txtIdentifierAppend_TextChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 81);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(202, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Identifizierung der einzulesenden Tabelle:";
-            // 
-            // txtIdentifierSource
-            // 
-            this.txtIdentifierSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtIdentifierSource.Location = new System.Drawing.Point(6, 42);
-            this.txtIdentifierSource.Name = "txtIdentifierSource";
-            this.txtIdentifierSource.Size = new System.Drawing.Size(270, 20);
-            this.txtIdentifierSource.TabIndex = 1;
-            this.txtIdentifierSource.TextChanged += new System.EventHandler(this.txtIdentifierSource_TextChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(231, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Identifizierung der bereits eingelesenen Tabelle:";
-            // 
             // gbCompare
             // 
             this.gbCompare.Controls.Add(this.lblCompareSecondColumn);
@@ -2630,6 +2630,8 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbAddTableColumns.ResumeLayout(false);
+            this.gbAddTableColumns.PerformLayout();
             this.gbTrim.ResumeLayout(false);
             this.gbTrim.PerformLayout();
             this.gbCount.ResumeLayout(false);
@@ -2665,8 +2667,6 @@
             this.gbReplaceWhole.ResumeLayout(false);
             this.gbReplaceWhole.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReplaceWhole)).EndInit();
-            this.gbAddTableColumns.ResumeLayout(false);
-            this.gbAddTableColumns.PerformLayout();
             this.gbCompare.ResumeLayout(false);
             this.gbCompare.PerformLayout();
             this.gbSubstring.ResumeLayout(false);

@@ -16,6 +16,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "Spalten zusammenfügen";
         internal enum ConditionColumn : int { Spalte = 0, Wert = 1, NichtLeer = 2, Format = 3 };
+        internal enum ConditionalText { Right, Left, None };
         public DataTable Conditions;
         public MergeFormat Format;
 
@@ -83,6 +84,11 @@ namespace DataTableConverter.Classes.WorkProcs
             row[index] = row[index].ToString().Replace($"[{oldName}]", $"[{newName}]");
         }
 
+        internal static string RenameFormatHeader(string format, string oldName, string newName)
+        {
+            return format?.Replace($"[{oldName}]", $"[{newName}]");
+        }
+
         //we only remove Conditions
         //for Format: a non existing column is seen as an empty column
         public override void removeHeader(string colName)
@@ -126,7 +132,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     });
                     MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
                     
-                    row[column] = GetFormat(row, format, table.Columns);
+                    row[column] = format.IsStringFormat() ? GetFormat(row, format.Formula, table.Columns) : GetFormat(row, format, table.Columns);
                 }
             }
             else
@@ -181,6 +187,141 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
             }
             return result.ToString();
+        }
+
+
+        private string GetFormat(DataRow row, string formula, DataColumnCollection tableColumns)
+        {
+            string[] columns = GetHeaderOfFormula(formula).ToArray();
+            Dictionary<FormatIdentifier, bool> emptyAfterHeader = GetEmptyAfterHeaders(columns, row, tableColumns);
+            StringBuilder result = new StringBuilder();
+            int counter = 0;
+            StringBuilder stringBetween = new StringBuilder();
+            bool emptyBefore = false;
+            List<string[]> headersInBrackets = GetHeaderInBrackets(formula).ToList();
+            if (headersInBrackets.Count == 0)
+            {
+                headersInBrackets.Add(new string[0]); //to not enter an ArrayOutOfBoundsException
+            }
+            int bracketCount = 0;
+            ConditionalText directionBefore = ConditionalText.None;
+            ConditionalText condDefault = ConditionalText.Right;
+            for (int i = 0; i < formula.Length; i++)
+            {
+                char c = formula[i];
+
+                if (c == '(')
+                {
+                    string value = headersInBrackets[bracketCount].FirstOrDefault(h => tableColumns.Contains(h) && !string.IsNullOrWhiteSpace(row[h]?.ToString())) ?? string.Empty;
+                    if (value != string.Empty)
+                    {
+                        result.Append(row[value].ToString());
+                    }
+                    counter += headersInBrackets[bracketCount].Length;
+                    i = formula.IndexOf(')', i);
+                    bracketCount++;
+                }
+                else if (c == '[') //insert column value
+                {
+                    if (counter > columns.Length)
+                    {
+                        ErrorHelper.LogMessage($"Ungültiges Format? Format:{formula}");
+                        continue;
+                    }
+                    string header = columns[counter];
+
+                    string value = tableColumns.Contains(header) ? row[header]?.ToString() : string.Empty;
+                    bool isEmpty = string.IsNullOrWhiteSpace(value);
+                    ConditionalText direction = GetDirection(formula, i + header.Length + 1, out int newIndex, condDefault);
+
+                    if ((direction == ConditionalText.Left && isEmpty
+                        || (directionBefore == ConditionalText.Right) && emptyBefore && direction != ConditionalText.Left
+                        )
+                      )
+                    {
+                        stringBetween.Clear();
+                    }
+                    
+                    result.Append(stringBetween);
+
+                    if (!isEmpty)
+                    {
+                        result.Append(value);
+                    }
+
+                    
+
+                    stringBetween.Clear();
+
+                    if (emptyAfterHeader[new FormatIdentifier { Header = columns[counter], Index = counter }])
+                    {
+                        break;
+                    }
+
+                    i = newIndex;
+                    counter++;
+                    emptyBefore = isEmpty;
+                    directionBefore = direction;
+                }
+                else
+                {
+                    stringBetween.Append(c);
+                }
+            }
+            return stringBetween.Length != 0 ? result.Append(stringBetween).ToString() : result.ToString();
+        }
+
+        private Dictionary<FormatIdentifier, bool> GetEmptyAfterHeaders(string[] headers, DataRow row, DataColumnCollection tableColumns)
+        {
+            Dictionary<FormatIdentifier, bool> dict = new Dictionary<FormatIdentifier, bool>();
+            Dictionary<string, bool> isEmpty = new Dictionary<string, bool>();
+            foreach(string header in headers)
+            {
+                if (!isEmpty.ContainsKey(header))
+                {
+                    isEmpty.Add(header, !tableColumns.Contains(header) || string.IsNullOrWhiteSpace(row[header]?.ToString()));
+                }
+            }
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                dict.Add(new FormatIdentifier { Header = headers[i], Index = i }, i != headers.Length && headers.Skip(i+1).All(header => isEmpty[header]));
+            }
+
+            return dict;
+        }
+
+        private ConditionalText GetDirection(string formula, int startindex, out int newIndex, ConditionalText condDefault)
+        {
+            newIndex = formula.IndexOf(']', startindex);
+            string value = formula.Substring(startindex, newIndex - startindex).Trim().ToLower();
+            ConditionalText result;
+            switch (value)
+            {
+                case "|r":
+                    result = ConditionalText.Right;
+                    break;
+
+                case "|l":
+                    result = ConditionalText.Left;
+                    break;
+
+                default:
+                    result = condDefault;
+                    break;
+            }
+            return result;
+        }
+
+        private IEnumerable<string[]> GetHeaderInBrackets(string formula)
+        {
+            Regex re = new Regex(@"\((.*?)\)");
+            MatchCollection matches = re.Matches(formula);
+
+            for (int i = 0; i < matches.Count; i++)
+            {
+                yield return GetHeaderOfFormula(matches[i].Groups[1].Value).ToArray();
+            }
         }
 
     }

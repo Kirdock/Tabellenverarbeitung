@@ -610,7 +610,6 @@ namespace DataTableConverter.View
             {
                 groupBox.Enabled = enabled;
             }
-            gbMain.Enabled = enabled;
         }
 
         private void SetProcedureLock(Proc procedure = null)
@@ -951,11 +950,12 @@ namespace DataTableConverter.View
             }
             else
             {
-                SetGroupBoxVisibility(typeof(ProcTrim));
+                SetGroupBoxVisibility(null);
                 txtWorkProcName.TextChanged -= txtWorkProcName_TextChanged;
                 txtWorkProcName.Text = lblOriginalNameText.Text = string.Empty;
                 txtWorkProcName.TextChanged += txtWorkProcName_TextChanged;
             }
+            gbMain.Enabled = lbUsedProcedures.SelectedIndex != -1;
         }
 
         private void SetGroupBoxVisibility(Type type)
@@ -966,8 +966,8 @@ namespace DataTableConverter.View
                 {
                     box.Visible = gbState[box] == type;
                 }
-                gbMain.Visible = type != null;
             }
+            gbMain.Visible = true;
         }
 
         private void SetNewColumnText(string text)

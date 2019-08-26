@@ -15,10 +15,12 @@ namespace DataTableConverter.View
     public partial class MergeFormatView : Form
     {
         private object[] Headers;
+        private MergeFormat Format;
         internal MergeFormatView(MergeFormat format, object[] headers = null)
         {
             InitializeComponent();
-
+            Format = format;
+            txtFormula.Text = format.Formula;
             ViewHelper.SetDataGridViewStyle(dgTable);
             try
             {
@@ -68,12 +70,21 @@ namespace DataTableConverter.View
             }
             dgTable.Refresh();
             dgTable.Update();
-            SetSize();
+            SetSize(format.Table.Rows.Count == 0);
         }
 
-        private void SetSize()
+        private void SetSize(bool isStringFormat)
         {
-            Size = Properties.Settings.Default.MergeFormatViewSize;
+            if (isStringFormat)
+            {
+                Size = new Size(Size.Width, 244);
+            }
+            else
+            {
+                Size = Properties.Settings.Default.MergeFormatViewSize;
+            }
+            RBExtended.Checked = !isStringFormat;
+            RBSimple.Checked = isStringFormat;
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
@@ -126,8 +137,12 @@ namespace DataTableConverter.View
 
         private void MergeFormatView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Properties.Settings.Default.MergeFormatViewSize = Size;
-            Properties.Settings.Default.Save();
+            if (Format.Table.Rows.Count != 0)
+            {
+                Properties.Settings.Default.MergeFormatViewSize = Size;
+                Properties.Settings.Default.Save();
+            }
+            Format.Formula = txtFormula.Text;
             if (DialogResult != DialogResult.OK)
             {
                 DataTable table = (dgTable.DataSource as DataTable);
@@ -145,6 +160,23 @@ namespace DataTableConverter.View
             {
                 dgTable.DataSource = null;
             }
+        }
+
+
+        private void RB_CheckedChanged(object sender, EventArgs e)
+        {
+            PanelSimple.Visible = RBSimple.Checked;
+            PanelExtended.Visible = RBExtended.Checked;
+
+            if (RBSimple.Checked)
+            {
+                (dgTable.DataSource as DataTable).Rows.Clear();
+            }
+            else
+            {
+                Format.Formula = string.Empty;
+            }
+            
         }
     }
 }

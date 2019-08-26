@@ -13,6 +13,7 @@ namespace DataTableConverter.Classes
     {
         public enum MergeColumns:int { Column = 0, Text = 1, Empty = 3, NotEmpty = 5, EmptyAll = 2, NotEmptyAll = 4}
         public DataTable Table { get; set; }
+        public string Formula;
 
         public MergeFormat()
         {
@@ -31,7 +32,11 @@ namespace DataTableConverter.Classes
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
-            if (Table.Columns.Count > 4) //== new format
+            if (IsStringFormat())
+            {
+                builder.Append(Formula);
+            }
+            else if (Table.Columns.Count > 4) //== new format
             {
                 foreach (DataRow row in Table.Rows)
                 {
@@ -45,9 +50,14 @@ namespace DataTableConverter.Classes
             return builder.ToString();
         }
 
+        internal bool IsStringFormat()
+        {
+            return !string.IsNullOrWhiteSpace(Formula);
+        }
+
         internal IEnumerable<string> GetHeaders()
         {
-            return GetColumn().Concat(GetHeadersEmpty()).Concat(GetHeadersNotEmpty()).Distinct();
+            return GetColumn().Concat(GetHeadersEmpty()).Concat(GetHeadersNotEmpty()).Concat(GetHeadersOfFormula()).Distinct();
         }
 
         internal IEnumerable<string> GetColumn()
@@ -65,6 +75,11 @@ namespace DataTableConverter.Classes
             return Table.AsEnumerable().SelectMany(row => ProcMerge.GetHeaderOfFormula(row[(int)MergeColumns.NotEmpty]?.ToString())).Distinct().Where(header => !string.IsNullOrWhiteSpace(header));
         }
 
+        internal IEnumerable<string> GetHeadersOfFormula()
+        {
+            return ProcMerge.GetHeaderOfFormula(Formula);
+        }
+
         internal void RenameHeaders(string oldName, string newName)
         {
             foreach(DataRow row in Table.Rows)
@@ -73,6 +88,8 @@ namespace DataTableConverter.Classes
                 ProcMerge.RenameFormatHeader(row, (int)MergeColumns.Empty, oldName, newName);
                 ProcMerge.RenameFormatHeader(row, (int)MergeColumns.NotEmpty, oldName, newName);
             }
+
+            Formula = ProcMerge.RenameFormatHeader(Formula, oldName, newName);
         }
     }
 }
