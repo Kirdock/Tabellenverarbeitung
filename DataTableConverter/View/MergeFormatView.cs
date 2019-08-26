@@ -90,6 +90,17 @@ namespace DataTableConverter.View
         private void btnConfirm_Click(object sender, EventArgs e)
         {
             ViewHelper.EndDataGridViewEdit(dgTable);
+            Format.Formula = txtFormula.Text;
+
+            if (RBSimple.Checked)
+            {
+                (dgTable.DataSource as DataTable).Rows.Clear();
+                (dgTable.DataSource as DataTable).AcceptChanges();
+            }
+            else
+            {
+                Format.Formula = string.Empty;
+            }
             DialogResult = DialogResult.OK;
         }
 
@@ -142,7 +153,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.MergeFormatViewSize = Size;
                 Properties.Settings.Default.Save();
             }
-            Format.Formula = txtFormula.Text;
+            
             if (DialogResult != DialogResult.OK)
             {
                 DataTable table = (dgTable.DataSource as DataTable);
@@ -167,16 +178,6 @@ namespace DataTableConverter.View
         {
             PanelSimple.Visible = RBSimple.Checked;
             PanelExtended.Visible = RBExtended.Checked;
-
-            if (RBSimple.Checked)
-            {
-                (dgTable.DataSource as DataTable).Rows.Clear();
-            }
-            else
-            {
-                Format.Formula = string.Empty;
-            }
-            
         }
     }
 }
