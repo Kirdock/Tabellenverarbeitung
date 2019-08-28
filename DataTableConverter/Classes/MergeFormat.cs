@@ -13,7 +13,7 @@ namespace DataTableConverter.Classes
     {
         public enum MergeColumns:int { Column = 0, Text = 1, Empty = 3, NotEmpty = 5, EmptyAll = 2, NotEmptyAll = 4}
         public DataTable Table { get; set; }
-        public string Formula;
+        public string Formula = string.Empty;
 
         public MergeFormat()
         {

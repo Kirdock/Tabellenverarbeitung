@@ -60,7 +60,7 @@ namespace DataTableConverter.Classes.WorkProcs
             string regularExpressionPattern = @"\[(.*?)\]";
             Regex re = new Regex(regularExpressionPattern);
 
-            return re.Matches(formula).Cast<Match>().Select(col => col.Groups[1].Value);
+            return re.Matches(formula ?? string.Empty).Cast<Match>().Select(col => col.Groups[1].Value);
         }
 
         public override void renameHeaders(string oldName, string newName)
@@ -124,7 +124,7 @@ namespace DataTableConverter.Classes.WorkProcs
                                 (rowValue = row[value].ToString()) == condition[(int)ConditionColumn.Wert].ToString()
                                 ||
                                 (
-                                    (bool)condition[(int)ConditionColumn.NichtLeer]
+                                    condition[(int)ConditionColumn.NichtLeer] == DBNull.Value ? false : (bool)condition[(int)ConditionColumn.NichtLeer]
                                     &&
                                     rowValue.Length > 0
                                 )
