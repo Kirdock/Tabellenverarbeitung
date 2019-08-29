@@ -461,10 +461,7 @@ namespace DataTableConverter.Assisstant
             int headerCounter = 0;
             DataRow row = table.NewRow();
             bool generatedMulti = false;
-            if (fileName != null)
-            {
-                row[Extensions.DataTableExtensions.FileName] = fileName;
-            }
+            
             for (; i < maxLength; i++)
             {
                 if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
@@ -476,12 +473,10 @@ namespace DataTableConverter.Assisstant
                     generatedMulti = false;
                     headerCounter = 0;
 
-                    table.Rows.Add(row);
+                    AddContentDataRow(row, table, fileName);
+
                     row = table.NewRow();
-                    if (fileName != null)
-                    {
-                        row[Extensions.DataTableExtensions.FileName] = fileName;
-                    }
+                    
                     i++;
                     if ((i + 1) < maxLength && content[i + 1] == '\"') //beginning of cell that has text wrappings
                     {
@@ -517,7 +512,19 @@ namespace DataTableConverter.Assisstant
                 }
             }
             SetContentRowValue(row, headers[headerCounter], cellBuilder);
-            table.Rows.Add(row);
+            AddContentDataRow(row, table, fileName);
+        }
+
+        private static void AddContentDataRow(DataRow row, DataTable table, string fileName)
+        {
+            if (row.ItemArray.Any(cell => !string.IsNullOrWhiteSpace(cell.ToString())))
+            {
+                if (fileName != null)
+                {
+                    row[Extensions.DataTableExtensions.FileName] = fileName;
+                }
+                table.Rows.Add(row);
+            }
         }
 
         private static void SetContentRowValue(DataRow row, string column, StringBuilder builder)
