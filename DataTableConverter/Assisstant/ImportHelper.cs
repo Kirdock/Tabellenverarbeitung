@@ -445,79 +445,169 @@ namespace DataTableConverter.Assisstant
             range.Copy();
             IDataObject data = Clipboard.GetDataObject();
             string content = (string)data.GetData(DataFormats.UnicodeText);
-            string[] stringRows = content.Split(new string[] { "\r\n" }, StringSplitOptions.None);
-            string[] headers = stringRows.First().Split('\t');
-            int[] columns = new int[headers.Length];
-            //header
-            for(int i = 0; i < headers.Length; i++)
+            GetDataOfString(content, table, fileName);
+            Clipboard.Clear();
+        }
+
+        private static void GetDataOfString(string content, DataTable table, string fileName)
+        {
+            int maxLength = content.Length;
+            
+            StringBuilder cellBuilder = new StringBuilder();
+            
+            Dictionary<string,string> cells = new Dictionary<string, string>();
+            List<string> headers = GetHeadersOfContent(content, table, out int i);
+            Dictionary<int, int> additionalHeaders = new Dictionary<int, int>();
+            int headerCounter = 0;
+            DataRow row = table.NewRow();
+            bool generatedMulti = false;
+            if (fileName != null)
             {
-                int index;
-                if((index = table.Columns.IndexOf(headers[i])) == -1)
-                {
-                    index = table.Columns.Count;
-                    table.Columns.Add(headers[i], typeof(string));
-                }
-                columns[i] = index;
+                row[Extensions.DataTableExtensions.FileName] = fileName;
             }
-
-            //content
-            foreach (string stringRow in stringRows.Skip(1))
+            for (; i < maxLength; i++)
             {
-                var values = stringRow.Split('\t');
-                DataRow dr = table.NewRow();
-                for (int i = 0; i < values.Length; i++)
+                if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
                 {
-
-                    string[] subValues = values[i].Split('\n') ?? new string[0];
-                    if (subValues.Length < 2)
+                    if (!generatedMulti)
                     {
-                        dr[columns[i]] = values[i];
+                        SetContentRowValue(row, headers[headerCounter], cellBuilder);
+                    }
+                    generatedMulti = false;
+                    headerCounter = 0;
+
+                    table.Rows.Add(row);
+                    row = table.NewRow();
+                    if (fileName != null)
+                    {
+                        row[Extensions.DataTableExtensions.FileName] = fileName;
+                    }
+                    i++;
+                    if ((i + 1) < maxLength && content[i + 1] == '\"') //beginning of cell that has text wrappings
+                    {
+                        i++;
+                        generatedMulti = true;
+                        GenerateMultiCell(content, table, row, headers[headerCounter], ref i);
                     }
                     else
                     {
-                        #region split \n into several columns
+                        cells.Clear();
+                    }
+                    
+                }
+                else if (content[i] == '\t') // new column
+                {
+                    if (!generatedMulti)
+                    {
+                        SetContentRowValue(row, headers[headerCounter], cellBuilder);
+                    }
+                    generatedMulti = false;
+                    headerCounter++;
 
-                        int[] newColIndizes = new int[subValues.Length];
-                        string colName = table.Columns[columns[i]].ColumnName;
-
-                        newColIndizes[0] = columns[i];
-                        for (int col = 1; col < subValues.Length; col++)
-                        {
-                            string newColName = colName + col;
-                            int index = table.Columns.IndexOf(newColName);
-                            if (index == -1)
-                            {
-                                newColIndizes[col] = table.Columns.Count;
-                                table.Columns.Add(newColName, typeof(string));
-                            }
-                            else
-                            {
-                                newColIndizes[col] = index;
-                            }
-                        }
-
-                        //format is "myText\nSecondText" with quotation marks
-                        subValues[0] = subValues[0].TrimStart('"');
-                        subValues[subValues.Length - 1] = subValues[subValues.Length - 1].TrimEnd('"');
-
-                        for (int index = 0; index < subValues.Length; index++)
-                        {
-                            dr[newColIndizes[index]] = subValues[index];
-                        }
-                        #endregion
+                    if ((i + 1) < maxLength && content[i + 1] == '\"') //beginning of cell that has text wrappings
+                    {
+                        i++;
+                        generatedMulti = true;
+                        GenerateMultiCell(content, table, row, headers[headerCounter], ref i);
                     }
                 }
-                if (dr.ItemArray.Any(value => !string.IsNullOrWhiteSpace(value?.ToString())))
+                else
                 {
-                    if (fileName != null)
-                    {
-                        dr[Extensions.DataTableExtensions.FileName] = fileName;
-                    }
-                    table.Rows.Add(dr);
+                    cellBuilder.Append(content[i]);
                 }
             }
+            SetContentRowValue(row, headers[headerCounter], cellBuilder);
+            table.Rows.Add(row);
+        }
 
-            Clipboard.Clear();
+        private static void SetContentRowValue(DataRow row, string column, StringBuilder builder)
+        {
+            row[column] = builder.ToString();
+            builder.Clear();
+        }
+
+        private static List<string> GetHeadersOfContent(string content, DataTable table, out int i)
+        {
+            List<string> headers = new List<string>();
+            StringBuilder header = new StringBuilder();
+            for(i=0; i < content.Length; i++)
+            {
+                if(content[i] == '\r' && content[i+1] == '\n')
+                {
+                    AddHeaderOfContent(table, headers, header.ToString());
+                    
+                    i += 2;
+                    break;
+                }
+                else if(content[i] == '\t')
+                {
+                    AddHeaderOfContent(table, headers, header.ToString());
+                    header.Clear();
+                }
+                else
+                {
+                    header.Append(content[i]);
+                }
+            }
+            return headers;
+        }
+
+        private static void AddHeaderOfContent(DataTable table, List<string> headers, string header)
+        {
+            string headerString = header.ToString();
+            headers.Add(header.ToString());
+            if (!table.Columns.Contains(headerString))
+            {
+                table.Columns.Add(headerString, typeof(string));
+            }
+        }
+
+        private static void GenerateMultiCell(string content, DataTable table, DataRow row, string header, ref int i)
+        {
+            ++i;
+            int multiCellCount = 0;
+            Dictionary<string, string> values = new Dictionary<string, string>();
+            StringBuilder cell = new StringBuilder();
+            bool newLine;
+            for(;i < content.Length; ++i)
+            {
+                if(EndOfMultiCell(content, i, out bool isNewLine))
+                {
+                    AddMultiCellColumn(header, multiCellCount, table, row, cell.ToString());
+                    break;
+                }
+                else if((newLine = (content[i] == '\r')) || content[i] == '\n')
+                {
+                    AddMultiCellColumn(header, multiCellCount, table, row,cell.ToString());
+
+                    if (newLine)
+                    {
+                        ++i;
+                    }
+                    cell.Clear();
+                    multiCellCount++;
+                }
+                else if (content[i] != '\"' || content[i-1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
+                {
+                    cell.Append(content[i]);
+                }
+            }
+        }
+
+        private static void AddMultiCellColumn(string header, int count, DataTable table, DataRow row, string text)
+        {
+            string multiHeader = count == 0 ? header : header + count;
+            if (!table.Columns.Contains(multiHeader))
+            {
+                table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(table.Columns.IndexOf(header) + count);
+            }
+            row[multiHeader] = text;
+        }
+
+        private static bool EndOfMultiCell(string content, int i, out bool newLine)
+        {
+            newLine = false;
+            return content[i] == '\"' && ((i + 1) == content.Length || ((i + 1) < content.Length && ((newLine = (content[i + 1] == '\r')) || content[i + 1] == '\t')));
         }
 
         internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview = false)
