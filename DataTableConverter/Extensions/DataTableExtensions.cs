@@ -1,5 +1,6 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
+using DataTableConverter.Classes.WorkProcs;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,6 +30,13 @@ namespace DataTableConverter.Extensions
         internal static List<string> HeadersToLower(this DataTable table)
         {
             return table.Columns.Cast<DataColumn>().Select(dt => dt.ColumnName.ToLower()).ToList();
+        }
+
+        internal static void Trim(this DataTable table)
+        {
+            ProcTrim proc = new ProcTrim();
+            string order = string.Empty;
+            proc.doWork(table, ref order, null, null, null, null, null, OrderType.Windows, null, out int[] newIndices);
         }
 
         internal static string[] HeadersOfDataTableAsString(this DataTable table)
@@ -331,17 +339,18 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] ImportColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, ProgressBar pgbLoading = null)
+        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] importColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, ProgressBar pgbLoading = null)
         {
             int oldCount = sourceTable.Columns.Count;
-            int newColumnIndex = oldCount + ImportColumns.Length - 1; //-1: without identifier
+            int newColumnIndex = oldCount + importColumns.Length - 1; //-1: without identifier
             int[] importIndices = new int[sourceTable.Rows.Count];
 
-            for (int i = 0; i < ImportColumns.Length; i++)
+            for (int i = 0; i < importColumns.Length; i++)
             {
-                if (i == ImportMergeIndex) continue;
-
-                sourceTable.TryAddColumn(ImportColumns[i]);
+                if (i != ImportMergeIndex)
+                {
+                    sourceTable.TryAddColumn(importColumns[i]);
+                }
             }
 
             try
@@ -364,31 +373,22 @@ namespace DataTableConverter.Extensions
                 }
             }
 
-            Dictionary<string, int> importValues = new Dictionary<string, int>();
-            for (int i = 0; i < sourceTable.Rows.Count; i++)
+            for (int i = 0; i < importTable.Rows.Count; i++)
             {
-                string value = importTable.Rows[i][ImportMergeIndex].ToString();
-                if (!importValues.ContainsKey(value))
+                string key = importTable.Rows[i][ImportMergeIndex].ToString();
+                if (sourceValues.TryGetValue(key, out int value))
                 {
-                    importValues.Add(value, i);
-                }
-            }
-
-            foreach(string key in sourceValues.Keys)
-            {
-                if (importValues.ContainsKey(key))
-                {
-                    importIndices[sourceValues[key]] = importValues[key];
+                    importIndices[value] = i;
                     int offset = 0;
-                    for (int i = 0; i < ImportColumns.Length; i++)
+                    for (int y = 0; y < importColumns.Length; y++)
                     {
-                        if (i == ImportMergeIndex)
+                        if (y == ImportMergeIndex)
                         {
                             offset++;
                         }
                         else
                         {
-                            sourceTable.Rows[sourceValues[key]].SetField(oldCount + i - offset, importTable.Rows[importValues[key]][i]);
+                            sourceTable.Rows[value].SetField(oldCount + y - offset, importTable.Rows[i][y]);
                         }
                     }
                 }

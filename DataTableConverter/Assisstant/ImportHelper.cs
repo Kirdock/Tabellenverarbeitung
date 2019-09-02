@@ -86,6 +86,7 @@ namespace DataTableConverter.Assisstant
                 CheckDataTableColumnHeader(table);
                 table.RemoveEmptyRows();
                 table.RemoveNull();
+                table.Trim();
             }            
             return table;
         }

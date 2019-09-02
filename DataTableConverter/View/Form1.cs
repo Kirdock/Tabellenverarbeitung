@@ -193,12 +193,7 @@ namespace DataTableConverter
         {
             historyHelper.ResetHistory();
             SetSorting(string.Empty);
-
             
-            ProcTrim proc = new ProcTrim();
-            string order = GetSorting();
-            proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this, out int[] newIndices);
-
             AssignDataSource(table, true);
             SetMenuEnabled(true);
         }
