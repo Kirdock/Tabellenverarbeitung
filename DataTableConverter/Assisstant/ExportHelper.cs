@@ -39,6 +39,7 @@ namespace DataTableConverter
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
         private static readonly int DbaseMaxCharacterLength = 254;
+        private static readonly int DbaseMaxRecordCharacterLength = 3999;
         private static readonly string FontFileName = "seguisym.ttf";
 
 
@@ -277,9 +278,9 @@ namespace DataTableConverter
             return path;
         }
 
-        internal static void ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Action updateLoadingBar = null)
+        internal static bool ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Action updateLoadingBar = null)
         {
-
+            bool saved = false;
             string fileName = originalFileName.ToUpper();
             if (fileName.Length > DbaseMaxFileLength)
             {
@@ -293,7 +294,7 @@ namespace DataTableConverter
             catch (Exception ex)
             {
                 ErrorHelper.LogMessage(ex);
-                return;
+                return saved;
             }
             string fullpath = Path.Combine(path,fileName+".DBF");
             string fullPathOriginal = Path.Combine(originalPath, originalFileName + ".DBF");
@@ -305,66 +306,76 @@ namespace DataTableConverter
 
 
             int[] max = MaxLengthOfColumns(dataTable);
-            string query = string.Empty;
-            try
+            if (max.Sum() <= DbaseMaxRecordCharacterLength)
             {
-                CreateTable(dataTable, max, path, fileName, ref query);
-            }
-            catch (Exception ex)
-            {
-
-                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ",dataTable.HeadersOfDataTableAsString())}]");
-                return;
-            }
-
-            try
-            {
-                #region Adjust Header. Update number of records
-
-                FileStream stream = new FileStream(fullpath, FileMode.Open);
-                byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
-                byte[] bytes = new byte[1] { 0x1A };
-
-                stream.Position = 4;
-                stream.Write(records, 0, records.Length);
-
-                stream.Position = stream.Length - 1;
-                
-                if(stream.ReadByte() == bytes[0])
+                string query = string.Empty;
+                try
                 {
-                    stream.Position--;
+                    CreateTable(dataTable, max, path, fileName, ref query);
                 }
-                
-                foreach (DataRow row in dataTable.Rows)
+                catch (Exception ex)
                 {
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append(" ");
-                    for (int y = 0; y < dataTable.Columns.Count; y++)
+                    DeleteDirectory(path);
+                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", dataTable.HeadersOfDataTableAsString())}]");
+                    return saved;
+                }
+
+                try
+                {
+                    #region Adjust Header. Update number of records
+
+                    FileStream stream = new FileStream(fullpath, FileMode.Open);
+                    byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
+                    byte[] bytes = new byte[1] { 0x1A };
+
+                    stream.Position = 4;
+                    stream.Write(records, 0, records.Length);
+
+                    stream.Position = stream.Length - 1;
+
+                    if (stream.ReadByte() == bytes[0])
                     {
-                        string temp = y >= row.ItemArray.Length ? string.Empty : row[y].ToString();
-                        builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[y]));
+                        stream.Position--;
                     }
-                    stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
-                    updateLoadingBar?.Invoke();
-                }
 
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Close();
-                if (File.Exists(fullPathOriginal))
-                {
-                    File.Delete(fullPathOriginal);
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        StringBuilder builder = new StringBuilder();
+                        builder.Append(" ");
+                        for (int y = 0; y < dataTable.Columns.Count; y++)
+                        {
+                            string temp = y >= row.ItemArray.Length ? string.Empty : row[y].ToString();
+                            builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[y]));
+                        }
+                        stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                        updateLoadingBar?.Invoke();
+                    }
+
+                    stream.Write(bytes, 0, bytes.Length);
+                    stream.Close();
+                    if (File.Exists(fullPathOriginal))
+                    {
+                        File.Delete(fullPathOriginal);
+                    }
+                    File.Move(fullpath, fullPathOriginal);
+                    saved = true;
+                    #endregion
                 }
-                File.Move(fullpath, fullPathOriginal);
-                #endregion
+                catch (Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex);
+                }
+                finally
+                {
+                    DeleteDirectory(path);
+                }
             }
-            catch (Exception ex)
-            {
-                ErrorHelper.LogMessage(ex);
-            }
-            finally
+            else
             {
                 DeleteDirectory(path);
+                MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
             }
+            return saved;
         }
 
         /// <summary>

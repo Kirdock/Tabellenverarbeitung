@@ -843,9 +843,12 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path), UpdateLoadingBar);
+                            bool saved = ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path), UpdateLoadingBar);
                             StopLoadingBar();
-                            SaveFinished();
+                            if (saved)
+                            {
+                                SaveFinished();
+                            }
                         }
                         catch (Exception ex)
                         {

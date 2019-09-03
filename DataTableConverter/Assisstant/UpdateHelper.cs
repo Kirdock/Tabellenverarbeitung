@@ -62,7 +62,8 @@ namespace DataTableConverter.Assisstant
                     }
                     catch (Exception ex)
                     {
-                        ErrorHelper.LogMessage(ex);
+                        ErrorHelper.LogMessage(ex, false);
+                        ErrorHelper.LogMessage("Update nicht möglich! Besteht eine Internetverbindung?");
                     }
                 }).Start();
             

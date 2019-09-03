@@ -388,7 +388,7 @@ namespace DataTableConverter.Extensions
                         }
                         else
                         {
-                            sourceTable.Rows[value].SetField(oldCount + y - offset, importTable.Rows[i][y]);
+                            sourceTable.Rows[value][oldCount + y - offset] = importTable.Rows[i][y];
                         }
                     }
                 }
