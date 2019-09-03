@@ -108,6 +108,10 @@ namespace DataTableConverter
             {
                 SaveWidthOfDataGridViewColumns();
             }
+            else
+            {
+                ColumnWidths.Clear();
+            }
             int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
             OrderType orderType = OrderType;
             (dgTable.DataSource as DataView)?.Dispose(); //in hope to remove all remaining lazy loading
