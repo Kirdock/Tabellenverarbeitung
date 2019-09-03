@@ -17,10 +17,12 @@ namespace DataTableConverter.View
     {
         internal IEnumerable<ExportCustomItem> Items => CmBFileNames.Items.Cast<ExportCustomItem>();
         private readonly DataTable Table;
+        private Dictionary<string, Dictionary<string, int>> CacheDataTableGroupCount;
         private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
         internal ExportCustom(object[] headers, DataTable table)
         {
             InitializeComponent();
+            CacheDataTableGroupCount = new Dictionary<string, Dictionary<string, int>>();
             SetListBoxStyle();
             Table = table;
             cmbColumn.Items.AddRange(headers);
@@ -74,13 +76,26 @@ namespace DataTableConverter.View
             if (CmBFileNames.SelectedIndex > -1)
             {
                 SelectedItem.Column = (sender as ComboBox).SelectedItem.ToString();
+                string identifier = cmbColumn.SelectedItem.ToString();
 
-                Dictionary<string, int> pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
+                Dictionary<string, int> pair;
+                if (CacheDataTableGroupCount.ContainsKey(identifier))
+                {
+                    pair = CacheDataTableGroupCount[identifier];
+                }
+                else
+                {
+                    pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
+                    CacheDataTableGroupCount.Add(identifier, pair);
+                }
+                clbValues.BeginUpdate();
                 foreach (string key in pair.Keys)
                 {
                     clbValues.Items.Add(new CountListboxItem(pair[key], key));
                 }
+                clbValues.EndUpdate();
                 SetValues();
+                SetSumCount();
             }
         }
 

@@ -128,6 +128,7 @@
             // 
             // lblSumCount
             // 
+            this.lblSumCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblSumCount.AutoSize = true;
             this.lblSumCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSumCount.Location = new System.Drawing.Point(132, 427);
@@ -138,6 +139,7 @@
             // 
             // label4
             // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(9, 427);
@@ -178,11 +180,14 @@
             // 
             // clbValues
             // 
+            this.clbValues.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.clbValues.CheckOnClick = true;
             this.clbValues.FormattingEnabled = true;
             this.clbValues.Location = new System.Drawing.Point(12, 184);
             this.clbValues.Name = "clbValues";
-            this.clbValues.Size = new System.Drawing.Size(261, 229);
+            this.clbValues.Size = new System.Drawing.Size(417, 229);
             this.clbValues.TabIndex = 14;
             this.clbValues.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbValues_ItemCheck);
             // 
@@ -205,7 +210,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.cmbColumn);
             this.Controls.Add(this.BtnDeleteFile);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MinimumSize = new System.Drawing.Size(457, 500);
             this.Name = "ExportCustom";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Benutzerdefiniertes Exportieren";

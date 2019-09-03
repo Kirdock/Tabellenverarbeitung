@@ -114,8 +114,8 @@ namespace DataTableConverter
             dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
             sourceTable = table ?? sourceTable;
             int rowCount = sourceTable.Rows.Count;
-
             dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
+            
             RestoreDataGridSortMode();
             SetWidth(isNewTable);
 
@@ -479,7 +479,7 @@ namespace DataTableConverter
                 Thread thread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
-                    bool fileNameSet = false;
+                    bool fileNameSet = state != ImportState.None;
                     StartLoadingBar();
                     bool multipleFiles = filenames.Length > 1;
                     Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
@@ -503,7 +503,7 @@ namespace DataTableConverter
                                     newTable = table;
                                 }
                                 fileNameBefore = filename;
-                                if (!fileNameSet && state == ImportState.None)
+                                if (!fileNameSet)
                                 {
                                     fileNameSet = true;
                                     SetFileName(file);
@@ -525,7 +525,11 @@ namespace DataTableConverter
 
         private void SetFileName(string path)
         {
-            lblFilename.Text = Path.GetFileName(path);
+            lblFilename.GetCurrentParent().BeginInvoke(new MethodInvoker(() =>
+            {
+                lblFilename.Text = Path.GetFileName(path);
+            }));
+            
             FilePath = path;
         }
 
@@ -727,11 +731,7 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            string newPath = ExportHelper.ExportExcel(table, Path.GetDirectoryName(path),path);
-                            if(newPath != null)
-                            {
-                                SetFileName(newPath);
-                            }
+                            ExportHelper.ExportExcel(table, Path.GetDirectoryName(path),path);
                             StopLoadingBar();
                             SaveFinished();
                         }

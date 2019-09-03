@@ -59,6 +59,15 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbMerge = new System.Windows.Forms.GroupBox();
+            this.BtnMergeDefaultFormat = new System.Windows.Forms.Button();
+            this.cbMergeOldColumn = new System.Windows.Forms.CheckBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.dgvMerge = new System.Windows.Forms.DataGridView();
+            this.lblNewColumnMerge = new System.Windows.Forms.Label();
+            this.txtFormula = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.txtNewColumnMerge = new System.Windows.Forms.TextBox();
             this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
             this.txtIdentifierAppend = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -172,15 +181,6 @@
             this.cbSubstringHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.label35 = new System.Windows.Forms.Label();
             this.txtSubstringNewColumn = new System.Windows.Forms.TextBox();
-            this.gbMerge = new System.Windows.Forms.GroupBox();
-            this.BtnMergeDefaultFormat = new System.Windows.Forms.Button();
-            this.cbMergeOldColumn = new System.Windows.Forms.CheckBox();
-            this.label18 = new System.Windows.Forms.Label();
-            this.dgvMerge = new System.Windows.Forms.DataGridView();
-            this.lblNewColumnMerge = new System.Windows.Forms.Label();
-            this.txtFormula = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.txtNewColumnMerge = new System.Windows.Forms.TextBox();
             this.gbMain = new System.Windows.Forms.GroupBox();
             this.lblOriginalName = new System.Windows.Forms.Label();
             this.lblOriginalNameText = new System.Windows.Forms.Label();
@@ -235,6 +235,8 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbMerge.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.gbAddTableColumns.SuspendLayout();
             this.gbTrim.SuspendLayout();
             this.gbCount.SuspendLayout();
@@ -266,8 +268,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringEnd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringStart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSubstringColumns)).BeginInit();
-            this.gbMerge.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.gbMain.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitDuplicates)).BeginInit();
@@ -523,11 +523,11 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCount);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbOrder);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbDefDuplicate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbProcedure);
@@ -703,6 +703,112 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // gbMerge
+            // 
+            this.gbMerge.Controls.Add(this.BtnMergeDefaultFormat);
+            this.gbMerge.Controls.Add(this.cbMergeOldColumn);
+            this.gbMerge.Controls.Add(this.label18);
+            this.gbMerge.Controls.Add(this.dgvMerge);
+            this.gbMerge.Controls.Add(this.lblNewColumnMerge);
+            this.gbMerge.Controls.Add(this.txtFormula);
+            this.gbMerge.Controls.Add(this.label16);
+            this.gbMerge.Controls.Add(this.txtNewColumnMerge);
+            this.gbMerge.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbMerge.Location = new System.Drawing.Point(0, 92);
+            this.gbMerge.Name = "gbMerge";
+            this.gbMerge.Size = new System.Drawing.Size(282, 643);
+            this.gbMerge.TabIndex = 12;
+            this.gbMerge.TabStop = false;
+            this.gbMerge.Text = "Spaltenangabe";
+            this.gbMerge.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            // 
+            // BtnMergeDefaultFormat
+            // 
+            this.BtnMergeDefaultFormat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnMergeDefaultFormat.Location = new System.Drawing.Point(217, 84);
+            this.BtnMergeDefaultFormat.Name = "BtnMergeDefaultFormat";
+            this.BtnMergeDefaultFormat.Size = new System.Drawing.Size(58, 23);
+            this.BtnMergeDefaultFormat.TabIndex = 13;
+            this.BtnMergeDefaultFormat.Text = "Format";
+            this.BtnMergeDefaultFormat.UseVisualStyleBackColor = true;
+            this.BtnMergeDefaultFormat.Click += new System.EventHandler(this.BtnMergeDefaultFormat_Click);
+            // 
+            // cbMergeOldColumn
+            // 
+            this.cbMergeOldColumn.AutoSize = true;
+            this.cbMergeOldColumn.Location = new System.Drawing.Point(6, 120);
+            this.cbMergeOldColumn.Name = "cbMergeOldColumn";
+            this.cbMergeOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbMergeOldColumn.TabIndex = 12;
+            this.cbMergeOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbMergeOldColumn.UseVisualStyleBackColor = true;
+            this.cbMergeOldColumn.CheckedChanged += new System.EventHandler(this.cbMergeOldColumn_CheckedChanged);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(3, 152);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(73, 13);
+            this.label18.TabIndex = 9;
+            this.label18.Text = "Bedingungen:";
+            // 
+            // dgvMerge
+            // 
+            this.dgvMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvMerge.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvMerge.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvMerge.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.dgvMerge.Location = new System.Drawing.Point(9, 172);
+            this.dgvMerge.Name = "dgvMerge";
+            this.dgvMerge.Size = new System.Drawing.Size(267, 451);
+            this.dgvMerge.TabIndex = 8;
+            this.dgvMerge.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvMerge_CellClick);
+            this.dgvMerge.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            this.dgvMerge.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgvMerge_CellFormatting);
+            this.dgvMerge.UserAddedRow += new System.Windows.Forms.DataGridViewRowEventHandler(this.dgvMerge_UserAddedRow);
+            // 
+            // lblNewColumnMerge
+            // 
+            this.lblNewColumnMerge.AutoSize = true;
+            this.lblNewColumnMerge.Location = new System.Drawing.Point(6, 19);
+            this.lblNewColumnMerge.Name = "lblNewColumnMerge";
+            this.lblNewColumnMerge.Size = new System.Drawing.Size(122, 13);
+            this.lblNewColumnMerge.TabIndex = 7;
+            this.lblNewColumnMerge.Text = "Name der neuen Spalte:";
+            // 
+            // txtFormula
+            // 
+            this.txtFormula.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtFormula.Location = new System.Drawing.Point(5, 85);
+            this.txtFormula.Name = "txtFormula";
+            this.txtFormula.ReadOnly = true;
+            this.txtFormula.Size = new System.Drawing.Size(205, 20);
+            this.txtFormula.TabIndex = 4;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(2, 68);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(88, 13);
+            this.label16.TabIndex = 3;
+            this.label16.Text = "Standard-Format:";
+            this.toolTip1.SetToolTip(this.label16, "[Spalte1][Spalte2]...");
+            // 
+            // txtNewColumnMerge
+            // 
+            this.txtNewColumnMerge.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtNewColumnMerge.Location = new System.Drawing.Point(6, 36);
+            this.txtNewColumnMerge.Name = "txtNewColumnMerge";
+            this.txtNewColumnMerge.Size = new System.Drawing.Size(270, 20);
+            this.txtNewColumnMerge.TabIndex = 2;
+            this.txtNewColumnMerge.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
             // 
             // gbAddTableColumns
             // 
@@ -2100,112 +2206,6 @@
             this.txtSubstringNewColumn.Visible = false;
             this.txtSubstringNewColumn.TextChanged += new System.EventHandler(this.txtSubstringNewColumn_TextChanged);
             // 
-            // gbMerge
-            // 
-            this.gbMerge.Controls.Add(this.BtnMergeDefaultFormat);
-            this.gbMerge.Controls.Add(this.cbMergeOldColumn);
-            this.gbMerge.Controls.Add(this.label18);
-            this.gbMerge.Controls.Add(this.dgvMerge);
-            this.gbMerge.Controls.Add(this.lblNewColumnMerge);
-            this.gbMerge.Controls.Add(this.txtFormula);
-            this.gbMerge.Controls.Add(this.label16);
-            this.gbMerge.Controls.Add(this.txtNewColumnMerge);
-            this.gbMerge.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbMerge.Location = new System.Drawing.Point(0, 92);
-            this.gbMerge.Name = "gbMerge";
-            this.gbMerge.Size = new System.Drawing.Size(282, 643);
-            this.gbMerge.TabIndex = 12;
-            this.gbMerge.TabStop = false;
-            this.gbMerge.Text = "Spaltenangabe";
-            this.gbMerge.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
-            // 
-            // BtnMergeDefaultFormat
-            // 
-            this.BtnMergeDefaultFormat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnMergeDefaultFormat.Location = new System.Drawing.Point(217, 84);
-            this.BtnMergeDefaultFormat.Name = "BtnMergeDefaultFormat";
-            this.BtnMergeDefaultFormat.Size = new System.Drawing.Size(58, 23);
-            this.BtnMergeDefaultFormat.TabIndex = 13;
-            this.BtnMergeDefaultFormat.Text = "Format";
-            this.BtnMergeDefaultFormat.UseVisualStyleBackColor = true;
-            this.BtnMergeDefaultFormat.Click += new System.EventHandler(this.BtnMergeDefaultFormat_Click);
-            // 
-            // cbMergeOldColumn
-            // 
-            this.cbMergeOldColumn.AutoSize = true;
-            this.cbMergeOldColumn.Location = new System.Drawing.Point(6, 120);
-            this.cbMergeOldColumn.Name = "cbMergeOldColumn";
-            this.cbMergeOldColumn.Size = new System.Drawing.Size(165, 17);
-            this.cbMergeOldColumn.TabIndex = 12;
-            this.cbMergeOldColumn.Text = "Alte Werte in ALT speichern?";
-            this.cbMergeOldColumn.UseVisualStyleBackColor = true;
-            this.cbMergeOldColumn.CheckedChanged += new System.EventHandler(this.cbMergeOldColumn_CheckedChanged);
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(3, 152);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(73, 13);
-            this.label18.TabIndex = 9;
-            this.label18.Text = "Bedingungen:";
-            // 
-            // dgvMerge
-            // 
-            this.dgvMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvMerge.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvMerge.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvMerge.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dgvMerge.Location = new System.Drawing.Point(9, 172);
-            this.dgvMerge.Name = "dgvMerge";
-            this.dgvMerge.Size = new System.Drawing.Size(267, 451);
-            this.dgvMerge.TabIndex = 8;
-            this.dgvMerge.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvMerge_CellClick);
-            this.dgvMerge.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
-            this.dgvMerge.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgvMerge_CellFormatting);
-            this.dgvMerge.UserAddedRow += new System.Windows.Forms.DataGridViewRowEventHandler(this.dgvMerge_UserAddedRow);
-            // 
-            // lblNewColumnMerge
-            // 
-            this.lblNewColumnMerge.AutoSize = true;
-            this.lblNewColumnMerge.Location = new System.Drawing.Point(6, 19);
-            this.lblNewColumnMerge.Name = "lblNewColumnMerge";
-            this.lblNewColumnMerge.Size = new System.Drawing.Size(122, 13);
-            this.lblNewColumnMerge.TabIndex = 7;
-            this.lblNewColumnMerge.Text = "Name der neuen Spalte:";
-            // 
-            // txtFormula
-            // 
-            this.txtFormula.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtFormula.Location = new System.Drawing.Point(5, 85);
-            this.txtFormula.Name = "txtFormula";
-            this.txtFormula.ReadOnly = true;
-            this.txtFormula.Size = new System.Drawing.Size(205, 20);
-            this.txtFormula.TabIndex = 4;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(2, 68);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(88, 13);
-            this.label16.TabIndex = 3;
-            this.label16.Text = "Standard-Format:";
-            this.toolTip1.SetToolTip(this.label16, "[Spalte1][Spalte2]...");
-            // 
-            // txtNewColumnMerge
-            // 
-            this.txtNewColumnMerge.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtNewColumnMerge.Location = new System.Drawing.Point(6, 36);
-            this.txtNewColumnMerge.Name = "txtNewColumnMerge";
-            this.txtNewColumnMerge.Size = new System.Drawing.Size(270, 20);
-            this.txtNewColumnMerge.TabIndex = 2;
-            this.txtNewColumnMerge.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
-            // 
             // gbMain
             // 
             this.gbMain.Controls.Add(this.lblOriginalName);
@@ -2630,6 +2630,9 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbMerge.ResumeLayout(false);
+            this.gbMerge.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
             this.gbAddTableColumns.ResumeLayout(false);
             this.gbAddTableColumns.PerformLayout();
             this.gbTrim.ResumeLayout(false);
@@ -2674,9 +2677,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringEnd)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringStart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSubstringColumns)).EndInit();
-            this.gbMerge.ResumeLayout(false);
-            this.gbMerge.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
             this.gbMain.ResumeLayout(false);
             this.gbMain.PerformLayout();
             this.tabPage3.ResumeLayout(false);
