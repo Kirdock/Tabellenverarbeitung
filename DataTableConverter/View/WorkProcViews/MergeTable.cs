@@ -71,6 +71,10 @@ namespace DataTableConverter.View
                     DialogResult = result;
                 }
             }
+            else
+            {
+                DialogResult = DialogResult.OK;
+            }
         }
         
 
