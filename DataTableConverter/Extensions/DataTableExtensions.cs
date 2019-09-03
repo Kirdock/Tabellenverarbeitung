@@ -14,7 +14,14 @@ namespace DataTableConverter.Extensions
     internal static class DataTableExtensions
     {
         private static readonly string TempSort = "[TEMP_SORT]";
-        internal static readonly string FileName = "Dateiname";
+        private static readonly string fileName = "Dateiname";
+        internal static string FileName
+        {
+            get
+            {
+                return Properties.Settings.Default.ImportHeaderUpperCase ? fileName.ToUpper() : fileName;
+            }
+        }
 
         internal static void RemoveEmptyRows(this DataTable table)
         {

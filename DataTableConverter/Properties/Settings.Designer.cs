@@ -513,5 +513,17 @@ namespace DataTableConverter.Properties {
                 this["MergeFormatViewSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("721, 280")]
+        public global::System.Drawing.Size MergeFormatViewSizeSimple {
+            get {
+                return ((global::System.Drawing.Size)(this["MergeFormatViewSizeSimple"]));
+            }
+            set {
+                this["MergeFormatViewSizeSimple"] = value;
+            }
+        }
     }
 }

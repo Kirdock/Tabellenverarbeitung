@@ -365,7 +365,7 @@ namespace DataTableConverter.Assisstant
                         objWB = objXL.Workbooks.Open(Filename: path, ReadOnly: true, Password: password);
                         hasPassword = false;
                     }
-                    catch (System.Runtime.InteropServices.COMException ex)
+                    catch (COMException ex)
                     {
                         if (hasPassword = (ex.ErrorCode == -2146827284))
                         {
@@ -403,7 +403,7 @@ namespace DataTableConverter.Assisstant
                     Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rows, cols];
                     Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
                     
-                    RangeToDataTable(range, data, selectedSheets.Length > 1 ? Path.GetFileName(path) + "; " + sheetName : null);
+                    RangeToDataTable(range, data, fileNameColumn ? path + "; " + sheetName : null);
                     Marshal.ReleaseComObject(objSHT);
                 }
                 if (fileNameColumn)

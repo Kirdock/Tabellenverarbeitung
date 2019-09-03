@@ -9,6 +9,7 @@ namespace DataTableConverter.View
     public partial class MergeTable : Form
     {
         private object[] Headers;
+        private bool SameRowCount;
 
         internal MergeTable(object[] headersOriginal, object[] headersMerge, string filename, int sourceCount, int importCount)
         {
@@ -23,6 +24,7 @@ namespace DataTableConverter.View
             lblRowCountImport.ForeColor = lblRowCountSource.ForeColor = lblSourceTable.ForeColor = lblImportTableText.ForeColor = sourceCount == importCount ? System.Drawing.Color.Green : System.Drawing.Color.Red;
             lblRowCountImport.Text = importCount.ToString();
             lblRowCountSource.Text = sourceCount.ToString();
+            SameRowCount = sourceCount == importCount;
         }
 
         private void SetListBoxStyle()
@@ -61,14 +63,16 @@ namespace DataTableConverter.View
 
         private void btnTakeOver_Click(object sender, EventArgs e)
         {
-            closeForm();
+            if (!SameRowCount)
+            {
+                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Die Zeilenanzahl der beiden Tabellen stimmt nicht überein! Trotzdem fortfahren?");
+                if(result != DialogResult.Abort)
+                {
+                    DialogResult = result;
+                }
+            }
         }
-
-        private void closeForm()
-        {
-            this.DialogResult = DialogResult.OK;
-            Close();
-        }
+        
 
         private void btnSelectAll_Click(object sender, EventArgs e)
         {

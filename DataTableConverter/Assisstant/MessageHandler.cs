@@ -9,10 +9,13 @@ namespace DataTableConverter
 {
     class MessageHandler
     {
+        private static readonly string WarningText = "Warnung!";
+        private static readonly string ErrorText = "Warnung!";
+        private static readonly string InfoText = "Info";
 
         public static DialogResult MessagesYesNo(MessageBoxIcon messageBoxIcon, string text)
         {
-            string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? "Achtung!" : ((messageBoxIcon == MessageBoxIcon.Error)) ? "Warnung!" : "Frage";
+            string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : ((messageBoxIcon == MessageBoxIcon.Error)) ? ErrorText : InfoText;
             return MessageBox.Show(text,
                                 warnung,
                                 MessageBoxButtons.YesNo,
@@ -22,7 +25,7 @@ namespace DataTableConverter
 
         public static DialogResult MessagesYesNoCancel(MessageBoxIcon messageBoxIcon, string text)
         {
-            string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? "Achtung!" : ((messageBoxIcon == MessageBoxIcon.Error)) ? "Warnung!" : "Frage";
+            string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : ((messageBoxIcon == MessageBoxIcon.Error)) ? ErrorText : InfoText;
             return MessageBox.Show(text,
                                 warnung,
                                 MessageBoxButtons.YesNoCancel,
@@ -32,7 +35,7 @@ namespace DataTableConverter
 
         public static DialogResult MessagesOkCancel(MessageBoxIcon messageBoxIcon, string text)
         {
-            string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? "Achtung!" : ((messageBoxIcon == MessageBoxIcon.Error)) ? "Warnung!" : "Frage";
+            string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : ((messageBoxIcon == MessageBoxIcon.Error)) ? ErrorText : InfoText;
             return MessageBox.Show(text,
                                 warnung,
                                 MessageBoxButtons.OKCancel,
@@ -43,7 +46,7 @@ namespace DataTableConverter
         public static void MessagesOK(MessageBoxIcon messageBoxIcon, string text)
         {
             MessageBox.Show(text,
-                            (messageBoxIcon == MessageBoxIcon.Exclamation) ? "Achtung!" : (messageBoxIcon == MessageBoxIcon.Error) ? "Warnung!" : "Info",
+                            (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : (messageBoxIcon == MessageBoxIcon.Error) ? ErrorText : InfoText,
                             MessageBoxButtons.OK,
                             messageBoxIcon,
                             MessageBoxDefaultButton.Button1);

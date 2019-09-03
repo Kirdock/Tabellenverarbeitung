@@ -125,5 +125,8 @@
     <Setting Name="MergeFormatViewSize" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">721, 467</Value>
     </Setting>
+    <Setting Name="MergeFormatViewSizeSimple" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">721, 280</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

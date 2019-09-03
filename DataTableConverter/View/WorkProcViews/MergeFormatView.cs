@@ -77,7 +77,7 @@ namespace DataTableConverter.View
         {
             if (isStringFormat)
             {
-                Size = new Size(Size.Width, 244);
+                Size = Properties.Settings.Default.MergeFormatViewSizeSimple;
             }
             else
             {
@@ -148,12 +148,16 @@ namespace DataTableConverter.View
 
         private void MergeFormatView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Format.Table.Rows.Count != 0)
+            if (RBExtended.Checked)
             {
                 Properties.Settings.Default.MergeFormatViewSize = Size;
-                Properties.Settings.Default.Save();
             }
-            
+            else
+            {
+                Properties.Settings.Default.MergeFormatViewSizeSimple = Size;
+            }
+            Properties.Settings.Default.Save();
+
             if (DialogResult != DialogResult.OK)
             {
                 DataTable table = (dgTable.DataSource as DataTable);
