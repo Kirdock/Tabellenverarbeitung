@@ -542,15 +542,14 @@ namespace DataTableConverter.Assisstant
             {
                 if(content[i] == '\r' && content[i+1] == '\n')
                 {
-                    AddHeaderOfContent(table, headers, header.ToString());
+                    AddHeaderOfContent(table, headers, header);
                     
                     i += 2;
                     break;
                 }
                 else if(content[i] == '\t')
                 {
-                    AddHeaderOfContent(table, headers, header.ToString());
-                    header.Clear();
+                    AddHeaderOfContent(table, headers, header);
                 }
                 else
                 {
@@ -560,14 +559,15 @@ namespace DataTableConverter.Assisstant
             return headers;
         }
 
-        private static void AddHeaderOfContent(DataTable table, List<string> headers, string header)
+        private static void AddHeaderOfContent(DataTable table, List<string> headers, StringBuilder header)
         {
             string headerString = header.ToString();
-            headers.Add(header.ToString());
+            headers.Add(headerString);
             if (!table.Columns.Contains(headerString))
             {
                 table.Columns.Add(headerString, typeof(string));
             }
+            header.Clear();
         }
 
         private static void GenerateMultiCell(string content, DataTable table, DataRow row, string header, ref int i)
@@ -579,20 +579,19 @@ namespace DataTableConverter.Assisstant
             bool newLine;
             for(;i < content.Length; ++i)
             {
-                if(EndOfMultiCell(content, i, out bool isNewLine))
+                if(EndOfMultiCell(content, i))
                 {
-                    AddMultiCellColumn(header, multiCellCount, table, row, cell.ToString());
+                    AddMultiCellColumn(header, multiCellCount, table, row, cell);
                     break;
                 }
                 else if((newLine = (content[i] == '\r')) || content[i] == '\n')
                 {
-                    AddMultiCellColumn(header, multiCellCount, table, row,cell.ToString());
+                    AddMultiCellColumn(header, multiCellCount, table, row,cell);
 
                     if (newLine)
                     {
                         ++i;
                     }
-                    cell.Clear();
                     multiCellCount++;
                 }
                 else if (content[i] != '\"' || content[i-1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
@@ -602,20 +601,20 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static void AddMultiCellColumn(string header, int count, DataTable table, DataRow row, string text)
+        private static void AddMultiCellColumn(string header, int count, DataTable table, DataRow row, StringBuilder text)
         {
             string multiHeader = count == 0 ? header : header + count;
             if (!table.Columns.Contains(multiHeader))
             {
                 table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(table.Columns.IndexOf(header) + count);
             }
-            row[multiHeader] = text;
+            row[multiHeader] = text.ToString();
+            text.Clear();
         }
 
-        private static bool EndOfMultiCell(string content, int i, out bool newLine)
+        private static bool EndOfMultiCell(string content, int i)
         {
-            newLine = false;
-            return content[i] == '\"' && ((i + 1) == content.Length || ((i + 1) < content.Length && ((newLine = (content[i + 1] == '\r')) || content[i + 1] == '\t')));
+            return content[i] == '\"' && ((i + 1) == content.Length || ((i + 1) < content.Length && (content[i + 1] == '\r' || content[i + 1] == '\t')));
         }
 
         internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview = false)

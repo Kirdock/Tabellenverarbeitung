@@ -22,6 +22,7 @@ namespace DataTableConverter.View
         internal ExportCustom(object[] headers, DataTable table)
         {
             InitializeComponent();
+            clbValues.Dict = Items;
             CacheDataTableGroupCount = new Dictionary<string, Dictionary<string, int>>();
             SetListBoxStyle();
             Table = table;

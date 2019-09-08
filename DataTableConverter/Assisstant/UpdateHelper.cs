@@ -118,7 +118,7 @@ namespace DataTableConverter.Assisstant
             string BatchPath = Path.Combine(directory, "Updater.bat");
             string ZipFolder = Path.Combine(directory, FileNameWithoutExtension);
             StreamWriter writer = new StreamWriter(BatchPath);
-
+            writer.WriteLine($"timeout /T 1"); //delay in seconds; waiting for application to be closed
             writer.WriteLine($"move \"{Path.Combine(ZipFolder, "*")}\" \"{directory}\"");
             writer.WriteLine($"start \"\" \"{Path.Combine(directory, AppDomain.CurrentDomain.FriendlyName)}\"");
             writer.WriteLine($"rmdir \"{ZipFolder}\"");

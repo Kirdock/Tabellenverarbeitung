@@ -12,26 +12,41 @@ namespace DataTableConverter.View.CustomControls
 {
     class CountListbox : CheckedListBox
     {
+        internal IEnumerable<ExportCustomItem> Dict { get; set; }
+
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
             e.DrawBackground();
             if (e.Index > -1 && Items != null && e.Index + 1 <= Items.Count)
             {
                 string text = Items[e.Index].ToString();
-                if ((Items[e.Index] is CountListboxItem))
-                {
-                    text += $" (Anzahl: {(Items[e.Index] as CountListboxItem).Count})";
-                }
+
                 CheckBoxState state = GetItemChecked(e.Index) ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
                 Size glyphSize = CheckBoxRenderer.GetGlyphSize(e.Graphics, state);
-                var b = e.Bounds;
-                int checkPad = (b.Height - glyphSize.Height) / 2;
-                CheckBoxRenderer.DrawCheckBox(e.Graphics, new Point(b.X + checkPad, b.Y + checkPad),
-                    new Rectangle(
-                        new Point(b.X + b.Height, b.Y),
-                        new Size(b.Width - b.Height, b.Height)),
-                    text, this.Font, TextFormatFlags.Left, false, state);
+
+                int checkPad = (e.Bounds.Height - glyphSize.Height) / 2;
+                
+
+                if (Items[e.Index] is CountListboxItem item)
+                {
+                    bool contains = ListContainsCustomExportItem(text);
+                    //e.Graphics.FillRectangle(new SolidBrush(contains ? Color.Gray : Color.Transparent), e.Bounds);
+
+                    CheckBoxRenderer.DrawCheckBox(e.Graphics, new Point(e.Bounds.X + checkPad, e.Bounds.Y + checkPad), state);
+                    using (StringFormat sf = new StringFormat { LineAlignment = StringAlignment.Center })
+                    {
+                        using (Brush brush = new SolidBrush(contains ? Color.Gray : Color.Black))
+                        {
+                            e.Graphics.DrawString(text + $" (Anzahl: {item.Count})", Font, brush, new Rectangle(e.Bounds.Height, e.Bounds.Top, e.Bounds.Width - e.Bounds.Height, e.Bounds.Height), sf);
+                        }
+                    }
+                }
             }
+        }
+
+        private bool ListContainsCustomExportItem(string value)
+        {
+            return Dict?.SelectMany(item => item.SelectedValues).Contains(value) ?? false;
         }
     }
 }

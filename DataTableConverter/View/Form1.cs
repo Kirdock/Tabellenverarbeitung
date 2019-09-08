@@ -208,8 +208,10 @@ namespace DataTableConverter
             {
                 if (isNewTable)
                 {
-                    dgTable.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-                    SaveWidthOfDataGridViewColumns();
+                    foreach(DataGridViewColumn col in dgTable.Columns)
+                    {
+                        SetOptimalColumnWidth(col);
+                    }
                 }
                 else
                 {
@@ -219,23 +221,40 @@ namespace DataTableConverter
                         {
                             dgTable.Columns[col].Width = ColumnWidths[col];
                         }
+                        else
+                        {
+                            SetOptimalColumnWidth(dgTable.Columns[col]);
+                        }
                     }
                 }
             }
+        }
+
+        private void SetOptimalColumnWidth(DataGridViewColumn col)
+        {
+            string result = sourceTable.AsEnumerable().Select(row => row[col.Name].ToString()).Concat(new string[] { col.Name }).Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
+            col.Width = TextRenderer.MeasureText(result, dgTable.DefaultCellStyle.Font).Width + 5;
+
+            AddColumnWidth(col);
         }
 
         private void SaveWidthOfDataGridViewColumns()
         {
             foreach (DataGridViewColumn col in dgTable.Columns)
             {
-                if (!ColumnWidths.ContainsKey(col.Name))
-                {
-                    ColumnWidths.Add(col.Name, col.Width);
-                }
-                else
-                {
-                    ColumnWidths[col.Name] = col.Width;
-                }
+                AddColumnWidth(col);
+            }
+        }
+
+        private void AddColumnWidth(DataGridViewColumn col)
+        {
+            if (!ColumnWidths.ContainsKey(col.Name))
+            {
+                ColumnWidths.Add(col.Name, col.Width);
+            }
+            else
+            {
+                ColumnWidths[col.Name] = col.Width;
             }
         }
 
@@ -924,6 +943,12 @@ namespace DataTableConverter
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            Size size = TextRenderer.MeasureText(dgTable[e.ColumnIndex, e.RowIndex].Value.ToString(), dgTable.DefaultCellStyle.Font);
+            DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
+            if (size.Width > col.Width)
+            {
+                ColumnWidths[col.Name] = col.Width = size.Width + 5;
+            }
             AddDataSourceCellChanged(tableValueBefore, e.ColumnIndex, rowBefore);
         }
 
