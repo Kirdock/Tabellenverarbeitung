@@ -32,7 +32,7 @@ namespace DataTableConverter.Assisstant
         internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
 
 
-        internal static DataTable ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar)
+        internal static DataTable ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar, ImportSettings settings = null)
         {
             string filename = Path.GetFileName(file);
             string extension = Path.GetExtension(file).ToLower();
@@ -52,19 +52,21 @@ namespace DataTableConverter.Assisstant
             }
             else
             {
-                if (fileImportSettings != null && fileImportSettings.TryGetValue(extension, out ImportSettings settings))
+                if (fileImportSettings != null && fileImportSettings.ContainsKey(extension) || settings != null)
                 {
+                    settings = settings ?? fileImportSettings[extension];
+
                     if (settings.Values != null)
                     {
-                        table = OpenTextFixed(file, settings.Values, settings.Headers, settings.CodePage);
+                        table = OpenTextFixed(file, settings.Values, settings.Headers, settings.CodePage,false, progressBar);
                     }
                     else if (settings.Separator != null)
                     {
-                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray());
+                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar);
                     }
                     else
                     {
-                        table = OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders, settings.Headers.ToArray());
+                        table = OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar);
                     }
 
                 }
@@ -77,7 +79,8 @@ namespace DataTableConverter.Assisstant
                         {
                             fileImportSettings.Add(extension, form.ImportSettings);
                         }
-                        table = form.DataTable;
+                        form.Dispose();
+                        return ImportFile(file, multipleFiles, fileImportSettings, ctxRow, progressBar, form.ImportSettings);
                     }
                     form.Dispose();
                 }
@@ -108,7 +111,7 @@ namespace DataTableConverter.Assisstant
             };
         }
 
-        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, object[] headers, bool isPreview = false)
+        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar)
         {
             DataTable dt = new DataTable();
 
@@ -118,7 +121,7 @@ namespace DataTableConverter.Assisstant
                 if (containsHeaders)
                 {
                     skip = 1;
-                    List<string> list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
+                    IEnumerable<string> list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
                     .SelectMany(x => x.Split(new string[] { separator }, StringSplitOptions.None))
                     .Select(ln => ln.Trim()).ToList();
 
@@ -138,11 +141,11 @@ namespace DataTableConverter.Assisstant
 
                 if (isPreview)
                 {
-                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator, null);
                 }
                 else
                 {
-                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator, progressBar);
                 }
 
                 //File.ReadLines doesn't read all lines, it returns a IEnumerable, and lines are lazy evaluated,
@@ -160,11 +163,13 @@ namespace DataTableConverter.Assisstant
             return dt;
         }
 
-        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator)
+        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator, ProgressBar progressBar)
         {
-            enumerable.Skip(skip)
-                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None))
-                    .ToList()
+            IEnumerable<string[]> enumerableArray = enumerable.Skip(skip)
+                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None));
+
+            progressBar?.StartLoadingBar(enumerableArray.Count());
+            enumerableArray.ToList()
                     .ForEach(line =>
                     {
                         var temp = line.Select(ln => ln.ToString().Trim()).ToArray();
@@ -174,10 +179,11 @@ namespace DataTableConverter.Assisstant
                             dt.TryAddColumn("Spalte" + dt.Columns.Count);
                         }
                         dt.Rows.Add(temp);
+                        progressBar?.UpdateLoadingBar();
                     });
         }
 
-        internal static DataTable OpenTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview = false)
+        internal static DataTable OpenTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar)
         {
             DataTable dt = new DataTable();
             try
@@ -209,8 +215,10 @@ namespace DataTableConverter.Assisstant
                 }
                 else
                 {
+                    var list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(skip);
                     lines = File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(skip).ToArray();
                 }
+                progressBar?.StartLoadingBar(lines.Length);
 
                 foreach(string line in lines)
                 {
@@ -219,6 +227,7 @@ namespace DataTableConverter.Assisstant
                     {
                         dt.TryAddColumn("Spalte" + dt.Columns.Count);
                     }
+                    progressBar?.UpdateLoadingBar();
                     dt.Rows.Add(row);
                 }
             }
@@ -618,7 +627,7 @@ namespace DataTableConverter.Assisstant
             return content[i] == '\"' && ((i + 1) == content.Length || ((i + 1) < content.Length && (content[i + 1] == '\r' || content[i + 1] == '\t')));
         }
 
-        internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview = false)
+        internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar)
         {
             DataTable dt = new DataTable();
             if (header == null || config == null || header.Count == 0 || config.Count == 0)
@@ -627,11 +636,14 @@ namespace DataTableConverter.Assisstant
             }
             try
             {
+                
                 header.ForEach(x => dt.TryAddColumn(x.ToString()));
 
                 StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding));
-                
-                
+                FileInfo info = new FileInfo(path);
+                progressBar?.StartLoadingBar((int) (info.Length/config.Sum()));
+
+
                 while (!stream.EndOfStream && (!isPreview || dt.Rows.Count < 3))
                 {
                     string[] itemArray = new string[header.Count];
@@ -647,7 +659,7 @@ namespace DataTableConverter.Assisstant
 
                         itemArray[i] = new string(body);
                     }
-                    
+                    progressBar?.UpdateLoadingBar();
                     dt.Rows.Add(itemArray);
 
                     int charCode;

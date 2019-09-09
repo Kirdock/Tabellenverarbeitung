@@ -219,6 +219,7 @@ namespace DataTableConverter.View
         {
             string separator = null;
             object[] headers = GetHeaders();
+            bool valid = false;
             if(rbSep.Checked && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
                 separator = txtSeparator.Text;
@@ -230,16 +231,18 @@ namespace DataTableConverter.View
             else if (rbBetween.Checked && checkBetweenText())
             {
                 ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked,headers);
-                DataTable = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, headers);
+                valid = true;
+                //DataTable = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, headers);
             }
 
             if(separator != null)
             {
+                valid = true;
                 ImportSettings = new ImportSettings(separator, getCodePage(), cbContainsHeaders.Checked, headers);
-                DataTable = ImportHelper.OpenText(path, separator, getCodePage(), cbContainsHeaders.Checked, headers);
+                //DataTable = ImportHelper.OpenText(path, separator, getCodePage(), cbContainsHeaders.Checked, headers);
             }
 
-            if(DataTable != null)
+            if(valid)
             {
                 DialogResult = DialogResult.OK;
             }
@@ -254,7 +257,7 @@ namespace DataTableConverter.View
         {
             getDataGridViewItems(out List<int> values, out List<string> headers);
             ImportSettings = new ImportSettings(values, headers, getCodePage());
-            DataTable = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage);
+            //DataTable = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, false, null);
         }
 
         private void dgvSetting_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -262,7 +265,7 @@ namespace DataTableConverter.View
             // sync preview
             ViewHelper.EndDataGridViewEdit(dgvSetting);
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, true);
+            dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, true, null);
         }
 
         private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)
@@ -308,7 +311,7 @@ namespace DataTableConverter.View
         {
             if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
-                dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null);
             }
         }
 
@@ -500,7 +503,7 @@ namespace DataTableConverter.View
             dgvPreview.DataSource = null;
             if (txtSeparator.ReadOnly = txtBegin.ReadOnly = txtEnd.ReadOnly = rbTab.Checked)
             {
-                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true, null);
             }
             
             else if ((txtBegin.ReadOnly = txtEnd.ReadOnly = rbSep.Checked))
@@ -508,7 +511,7 @@ namespace DataTableConverter.View
                 txtSeparator.ReadOnly = false;
                 if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
                 {
-                    dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true);
+                    dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null);
                 }
             }
             else if (txtSeparator.ReadOnly = rbBetween.Checked)
@@ -516,7 +519,7 @@ namespace DataTableConverter.View
                 txtBegin.ReadOnly = txtEnd.ReadOnly = false;
                 if (checkBetweenText())
                 {
-                    dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true);
+                    dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true,null);
                 }
             }
         }
@@ -573,7 +576,7 @@ namespace DataTableConverter.View
         {
             if (checkBetweenText())
             {
-                dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true);
+                dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true, null);
             }
             else
             {
