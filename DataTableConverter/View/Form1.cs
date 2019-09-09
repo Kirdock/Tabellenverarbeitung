@@ -39,6 +39,7 @@ namespace DataTableConverter
         private string FilePath = string.Empty;
         private OrderType OrderType = OrderType.Windows;
         private Dictionary<string, int> ColumnWidths;
+        private readonly int ColumnWidthTolerance = 10;
 
         internal Form1(DataTable table = null)
         {
@@ -236,7 +237,7 @@ namespace DataTableConverter
         private void SetOptimalColumnWidth(DataGridViewColumn col)
         {
             string result = sourceTable.AsEnumerable().Select(row => row[col.Name].ToString()).Concat(new string[] { col.Name }).Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
-            col.Width = TextRenderer.MeasureText(result, dgTable.DefaultCellStyle.Font).Width + 5;
+            col.Width = TextRenderer.MeasureText(result, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
 
             AddColumnWidth(col);
         }
@@ -990,7 +991,7 @@ namespace DataTableConverter
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            int width = TextRenderer.MeasureText(dgTable[e.ColumnIndex, e.RowIndex].Value.ToString(), dgTable.DefaultCellStyle.Font).Width + 5;
+            int width = TextRenderer.MeasureText(dgTable[e.ColumnIndex, e.RowIndex].Value.ToString(), dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
             DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
             if (width > col.Width)
             {
