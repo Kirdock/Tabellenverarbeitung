@@ -168,6 +168,7 @@ namespace DataTableConverter.View
 
                 Properties.Settings.Default.SettingPath = TxtSettingPath.Text = folderPath;
             }
+            folderBrowser.Dispose();
         }
     }
 }

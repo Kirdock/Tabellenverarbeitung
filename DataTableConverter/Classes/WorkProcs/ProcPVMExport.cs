@@ -16,6 +16,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "PVM Export";
         private Action UpdateLoadingBar;
+        public string SecondFileName;
         public ProcPVMExport(int ordinal, int id, string name) : base(ordinal, id, name) { }
         public ProcPVMExport(string[] headers, Action updateLoadingBar = null)
         {
@@ -67,9 +68,18 @@ namespace DataTableConverter.Classes.WorkProcs
                 try
                 {
                     ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
-                    if(Properties.Settings.Default.PVMSaveTwice && saveFileDialog2.ShowDialog() == DialogResult.OK)
+                    
+                    if(Properties.Settings.Default.PVMSaveTwice)
                     {
-                        path = saveFileDialog2.FileName;
+                        if((string.IsNullOrWhiteSpace(SecondFileName) || !Directory.Exists(SecondFileName)) && saveFileDialog2.ShowDialog() == DialogResult.OK)
+                        {
+                            path = saveFileDialog2.FileName;
+                        }
+                        else
+                        {
+                            path = Path.Combine(SecondFileName, Path.GetFileNameWithoutExtension(path));
+                        }
+
                         ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
                     }
                 }

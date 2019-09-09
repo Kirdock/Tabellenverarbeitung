@@ -917,7 +917,7 @@ namespace DataTableConverter.View
         {
             SetHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcPVMExport.ClassName;
-
+            TxtPVMPath.Text = (selectedProc as ProcPVMExport).SecondFileName;
             SetDataSource(dgvPVMExport, selectedProc.Columns);
         }
 
@@ -1887,6 +1887,22 @@ namespace DataTableConverter.View
         private void CbTrimDeleteDouble_CheckedChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcTrim).DeleteDouble = CbTrimDeleteDouble.Checked;
+        }
+
+        private void BtnSearchPVM_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog folderBrowser = new OpenFileDialog
+            {
+                ValidateNames = false,
+                CheckFileExists = false,
+                CheckPathExists = true,
+                FileName = "Ordnerauswahl"
+            };
+            if (folderBrowser.ShowDialog() == DialogResult.OK)
+            {
+                TxtPVMPath.Text = (GetSelectedWorkProcedure() as ProcPVMExport).SecondFileName = Path.GetDirectoryName(folderBrowser.FileName);
+            }
+            folderBrowser.Dispose();
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

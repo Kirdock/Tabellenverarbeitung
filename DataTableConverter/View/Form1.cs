@@ -202,11 +202,11 @@ namespace DataTableConverter
             SetMenuEnabled(true);
         }
 
-        private void SetWidth(bool isNewTable)
+        private void SetWidth(bool adjustColumnWidth)
         {
             if (Properties.Settings.Default.FullWidthImport)
             {
-                if (isNewTable)
+                if (adjustColumnWidth)
                 {
                     foreach(DataGridViewColumn col in dgTable.Columns)
                     {
