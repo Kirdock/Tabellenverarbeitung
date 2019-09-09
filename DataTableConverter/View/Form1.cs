@@ -517,7 +517,7 @@ namespace DataTableConverter
                         {
 
                             string filename = Path.GetFileName(file);
-                            DataTable table = ImportHelper.ImportFile(file, this, multipleFiles, fileImportSettings, contextGlobal);
+                            DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, pgbLoading);
                             if (table != null)
                             {
                                 if (newTable != null)

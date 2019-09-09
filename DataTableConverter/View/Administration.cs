@@ -129,10 +129,6 @@ namespace DataTableConverter.View
 
         private void Administration_Load(object sender, EventArgs e)
         {
-            //ltbProcedures_SelectedIndexChanged(null, null);
-            //lbWorkflows_SelectedIndexChanged(null, null);
-            //lbTolerances_SelectedIndexChanged(null, null);
-            //lbCases_SelectedIndexChanged(null, null);
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 

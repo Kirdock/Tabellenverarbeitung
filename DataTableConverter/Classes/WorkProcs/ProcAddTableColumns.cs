@@ -65,7 +65,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             if (!string.IsNullOrWhiteSpace(path))
             {
-                DataTable newTable = ImportHelper.ImportFile(path, null, false, null, ctxRow); //load file
+                DataTable newTable = ImportHelper.ImportFile(path, false, null, ctxRow, null); //load file
                 if (newTable != null) {
                     object[] ImportHeaders = newTable.HeadersOfDataTable();
                     List<string> notFoundHeaders = new List<string>();

@@ -32,7 +32,7 @@ namespace DataTableConverter.Assisstant
         internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
 
 
-        internal static DataTable ImportFile(string file, Form1 mainform, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow)
+        internal static DataTable ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar)
         {
             string filename = Path.GetFileName(file);
             string extension = Path.GetExtension(file).ToLower();
@@ -48,7 +48,7 @@ namespace DataTableConverter.Assisstant
             }
             else if (extension != string.Empty && ExcelExt.Contains(extension))
             {
-                table = OpenExcel(file, mainform);
+                table = OpenExcel(file, progressBar);
             }
             else
             {
@@ -79,6 +79,7 @@ namespace DataTableConverter.Assisstant
                         }
                         table = form.DataTable;
                     }
+                    form.Dispose();
                 }
             }
             if(table != null)
@@ -343,7 +344,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static DataTable OpenExcel(string path, Form1 mainform)
+        internal static DataTable OpenExcel(string path, ProgressBar progressBar)
         {
             DataTable data = new DataTable();
             
@@ -402,8 +403,10 @@ namespace DataTableConverter.Assisstant
                     Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[1, 1];
                     Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rows, cols];
                     Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
-                    
-                    RangeToDataTable(range, data, fileNameColumn ? path + "; " + sheetName : null);
+
+                    progressBar?.StartLoadingBar(rows);
+
+                    RangeToDataTable(range, data, fileNameColumn ? path + "; " + sheetName : null, progressBar);
                     Marshal.ReleaseComObject(objSHT);
                 }
                 if (fileNameColumn)
@@ -441,24 +444,21 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Range range, DataTable table, string fileName)
+        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Range range, DataTable table, string fileName, ProgressBar progressBar)
         {
             range.Copy();
             IDataObject data = Clipboard.GetDataObject();
             string content = (string)data.GetData(DataFormats.UnicodeText);
-            GetDataOfString(content, table, fileName);
+            GetDataOfString(content, table, fileName, progressBar);
             Clipboard.Clear();
         }
 
-        private static void GetDataOfString(string content, DataTable table, string fileName)
+        private static void GetDataOfString(string content, DataTable table, string fileName, ProgressBar progressBar)
         {
             int maxLength = content.Length;
-            
             StringBuilder cellBuilder = new StringBuilder();
-            
             Dictionary<string,string> cells = new Dictionary<string, string>();
             List<string> headers = GetHeadersOfContent(content, table, out int i);
-            Dictionary<int, int> additionalHeaders = new Dictionary<int, int>();
             int headerCounter = 0;
             DataRow row = table.NewRow();
             bool generatedMulti = false;
@@ -467,6 +467,7 @@ namespace DataTableConverter.Assisstant
             {
                 if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
                 {
+                    progressBar?.UpdateLoadingBar();
                     if (!generatedMulti)
                     {
                         SetContentRowValue(row, headers[headerCounter], cellBuilder);
@@ -783,6 +784,7 @@ namespace DataTableConverter.Assisstant
                 {
                     checkedSheets = form.GetSheets();
                 }
+                form.Dispose();
                 return checkedSheets;
             }
         }
