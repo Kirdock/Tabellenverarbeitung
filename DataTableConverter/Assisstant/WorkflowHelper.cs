@@ -133,6 +133,10 @@ namespace DataTableConverter.Assisstant
                             newProc = new ProcCount(ordinal, id, name);
                             break;
 
+                        case 14:
+                            newProc = new ProcSeparate(ordinal, id, name);
+                            break;
+
                         case 1:
                         default:
                             newProc = new ProcTrim(ordinal, id, name);

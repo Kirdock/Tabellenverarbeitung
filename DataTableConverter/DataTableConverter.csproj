@@ -81,6 +81,7 @@
     <Compile Include="Classes\CountListboxItem.cs" />
     <Compile Include="Classes\DataRowArray.cs" />
     <Compile Include="Classes\ExportCustomItem.cs" />
+    <Compile Include="Classes\ExportSeparate.cs" />
     <Compile Include="Classes\History.cs" />
     <Compile Include="Classes\HistoryStates.cs" />
     <Compile Include="Classes\ImportSettings.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Classes\WorkProcs\ProcNumber.cs" />
     <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
     <Compile Include="Classes\WorkProcs\ProcPadding.cs" />
+    <Compile Include="Classes\WorkProcs\ProcSeparate.cs" />
     <Compile Include="Classes\WorkProcs\ProcPVMExport.cs" />
     <Compile Include="Classes\WorkProcs\ProcReplaceWhole.cs" />
     <Compile Include="Classes\WorkProcs\ProcRound.cs" />

@@ -163,7 +163,8 @@ namespace DataTableConverter.View
                 lblCompareSecondColumn,
                 lblCompareNewColumn,
                 lblCountColumn,
-                lblTrimCharacter
+                lblTrimCharacter,
+                LblSeparateColumn
             };
             foreach (Label label in labels)
             {
@@ -197,7 +198,8 @@ namespace DataTableConverter.View
                 dgvPadConditions,
                 dgvSubstringColumns,
                 dgvReplaceWhole,
-                dgvPVMExport
+                dgvPVMExport,
+                DgvSeparate
             };
 
             DataGridView[] dataGridViews = new DataGridView[]
@@ -263,7 +265,8 @@ namespace DataTableConverter.View
                 { gbCompare, typeof(ProcCompare) },
                 { gbPVMExport, typeof(ProcPVMExport) },
                 { gbCount, typeof(ProcCount) },
-                { gbTrim, typeof(ProcTrim) }
+                { gbTrim, typeof(ProcTrim) },
+                { gbSeparate, typeof(ProcSeparate) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -281,7 +284,8 @@ namespace DataTableConverter.View
                 { typeof(ProcAddTableColumns), SetAddTableColumnsControls },
                 { typeof(ProcCompare), SetCompareControls },
                 { typeof(ProcPVMExport), SetPVMExportControls },
-                { typeof(ProcCount), SetCountControls }
+                { typeof(ProcCount), SetCountControls },
+                { typeof(ProcSeparate), SetSeparateControls }
             };
         }
 
@@ -301,7 +305,8 @@ namespace DataTableConverter.View
                 new Proc(ProcAddTableColumns.ClassName, null, 10),
                 new Proc(ProcCompare.ClassName, null, 11),
                 new Proc(ProcPVMExport.ClassName, null, 12),
-                new Proc(ProcCount.ClassName, null, 13)
+                new Proc(ProcCount.ClassName, null, 13),
+                new Proc(ProcSeparate.ClassName, null, 14)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -932,6 +937,54 @@ namespace DataTableConverter.View
             nbCount.Visible = proc.CountChecked;
         }
 
+        private void SetSeparateControls(WorkProc selectedProc)
+        {
+            ProcSeparate proc = selectedProc as ProcSeparate;
+            lblOriginalNameText.Text = ProcSeparate.ClassName;
+            DgvSeparate.DataSource = null;
+
+            TxtSeparateColumn.TextChanged -= TxtSeparateColumn_TextChanged;
+            TxtSeparateColumn.Text = string.Empty;
+            TxtSeparateColumn.TextChanged += TxtSeparateColumn_TextChanged;
+
+            CmBSeparateFormat.SelectedIndexChanged -= CmBSeparateFormat_SelectedIndexChanged;
+            CmBSeparateFormat.SelectedIndex = 0;
+            CmBSeparateFormat.SelectedIndexChanged += CmBSeparateFormat_SelectedIndexChanged;
+
+            CbSeparateSaveAll.CheckedChanged -= CbSeparateSaveAll_CheckedChanged;
+            CbSeparateSaveAll.Checked = false;
+            CbSeparateSaveAll.CheckedChanged += CbSeparateSaveAll_CheckedChanged;
+
+            CmBSeparate.DataSource = proc.Files;
+            CmBSeparate.DisplayMember = "Name";
+            
+            if (proc.Files.Count > 0)
+            {
+                CmBSeparate.SelectedIndex = 0;
+                CmBSeparate_SelectedIndexChanged(null, null);
+            }
+            SetSeparateEnabled();
+        }
+
+        private void SetSeparateEnabled()
+        {
+            bool enabled = CmBSeparate.SelectedIndex != -1;
+            Control[] controls = new Control[]
+            {
+                CmBSeparate,
+                CmBSeparateFormat,
+                TxtSeparateColumn,
+                CbSeparateSaveAll
+            };
+
+            foreach(Control control in controls)
+            {
+                control.Enabled = enabled;
+            }
+
+            DgvSeparate.Enabled = enabled && !CbSeparateSaveAll.Checked;
+        }
+
         private void SetProcValues(WorkProc selectedProc)
         {
             txtWorkProcName.Text = selectedProc.Name;
@@ -1137,7 +1190,7 @@ namespace DataTableConverter.View
 
         private void cmbProcedureType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LoadProceduresWorkflow();
+            LoadProceduresWorkflow(false);
         }
 
         #endregion
@@ -1905,6 +1958,97 @@ namespace DataTableConverter.View
             folderBrowser.Dispose();
         }
 
+        private void BtnSeparateAdd_Click(object sender, EventArgs e)
+        {
+            string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte Dateinamen eingeben", "Dateiname", string.Empty);
+            ProcSeparate selectedProc = GetSelectedWorkProcedure() as ProcSeparate;
+            if (!string.IsNullOrWhiteSpace(newText))
+            {
+                if (selectedProc.Files.Cast<ExportSeparate>().Select(item => item.Name).Contains(newText))
+                {
+                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                    BtnSeparateAdd_Click(sender, e);
+                }
+                else
+                {
+                    int index = selectedProc.Files.Count;
+                    selectedProc.Files.Add(new ExportSeparate(newText, string.Empty));
+                    CmBSeparate.SelectedIndex = index;
+                    CmBSeparateFormat.SelectedIndex = 0;
+                    SetSeparateEnabled();
+                }
+            }
+        }
+
+        private void BtnSeparateDelete_Click(object sender, EventArgs e)
+        {
+            if (CmBSeparate.SelectedIndex != -1)
+            {
+                (GetSelectedWorkProcedure() as ProcSeparate).Files.RemoveAt(CmBSeparate.SelectedIndex);
+                if (CmBSeparate.Items.Count > 0)
+                {
+                    CmBSeparate.SelectedIndex = 0;
+                }
+                else
+                {
+                    SetSeparateEnabled();
+                }
+            }
+        }
+
+        private ExportSeparate GetSeparateSelectedItem()
+        {
+            return CmBSeparate.SelectedItem as ExportSeparate;
+        }
+
+        private void BtnSeparateRename_Click(object sender, EventArgs e)
+        {
+            if (CmBSeparate.SelectedIndex > -1)
+            {
+                ExportSeparate selectedItem = GetSeparateSelectedItem();
+                string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte den Dateinamen eingeben", "Dateiname", selectedItem.Name);
+                if (!string.IsNullOrWhiteSpace(newText))
+                {
+                    if (newText != selectedItem.Name && CmBSeparate.Items.Cast<ExportSeparate>().Select(item => item.Name).Contains(newText))
+                    {
+                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                        BtnSeparateRename_Click(sender, e);
+                    }
+                    else
+                    {
+                        selectedItem.Name = newText;
+                        (CmBSeparate.DataSource as BindingList<ExportSeparate>).ResetBindings();
+                    }
+                }
+            }
+        }
+
+        private void CmBSeparate_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ExportSeparate selectedItem = GetSeparateSelectedItem();
+            TxtSeparateColumn.Text = selectedItem.Column;
+            CmBSeparateFormat.SelectedIndex = selectedItem.Format;
+            CbSeparateSaveAll.Checked = selectedItem.CheckedAllValues;
+
+            DgvSeparate.DataSource = selectedItem.Table;
+        }
+
+        private void CbSeparateSaveAll_CheckedChanged(object sender, EventArgs e)
+        {
+            GetSeparateSelectedItem().CheckedAllValues = CbSeparateSaveAll.Checked;
+            SetSeparateEnabled();
+        }
+
+        private void TxtSeparateColumn_TextChanged(object sender, EventArgs e)
+        {
+            GetSeparateSelectedItem().Column = TxtSeparateColumn.Text;
+        }
+
+        private void CmBSeparateFormat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            GetSeparateSelectedItem().Format = CmBSeparateFormat.SelectedIndex;
+        }
+
         private void txtSubstringText_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSubstring).ReplaceText = (sender as TextBox).Text;
@@ -1918,7 +2062,6 @@ namespace DataTableConverter.View
             {
                 txtFormula.Text = format.ToString();
             }
-
         }
 
         private void dgvMerge_UserAddedRow(object sender, DataGridViewRowEventArgs e)

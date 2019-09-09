@@ -1114,6 +1114,7 @@ namespace DataTableConverter
                 StartLoadingBar();
                 ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished);
             }
+            export.Dispose();
         }
 
         private void StartLoadingBar()

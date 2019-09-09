@@ -71,16 +71,19 @@ namespace DataTableConverter.Classes.WorkProcs
                     
                     if(Properties.Settings.Default.PVMSaveTwice)
                     {
-                        if((string.IsNullOrWhiteSpace(SecondFileName) || !Directory.Exists(SecondFileName)) && saveFileDialog2.ShowDialog() == DialogResult.OK)
+                        if((string.IsNullOrWhiteSpace(SecondFileName) || !Directory.Exists(SecondFileName)))
                         {
-                            path = saveFileDialog2.FileName;
+                            if (saveFileDialog2.ShowDialog() == DialogResult.OK)
+                            {
+                                path = saveFileDialog2.FileName;
+                                ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
+                            }
                         }
                         else
                         {
                             path = Path.Combine(SecondFileName, Path.GetFileNameWithoutExtension(path));
+                            ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
                         }
-
-                        ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
                     }
                 }
                 catch (Exception ex)
@@ -88,6 +91,8 @@ namespace DataTableConverter.Classes.WorkProcs
                     ErrorHelper.LogMessage(ex);
                 }
             }
+            saveFileDialog1.Dispose();
+            saveFileDialog2.Dispose();
         }
 
         public override string[] GetHeaders()
