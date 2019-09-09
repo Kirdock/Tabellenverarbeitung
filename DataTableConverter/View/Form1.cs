@@ -102,9 +102,9 @@ namespace DataTableConverter
         }
 
 
-        private void AssignDataSource(DataTable table = null, bool isNewTable = false)
+        private void AssignDataSource(DataTable table = null, bool adjustColumnWidth = false)
         {
-            if (!isNewTable)
+            if (!adjustColumnWidth)
             {
                 SaveWidthOfDataGridViewColumns();
             }
@@ -121,7 +121,7 @@ namespace DataTableConverter
             dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
             
             RestoreDataGridSortMode();
-            SetWidth(isNewTable);
+            SetWidth(adjustColumnWidth);
 
             dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
         }
@@ -223,7 +223,10 @@ namespace DataTableConverter
                         }
                         else
                         {
-                            SetOptimalColumnWidth(dgTable.Columns[col]);
+                            if (dgTable.Columns.Contains(col))
+                            {
+                                SetOptimalColumnWidth(dgTable.Columns[col]);
+                            }
                         }
                     }
                 }
@@ -563,7 +566,7 @@ namespace DataTableConverter
                 switch (state)
                 {
                     case ImportState.Merge:
-                        ShowMergeForm(table, oldTable, filename);
+                        StartMerge(table, oldTable, filename);
                         break;
 
                     case ImportState.Append:
@@ -585,19 +588,49 @@ namespace DataTableConverter
             }
         }
 
-        private void ShowMergeForm(DataTable importTable, DataTable sourceTable, string filename)
+        private void StartMerge(DataTable importTable, DataTable sourceTable, string filename)
         {
-            MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
-            if (form.ShowDialog() == DialogResult.OK)
-            {
-                string[] ImportColumns = form.getSelectedColumns();
-                int SourceMergeIndex = form.getSelectedOriginal();
-                int ImportMergeIndex = form.getSelectedMerge();
+            string[] importColumns = new string[0];
+            int sourceMergeIndex = -1;
+            int importMergeIndex = -1;
+            DialogResult result = DialogResult.No;
 
+            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.PVMIdentifier))
+            {
+                result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
+            }
+            else
+            {
+                if ((sourceMergeIndex = sourceTable.Columns.IndexOf(Properties.Settings.Default.PVMIdentifier)) > -1)
+                {
+                    if ((importMergeIndex = importTable.Columns.IndexOf(Properties.Settings.Default.PVMIdentifier)) > -1)
+                    {
+                        importColumns = importTable.HeadersOfDataTableAsString();
+                        result = DialogResult.Yes;
+                        if (sourceTable.Rows.Count != importTable.Rows.Count)
+                        {
+                            result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({sourceTable.Rows.Count} zu {importTable.Rows.Count})!\nTrotzdem fortfahren?");
+                        }
+                    }
+                    else
+                    {
+                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabelle \"{filename}\" hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
+                        result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
+                    }
+                }
+                else
+                {
+                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
+                    result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
+                }
+            }
+            
+            if (result == DialogResult.Yes)
+            {
                 Thread thread = new Thread(() =>
                 {
                     try {
-                        sourceTable.AddColumnsOfDataTable(importTable, ImportColumns, SourceMergeIndex, ImportMergeIndex, out int[] newIndices, pgbLoading);
+                        sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, pgbLoading);
 
                         if (Properties.Settings.Default.SplitPVM)
                         {
@@ -629,6 +662,20 @@ namespace DataTableConverter
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
             }
+        }
+
+        private DialogResult ShowMergeForm(ref string[] importColumns, ref int sourceMergeIndex, ref int importMergeIndex, DataTable sourceTable, DataTable importTable, string filename)
+        {
+            MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
+            bool result;
+            if (result = (form.ShowDialog() == DialogResult.OK))
+            {
+                importColumns = form.getSelectedColumns();
+                sourceMergeIndex = form.getSelectedOriginal();
+                importMergeIndex = form.getSelectedMerge();
+            }
+            form.Dispose();
+            return result ? DialogResult.Yes : DialogResult.No;
         }
 
         private void SetRowCount()
@@ -914,7 +961,7 @@ namespace DataTableConverter
         private void TakeOverHistory(DataTable table, string orderString)
         {
             SetSorting(orderString);
-            AssignDataSource(table);
+            AssignDataSource(table, true);
             SetRowCount();
         }
 
@@ -943,11 +990,11 @@ namespace DataTableConverter
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            Size size = TextRenderer.MeasureText(dgTable[e.ColumnIndex, e.RowIndex].Value.ToString(), dgTable.DefaultCellStyle.Font);
+            int width = TextRenderer.MeasureText(dgTable[e.ColumnIndex, e.RowIndex].Value.ToString(), dgTable.DefaultCellStyle.Font).Width + 5;
             DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
-            if (size.Width > col.Width)
+            if (width > col.Width)
             {
-                ColumnWidths[col.Name] = col.Width = size.Width + 5;
+                ColumnWidths[col.Name] = col.Width = width;
             }
             AddDataSourceCellChanged(tableValueBefore, e.ColumnIndex, rowBefore);
         }
@@ -1395,7 +1442,8 @@ namespace DataTableConverter
 
             if (oldHeight != Properties.Settings.Default.RowHeight)
             {
-                AssignDataSource();
+                ColumnWidths.Clear();
+                AssignDataSource(null,true);
             }
         }
 

@@ -25,6 +25,7 @@ namespace DataTableConverter.View
             lblRowCountImport.Text = importCount.ToString();
             lblRowCountSource.Text = sourceCount.ToString();
             SameRowCount = sourceCount == importCount;
+            markAll(true);
         }
 
         private void SetListBoxStyle()

@@ -128,5 +128,8 @@
     <Setting Name="MergeFormatViewSizeSimple" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">721, 280</Value>
     </Setting>
+    <Setting Name="PVMIdentifier" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PVM_ID</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

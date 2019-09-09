@@ -56,6 +56,7 @@ namespace DataTableConverter.View
             NbFontSizeListBox.Value = Properties.Settings.Default.ListBoxFontSize;
             NbRowHeightListBox.Value = Properties.Settings.Default.ListBoxRowHeight;
             CBPvmSaveTwice.Checked = Properties.Settings.Default.PVMSaveTwice;
+            TxTPVMIdentifier.Text = Properties.Settings.Default.PVMIdentifier;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -80,6 +81,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.ListBoxFontSize = (int)NbFontSizeListBox.Value;
                 Properties.Settings.Default.ListBoxRowHeight = (int)NbRowHeightListBox.Value;
                 Properties.Settings.Default.PVMSaveTwice = CBPvmSaveTwice.Checked;
+                Properties.Settings.Default.PVMIdentifier = TxTPVMIdentifier.Text;
                 Properties.Settings.Default.Save();
             }
             else
@@ -108,7 +110,6 @@ namespace DataTableConverter.View
                     tabSettings.SelectedIndex = 1;
                     textBox.Focus();
                     break;
-
                 }
             }
             return valid;
