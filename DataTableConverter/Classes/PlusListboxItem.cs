@@ -10,16 +10,16 @@ namespace DataTableConverter.Classes
     {
         public enum RowMergeState { Sum, Count, Nothing}
         internal RowMergeState State = RowMergeState.Nothing;
-        internal object value;
+        internal string Value;
 
-        public PlusListboxItem(object value)
+        public PlusListboxItem(string value)
         {
-            this.value = value;
+            Value = value;
         }
 
         public override string ToString()
         {
-            return value.ToString();
+            return Value;
         }
 
         internal void Next()

@@ -1325,40 +1325,25 @@ namespace DataTableConverter
                 {
                     try
                     {
-                        StartLoadingBar();
-                        string tempSortName = table.MergeRows(identifier, identifierIndex, additionalColumns, OrderType, SetStatusLabel);
+                        string tempSortName = table.MergeRows(identifier, additionalColumns, pgbLoading);
 
                         dgTable.Invoke(new MethodInvoker(() =>
                         {
-                            DataTable originalSortTable = table.Copy().GetSortedView($"[{tempSortName}] asc", OrderType).ToTable();
-
                             List<CellMatrix> oldValues = table.ChangesOfDataTable();
                             historyHelper.AddHistory(new History { State = State.ValueChange, Table = oldValues }, GetSorting());
-                            originalSortTable.Columns.Remove(tempSortName);
-
-                            AssignDataSource(originalSortTable);
+                            table.Columns.Remove(tempSortName);
+                            AssignDataSource(table);
                         }));
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         ErrorHelper.LogMessage(ex);
                     }
-                    finally
-                    {
-                        SetStatusLabel(string.Empty);
-                        StopLoadingBar();
-                    }
+                    StopLoadingBar();
 
                 }).Start();
             }
-        }
-
-        private void SetStatusLabel(string text)
-        {
-            StatusLabel.GetCurrentParent().Invoke(new MethodInvoker(() =>
-            {
-                StatusLabel.Text = text;
-            }));
+            form.Dispose();
         }
 
         private void zeichenAuffüllenToolStripMenuItem_Click(object sender, EventArgs e)

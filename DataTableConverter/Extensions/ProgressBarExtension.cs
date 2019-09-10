@@ -21,9 +21,9 @@ namespace DataTableConverter.Extensions
                     progressBar.Maximum = max;
                 }));
             }
-            catch
+            catch (Exception ex)
             {
-                
+                ErrorHelper.LogMessage(ex, false);
             }
         }
 
@@ -33,12 +33,19 @@ namespace DataTableConverter.Extensions
             {
                 progressBar.Invoke(new MethodInvoker(() =>
                 {
-                    progressBar.Value++;
+                    if (progressBar.Value < progressBar.Maximum)
+                    {
+                        progressBar.Value++;
+                    }
+                    else
+                    {
+                        progressBar.Value = progressBar.Maximum = 0;
+                    }
                 }));
             }
-            catch
+            catch (Exception ex)
             {
-                
+                ErrorHelper.LogMessage(ex, false);
             }
         }
     }

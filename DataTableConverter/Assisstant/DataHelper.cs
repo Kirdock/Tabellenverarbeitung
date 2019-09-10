@@ -39,13 +39,5 @@ namespace DataTableConverter.Assisstant
             return result;
         }
         
-
-        internal static string AddStringAsFloat(string a, string b)
-        {
-            float.TryParse(a, out float fa);
-            float.TryParse(b, out float fb);
-            return (fa + fb).ToString();
-        }
-        
     }
 }

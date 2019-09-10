@@ -584,7 +584,6 @@ namespace DataTableConverter.Assisstant
         {
             ++i;
             int multiCellCount = 0;
-            Dictionary<string, string> values = new Dictionary<string, string>();
             StringBuilder cell = new StringBuilder();
             bool newLine;
             for(;i < content.Length; ++i)
@@ -624,7 +623,8 @@ namespace DataTableConverter.Assisstant
 
         private static bool EndOfMultiCell(string content, int i)
         {
-            return content[i] == '\"' && ((i + 1) == content.Length || ((i + 1) < content.Length && (content[i + 1] == '\r' || content[i + 1] == '\t')));
+            int nextIndex = i + 1;
+            return content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
         }
 
         internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar)

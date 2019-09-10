@@ -2069,9 +2069,8 @@ namespace DataTableConverter.View
                 DataTable table = (dgvMerge.DataSource as DataView).Table;
 
                 table.Rows[e.Row.Index - 1][(int)ProcMerge.ConditionColumn.Format] = new MergeFormat();
-                if (dgvMerge.EditingControl is TextBox)
+                if (dgvMerge.EditingControl is TextBox box)
                 {
-                    TextBox box = ((TextBox)dgvMerge.EditingControl);
                     box.SelectionStart = box.Text.Length;
                     box.SelectionLength = 0;
                 }

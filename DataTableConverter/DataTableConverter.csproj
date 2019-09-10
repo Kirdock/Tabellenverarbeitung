@@ -79,13 +79,13 @@
     <Compile Include="Classes\CellMatrix.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
     <Compile Include="Classes\CountListboxItem.cs" />
-    <Compile Include="Classes\DataRowArray.cs" />
     <Compile Include="Classes\ExportCustomItem.cs" />
     <Compile Include="Classes\ExportSeparate.cs" />
     <Compile Include="Classes\History.cs" />
     <Compile Include="Classes\HistoryStates.cs" />
     <Compile Include="Classes\ImportSettings.cs" />
     <Compile Include="Classes\MergeFormat.cs" />
+    <Compile Include="Classes\MergeRowsInfo.cs" />
     <Compile Include="Classes\NotFoundHeaders.cs" />
     <Compile Include="Classes\PlusListboxItem.cs" />
     <Compile Include="Classes\Proc.cs" />

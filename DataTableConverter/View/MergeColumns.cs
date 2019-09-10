@@ -27,7 +27,7 @@ namespace DataTableConverter.View
             SetListBoxStyle();
             CmBHeaders.Items.AddRange(headers);
             List<PlusListboxItem> list = new List<PlusListboxItem>();
-            foreach(object header in headers)
+            foreach(string header in headers)
             {
                 list.Add(new PlusListboxItem(header));
             }
