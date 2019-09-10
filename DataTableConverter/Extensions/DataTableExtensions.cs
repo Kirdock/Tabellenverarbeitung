@@ -576,7 +576,6 @@ namespace DataTableConverter.Extensions
             progressBar.StartLoadingBar(table.Rows.Count);
 
             int lastIndex = table.Columns.Count;
-
             string name = table.TryAddColumn(TempSort);
 
             for (int i = 0; i < table.Rows.Count; i++)
