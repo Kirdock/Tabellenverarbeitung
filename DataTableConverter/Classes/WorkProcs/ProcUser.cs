@@ -51,46 +51,51 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
-            int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
-            bool intoNewCol = false;
+            string newColumn = null;
+            bool newCol = false;
+
+
             IEnumerable<DataRow> replaces = procedure.Replace.Rows.Cast<DataRow>().Where(row => !string.IsNullOrWhiteSpace(row[0]?.ToString()));
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
                 table.CopyColumns(columns);
             }
-            else if (!string.IsNullOrWhiteSpace(NewColumn))
+            else if ((newCol= !string.IsNullOrWhiteSpace(NewColumn)))
             {
-                table.TryAddColumn(NewColumn);
-                intoNewCol = true;
+                newColumn = table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
             }
-            foreach (DataRow row in table.Rows)
-            {
-                foreach (string column in columns)
-                {
-                    int index = intoNewCol ? lastCol : table.Columns.IndexOf(column);
-                    string value = row[column].ToString();
 
-                    if (procedure.CheckTotal)
+            if (!newCol || newColumn != null)
+            {
+                foreach (DataRow row in table.Rows)
+                {
+                    foreach (string column in columns)
                     {
-                        DataRow foundRows = replaces.FirstOrDefault(replace => replace[0].ToString() == value);
-                        if(foundRows != null)
+                        string index = newColumn ?? column;
+                        string value = row[column].ToString();
+
+                        if (procedure.CheckTotal)
                         {
-                            row[index] = foundRows[1];
+                            DataRow foundRows = replaces.FirstOrDefault(replace => replace[0].ToString() == value);
+                            if (foundRows != null)
+                            {
+                                row[index] = foundRows[1];
+                            }
+                            else
+                            {
+                                row[index] = value;
+                            }
                         }
                         else
                         {
+                            foreach (DataRow rep in replaces)
+                            {
+                                value = value.Replace(rep[0].ToString(), rep[1].ToString());
+                            }
                             row[index] = value;
                         }
-                    }
-                    else
-                    {
-                        foreach (DataRow rep in replaces)
-                        {
-                            value = value.Replace(rep[0].ToString(), rep[1].ToString());
-                        }
-                        row[index] = value;
                     }
                 }
             }

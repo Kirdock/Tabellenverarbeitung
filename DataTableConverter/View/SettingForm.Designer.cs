@@ -28,8 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingForm));
             this.tabSettings = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.PSeparateColor = new System.Windows.Forms.Panel();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
             this.cLocked = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.cRequired = new System.Windows.Forms.Panel();
@@ -57,6 +61,11 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.TxTPVMIdentifier = new System.Windows.Forms.TextBox();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cbPVMSaveFormat = new System.Windows.Forms.ComboBox();
+            this.cbSplitPVM = new System.Windows.Forms.CheckBox();
             this.CBPvmSaveTwice = new System.Windows.Forms.CheckBox();
             this.BtnSearchFolder = new System.Windows.Forms.Button();
             this.TxtSettingPath = new System.Windows.Forms.TextBox();
@@ -67,14 +76,31 @@
             this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.label15 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.dgvFormat = new System.Windows.Forms.DataGridView();
             this.Col = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TextCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column1 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.ColEmpty = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.ColNotEmpty = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.DgVSecondExample = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn1 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewCheckBoxColumn2 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label32 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label30 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
+            this.label28 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.llSourceCode = new System.Windows.Forms.LinkLabel();
@@ -82,11 +108,9 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label8 = new System.Windows.Forms.Label();
-            this.cbPVMSaveFormat = new System.Windows.Forms.ComboBox();
-            this.cbSplitPVM = new System.Windows.Forms.CheckBox();
-            this.label25 = new System.Windows.Forms.Label();
-            this.TxTPVMIdentifier = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label34 = new System.Windows.Forms.Label();
+            this.label35 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -97,7 +121,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.NbFontSize)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).BeginInit();
+            this.tabPage6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DgVSecondExample)).BeginInit();
             this.SuspendLayout();
             // 
             // tabSettings
@@ -111,11 +139,14 @@
             this.tabSettings.Location = new System.Drawing.Point(0, 0);
             this.tabSettings.Name = "tabSettings";
             this.tabSettings.SelectedIndex = 0;
-            this.tabSettings.Size = new System.Drawing.Size(800, 450);
+            this.tabSettings.Size = new System.Drawing.Size(800, 721);
             this.tabSettings.TabIndex = 0;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.PSeparateColor);
+            this.tabPage1.Controls.Add(this.label26);
+            this.tabPage1.Controls.Add(this.label27);
             this.tabPage1.Controls.Add(this.cLocked);
             this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.cRequired);
@@ -123,14 +154,41 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(792, 424);
+            this.tabPage1.Size = new System.Drawing.Size(792, 630);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Farben";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // PSeparateColor
+            // 
+            this.PSeparateColor.Location = new System.Drawing.Point(170, 144);
+            this.PSeparateColor.Name = "PSeparateColor";
+            this.PSeparateColor.Size = new System.Drawing.Size(20, 20);
+            this.PSeparateColor.TabIndex = 11;
+            this.PSeparateColor.Click += new System.EventHandler(this.cRequired_Click);
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(8, 151);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(143, 13);
+            this.label26.TabIndex = 10;
+            this.label26.Text = "Bereits verwendete Einträge:";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label27.Location = new System.Drawing.Point(8, 117);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(69, 16);
+            this.label27.TabIndex = 9;
+            this.label27.Text = "Trennen:";
+            // 
             // cLocked
             // 
-            this.cLocked.Location = new System.Drawing.Point(79, 63);
+            this.cLocked.Location = new System.Drawing.Point(170, 63);
             this.cLocked.Name = "cLocked";
             this.cLocked.Size = new System.Drawing.Size(20, 20);
             this.cLocked.TabIndex = 2;
@@ -147,7 +205,7 @@
             // 
             // cRequired
             // 
-            this.cRequired.Location = new System.Drawing.Point(79, 17);
+            this.cRequired.Location = new System.Drawing.Point(170, 19);
             this.cRequired.Name = "cRequired";
             this.cRequired.Size = new System.Drawing.Size(20, 20);
             this.cRequired.TabIndex = 1;
@@ -177,7 +235,7 @@
             this.tpFileShortcuts.Location = new System.Drawing.Point(4, 22);
             this.tpFileShortcuts.Name = "tpFileShortcuts";
             this.tpFileShortcuts.Padding = new System.Windows.Forms.Padding(3);
-            this.tpFileShortcuts.Size = new System.Drawing.Size(792, 424);
+            this.tpFileShortcuts.Size = new System.Drawing.Size(792, 630);
             this.tpFileShortcuts.TabIndex = 1;
             this.tpFileShortcuts.Text = "Dateikürzel";
             this.tpFileShortcuts.UseVisualStyleBackColor = true;
@@ -277,7 +335,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(792, 424);
+            this.tabPage4.Size = new System.Drawing.Size(792, 630);
             this.tabPage4.TabIndex = 4;
             this.tabPage4.Text = "Größen";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -425,10 +483,58 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(792, 424);
+            this.tabPage2.Size = new System.Drawing.Size(792, 630);
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // TxTPVMIdentifier
+            // 
+            this.TxTPVMIdentifier.Location = new System.Drawing.Point(217, 234);
+            this.TxTPVMIdentifier.Name = "TxTPVMIdentifier";
+            this.TxTPVMIdentifier.Size = new System.Drawing.Size(132, 20);
+            this.TxTPVMIdentifier.TabIndex = 17;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(8, 237);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(166, 13);
+            this.label25.TabIndex = 16;
+            this.label25.Text = "PVM-Import Identifizierungsspalte:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(253, 192);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(42, 13);
+            this.label8.TabIndex = 15;
+            this.label8.Text = "Format:";
+            // 
+            // cbPVMSaveFormat
+            // 
+            this.cbPVMSaveFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPVMSaveFormat.FormattingEnabled = true;
+            this.cbPVMSaveFormat.Items.AddRange(new object[] {
+            "CSV",
+            "DBASE",
+            "Excel"});
+            this.cbPVMSaveFormat.Location = new System.Drawing.Point(301, 187);
+            this.cbPVMSaveFormat.Name = "cbPVMSaveFormat";
+            this.cbPVMSaveFormat.Size = new System.Drawing.Size(121, 21);
+            this.cbPVMSaveFormat.TabIndex = 14;
+            // 
+            // cbSplitPVM
+            // 
+            this.cbSplitPVM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cbSplitPVM.Location = new System.Drawing.Point(8, 192);
+            this.cbSplitPVM.Name = "cbSplitPVM";
+            this.cbSplitPVM.Size = new System.Drawing.Size(224, 17);
+            this.cbSplitPVM.TabIndex = 13;
+            this.cbSplitPVM.Text = "Aufteilen der Adressen nach PVM-Import";
+            this.cbSplitPVM.UseVisualStyleBackColor = true;
             // 
             // CBPvmSaveTwice
             // 
@@ -516,10 +622,17 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.label35);
+            this.tabPage3.Controls.Add(this.label34);
+            this.tabPage3.Controls.Add(this.tabControl1);
             this.tabPage3.Controls.Add(this.label15);
             this.tabPage3.Controls.Add(this.label14);
+            this.tabPage3.Controls.Add(this.label32);
+            this.tabPage3.Controls.Add(this.label31);
+            this.tabPage3.Controls.Add(this.label30);
+            this.tabPage3.Controls.Add(this.label29);
+            this.tabPage3.Controls.Add(this.label28);
             this.tabPage3.Controls.Add(this.label12);
-            this.tabPage3.Controls.Add(this.dgvFormat);
             this.tabPage3.Controls.Add(this.label20);
             this.tabPage3.Controls.Add(this.label19);
             this.tabPage3.Controls.Add(this.llSourceCode);
@@ -529,37 +642,31 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(792, 424);
+            this.tabPage3.Size = new System.Drawing.Size(792, 695);
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "Hilfe";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // label15
+            // tabControl1
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(129, 79);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(148, 13);
-            this.label15.TabIndex = 15;
-            this.label15.Text = "\"Sehr geehrter Herr Strießnig\"";
+            this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.tabPage6);
+            this.tabControl1.Location = new System.Drawing.Point(12, 296);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(777, 348);
+            this.tabControl1.TabIndex = 23;
             // 
-            // label14
+            // tabPage5
             // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(129, 57);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(173, 13);
-            this.label14.TabIndex = 14;
-            this.label14.Text = "\"Sehr geehrter Herr MSc Strießnig\"";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(193, 98);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(255, 13);
-            this.label12.TabIndex = 13;
-            this.label12.Text = "\"_\" Dient hier nur zur Visualisierung von Leerzeichen";
+            this.tabPage5.Controls.Add(this.dgvFormat);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(769, 322);
+            this.tabPage5.TabIndex = 0;
+            this.tabPage5.Text = "Beispiel Titel";
+            this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // dgvFormat
             // 
@@ -570,12 +677,15 @@
             this.dgvFormat.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Col,
             this.TextCol,
+            this.Column1,
             this.ColEmpty,
+            this.Column2,
             this.ColNotEmpty});
-            this.dgvFormat.Location = new System.Drawing.Point(12, 118);
+            this.dgvFormat.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvFormat.Location = new System.Drawing.Point(3, 3);
             this.dgvFormat.Name = "dgvFormat";
             this.dgvFormat.ReadOnly = true;
-            this.dgvFormat.Size = new System.Drawing.Size(772, 285);
+            this.dgvFormat.Size = new System.Drawing.Size(763, 316);
             this.dgvFormat.TabIndex = 12;
             // 
             // Col
@@ -592,6 +702,12 @@
             this.TextCol.Name = "TextCol";
             this.TextCol.ReadOnly = true;
             // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "Alle Spalten überprüfen";
+            this.Column1.Name = "Column1";
+            this.Column1.ReadOnly = true;
+            // 
             // ColEmpty
             // 
             this.ColEmpty.FillWeight = 75.12691F;
@@ -600,6 +716,12 @@
             this.ColEmpty.Name = "ColEmpty";
             this.ColEmpty.ReadOnly = true;
             // 
+            // Column2
+            // 
+            this.Column2.HeaderText = "Alle Spalten überprüfen ";
+            this.Column2.Name = "Column2";
+            this.Column2.ReadOnly = true;
+            // 
             // ColNotEmpty
             // 
             this.ColNotEmpty.FillWeight = 108.291F;
@@ -607,6 +729,159 @@
             this.ColNotEmpty.MinimumWidth = 150;
             this.ColNotEmpty.Name = "ColNotEmpty";
             this.ColNotEmpty.ReadOnly = true;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.label33);
+            this.tabPage6.Controls.Add(this.DgVSecondExample);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage6.Size = new System.Drawing.Size(769, 322);
+            this.tabPage6.TabIndex = 1;
+            this.tabPage6.Text = "Beispiel Straße";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // DgVSecondExample
+            // 
+            this.DgVSecondExample.AllowUserToAddRows = false;
+            this.DgVSecondExample.AllowUserToDeleteRows = false;
+            this.DgVSecondExample.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DgVSecondExample.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.dataGridViewCheckBoxColumn1,
+            this.dataGridViewTextBoxColumn3,
+            this.dataGridViewCheckBoxColumn2,
+            this.dataGridViewTextBoxColumn4});
+            this.DgVSecondExample.Location = new System.Drawing.Point(3, 59);
+            this.DgVSecondExample.Name = "DgVSecondExample";
+            this.DgVSecondExample.ReadOnly = true;
+            this.DgVSecondExample.Size = new System.Drawing.Size(763, 257);
+            this.DgVSecondExample.TabIndex = 13;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.FillWeight = 108.291F;
+            this.dataGridViewTextBoxColumn1.HeaderText = "Spalte";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1.Width = 109;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.FillWeight = 108.291F;
+            this.dataGridViewTextBoxColumn2.HeaderText = "Text";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            this.dataGridViewTextBoxColumn2.ReadOnly = true;
+            this.dataGridViewTextBoxColumn2.Width = 109;
+            // 
+            // dataGridViewCheckBoxColumn1
+            // 
+            this.dataGridViewCheckBoxColumn1.HeaderText = "Alle Spalten überprüfen";
+            this.dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
+            this.dataGridViewCheckBoxColumn1.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn1.Width = 101;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.FillWeight = 75.12691F;
+            this.dataGridViewTextBoxColumn3.HeaderText = "Wenn Spalten leer";
+            this.dataGridViewTextBoxColumn3.MinimumWidth = 150;
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            this.dataGridViewTextBoxColumn3.ReadOnly = true;
+            this.dataGridViewTextBoxColumn3.Width = 150;
+            // 
+            // dataGridViewCheckBoxColumn2
+            // 
+            this.dataGridViewCheckBoxColumn2.HeaderText = "Alle Spalten überprüfen ";
+            this.dataGridViewCheckBoxColumn2.Name = "dataGridViewCheckBoxColumn2";
+            this.dataGridViewCheckBoxColumn2.ReadOnly = true;
+            this.dataGridViewCheckBoxColumn2.Width = 101;
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.FillWeight = 108.291F;
+            this.dataGridViewTextBoxColumn4.HeaderText = "Wenn Spalten nicht leer";
+            this.dataGridViewTextBoxColumn4.MinimumWidth = 150;
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            this.dataGridViewTextBoxColumn4.ReadOnly = true;
+            this.dataGridViewTextBoxColumn4.Width = 150;
+            // 
+            // label15
+            // 
+            this.label15.Location = new System.Drawing.Point(344, 135);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(259, 32);
+            this.label15.TabIndex = 22;
+            this.label15.Text = "Das heißt bei \"[Spalte1] [Spalte2]\" fällt das Leerzeichen dazwischen weg, wenn Sp" +
+    "alte2 leer ist";
+            // 
+            // label14
+            // 
+            this.label14.Location = new System.Drawing.Point(344, 88);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(247, 47);
+            this.label14.TabIndex = 21;
+            this.label14.Text = "Info: Angegebener Text nach einer Spaltenangabe fällt weg, wenn die Spalten danac" +
+    "h leer sind";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(151, 157);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(115, 13);
+            this.label32.TabIndex = 20;
+            this.label32.Text = "([Titel1] [Titel2] [Titel3])";
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(9, 157);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(119, 13);
+            this.label31.TabIndex = 19;
+            this.label31.Text = "Erste nicht-leere Spalte:";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(151, 92);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(49, 13);
+            this.label30.TabIndex = 18;
+            this.label30.Text = "[Spalte1]";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(9, 92);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(82, 13);
+            this.label29.TabIndex = 17;
+            this.label29.Text = "Spaltenangabe:";
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label28.Location = new System.Drawing.Point(8, 59);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(207, 20);
+            this.label28.TabIndex = 16;
+            this.label28.Text = "Einfache Formatangabe:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.label12.Location = new System.Drawing.Point(197, 280);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(445, 16);
+            this.label12.TabIndex = 13;
+            this.label12.Text = "\"_\" (Underline) Dient hier nur zur Visualisierung der Leerzeichen";
             // 
             // label20
             // 
@@ -628,8 +903,9 @@
             // 
             // llSourceCode
             // 
+            this.llSourceCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.llSourceCode.AutoSize = true;
-            this.llSourceCode.Location = new System.Drawing.Point(9, 406);
+            this.llSourceCode.Location = new System.Drawing.Point(9, 664);
             this.llSourceCode.Name = "llSourceCode";
             this.llSourceCode.Size = new System.Drawing.Size(55, 13);
             this.llSourceCode.TabIndex = 9;
@@ -640,7 +916,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(595, 79);
+            this.label13.Location = new System.Drawing.Point(151, 123);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(94, 13);
             this.label13.TabIndex = 3;
@@ -649,7 +925,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(453, 79);
+            this.label11.Location = new System.Drawing.Point(9, 123);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(136, 13);
             this.label11.TabIndex = 1;
@@ -658,68 +934,47 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(6, 52);
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(8, 208);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(117, 20);
+            this.label10.Size = new System.Drawing.Size(218, 20);
             this.label10.TabIndex = 0;
-            this.label10.Text = "Formatbeispiel:";
+            this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // label8
+            // label33
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(253, 192);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(42, 13);
-            this.label8.TabIndex = 15;
-            this.label8.Text = "Format:";
+            this.label33.Location = new System.Drawing.Point(108, 3);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(521, 43);
+            this.label33.TabIndex = 14;
+            this.label33.Text = resources.GetString("label33.Text");
             // 
-            // cbPVMSaveFormat
+            // label34
             // 
-            this.cbPVMSaveFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPVMSaveFormat.FormattingEnabled = true;
-            this.cbPVMSaveFormat.Items.AddRange(new object[] {
-            "CSV",
-            "DBASE",
-            "Excel"});
-            this.cbPVMSaveFormat.Location = new System.Drawing.Point(301, 187);
-            this.cbPVMSaveFormat.Name = "cbPVMSaveFormat";
-            this.cbPVMSaveFormat.Size = new System.Drawing.Size(121, 21);
-            this.cbPVMSaveFormat.TabIndex = 14;
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(16, 240);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(130, 13);
+            this.label34.TabIndex = 24;
+            this.label34.Text = "\"Alle Spalten überprüfen\":";
             // 
-            // cbSplitPVM
+            // label35
             // 
-            this.cbSplitPVM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cbSplitPVM.Location = new System.Drawing.Point(8, 192);
-            this.cbSplitPVM.Name = "cbSplitPVM";
-            this.cbSplitPVM.Size = new System.Drawing.Size(224, 17);
-            this.cbSplitPVM.TabIndex = 13;
-            this.cbSplitPVM.Text = "Aufteilen der Adressen nach PVM-Import";
-            this.cbSplitPVM.UseVisualStyleBackColor = true;
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(8, 237);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(166, 13);
-            this.label25.TabIndex = 16;
-            this.label25.Text = "PVM-Import Identifizierungsspalte:";
-            // 
-            // TxTPVMIdentifier
-            // 
-            this.TxTPVMIdentifier.Location = new System.Drawing.Point(217, 234);
-            this.TxTPVMIdentifier.Name = "TxTPVMIdentifier";
-            this.TxTPVMIdentifier.Size = new System.Drawing.Size(132, 20);
-            this.TxTPVMIdentifier.TabIndex = 17;
+            this.label35.Location = new System.Drawing.Point(152, 234);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(389, 28);
+            this.label35.TabIndex = 25;
+            this.label35.Text = "Diese Auswahl legt fest, ob alle angegebenen Spalten leer bzw. nicht leer sein so" +
+    "llten. Sonst wird nur überprüft ob eine Spalte leer bzw. nicht leer ist";
             // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 721);
             this.Controls.Add(this.tabSettings);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "SettingForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Einstellungen";
@@ -739,7 +994,11 @@
             this.tabPage2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).EndInit();
+            this.tabPage6.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.DgVSecondExample)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -783,13 +1042,7 @@
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.DataGridView dgvFormat;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Col;
-        private System.Windows.Forms.DataGridViewTextBoxColumn TextCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColEmpty;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNotEmpty;
         private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox TxtSettingPath;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button BtnSearchFolder;
@@ -805,5 +1058,34 @@
         private System.Windows.Forms.CheckBox cbSplitPVM;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.TextBox TxTPVMIdentifier;
+        private System.Windows.Forms.Panel PSeparateColor;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Col;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TextCol;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColEmpty;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Column2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColNotEmpty;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.DataGridView DgVSecondExample;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Label label34;
     }
 }

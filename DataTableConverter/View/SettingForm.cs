@@ -26,18 +26,26 @@ namespace DataTableConverter.View
         private void InitDataGridView()
         {
             //column, text, empty, not empty
-            dgvFormat.Rows.Add(new object[] { string.Empty, "Sehr_geehrter_" });
-            dgvFormat.Rows.Add(new object[] { "Anrede", "_"});
-            dgvFormat.Rows.Add(new object[] { "Titel 1", "_", "[Titel 2] [Titel 3]" });
-            dgvFormat.Rows.Add(new object[] { "Titel 2", "_", "[Titel 1] [Titel 3]" });
-            dgvFormat.Rows.Add(new object[] { "Titel 3", "_", "[Titel 1] [Titel 2]" });
-            dgvFormat.Rows.Add(new object[] { "Nachname"});
+            dgvFormat.Rows.Add(new object[] { "Titel 1", string.Empty, true, "[Titel 2] [Titel 3]" });
+            dgvFormat.Rows.Add(new object[] { "Titel 2", string.Empty, true, "[Titel 1] [Titel 3]" });
+            dgvFormat.Rows.Add(new object[] { "Titel 3", string.Empty,true, "[Titel 1] [Titel 2]" });
             dgvFormat.Rows.Add(new object[] {});
+
+
+            DgVSecondExample.Rows.Add(new object[] { "Straße"});
+            DgVSecondExample.Rows.Add(new object[] { string.Empty, "_", false, string.Empty, false, "[Straße] [HNR] [Stock] [Tuer]" });
+            DgVSecondExample.Rows.Add(new object[] { "HNR" });
+            DgVSecondExample.Rows.Add(new object[] { string.Empty, "_/_", false, string.Empty, false, "[HNR] [Stock] [Tuer]" });
+            DgVSecondExample.Rows.Add(new object[] { "Stock" });
+            DgVSecondExample.Rows.Add(new object[] { string.Empty, "_/_", false, string.Empty, false, "[Stock] [Tuer]" });
+            DgVSecondExample.Rows.Add(new object[] { "Tuer" });
+            DgVSecondExample.Rows.Add(new object[] { });
         }
 
         private void LoadSettings()
         {
             cRequired.BackColor = Properties.Settings.Default.RequiredField;
+            PSeparateColor.BackColor = Properties.Settings.Default.SeparateColor;
             cLocked.BackColor = Properties.Settings.Default.Locked;
             txtFailAddress.Text = Properties.Settings.Default.FailAddressText;
             txtRightAddress.Text = Properties.Settings.Default.RightAddressText;
@@ -82,6 +90,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.ListBoxRowHeight = (int)NbRowHeightListBox.Value;
                 Properties.Settings.Default.PVMSaveTwice = CBPvmSaveTwice.Checked;
                 Properties.Settings.Default.PVMIdentifier = TxTPVMIdentifier.Text;
+                Properties.Settings.Default.SeparateColor = PSeparateColor.BackColor;
                 Properties.Settings.Default.Save();
             }
             else
@@ -169,6 +178,11 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.SettingPath = TxtSettingPath.Text = folderPath;
             }
             folderBrowser.Dispose();
+        }
+
+        private void DgVSecondExample_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

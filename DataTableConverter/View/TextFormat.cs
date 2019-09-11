@@ -61,7 +61,14 @@ namespace DataTableConverter.View
 
         private void SetSize()
         {
-            Size = Properties.Settings.Default.TextFormatSize;
+            if (Properties.Settings.Default.TextFormatMaximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                Size = Properties.Settings.Default.TextFormatSize;
+            }
         }
 
         private void TextFormat_Load(object sender, EventArgs e)
@@ -210,7 +217,11 @@ namespace DataTableConverter.View
             Properties.Settings.Default.TextEnd = txtEnd.Text;
             Properties.Settings.Default.TakeOverAllFiles = cbTakeOver.Checked;
             Properties.Settings.Default.HeaderInFirstRow = cbContainsHeaders.Checked;
-            Properties.Settings.Default.TextFormatSize = Size;
+            if (WindowState != FormWindowState.Maximized)
+            {
+                Properties.Settings.Default.TextFormatSize = Size;
+            }
+            Properties.Settings.Default.TextFormatMaximized = WindowState == FormWindowState.Maximized;
             Properties.Settings.Default.Save();
             ViewHelper.Clear();
         }

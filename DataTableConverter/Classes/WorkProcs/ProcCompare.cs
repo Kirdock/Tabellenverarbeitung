@@ -34,26 +34,25 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 return;
             }
-            int lastCol = table.Columns.Count;
-            bool intoNewCol = false;
 
+            string column = SourceColumn;
             if (CopyOldColumn)
             {
                 table.CopyColumns(new string[] { SourceColumn });
             }
             else if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                table.TryAddColumn(NewColumn);
-                intoNewCol = true;
+                column = table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
             }
 
-            int index = intoNewCol ? lastCol : table.Columns.IndexOf(SourceColumn);
-
-            foreach (DataRow row in table.Rows)
+            if (column != null)
             {
-                if(row[SourceColumn].ToString() == row[CompareColumn].ToString())
+                foreach (DataRow row in table.Rows)
                 {
-                    row[index] = string.Empty;
+                    if (row[SourceColumn].ToString() == row[CompareColumn].ToString())
+                    {
+                        row[column] = string.Empty;
+                    }
                 }
             }
         }

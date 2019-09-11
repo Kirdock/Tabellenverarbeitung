@@ -52,46 +52,40 @@ namespace DataTableConverter.Classes.WorkProcs
             newOrderIndices = new int[0];
             Hashtable hTable = new Hashtable();
             Hashtable totalTable = new Hashtable();
-            ArrayList duplicateList = new ArrayList();
 
             int[] subStringBegin = duplicateCase.getBeginSubstring();
             int[] subStringEnd = duplicateCase.getEndSubstring();
-            
-            int lastIndex = table.Columns.IndexOf("Duplikat");
-            bool columnAdded;
-            if (columnAdded = lastIndex == -1)
+
+
+            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+
+            if (column != null)
             {
-                lastIndex = table.Columns.Count;
-                table.TryAddColumn("Duplikat");
-
-            }
-
-
-
-            for (int index = 0; index < table.Rows.Count; index++)
-            {
-                string identifierTotal = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, null, null, null);
-                bool isTotal;
-                if (isTotal = totalTable.Contains(identifierTotal))
+                for (int index = 0; index < table.Rows.Count; index++)
                 {
-                    table.Rows[(int)totalTable[identifierTotal]].SetField(lastIndex, duplicateCase.ShortcutTotal);
-                    table.Rows[index].SetField(lastIndex, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
-                }
-                else
-                {
-                    totalTable.Add(identifierTotal, index);
-                }
-                if (!isTotal)
-                {
-                    string identifier = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
-                    if (hTable.Contains(identifier))
+                    string identifierTotal = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, null, null, null);
+                    bool isTotal;
+                    if (isTotal = totalTable.Contains(identifierTotal))
                     {
-                        table.Rows[(int)hTable[identifier]].SetField(lastIndex, duplicateCase.Shortcut);
-                        table.Rows[index].SetField(lastIndex, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                        table.Rows[(int)totalTable[identifierTotal]].SetField(column, duplicateCase.ShortcutTotal);
+                        table.Rows[index].SetField(column, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
                     }
                     else
                     {
-                        hTable.Add(identifier, index);
+                        totalTable.Add(identifierTotal, index);
+                    }
+                    if (!isTotal)
+                    {
+                        string identifier = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
+                        if (hTable.Contains(identifier))
+                        {
+                            table.Rows[(int)hTable[identifier]].SetField(column, duplicateCase.Shortcut);
+                            table.Rows[index].SetField(column, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                        }
+                        else
+                        {
+                            hTable.Add(identifier, index);
+                        }
                     }
                 }
             }

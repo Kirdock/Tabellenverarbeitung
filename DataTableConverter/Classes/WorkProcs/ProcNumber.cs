@@ -31,16 +31,14 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
-            if (!string.IsNullOrWhiteSpace(NewColumn))
+            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+            if (column != null)
             {
-                int index = table.Columns.Count;
-                table.TryAddColumn(NewColumn);
-
                 int count = Start;
                 bool noEnd = End != 0;
                 foreach (DataRow row in table.GetSortedTable(sortingOrder,orderType))
                 {
-                    row[index] = count;
+                    row[column] = count;
                     count++;
                     if (noEnd && count > End)
                     {

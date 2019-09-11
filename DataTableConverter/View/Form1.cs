@@ -92,7 +92,14 @@ namespace DataTableConverter
 
         private void SetSize()
         {
-            Size = Properties.Settings.Default.Form1Size;
+            if (Properties.Settings.Default.Form1Maximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                Size = Properties.Settings.Default.Form1Size;
+            }
         }
 
         private void SetSorting(string order)
@@ -105,13 +112,13 @@ namespace DataTableConverter
 
         private void AssignDataSource(DataTable table = null, bool adjustColumnWidth = false)
         {
-            if (!adjustColumnWidth)
+            if (adjustColumnWidth)
             {
-                SaveWidthOfDataGridViewColumns();
+                ColumnWidths.Clear();
             }
             else
             {
-                ColumnWidths.Clear();
+                SaveWidthOfDataGridViewColumns();
             }
             int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
             OrderType orderType = OrderType;
@@ -122,7 +129,7 @@ namespace DataTableConverter
             dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
             
             RestoreDataGridSortMode();
-            SetWidth(adjustColumnWidth);
+            SetWidth();
 
             dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
         }
@@ -203,32 +210,19 @@ namespace DataTableConverter
             SetMenuEnabled(true);
         }
 
-        private void SetWidth(bool adjustColumnWidth)
+        private void SetWidth()
         {
             if (Properties.Settings.Default.FullWidthImport)
             {
-                if (adjustColumnWidth)
+                foreach (DataGridViewColumn col in dgTable.Columns)
                 {
-                    foreach(DataGridViewColumn col in dgTable.Columns)
+                    if (ColumnWidths.TryGetValue(col.Name, out int value))
+                    {
+                        col.Width = value;
+                    }
+                    else
                     {
                         SetOptimalColumnWidth(col);
-                    }
-                }
-                else
-                {
-                    foreach(string col in ColumnWidths.Keys)
-                    {
-                        if (dgTable.Columns.Contains(col))
-                        {
-                            dgTable.Columns[col].Width = ColumnWidths[col];
-                        }
-                        else
-                        {
-                            if (dgTable.Columns.Contains(col))
-                            {
-                                SetOptimalColumnWidth(dgTable.Columns[col]);
-                            }
-                        }
                     }
                 }
             }
@@ -1441,7 +1435,14 @@ namespace DataTableConverter
 
         private void SaveSize()
         {
-            Properties.Settings.Default.Form1Size = Size;
+            if (WindowState != FormWindowState.Maximized)
+            {
+                Properties.Settings.Default.Form1Size = Size;
+            }
+            else
+            {
+                Properties.Settings.Default.Form1Maximized = WindowState == FormWindowState.Maximized;
+            }
             Properties.Settings.Default.Save();
         }
 

@@ -63,56 +63,54 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
-            int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
-            string newColumn = null;
 
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
                 table.CopyColumns(columns);
             }
-            if (!string.IsNullOrWhiteSpace(NewColumn))
-            {
-                newColumn = table.TryAddColumn(NewColumn);
-            }
+            bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
+            string newColumn = newCol && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
 
-            if (!ReplaceChecked)
+            if (!newCol || newColumn != null)
             {
-
-                foreach (DataRow row in table.Rows)
+                if (!ReplaceChecked)
                 {
-                    foreach (string header in columns)
+                    foreach (DataRow row in table.Rows)
                     {
-                        string value = row[header].ToString();
-                        string col = newColumn ?? header;
-                        if (End == 0)
+                        foreach (string header in columns)
                         {
-                            row[col] = Start > value.Length ? string.Empty : value.Substring(Start - 1);
-                        }
-                        else
-                        {
-                            int length = (End - Start);
-                            row[col] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start - 1) : value.Substring(Start - 1, length + 1);
+                            string value = row[header].ToString();
+                            string col = newColumn ?? header;
+                            if (End == 0)
+                            {
+                                row[col] = Start > value.Length ? string.Empty : value.Substring(Start - 1);
+                            }
+                            else
+                            {
+                                int length = (End - Start);
+                                row[col] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start - 1) : value.Substring(Start - 1, length + 1);
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                foreach (DataRow row in table.Rows)
+                else
                 {
-                    foreach (string header in columns)
+                    foreach (DataRow row in table.Rows)
                     {
-                        string value = row[header].ToString();
-                        string result = Start > value.Length ? string.Empty : value.Substring(0, Start-1) + ReplaceText;
-
-                        if (End < value.Length && End != 0 && Start <= value.Length)
+                        foreach (string header in columns)
                         {
-                            result += value.Substring(End);
-                        }
+                            string value = row[header].ToString();
+                            string result = Start > value.Length ? string.Empty : value.Substring(0, Start - 1) + ReplaceText;
 
-                        row[newColumn ?? header] = result;
+                            if (End < value.Length && End != 0 && Start <= value.Length)
+                            {
+                                result += value.Substring(End);
+                            }
+
+                            row[newColumn ?? header] = result;
+                        }
                     }
                 }
             }

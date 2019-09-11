@@ -124,7 +124,14 @@ namespace DataTableConverter.View
 
         private void SetSize()
         {
-            Size = Properties.Settings.Default.AdministrationWindowSize;
+            if (Properties.Settings.Default.AdministrationWindowMaximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                Size = Properties.Settings.Default.AdministrationWindowSize;
+            }
         }
 
         private void Administration_Load(object sender, EventArgs e)
@@ -324,7 +331,11 @@ namespace DataTableConverter.View
 
         private void SaveSize()
         {
-            Properties.Settings.Default.AdministrationWindowSize = Size;
+            if (WindowState != FormWindowState.Maximized)
+            {
+                Properties.Settings.Default.AdministrationWindowSize = Size;
+            }
+            Properties.Settings.Default.AdministrationWindowMaximized = WindowState == FormWindowState.Maximized;
         }
 
         private void SaveSplitterDistance()

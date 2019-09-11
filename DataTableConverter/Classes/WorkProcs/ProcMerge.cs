@@ -81,7 +81,14 @@ namespace DataTableConverter.Classes.WorkProcs
 
         internal static void RenameFormatHeader(DataRow row, int index, string oldName, string newName)
         {
-            row[index] = row[index].ToString().Replace($"[{oldName}]", $"[{newName}]");
+            if (row[index] is MergeFormat format)
+            {
+                format.Formula.Replace($"[{oldName}]", $"[{newName}]");
+            }
+            else
+            {
+                row[index] = row[index].ToString().Replace($"[{oldName}]", $"[{newName}]");
+            }
         }
 
         internal static string RenameFormatHeader(string format, string oldName, string newName)
@@ -101,38 +108,43 @@ namespace DataTableConverter.Classes.WorkProcs
             newOrderIndices = new int[0];
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                int column = table.Columns.IndexOf(NewColumn);
-                if (CopyOldColumn && column > -1)
+                string column = NewColumn;
+                if (CopyOldColumn && table.Columns.IndexOf(NewColumn) > -1)
                 {
                     table.CopyColumns(new string[] { NewColumn });
                 }
-                else if(!CopyOldColumn && column == -1)
+                else if(!CopyOldColumn)
                 {
-                    column = table.Columns.Count;
-                    table.TryAddColumn(NewColumn);
-                }
-
-                foreach (DataRow row in table.Rows)
-                {
-                    DataRow match = Conditions.AsEnumerable().FirstOrDefault(condition =>
+                    if (!table.AddColumnWithDialog(NewColumn))
                     {
-                        string value = condition[(int)ConditionColumn.Spalte]?.ToString();
-                        string rowValue;
-                        return !string.IsNullOrWhiteSpace(value)
-                            &&
-                            (
-                                (rowValue = row[value].ToString()) == condition[(int)ConditionColumn.Wert].ToString()
-                                ||
+                        column = null;
+                    }
+                }
+                if (column != null)
+                {
+                    foreach (DataRow row in table.Rows)
+                    {
+                        DataRow match = Conditions.AsEnumerable().FirstOrDefault(condition =>
+                        {
+                            string value = condition[(int)ConditionColumn.Spalte]?.ToString();
+                            string rowValue;
+                            bool notEmpty = condition[(int)ConditionColumn.NichtLeer] == DBNull.Value ? false : (bool)condition[(int)ConditionColumn.NichtLeer];
+                            return !string.IsNullOrWhiteSpace(value)
+                                &&
                                 (
-                                    condition[(int)ConditionColumn.NichtLeer] == DBNull.Value ? false : (bool)condition[(int)ConditionColumn.NichtLeer]
-                                    &&
-                                    rowValue.Length > 0
-                                )
-                            );
-                    });
-                    MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
-                    
-                    row[column] = format.IsStringFormat() ? GetFormat(row, format.Formula, table.Columns) : GetFormat(row, format, table.Columns);
+                                    ((rowValue = row[value].ToString()) == condition[(int)ConditionColumn.Wert].ToString() && !notEmpty)
+                                    ||
+                                    (
+                                        notEmpty
+                                        &&
+                                        !string.IsNullOrWhiteSpace(rowValue)
+                                    )
+                                );
+                        });
+                        MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
+
+                        row[column] = format.IsStringFormat() ? GetFormat(row, format.Formula, table.Columns) : GetFormat(row, format, table.Columns);
+                    }
                 }
             }
             else

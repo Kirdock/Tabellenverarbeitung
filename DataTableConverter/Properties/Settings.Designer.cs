@@ -537,5 +537,77 @@ namespace DataTableConverter.Properties {
                 this["PVMIdentifier"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Red")]
+        public global::System.Drawing.Color SeparateColor {
+            get {
+                return ((global::System.Drawing.Color)(this["SeparateColor"]));
+            }
+            set {
+                this["SeparateColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AdministrationWindowMaximized {
+            get {
+                return ((bool)(this["AdministrationWindowMaximized"]));
+            }
+            set {
+                this["AdministrationWindowMaximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Form1Maximized {
+            get {
+                return ((bool)(this["Form1Maximized"]));
+            }
+            set {
+                this["Form1Maximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TextFormatMaximized {
+            get {
+                return ((bool)(this["TextFormatMaximized"]));
+            }
+            set {
+                this["TextFormatMaximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MergeFormatViewMaximized {
+            get {
+                return ((bool)(this["MergeFormatViewMaximized"]));
+            }
+            set {
+                this["MergeFormatViewMaximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MergeFormatViewSimpleMaximized {
+            get {
+                return ((bool)(this["MergeFormatViewSimpleMaximized"]));
+            }
+            set {
+                this["MergeFormatViewSimpleMaximized"] = value;
+            }
+        }
     }
 }

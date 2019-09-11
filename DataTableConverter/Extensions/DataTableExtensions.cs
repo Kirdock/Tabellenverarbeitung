@@ -480,7 +480,7 @@ namespace DataTableConverter.Extensions
             Dictionary<string, SortOrder> dict = ViewHelper.GenerateSortingList(order);
             if (dict.Count == 0)
             {
-                view = table.DefaultView;
+                view = table.AsEnumerable().AsDataView(); //create new view. Default view throws exception "is not opened"
             }
             else
             {
@@ -643,6 +643,20 @@ namespace DataTableConverter.Extensions
                 }
             }
             return name;
+        }
+
+        internal static bool AddColumnWithDialog(this DataTable table, string column)
+        {
+            bool inserted = true;
+            if (table.Columns.Contains(column))
+            {
+                inserted = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Es gibt bereits eine Spalte mit der Bezeichnung \"{column}\".\nSpalte überschreiben?") == DialogResult.Yes;
+            }
+            else
+            {
+                table.Columns.Add(column);
+            }
+            return inserted;
         }
     }
         

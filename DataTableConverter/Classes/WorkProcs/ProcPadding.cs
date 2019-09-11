@@ -53,11 +53,8 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
-            int lastCol = table.Columns.Count;
             string[] columns = GetAffectedHeaders();
-            bool intoNewCol = false;
             
-
             if (!Character.HasValue)
             {
                 return;
@@ -69,51 +66,48 @@ namespace DataTableConverter.Classes.WorkProcs
                 table.CopyColumns(columns);
             }
 
-            if (!string.IsNullOrWhiteSpace(NewColumn))
+            bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
+            string c = newCol && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+            bool intoNewCol = c != null;
+            if (!newCol || c != null)
             {
-                table.TryAddColumn(NewColumn);
-                intoNewCol = true;
-            }
-
-            foreach (DataRow row in table.Rows)
-            {
-                foreach (string col in columns)
+                foreach (DataRow row in table.Rows)
                 {
-                    bool valid = Conditions.Rows.Count == 0;
-                    int index = intoNewCol ? lastCol : table.Columns.IndexOf(col);
-                    bool result = false;
-                    foreach (DataRow rep in Conditions.Rows)
+                    foreach (string col in columns)
                     {
-                        string column = rep[(int)ConditionColumn.Spalte].ToString();
-                        string value = rep[(int)ConditionColumn.Wert].ToString();
-                        if (!string.IsNullOrWhiteSpace(column))
+                        bool valid = Conditions.Rows.Count == 0;
+                        string index = c ?? col;
+                        bool result = false;
+                        foreach (DataRow rep in Conditions.Rows)
                         {
-                            result |= row[column].ToString() == value;
+                            string column = rep[(int)ConditionColumn.Spalte].ToString();
+                            string value = rep[(int)ConditionColumn.Wert].ToString();
+                            if (!string.IsNullOrWhiteSpace(column))
+                            {
+                                result |= row[column].ToString() == value;
+                            }
                         }
-                    }
-                    if (valid || result)
-                    {
-                        switch (OperationSide)
+                        if (valid || result)
                         {
-                            case Side.Left:
-                                row[index] = row[col].ToString().PadLeft(Counter, Character.Value);
-                                break;
+                            switch (OperationSide)
+                            {
+                                case Side.Left:
+                                    row[index] = row[col].ToString().PadLeft(Counter, Character.Value);
+                                    break;
 
-                            case Side.Right:
-                            default:
-                                row[index] = row[col].ToString().PadRight(Counter, Character.Value);
-                                break;
+                                case Side.Right:
+                                default:
+                                    row[index] = row[col].ToString().PadRight(Counter, Character.Value);
+                                    break;
+                            }
                         }
-                    }
-                    else if(intoNewCol)
-                    {
-                        row[index] = row[col];
+                        else if (intoNewCol)
+                        {
+                            row[index] = row[col];
+                        }
                     }
                 }
             }
-
-
-
         }
 
         public override void renameHeaders(string oldName, string newName)

@@ -77,11 +77,25 @@ namespace DataTableConverter.View
         {
             if (isStringFormat)
             {
-                Size = Properties.Settings.Default.MergeFormatViewSizeSimple;
+                if (Properties.Settings.Default.MergeFormatViewSimpleMaximized)
+                {
+                    WindowState = FormWindowState.Maximized;
+                }
+                else
+                {
+                    Size = Properties.Settings.Default.MergeFormatViewSizeSimple;
+                }
             }
             else
             {
-                Size = Properties.Settings.Default.MergeFormatViewSize;
+                if (Properties.Settings.Default.MergeFormatViewMaximized)
+                {
+                    WindowState = FormWindowState.Maximized;
+                }
+                else
+                {
+                    Size = Properties.Settings.Default.MergeFormatViewSize;
+                }
             }
             RBExtended.Checked = !isStringFormat;
             RBSimple.Checked = isStringFormat;
@@ -150,11 +164,20 @@ namespace DataTableConverter.View
         {
             if (RBExtended.Checked)
             {
-                Properties.Settings.Default.MergeFormatViewSize = Size;
+                if(WindowState != FormWindowState.Maximized)
+                {
+                    Properties.Settings.Default.MergeFormatViewSize = Size;
+                }
+                Properties.Settings.Default.MergeFormatViewMaximized = WindowState == FormWindowState.Maximized;
             }
             else
             {
-                Properties.Settings.Default.MergeFormatViewSizeSimple = Size;
+                if(WindowState != FormWindowState.Maximized)
+                {
+                    Properties.Settings.Default.MergeFormatViewSizeSimple = Size;
+                }
+                Properties.Settings.Default.MergeFormatViewSimpleMaximized = WindowState == FormWindowState.Maximized;
+                
             }
             Properties.Settings.Default.Save();
 

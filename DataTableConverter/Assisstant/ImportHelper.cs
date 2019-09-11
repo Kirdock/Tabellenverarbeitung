@@ -588,8 +588,15 @@ namespace DataTableConverter.Assisstant
             bool newLine;
             for(;i < content.Length; ++i)
             {
-                if(EndOfMultiCell(content, i))
+                if(EndOfMultiCell(content, i, out bool isNotMultiCell))
                 {
+                    if (isNotMultiCell)
+                    {
+                        cell = new StringBuilder("\"").Append(cell);
+                        i--;
+                        string myString = content.Substring(i - (cell.Length + 10), cell.Length + 10);
+                        Console.WriteLine(myString);
+                    }
                     AddMultiCellColumn(header, multiCellCount, table, row, cell);
                     break;
                 }
@@ -603,7 +610,7 @@ namespace DataTableConverter.Assisstant
                     }
                     multiCellCount++;
                 }
-                else if (content[i] != '\"' || content[i-1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
+                else if (content[i] != '\"' || content[i-1] != '\"') //when there is a " in a multiCell, then Excel writes \"\"
                 {
                     cell.Append(content[i]);
                 }
@@ -621,10 +628,10 @@ namespace DataTableConverter.Assisstant
             text.Clear();
         }
 
-        private static bool EndOfMultiCell(string content, int i)
+        private static bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)
         {
             int nextIndex = i + 1;
-            return content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
+            return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
         }
 
         internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar)

@@ -70,22 +70,22 @@ namespace DataTableConverter.Classes.WorkProcs
                         string value = row.ItemArray[i].ToString();
                         switch (Option)
                         {
-                            //Alles Großbuchstaben
+                            //Everything upper case letters
                             case 0:
                                 value = value.ToUpper();
                                 break;
 
-                            //Alles Kleinbuchstaben
+                            //Everything lower case letters
                             case 1:
                                 value = value.ToLower();
                                 break;
 
-                            //Erster Buchstabe groß
+                            //First letter upper case
                             case 2:
                                 value = value.First().ToString().ToUpper() + value.Substring(1).ToLower();
                                 break;
 
-                            //Erste Buchstaben groß
+                            //First letters upper case
                             default:
                                 value = FirstLettersUpperCase(value);
                                 break;

@@ -35,7 +35,7 @@ namespace DataTableConverter.View.CustomControls
                     CheckBoxRenderer.DrawCheckBox(e.Graphics, new Point(e.Bounds.X + checkPad, e.Bounds.Y + checkPad), state);
                     using (StringFormat sf = new StringFormat { LineAlignment = StringAlignment.Center })
                     {
-                        using (Brush brush = new SolidBrush(contains ? Color.Gray : Color.Black))
+                        using (Brush brush = new SolidBrush(contains ? Properties.Settings.Default.SeparateColor : Color.Black))
                         {
                             e.Graphics.DrawString(text + $" (Anzahl: {item.Count})", Font, brush, new Rectangle(e.Bounds.Height, e.Bounds.Top, e.Bounds.Width - e.Bounds.Height, e.Bounds.Height), sf);
                         }

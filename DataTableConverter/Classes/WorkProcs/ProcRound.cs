@@ -57,32 +57,33 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
-            int lastCol = table.Columns.Count;
             string[] columns = GetHeaders();
-            bool intoNewCol = false;
 
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
                 table.CopyColumns(columns);
             }
-            if (!string.IsNullOrWhiteSpace(NewColumn))
-            {
-                table.TryAddColumn(NewColumn);
-                intoNewCol = true;
-            }
-            List<int> headerIndices = table.HeaderIndices(columns);
-            foreach (DataRow row in table.Rows)
-            {
-                for (int i = 0; i < row.ItemArray.Length; i++)
-                {
+            bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
+            string c = newCol && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+            bool intoNewCol = c != null;
+            
 
-                    if (columns == null || headerIndices.Contains(i))
+            if (!newCol || c != null)
+            {
+                int lastCol = table.Columns.IndexOf(NewColumn);
+                List<int> headerIndices = table.HeaderIndices(columns);
+                foreach (DataRow row in table.Rows)
+                {
+                    for (int i = 0; i < row.ItemArray.Length; i++)
                     {
-                        int index = intoNewCol ? lastCol : i;
-                        if (float.TryParse(row[i].ToString(), out float result))
+                        if (columns == null || headerIndices.Contains(i))
                         {
-                            row.SetField(index, Round(result));
+                            int index = intoNewCol ? lastCol : i;
+                            if (float.TryParse(row[i].ToString(), out float result))
+                            {
+                                row[index] = Round(result);
+                            }
                         }
                     }
                 }
