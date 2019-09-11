@@ -651,6 +651,13 @@ namespace DataTableConverter.Extensions
             if (table.Columns.Contains(column))
             {
                 inserted = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Es gibt bereits eine Spalte mit der Bezeichnung \"{column}\".\nSpalte überschreiben?") == DialogResult.Yes;
+                if (inserted)
+                {
+                    foreach(DataRow row in table.Rows)
+                    {
+                        row[column] = string.Empty;
+                    }
+                }
             }
             else
             {
