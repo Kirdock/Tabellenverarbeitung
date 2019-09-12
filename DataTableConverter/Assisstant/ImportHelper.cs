@@ -588,14 +588,16 @@ namespace DataTableConverter.Assisstant
             bool newLine;
             for(;i < content.Length; ++i)
             {
-                if(EndOfMultiCell(content, i, out bool isNotMultiCell))
+                if (EndOfMultiCell(content, i, out bool isNotMultiCell))
                 {
                     if (isNotMultiCell)
                     {
-                        cell = new StringBuilder("\"").Append(cell);
                         i--;
-                        string myString = content.Substring(i - (cell.Length + 10), cell.Length + 10);
-                        Console.WriteLine(myString);
+                        cell = new StringBuilder("\"").Append(cell);
+                    }
+                    else if(multiCellCount == 0)
+                    {
+                        cell = new StringBuilder("\"").Append(cell).Append('\"');
                     }
                     AddMultiCellColumn(header, multiCellCount, table, row, cell);
                     break;
@@ -610,7 +612,7 @@ namespace DataTableConverter.Assisstant
                     }
                     multiCellCount++;
                 }
-                else if (content[i] != '\"' || content[i-1] != '\"') //when there is a " in a multiCell, then Excel writes \"\"
+                else if (content[i] != '\"' || content[i-1] != '\"' || content[i + 1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
                 {
                     cell.Append(content[i]);
                 }

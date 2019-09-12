@@ -85,7 +85,7 @@ namespace DataTableConverter.View
 
         private void setEncodingCmb()
         {
-            cmbEncoding.DataSource = Encoding.GetEncodings();
+            cmbEncoding.DataSource = Encoding.GetEncodings().OrderBy(encoding => encoding.DisplayName, new NaturalStringComparer(SortOrder.Ascending)).ToArray();
 
             cmbEncoding.DisplayMember = "DisplayName";
             cmbEncoding.ValueMember = "CodePage";
