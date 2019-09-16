@@ -59,6 +59,16 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbCompare = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.lblCompareSecondColumn = new System.Windows.Forms.Label();
+            this.txtCompareSecondColumn = new System.Windows.Forms.TextBox();
+            this.lblCompareFirstColumn = new System.Windows.Forms.Label();
+            this.txtCompareSourceColumn = new System.Windows.Forms.TextBox();
+            this.cbCompareOldColumn = new System.Windows.Forms.CheckBox();
+            this.lblCompareNewColumn = new System.Windows.Forms.Label();
+            this.txtNewColumnCompare = new System.Windows.Forms.TextBox();
+            this.cbCompareNewColumn = new System.Windows.Forms.CheckBox();
             this.gbSeparate = new System.Windows.Forms.GroupBox();
             this.CbSeparateSaveAll = new System.Windows.Forms.CheckBox();
             this.CmBSeparateFormat = new System.Windows.Forms.ComboBox();
@@ -172,15 +182,6 @@
             this.dgvReplaceWhole = new System.Windows.Forms.DataGridView();
             this.cbHeadersReplaceWhole = new CheckComboBoxTest.CheckedComboBox();
             this.label26 = new System.Windows.Forms.Label();
-            this.gbCompare = new System.Windows.Forms.GroupBox();
-            this.lblCompareSecondColumn = new System.Windows.Forms.Label();
-            this.txtCompareSecondColumn = new System.Windows.Forms.TextBox();
-            this.lblCompareFirstColumn = new System.Windows.Forms.Label();
-            this.txtCompareSourceColumn = new System.Windows.Forms.TextBox();
-            this.cbCompareOldColumn = new System.Windows.Forms.CheckBox();
-            this.lblCompareNewColumn = new System.Windows.Forms.Label();
-            this.txtNewColumnCompare = new System.Windows.Forms.TextBox();
-            this.cbCompareNewColumn = new System.Windows.Forms.CheckBox();
             this.gbSubstring = new System.Windows.Forms.GroupBox();
             this.txtSubstringText = new System.Windows.Forms.TextBox();
             this.cbSubstringText = new System.Windows.Forms.CheckBox();
@@ -228,7 +229,6 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.label13 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -251,6 +251,7 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbCompare.SuspendLayout();
             this.gbSeparate.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).BeginInit();
             this.gbPVMExport.SuspendLayout();
@@ -281,7 +282,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvPadConditions)).BeginInit();
             this.gbReplaceWhole.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReplaceWhole)).BeginInit();
-            this.gbCompare.SuspendLayout();
             this.gbSubstring.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringEnd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringStart)).BeginInit();
@@ -541,9 +541,9 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCompare);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
@@ -722,6 +722,115 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // gbCompare
+            // 
+            this.gbCompare.Controls.Add(this.label13);
+            this.gbCompare.Controls.Add(this.lblCompareSecondColumn);
+            this.gbCompare.Controls.Add(this.txtCompareSecondColumn);
+            this.gbCompare.Controls.Add(this.lblCompareFirstColumn);
+            this.gbCompare.Controls.Add(this.txtCompareSourceColumn);
+            this.gbCompare.Controls.Add(this.cbCompareOldColumn);
+            this.gbCompare.Controls.Add(this.lblCompareNewColumn);
+            this.gbCompare.Controls.Add(this.txtNewColumnCompare);
+            this.gbCompare.Controls.Add(this.cbCompareNewColumn);
+            this.gbCompare.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbCompare.Location = new System.Drawing.Point(0, 92);
+            this.gbCompare.Name = "gbCompare";
+            this.gbCompare.Size = new System.Drawing.Size(282, 643);
+            this.gbCompare.TabIndex = 22;
+            this.gbCompare.TabStop = false;
+            this.gbCompare.Text = "Spaltenangabe";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(7, 213);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(263, 13);
+            this.label13.TabIndex = 15;
+            this.label13.Text = "Info: Werte in \"Erste Spalte\" werden dann leer gesetzt";
+            // 
+            // lblCompareSecondColumn
+            // 
+            this.lblCompareSecondColumn.AutoSize = true;
+            this.lblCompareSecondColumn.Location = new System.Drawing.Point(3, 150);
+            this.lblCompareSecondColumn.Name = "lblCompareSecondColumn";
+            this.lblCompareSecondColumn.Size = new System.Drawing.Size(75, 13);
+            this.lblCompareSecondColumn.TabIndex = 14;
+            this.lblCompareSecondColumn.Text = "Zweite Spalte:";
+            // 
+            // txtCompareSecondColumn
+            // 
+            this.txtCompareSecondColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCompareSecondColumn.Location = new System.Drawing.Point(5, 168);
+            this.txtCompareSecondColumn.Name = "txtCompareSecondColumn";
+            this.txtCompareSecondColumn.Size = new System.Drawing.Size(271, 20);
+            this.txtCompareSecondColumn.TabIndex = 13;
+            this.txtCompareSecondColumn.TextChanged += new System.EventHandler(this.txtCompareSecondColumn_TextChanged);
+            // 
+            // lblCompareFirstColumn
+            // 
+            this.lblCompareFirstColumn.AutoSize = true;
+            this.lblCompareFirstColumn.Location = new System.Drawing.Point(3, 103);
+            this.lblCompareFirstColumn.Name = "lblCompareFirstColumn";
+            this.lblCompareFirstColumn.Size = new System.Drawing.Size(67, 13);
+            this.lblCompareFirstColumn.TabIndex = 12;
+            this.lblCompareFirstColumn.Text = "Erste Spalte:";
+            // 
+            // txtCompareSourceColumn
+            // 
+            this.txtCompareSourceColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCompareSourceColumn.Location = new System.Drawing.Point(5, 123);
+            this.txtCompareSourceColumn.Name = "txtCompareSourceColumn";
+            this.txtCompareSourceColumn.Size = new System.Drawing.Size(271, 20);
+            this.txtCompareSourceColumn.TabIndex = 11;
+            this.txtCompareSourceColumn.TextChanged += new System.EventHandler(this.txtCompareSourceColumn_TextChanged);
+            // 
+            // cbCompareOldColumn
+            // 
+            this.cbCompareOldColumn.AutoSize = true;
+            this.cbCompareOldColumn.Location = new System.Drawing.Point(7, 47);
+            this.cbCompareOldColumn.Name = "cbCompareOldColumn";
+            this.cbCompareOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbCompareOldColumn.TabIndex = 10;
+            this.cbCompareOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbCompareOldColumn.UseVisualStyleBackColor = true;
+            this.cbCompareOldColumn.CheckedChanged += new System.EventHandler(this.cbCompareOldColumn_CheckedChanged);
+            // 
+            // lblCompareNewColumn
+            // 
+            this.lblCompareNewColumn.AutoSize = true;
+            this.lblCompareNewColumn.Location = new System.Drawing.Point(3, 35);
+            this.lblCompareNewColumn.Name = "lblCompareNewColumn";
+            this.lblCompareNewColumn.Size = new System.Drawing.Size(89, 13);
+            this.lblCompareNewColumn.TabIndex = 7;
+            this.lblCompareNewColumn.Text = "Name der Spalte:";
+            this.lblCompareNewColumn.Visible = false;
+            // 
+            // txtNewColumnCompare
+            // 
+            this.txtNewColumnCompare.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtNewColumnCompare.Location = new System.Drawing.Point(6, 52);
+            this.txtNewColumnCompare.Name = "txtNewColumnCompare";
+            this.txtNewColumnCompare.Size = new System.Drawing.Size(270, 20);
+            this.txtNewColumnCompare.TabIndex = 2;
+            this.txtNewColumnCompare.Visible = false;
+            this.txtNewColumnCompare.TextChanged += new System.EventHandler(this.txtNewColumnCompare_TextChanged);
+            // 
+            // cbCompareNewColumn
+            // 
+            this.cbCompareNewColumn.AutoSize = true;
+            this.cbCompareNewColumn.Location = new System.Drawing.Point(6, 19);
+            this.cbCompareNewColumn.Name = "cbCompareNewColumn";
+            this.cbCompareNewColumn.Size = new System.Drawing.Size(193, 17);
+            this.cbCompareNewColumn.TabIndex = 1;
+            this.cbCompareNewColumn.Text = "Ergebnis in neue Spalte schreiben?";
+            this.cbCompareNewColumn.UseVisualStyleBackColor = true;
+            this.cbCompareNewColumn.CheckedChanged += new System.EventHandler(this.cbCompareNewColumn_CheckedChanged);
             // 
             // gbSeparate
             // 
@@ -906,6 +1015,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TxtPVMPath.Location = new System.Drawing.Point(7, 95);
             this.TxtPVMPath.Name = "TxtPVMPath";
+            this.TxtPVMPath.ReadOnly = true;
             this.TxtPVMPath.Size = new System.Drawing.Size(183, 20);
             this.TxtPVMPath.TabIndex = 20;
             // 
@@ -2107,106 +2217,6 @@
             this.label26.TabIndex = 5;
             this.label26.Text = "Spalten aus geladener Tabelle hinzufügen:";
             // 
-            // gbCompare
-            // 
-            this.gbCompare.Controls.Add(this.label13);
-            this.gbCompare.Controls.Add(this.lblCompareSecondColumn);
-            this.gbCompare.Controls.Add(this.txtCompareSecondColumn);
-            this.gbCompare.Controls.Add(this.lblCompareFirstColumn);
-            this.gbCompare.Controls.Add(this.txtCompareSourceColumn);
-            this.gbCompare.Controls.Add(this.cbCompareOldColumn);
-            this.gbCompare.Controls.Add(this.lblCompareNewColumn);
-            this.gbCompare.Controls.Add(this.txtNewColumnCompare);
-            this.gbCompare.Controls.Add(this.cbCompareNewColumn);
-            this.gbCompare.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbCompare.Location = new System.Drawing.Point(0, 92);
-            this.gbCompare.Name = "gbCompare";
-            this.gbCompare.Size = new System.Drawing.Size(282, 643);
-            this.gbCompare.TabIndex = 22;
-            this.gbCompare.TabStop = false;
-            this.gbCompare.Text = "Spaltenangabe";
-            // 
-            // lblCompareSecondColumn
-            // 
-            this.lblCompareSecondColumn.AutoSize = true;
-            this.lblCompareSecondColumn.Location = new System.Drawing.Point(3, 150);
-            this.lblCompareSecondColumn.Name = "lblCompareSecondColumn";
-            this.lblCompareSecondColumn.Size = new System.Drawing.Size(75, 13);
-            this.lblCompareSecondColumn.TabIndex = 14;
-            this.lblCompareSecondColumn.Text = "Zweite Spalte:";
-            // 
-            // txtCompareSecondColumn
-            // 
-            this.txtCompareSecondColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCompareSecondColumn.Location = new System.Drawing.Point(5, 168);
-            this.txtCompareSecondColumn.Name = "txtCompareSecondColumn";
-            this.txtCompareSecondColumn.Size = new System.Drawing.Size(271, 20);
-            this.txtCompareSecondColumn.TabIndex = 13;
-            this.txtCompareSecondColumn.TextChanged += new System.EventHandler(this.txtCompareSecondColumn_TextChanged);
-            // 
-            // lblCompareFirstColumn
-            // 
-            this.lblCompareFirstColumn.AutoSize = true;
-            this.lblCompareFirstColumn.Location = new System.Drawing.Point(3, 103);
-            this.lblCompareFirstColumn.Name = "lblCompareFirstColumn";
-            this.lblCompareFirstColumn.Size = new System.Drawing.Size(67, 13);
-            this.lblCompareFirstColumn.TabIndex = 12;
-            this.lblCompareFirstColumn.Text = "Erste Spalte:";
-            // 
-            // txtCompareSourceColumn
-            // 
-            this.txtCompareSourceColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCompareSourceColumn.Location = new System.Drawing.Point(5, 123);
-            this.txtCompareSourceColumn.Name = "txtCompareSourceColumn";
-            this.txtCompareSourceColumn.Size = new System.Drawing.Size(271, 20);
-            this.txtCompareSourceColumn.TabIndex = 11;
-            this.txtCompareSourceColumn.TextChanged += new System.EventHandler(this.txtCompareSourceColumn_TextChanged);
-            // 
-            // cbCompareOldColumn
-            // 
-            this.cbCompareOldColumn.AutoSize = true;
-            this.cbCompareOldColumn.Location = new System.Drawing.Point(7, 47);
-            this.cbCompareOldColumn.Name = "cbCompareOldColumn";
-            this.cbCompareOldColumn.Size = new System.Drawing.Size(165, 17);
-            this.cbCompareOldColumn.TabIndex = 10;
-            this.cbCompareOldColumn.Text = "Alte Werte in ALT speichern?";
-            this.cbCompareOldColumn.UseVisualStyleBackColor = true;
-            this.cbCompareOldColumn.CheckedChanged += new System.EventHandler(this.cbCompareOldColumn_CheckedChanged);
-            // 
-            // lblCompareNewColumn
-            // 
-            this.lblCompareNewColumn.AutoSize = true;
-            this.lblCompareNewColumn.Location = new System.Drawing.Point(3, 35);
-            this.lblCompareNewColumn.Name = "lblCompareNewColumn";
-            this.lblCompareNewColumn.Size = new System.Drawing.Size(89, 13);
-            this.lblCompareNewColumn.TabIndex = 7;
-            this.lblCompareNewColumn.Text = "Name der Spalte:";
-            this.lblCompareNewColumn.Visible = false;
-            // 
-            // txtNewColumnCompare
-            // 
-            this.txtNewColumnCompare.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtNewColumnCompare.Location = new System.Drawing.Point(6, 52);
-            this.txtNewColumnCompare.Name = "txtNewColumnCompare";
-            this.txtNewColumnCompare.Size = new System.Drawing.Size(270, 20);
-            this.txtNewColumnCompare.TabIndex = 2;
-            this.txtNewColumnCompare.Visible = false;
-            this.txtNewColumnCompare.TextChanged += new System.EventHandler(this.txtNewColumnCompare_TextChanged);
-            // 
-            // cbCompareNewColumn
-            // 
-            this.cbCompareNewColumn.AutoSize = true;
-            this.cbCompareNewColumn.Location = new System.Drawing.Point(6, 19);
-            this.cbCompareNewColumn.Name = "cbCompareNewColumn";
-            this.cbCompareNewColumn.Size = new System.Drawing.Size(193, 17);
-            this.cbCompareNewColumn.TabIndex = 1;
-            this.cbCompareNewColumn.Text = "Ergebnis in neue Spalte schreiben?";
-            this.cbCompareNewColumn.UseVisualStyleBackColor = true;
-            this.cbCompareNewColumn.CheckedChanged += new System.EventHandler(this.cbCompareNewColumn_CheckedChanged);
-            // 
             // gbSubstring
             // 
             this.gbSubstring.Controls.Add(this.txtSubstringText);
@@ -2786,15 +2796,6 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(7, 213);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(263, 13);
-            this.label13.TabIndex = 15;
-            this.label13.Text = "Info: Werte in \"Erste Spalte\" werden dann leer gesetzt";
-            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2832,6 +2833,8 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbCompare.ResumeLayout(false);
+            this.gbCompare.PerformLayout();
             this.gbSeparate.ResumeLayout(false);
             this.gbSeparate.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).EndInit();
@@ -2875,8 +2878,6 @@
             this.gbReplaceWhole.ResumeLayout(false);
             this.gbReplaceWhole.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReplaceWhole)).EndInit();
-            this.gbCompare.ResumeLayout(false);
-            this.gbCompare.PerformLayout();
             this.gbSubstring.ResumeLayout(false);
             this.gbSubstring.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringEnd)).EndInit();

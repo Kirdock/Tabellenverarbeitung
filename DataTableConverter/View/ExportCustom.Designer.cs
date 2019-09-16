@@ -42,6 +42,8 @@
             this.BtnAdd = new System.Windows.Forms.Button();
             this.BtnRename = new System.Windows.Forms.Button();
             this.clbValues = new DataTableConverter.View.CustomControls.CountListbox();
+            this.BtnCheckAll = new System.Windows.Forms.Button();
+            this.BtnUncheckAll = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // cmbColumn
@@ -191,11 +193,33 @@
             this.clbValues.TabIndex = 14;
             this.clbValues.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbValues_ItemCheck);
             // 
+            // BtnCheckAll
+            // 
+            this.BtnCheckAll.Location = new System.Drawing.Point(198, 149);
+            this.BtnCheckAll.Name = "BtnCheckAll";
+            this.BtnCheckAll.Size = new System.Drawing.Size(108, 23);
+            this.BtnCheckAll.TabIndex = 20;
+            this.BtnCheckAll.Text = "Alles auswählen";
+            this.BtnCheckAll.UseVisualStyleBackColor = true;
+            this.BtnCheckAll.Click += new System.EventHandler(this.BtnCheckAll_Click);
+            // 
+            // BtnUncheckAll
+            // 
+            this.BtnUncheckAll.Location = new System.Drawing.Point(321, 147);
+            this.BtnUncheckAll.Name = "BtnUncheckAll";
+            this.BtnUncheckAll.Size = new System.Drawing.Size(108, 23);
+            this.BtnUncheckAll.TabIndex = 21;
+            this.BtnUncheckAll.Text = "Alles abwählen";
+            this.BtnUncheckAll.UseVisualStyleBackColor = true;
+            this.BtnUncheckAll.Click += new System.EventHandler(this.BtnUncheckAll_Click);
+            // 
             // ExportCustom
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(441, 461);
+            this.Controls.Add(this.BtnUncheckAll);
+            this.Controls.Add(this.BtnCheckAll);
             this.Controls.Add(this.BtnRename);
             this.Controls.Add(this.CmBFormat);
             this.Controls.Add(this.BtnAdd);
@@ -235,5 +259,7 @@
         private System.Windows.Forms.Button BtnAdd;
         private System.Windows.Forms.ComboBox CmBFileNames;
         private System.Windows.Forms.Button BtnRename;
+        private System.Windows.Forms.Button BtnCheckAll;
+        private System.Windows.Forms.Button BtnUncheckAll;
     }
 }

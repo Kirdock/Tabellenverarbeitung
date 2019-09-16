@@ -45,7 +45,9 @@ namespace DataTableConverter.View
                 CmBFormat,
                 clbValues,
                 CbSaveAll,
-                CmBFileNames
+                CmBFileNames,
+                BtnCheckAll,
+                BtnUncheckAll
             };
 
             foreach(Control control in controls)
@@ -90,12 +92,12 @@ namespace DataTableConverter.View
                     CacheDataTableGroupCount.Add(identifier, pair);
                 }
                 clbValues.BeginUpdate();
-                foreach (string key in pair.Keys)
+                foreach (string key in pair.Keys.OrderBy(key => key,new NaturalStringComparer(SortOrder.Ascending)))
                 {
                     clbValues.Items.Add(new CountListboxItem(pair[key], key));
                 }
                 clbValues.EndUpdate();
-                SetValues();
+                SetValues(false);
                 SetSumCount();
             }
         }
@@ -158,7 +160,7 @@ namespace DataTableConverter.View
                 else
                 {
                     var item = new ExportCustomItem(newText, cmbColumn.Items[0].ToString());
-                    SetValues(item);
+                    SetValues(false, item);
                     int index = CmBFileNames.Items.Count;
                     CmBFileNames.Items.Add(item);
                     CmBFileNames.SelectedIndex = index;
@@ -168,10 +170,10 @@ namespace DataTableConverter.View
             }
         }
 
-        private void SetValues(ExportCustomItem i = null)
+        private void SetValues(bool status, ExportCustomItem i = null)
         {
             ExportCustomItem item = i ?? SelectedItem;
-            item.SetValues(clbValues.Items.Cast<CountListboxItem>().Select(x => x.ToString()));
+            item.SetValues(clbValues.Items.Cast<CountListboxItem>().Select(x => x.ToString()), status);
         }
 
         private void CmBFormat_SelectedIndexChanged(object sender, EventArgs e)
@@ -198,6 +200,18 @@ namespace DataTableConverter.View
                     }
                 }
             }
+        }
+
+        private void BtnCheckAll_Click(object sender, EventArgs e)
+        {
+            SetValues(true);
+            CmBFileNames_SelectedIndexChanged(null, null);
+        }
+
+        private void BtnUncheckAll_Click(object sender, EventArgs e)
+        {
+            SetValues(false);
+            CmBFileNames_SelectedIndexChanged(null, null);
         }
     }
 }

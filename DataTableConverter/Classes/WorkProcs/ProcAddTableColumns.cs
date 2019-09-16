@@ -115,7 +115,7 @@ namespace DataTableConverter.Classes.WorkProcs
                         newOrderIndices = newIndices;
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            table.SplitDataTable(path, invalidColumnName);
+                            table.SplitDataTable(filePath, invalidColumnName);
                         }
                     }
                 }

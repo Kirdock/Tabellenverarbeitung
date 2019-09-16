@@ -609,5 +609,17 @@ namespace DataTableConverter.Properties {
                 this["MergeFormatViewSimpleMaximized"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CountSelectedType {
+            get {
+                return ((int)(this["CountSelectedType"]));
+            }
+            set {
+                this["CountSelectedType"] = value;
+            }
+        }
     }
 }

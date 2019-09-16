@@ -22,12 +22,12 @@ namespace DataTableConverter.Classes
             Values = new Dictionary<string, bool>();
         }
 
-        internal void SetValues(IEnumerable<string> allValues)
+        internal void SetValues(IEnumerable<string> allValues, bool status)
         {
             Values.Clear();
             foreach (string value in allValues)
             {
-                Values.Add(value, false);
+                Values.Add(value, status);
             }
         }
 

@@ -1131,7 +1131,7 @@ namespace DataTableConverter
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCount export = new ExportCount(sourceTable.HeadersOfDataTable());
+            ExportCount export = new ExportCount(sourceTable.HeadersOfDataTable(), sourceTable);
             
             if(export.ShowDialog() == DialogResult.OK)
             {
@@ -1148,6 +1148,7 @@ namespace DataTableConverter
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
             }
+            export.Dispose();
         }
 
 
