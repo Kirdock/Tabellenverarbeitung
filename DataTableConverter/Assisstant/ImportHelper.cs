@@ -409,13 +409,9 @@ namespace DataTableConverter.Assisstant
                         continue;
                     }
 
-                    Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[1, 1];
-                    Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rows, cols];
-                    Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
-
                     progressBar?.StartLoadingBar(rows);
 
-                    RangeToDataTable(range, data, fileNameColumn ? path + "; " + sheetName : null, progressBar);
+                    RangeToDataTable(objSHT, objXL, rows, cols, data, fileNameColumn ? path + "; " + sheetName : null, progressBar);
                     Marshal.ReleaseComObject(objSHT);
                 }
                 if (fileNameColumn)
@@ -453,26 +449,50 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Range range, DataTable table, string fileName, ProgressBar progressBar)
+        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, DataTable table, string fileName, ProgressBar progressBar)
         {
+            List<string> headers = SetHeaderOfExcel(table, objSHT, cols);
+            Clipboard.Clear();
+            objXL.CutCopyMode = 0;
+            int rowRange = 3000;
+            for(int i = 2; i < rows; i++)
+            {
+                Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[i, 1];
+                int rowCount = i + rowRange;
+                Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rowCount > rows ? rows : rowCount, cols];
+                Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
+                range.Copy();
+                IDataObject data = Clipboard.GetDataObject();
+                string content = (string)data.GetData(DataFormats.UnicodeText);
+                GetDataOfString(content, table, fileName, headers,progressBar);
+                objXL.CutCopyMode = 0;
+                Clipboard.Clear();
+                i = rowCount;
+            }
+        }
+
+        private static List<string> SetHeaderOfExcel(DataTable table, Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols)
+        {
+            Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[1, 1];
+            Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[1, cols];
+            Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
             range.Copy();
             IDataObject data = Clipboard.GetDataObject();
             string content = (string)data.GetData(DataFormats.UnicodeText);
-            GetDataOfString(content, table, fileName, progressBar);
-            Clipboard.Clear();
+            return GetHeadersOfContent(content, table);
         }
 
-        private static void GetDataOfString(string content, DataTable table, string fileName, ProgressBar progressBar)
+        private static void GetDataOfString(string content, DataTable table, string fileName, List<string> headers, ProgressBar progressBar)
         {
             int maxLength = content.Length;
             StringBuilder cellBuilder = new StringBuilder();
             Dictionary<string,string> cells = new Dictionary<string, string>();
-            List<string> headers = GetHeadersOfContent(content, table, out int i);
+            
             int headerCounter = 0;
             DataRow row = table.NewRow();
             bool generatedMulti = false;
             
-            for (; i < maxLength; i++)
+            for (int i = 0; i < maxLength; i++)
             {
                 if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
                 {
@@ -544,17 +564,15 @@ namespace DataTableConverter.Assisstant
             builder.Clear();
         }
 
-        private static List<string> GetHeadersOfContent(string content, DataTable table, out int i)
+        private static List<string> GetHeadersOfContent(string content, DataTable table)
         {
             List<string> headers = new List<string>();
             StringBuilder header = new StringBuilder();
-            for(i=0; i < content.Length; i++)
+            for(int i=0; i < content.Length; i++)
             {
                 if(content[i] == '\r' && content[i+1] == '\n')
                 {
                     AddHeaderOfContent(table, headers, header);
-                    
-                    i += 2;
                     break;
                 }
                 else if(content[i] == '\t')
@@ -586,16 +604,20 @@ namespace DataTableConverter.Assisstant
             int multiCellCount = 0;
             StringBuilder cell = new StringBuilder();
             bool newLine;
-            for(;i < content.Length; ++i)
+            bool isSpecialField = IsSpecialField(content, i);
+            for (;i < content.Length; ++i)
             {
-                if (EndOfMultiCell(content, i, out bool isNotMultiCell))
+                if (EndOfMultiCell(content, i, out bool isNotMultiCell, isSpecialField))
                 {
                     if (isNotMultiCell)
                     {
-                        i--;
-                        cell = new StringBuilder("\"").Append(cell);
+                        if (!isSpecialField)
+                        {
+                            i--;
+                            cell = new StringBuilder("\"").Append(cell);
+                        }
                     }
-                    else if(multiCellCount == 0)
+                    else if(multiCellCount == 0 && !isSpecialField)
                     {
                         cell = new StringBuilder("\"").Append(cell).Append('\"');
                     }
@@ -612,7 +634,7 @@ namespace DataTableConverter.Assisstant
                     }
                     multiCellCount++;
                 }
-                else if (content[i] != '\"' || content[i-1] != '\"' || content[i + 1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
+                else if (content[i] != '\t' && (content[i] != '\"' || content[i-1] != '\"' || content[i + 1] == '\"')) //when there is a " in a multiCell, then Excel writes \"\"
                 {
                     cell.Append(content[i]);
                 }
@@ -630,10 +652,29 @@ namespace DataTableConverter.Assisstant
             text.Clear();
         }
 
-        private static bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)
+        private static bool EndOfMultiCell(string content, int i, out bool isNotMultiCell, bool isSpecialField)
         {
             int nextIndex = i + 1;
-            return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
+            return (isNotMultiCell = content[i] == '\t') && !isSpecialField || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
+        }
+
+        private static bool IsSpecialField(string content, int i)
+        {
+            bool status = false;
+            for(; i < content.Length; i++)
+            {
+                if(content[i] == '\r')
+                {
+                    status = false;
+                    break;
+                }
+                else if(content[i] == '\"' && content[i+1] == '\t')
+                {
+                    status = true;
+                    break;
+                }
+            }
+            return status;
         }
 
         internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar)
