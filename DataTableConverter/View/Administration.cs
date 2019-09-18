@@ -485,9 +485,13 @@ namespace DataTableConverter.View
 
         private void ResetForm()
         {
+            txtName.TextChanged -= txtName_TextChanged;
             txtName.Text = string.Empty;
+            txtName.TextChanged += txtName_TextChanged;
             dgvReplaces.DataSource = null;
+            cbCheckTotal.CheckedChanged -= cbCheckTotal_CheckedChanged;
             cbCheckTotal.Checked = false;
+            cbCheckTotal.CheckedChanged += cbCheckTotal_CheckedChanged;
         }
 
 
