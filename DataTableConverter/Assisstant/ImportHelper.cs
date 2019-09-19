@@ -303,6 +303,7 @@ namespace DataTableConverter.Assisstant
             con.Open();
             OleDbDataAdapter da = new OleDbDataAdapter(cmd);
             da.Fill(data);
+            da.Dispose();
             return data.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? data : data.SetColumnsTypeStringWithContainingData();
         }
 
@@ -364,8 +365,10 @@ namespace DataTableConverter.Assisstant
 
             try
             {
-                objXL = new Microsoft.Office.Interop.Excel.Application();
-
+                objXL = new Microsoft.Office.Interop.Excel.Application
+                {
+                    DisplayAlerts = false
+                };
                 bool hasPassword = false;
                 string password = string.Empty;
                 do
@@ -421,21 +424,27 @@ namespace DataTableConverter.Assisstant
                 {
                     data.Columns[Extensions.DataTableExtensions.FileName].SetOrdinal(data.Columns.Count - 1);
                 }
-                objXL.CutCopyMode = 0;
-                objWB.Close(false);
-                objXL.Quit();
-                Marshal.ReleaseComObject(objWB);
-                Marshal.ReleaseComObject(objXL);
-                Marshal.FinalReleaseComObject(objXL);
             }
             catch (Exception ex)
             {
-                objWB?.Close();
-                objXL?.Quit();
                 ErrorHelper.LogMessage(ex);
             }
             finally
             {
+                if (objWB != null)
+                {
+                    objWB.Close(false);
+                    Marshal.ReleaseComObject(objWB);
+                }
+                if (objXL != null)
+                {
+                    objXL.DisplayAlerts = true;
+                    objXL.CutCopyMode = 0;
+                    objXL.Quit();
+                    Marshal.ReleaseComObject(objXL);
+                    Marshal.FinalReleaseComObject(objXL);
+                }
+
                 if (!string.IsNullOrEmpty(clipboardBefore))
                 {
                     //idk why but the Clipboard text is not set when I do it immediately
