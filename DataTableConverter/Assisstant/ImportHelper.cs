@@ -457,7 +457,7 @@ namespace DataTableConverter.Assisstant
             List<string> headers = SetHeaderOfExcel(table, objSHT, cols);
             Clipboard.Clear();
             objXL.CutCopyMode = 0;
-            int rowRange = 3000;
+            int rowRange = 50000;
             for(int i = 2; i <= rows; i++)
             {
                 Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[i, 1];
