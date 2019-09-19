@@ -422,7 +422,7 @@ namespace DataTableConverter.Assisstant
                     data.Columns[Extensions.DataTableExtensions.FileName].SetOrdinal(data.Columns.Count - 1);
                 }
                 objXL.CutCopyMode = 0;
-                objWB.Close();
+                objWB.Close(false);
                 objXL.Quit();
                 Marshal.ReleaseComObject(objWB);
                 Marshal.ReleaseComObject(objXL);
@@ -448,7 +448,6 @@ namespace DataTableConverter.Assisstant
                     thread.Start();
                 }
             }
-
             return data;
         }
 
@@ -468,8 +467,6 @@ namespace DataTableConverter.Assisstant
                 IDataObject data = Clipboard.GetDataObject();
                 string content = (string)data.GetData(DataFormats.UnicodeText);
                 GetDataOfString(content, table, fileName, headers,progressBar);
-                objXL.CutCopyMode = 0;
-                Clipboard.Clear();
                 i = rowCount;
             }
         }
