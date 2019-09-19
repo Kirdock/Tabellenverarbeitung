@@ -395,6 +395,9 @@ namespace DataTableConverter.Assisstant
                 {
                     data.Columns.Add(Extensions.DataTableExtensions.FileName, typeof(string));
                 }
+
+                RemoveTabsInCellsOfExcel(objXL);
+
                 foreach (string sheetName in selectedSheets)
                 {
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
@@ -469,6 +472,13 @@ namespace DataTableConverter.Assisstant
                 Clipboard.Clear();
                 i = rowCount;
             }
+        }
+
+        private static void RemoveTabsInCellsOfExcel(Microsoft.Office.Interop.Excel.Application objXL)
+        {
+            objXL.Cells.Replace(What: "\t", Replacement: string.Empty, LookAt: Microsoft.Office.Interop.Excel.XlLookAt.xlPart,
+                    SearchOrder: Microsoft.Office.Interop.Excel.XlSearchOrder.xlByRows
+                    , MatchCase: false, SearchFormat: false, ReplaceFormat: false);
         }
 
         private static List<string> SetHeaderOfExcel(DataTable table, Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols)
@@ -604,20 +614,16 @@ namespace DataTableConverter.Assisstant
             int multiCellCount = 0;
             StringBuilder cell = new StringBuilder();
             bool newLine;
-            bool isSpecialField = IsSpecialField(content, i);
             for (;i < content.Length; ++i)
             {
-                if (EndOfMultiCell(content, i, out bool isNotMultiCell, isSpecialField))
+                if (EndOfMultiCell(content, i, out bool isNotMultiCell))
                 {
                     if (isNotMultiCell)
                     {
-                        if (!isSpecialField)
-                        {
-                            i--;
-                            cell = new StringBuilder("\"").Append(cell);
-                        }
+                        i--;
+                        cell = new StringBuilder("\"").Append(cell);
                     }
-                    else if(multiCellCount == 0 && !isSpecialField)
+                    else if(multiCellCount == 0)
                     {
                         cell = new StringBuilder("\"").Append(cell).Append('\"');
                     }
@@ -634,7 +640,7 @@ namespace DataTableConverter.Assisstant
                     }
                     multiCellCount++;
                 }
-                else if (content[i] != '\t' && (content[i] != '\"' || content[i-1] != '\"' || content[i + 1] == '\"')) //when there is a " in a multiCell, then Excel writes \"\"
+                else if (content[i] != '\"' || content[i-1] != '\"' || content[i + 1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
                 {
                     cell.Append(content[i]);
                 }
@@ -652,29 +658,10 @@ namespace DataTableConverter.Assisstant
             text.Clear();
         }
 
-        private static bool EndOfMultiCell(string content, int i, out bool isNotMultiCell, bool isSpecialField)
+        private static bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)
         {
             int nextIndex = i + 1;
-            return (isNotMultiCell = content[i] == '\t') && !isSpecialField || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
-        }
-
-        private static bool IsSpecialField(string content, int i)
-        {
-            bool status = false;
-            for(; i < content.Length; i++)
-            {
-                if(content[i] == '\r')
-                {
-                    status = false;
-                    break;
-                }
-                else if(content[i] == '\"' && content[i+1] == '\t')
-                {
-                    status = true;
-                    break;
-                }
-            }
-            return status;
+            return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
         }
 
         internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar)
