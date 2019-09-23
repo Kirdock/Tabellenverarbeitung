@@ -91,7 +91,7 @@ namespace DataTableConverter.Assisstant
                 table.RemoveEmptyRows();
                 table.RemoveNull();
                 table.Trim();
-            }            
+            }
             return table;
         }
 

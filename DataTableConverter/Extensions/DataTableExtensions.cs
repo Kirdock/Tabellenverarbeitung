@@ -43,7 +43,7 @@ namespace DataTableConverter.Extensions
         {
             ProcTrim proc = new ProcTrim();
             string order = string.Empty;
-            proc.doWork(table, ref order, null, null, null, null, null, OrderType.Windows, null, out int[] newIndices);
+            proc.doWork(table, ref order, null, null, null, null, null, OrderType.Windows, null, out int[] _);
         }
 
         internal static string[] HeadersOfDataTableAsString(this DataTable table)

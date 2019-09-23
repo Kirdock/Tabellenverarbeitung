@@ -60,6 +60,10 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
+            if (Characters.Contains(" "))
+            {
+                Characters += (char)160;
+            }
             char[] charArray = Characters.ToCharArray();
 
             if (DeleteDouble)
