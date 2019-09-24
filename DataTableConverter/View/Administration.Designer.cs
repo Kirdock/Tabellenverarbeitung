@@ -42,6 +42,7 @@
             this.txtName = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitWorkflow = new System.Windows.Forms.SplitContainer();
+            this.BtnImportWorkflow = new System.Windows.Forms.Button();
             this.lbWorkflows = new System.Windows.Forms.ListBox();
             this.button2 = new System.Windows.Forms.Button();
             this.btnDeleteWorkflow = new System.Windows.Forms.Button();
@@ -229,7 +230,6 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.BtnImportWorkflow = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -489,6 +489,16 @@
             this.splitWorkflow.SplitterDistance = 277;
             this.splitWorkflow.TabIndex = 18;
             // 
+            // BtnImportWorkflow
+            // 
+            this.BtnImportWorkflow.Location = new System.Drawing.Point(91, 7);
+            this.BtnImportWorkflow.Name = "BtnImportWorkflow";
+            this.BtnImportWorkflow.Size = new System.Drawing.Size(86, 23);
+            this.BtnImportWorkflow.TabIndex = 12;
+            this.BtnImportWorkflow.Text = "Importieren";
+            this.BtnImportWorkflow.UseVisualStyleBackColor = true;
+            this.BtnImportWorkflow.Click += new System.EventHandler(this.BtnImportWorkflow_Click);
+            // 
             // lbWorkflows
             // 
             this.lbWorkflows.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -543,9 +553,9 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCompare);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
@@ -2797,16 +2807,6 @@
             this.BtnDiscard.Text = "Verwerfen";
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
-            // 
-            // BtnImportWorkflow
-            // 
-            this.BtnImportWorkflow.Location = new System.Drawing.Point(91, 7);
-            this.BtnImportWorkflow.Name = "BtnImportWorkflow";
-            this.BtnImportWorkflow.Size = new System.Drawing.Size(86, 23);
-            this.BtnImportWorkflow.TabIndex = 12;
-            this.BtnImportWorkflow.Text = "Importieren";
-            this.BtnImportWorkflow.UseVisualStyleBackColor = true;
-            this.BtnImportWorkflow.Click += new System.EventHandler(this.BtnImportWorkflow_Click);
             // 
             // Administration
             // 

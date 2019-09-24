@@ -1987,6 +1987,7 @@ namespace DataTableConverter.View
                     CmBSeparate.SelectedIndex = index;
                     CmBSeparateFormat.SelectedIndex = 0;
                     SetSeparateEnabled();
+                    CmBSeparate_SelectedIndexChanged(null, null);
                 }
             }
         }

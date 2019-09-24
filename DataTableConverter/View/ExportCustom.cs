@@ -15,6 +15,7 @@ namespace DataTableConverter.View
 {
     public partial class ExportCustom : Form
     {
+        internal IEnumerable<ExportCustomItem> SelectedColumnItems => CmBFileNames.Items.Cast<ExportCustomItem>().Where(item => item.Column == cmbColumn.SelectedItem.ToString());
         internal IEnumerable<ExportCustomItem> Items => CmBFileNames.Items.Cast<ExportCustomItem>();
         private readonly DataTable Table;
         private Dictionary<string, Dictionary<string, int>> CacheDataTableGroupCount;
@@ -22,7 +23,7 @@ namespace DataTableConverter.View
         internal ExportCustom(object[] headers, DataTable table)
         {
             InitializeComponent();
-            clbValues.Dict = Items;
+            clbValues.Dict = SelectedColumnItems;
             CacheDataTableGroupCount = new Dictionary<string, Dictionary<string, int>>();
             SetListBoxStyle();
             Table = table;
@@ -75,31 +76,36 @@ namespace DataTableConverter.View
 
         private void cmbColumn_SelectedIndexChanged(object sender, EventArgs e)
         {
-            clbValues.Items.Clear();
             if (CmBFileNames.SelectedIndex > -1)
             {
-                SelectedItem.Column = (sender as ComboBox).SelectedItem.ToString();
-                string identifier = cmbColumn.SelectedItem.ToString();
-
-                Dictionary<string, int> pair;
-                if (CacheDataTableGroupCount.ContainsKey(identifier))
-                {
-                    pair = CacheDataTableGroupCount[identifier];
-                }
-                else
-                {
-                    pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
-                    CacheDataTableGroupCount.Add(identifier, pair);
-                }
-                clbValues.BeginUpdate();
-                foreach (string key in pair.Keys.OrderBy(key => key,new NaturalStringComparer(SortOrder.Ascending)))
-                {
-                    clbValues.Items.Add(new CountListboxItem(pair[key], key));
-                }
-                clbValues.EndUpdate();
+                SelectedItem.Column = cmbColumn.SelectedItem.ToString();
+                SetListValues();
                 SetValues(false);
                 SetSumCount();
             }
+        }
+
+        private void SetListValues()
+        {
+            string identifier = cmbColumn.SelectedItem.ToString();
+
+            Dictionary<string, int> pair;
+            if (CacheDataTableGroupCount.ContainsKey(identifier))
+            {
+                pair = CacheDataTableGroupCount[identifier];
+            }
+            else
+            {
+                pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
+                CacheDataTableGroupCount.Add(identifier, pair);
+            }
+            clbValues.BeginUpdate();
+            clbValues.Items.Clear();
+            foreach (string key in pair.Keys.OrderBy(key => key, new NaturalStringComparer(SortOrder.Ascending)))
+            {
+                clbValues.Items.Add(new CountListboxItem(pair[key], key));
+            }
+            clbValues.EndUpdate();
         }
 
         private void btnDeleteFile_Click(object sender, EventArgs e)
@@ -142,18 +148,21 @@ namespace DataTableConverter.View
 
         private bool ListContainsCustomExportItem(string value)
         {
-            return Items.SelectMany(item => item.SelectedValues).Contains(value);
+            return SelectedColumnItems.SelectMany(item => item.SelectedValues).Contains(value);
         }
 
         private void CmBFileNames_SelectedIndexChanged(object sender, EventArgs e)
         {
+            cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
             cmbColumn.SelectedItem = SelectedItem.Column;
+            cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
+
             CmBFormat.SelectedIndex = SelectedItem.Format;
             CbSaveAll.Checked = SelectedItem.CheckedAllValues;
-
+            SetListValues();
             clbValues.ItemCheck -= clbValues_ItemCheck;
 
-            for(int i = 0; i < clbValues.Items.Count; i++)
+            for (int i = 0; i < clbValues.Items.Count; i++)
             {
                 clbValues.SetItemChecked(i, SelectedItem.Values[clbValues.Items[i].ToString()]);
             }
@@ -181,6 +190,10 @@ namespace DataTableConverter.View
                 else
                 {
                     var item = new ExportCustomItem(newText, cmbColumn.Items[0].ToString());
+                    cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
+                    cmbColumn.SelectedIndex = 0;
+                    cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
+                    SetListValues();
                     SetValues(false, item);
                     int index = CmBFileNames.Items.Count;
                     CmBFileNames.Items.Add(item);
@@ -194,7 +207,7 @@ namespace DataTableConverter.View
         private void SetValues(bool status, ExportCustomItem i = null)
         {
             ExportCustomItem item = i ?? SelectedItem;
-            item.SetValues(clbValues.Items.Cast<CountListboxItem>().Select(x => x.ToString()), status);
+            item.SetValues(clbValues.Items.Cast<CountListboxItem>().Select(x => x.ToString()), status, SelectedColumnItems);
         }
 
         private void CmBFormat_SelectedIndexChanged(object sender, EventArgs e)

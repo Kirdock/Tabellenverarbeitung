@@ -22,12 +22,24 @@ namespace DataTableConverter.Classes
             Values = new Dictionary<string, bool>();
         }
 
-        internal void SetValues(IEnumerable<string> allValues, bool status)
+        internal void SetValues(IEnumerable<string> allValues, bool status, IEnumerable<ExportCustomItem> dict)
         {
             Values.Clear();
-            foreach (string value in allValues)
+            if (status && !Properties.Settings.Default.SeparateSelectable)
             {
-                Values.Add(value, status);
+                IEnumerable<string> values = dict.SelectMany(item => item.SelectedValues);
+                foreach (string value in allValues)
+                {
+                    Values.Add(value, !values.Contains(value));
+                }
+            }
+            else
+            {
+                string[] a = allValues.ToArray();
+                foreach (string value in allValues)
+                {
+                    Values.Add(value, status);
+                }
             }
         }
 
