@@ -621,5 +621,17 @@ namespace DataTableConverter.Properties {
                 this["CountSelectedType"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ImportWorkflowAuto {
+            get {
+                return ((bool)(this["ImportWorkflowAuto"]));
+            }
+            set {
+                this["ImportWorkflowAuto"] = value;
+            }
+        }
     }
 }

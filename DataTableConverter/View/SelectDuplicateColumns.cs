@@ -15,18 +15,22 @@ namespace DataTableConverter.View
         internal DataTable Table { get; set; }
         internal static readonly string IgnoreColumn = "Ignorieren";
         private int ComboBoxIndex;
-        internal SelectDuplicateColumns(string[] caseHeaders, object[] headers, bool mustBeAssigned)
+        internal SelectDuplicateColumns(string[] caseHeaders, object[] headers, bool mustBeAssigned, string heading = null, string firstColumnName = null)
         {
             InitializeComponent();
-            setDataGridView(caseHeaders, headers, mustBeAssigned);
+            if(heading != null)
+            {
+                Text = heading;
+            }
+            setDataGridView(caseHeaders, headers, mustBeAssigned, firstColumnName);
             ViewHelper.AdjustComboBoxGridView(dgDuplicate, ComboBoxIndex, headers);
             ViewHelper.SetDataGridViewStyle(dgDuplicate);
         }
 
-        private void setDataGridView(string[] caseHeaders, object[] headers, bool mustBeAssigned)
+        private void setDataGridView(string[] caseHeaders, object[] headers, bool mustBeAssigned, string firstColumnName)
         {
             DataTable table = new DataTable { TableName = "Duplicates" };
-            table.Columns.Add("Spalte");
+            table.Columns.Add(firstColumnName ?? "Spalte");
             table.Columns.Add("Zuweisung");
             object[] newHeaders;
             if (mustBeAssigned)

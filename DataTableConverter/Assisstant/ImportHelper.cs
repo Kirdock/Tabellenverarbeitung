@@ -354,6 +354,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        #region Excel Import
         internal static DataTable OpenExcel(string path, ProgressBar progressBar)
         {
             DataTable data = new DataTable();
@@ -669,6 +670,7 @@ namespace DataTableConverter.Assisstant
             int nextIndex = i + 1;
             return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
         }
+        #endregion
 
         internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar)
         {
@@ -758,8 +760,51 @@ namespace DataTableConverter.Assisstant
                 catch (IOException)
                 {
                 }
+                if (!ExportHelper.SaveWorkflows(data))
+                {
+                    File.Delete(ProjectWorkflows);
+                }
+            }
+            else
+            {
+                string[] files = ExportHelper.GetWorkflows();
+                bool error = false;
+                foreach(string file in files)
+                {
+                    try
+                    {
+                        using (Stream stream = File.Open(file, FileMode.Open))
+                        {
+                            BinaryFormatter bin = new BinaryFormatter();
+                            if (bin.Deserialize(stream) is Work work)
+                            {
+                                data.Add(work);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        error = true;
+                        ErrorHelper.LogMessage(ex, false);
+                    }
+                }
+                if (error)
+                {
+                    MessagesOK(MessageBoxIcon.Error, "Es konnten nicht alle Arbeitsabläufe geladen werden");
+                }
             }
             return data;
+        }
+
+        internal static Work LoadWorkflow(string path)
+        {
+            Work result = null;
+            using (Stream stream = File.Open(path, FileMode.Open))
+            {
+                BinaryFormatter bin = new BinaryFormatter();
+                result = bin.Deserialize(stream) as Work;
+            }
+            return result;
         }
 
         internal static List<Tolerance> LoadTolerances()

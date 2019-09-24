@@ -65,6 +65,7 @@ namespace DataTableConverter.View
             NbRowHeightListBox.Value = Properties.Settings.Default.ListBoxRowHeight;
             CBPvmSaveTwice.Checked = Properties.Settings.Default.PVMSaveTwice;
             TxTPVMIdentifier.Text = Properties.Settings.Default.PVMIdentifier;
+            CbImportWorkflowAuto.Checked = Properties.Settings.Default.ImportWorkflowAuto;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -91,6 +92,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.PVMSaveTwice = CBPvmSaveTwice.Checked;
                 Properties.Settings.Default.PVMIdentifier = TxTPVMIdentifier.Text;
                 Properties.Settings.Default.SeparateColor = PSeparateColor.BackColor;
+                Properties.Settings.Default.ImportWorkflowAuto = CbImportWorkflowAuto.Checked;
                 Properties.Settings.Default.Save();
             }
             else

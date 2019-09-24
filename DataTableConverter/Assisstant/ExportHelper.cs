@@ -34,6 +34,7 @@ namespace DataTableConverter
         internal static string ProjectTolerance => Path.Combine(ProjectPath,"Toleranzen.bin");
         internal static string ProjectCases => Path.Combine(ProjectPath,"Fälle.bin");
         internal static string ProjectWorkflows => Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
+        internal static string WorkflowPath => Path.Combine(ProjectPath, "Arbeitsabläufe");
         internal static string ProjectHeaderPresets => Path.Combine(ProjectPath, "Vorlagen Überschriften");
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
@@ -59,6 +60,10 @@ namespace DataTableConverter
             if (!Directory.Exists(ProjectHeaderPresets))
             {
                 Directory.CreateDirectory(ProjectHeaderPresets);
+            }
+            if (!Directory.Exists(WorkflowPath))
+            {
+                Directory.CreateDirectory(WorkflowPath);
             }
         }
 
@@ -105,19 +110,38 @@ namespace DataTableConverter
         internal static bool SaveWorkflows(List<Work> workflows)
         {
             bool error = false;
-            try
+            List<string> files = new List<string>(GetWorkflows());
+            foreach (Work work in workflows.Where(work => work.Name != null))
             {
-                using (Stream stream = File.Open(ProjectWorkflows, FileMode.Create))
+                try
                 {
-                    BinaryFormatter bin = new BinaryFormatter();
-                    bin.Serialize(stream, workflows);
+                    string path = Path.Combine(WorkflowPath, work.Name+".bin");
+                    using (Stream stream = File.Open(path, FileMode.Create))
+                    {
+                        BinaryFormatter bin = new BinaryFormatter();
+                        bin.Serialize(stream, work);
+                        files.Remove(path);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    error = true;
+                    ErrorHelper.LogMessage(ex, false);
                 }
             }
-            catch (IOException)
+            if (!error)
             {
-                error = true;
+                foreach(string file in files)
+                {
+                    File.Delete(file);
+                }
             }
             return error;
+        }
+
+        internal static string[] GetWorkflows()
+        {
+            return Directory.GetFiles(WorkflowPath, "*.bin"); ;
         }
 
         internal static bool SaveTextImportTemplate(TextImportTemplate template, string path)

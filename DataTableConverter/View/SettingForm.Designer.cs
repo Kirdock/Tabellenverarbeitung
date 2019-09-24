@@ -76,6 +76,8 @@
             this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label35 = new System.Windows.Forms.Label();
+            this.label34 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.dgvFormat = new System.Windows.Forms.DataGridView();
@@ -86,6 +88,7 @@
             this.Column2 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.ColNotEmpty = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.label33 = new System.Windows.Forms.Label();
             this.DgVSecondExample = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -108,9 +111,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label33 = new System.Windows.Forms.Label();
-            this.label34 = new System.Windows.Forms.Label();
-            this.label35 = new System.Windows.Forms.Label();
+            this.label36 = new System.Windows.Forms.Label();
+            this.CbImportWorkflowAuto = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -154,7 +156,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(792, 630);
+            this.tabPage1.Size = new System.Drawing.Size(792, 695);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Farben";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -235,7 +237,7 @@
             this.tpFileShortcuts.Location = new System.Drawing.Point(4, 22);
             this.tpFileShortcuts.Name = "tpFileShortcuts";
             this.tpFileShortcuts.Padding = new System.Windows.Forms.Padding(3);
-            this.tpFileShortcuts.Size = new System.Drawing.Size(792, 630);
+            this.tpFileShortcuts.Size = new System.Drawing.Size(792, 695);
             this.tpFileShortcuts.TabIndex = 1;
             this.tpFileShortcuts.Text = "Dateikürzel";
             this.tpFileShortcuts.UseVisualStyleBackColor = true;
@@ -335,7 +337,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(792, 630);
+            this.tabPage4.Size = new System.Drawing.Size(792, 695);
             this.tabPage4.TabIndex = 4;
             this.tabPage4.Text = "Größen";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -466,6 +468,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.CbImportWorkflowAuto);
+            this.tabPage2.Controls.Add(this.label36);
             this.tabPage2.Controls.Add(this.TxTPVMIdentifier);
             this.tabPage2.Controls.Add(this.label25);
             this.tabPage2.Controls.Add(this.label8);
@@ -483,7 +487,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(792, 630);
+            this.tabPage2.Size = new System.Drawing.Size(792, 695);
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -647,6 +651,24 @@
             this.tabPage3.Text = "Hilfe";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // label35
+            // 
+            this.label35.Location = new System.Drawing.Point(152, 234);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(389, 28);
+            this.label35.TabIndex = 25;
+            this.label35.Text = "Diese Auswahl legt fest, ob alle angegebenen Spalten leer bzw. nicht leer sein so" +
+    "llten. Sonst wird nur überprüft ob eine Spalte leer bzw. nicht leer ist";
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(16, 240);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(130, 13);
+            this.label34.TabIndex = 24;
+            this.label34.Text = "\"Alle Spalten überprüfen\":";
+            // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage5);
@@ -741,6 +763,14 @@
             this.tabPage6.TabIndex = 1;
             this.tabPage6.Text = "Beispiel Straße";
             this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // label33
+            // 
+            this.label33.Location = new System.Drawing.Point(108, 3);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(521, 43);
+            this.label33.TabIndex = 14;
+            this.label33.Text = resources.GetString("label33.Text");
             // 
             // DgVSecondExample
             // 
@@ -941,31 +971,26 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // label33
+            // label36
             // 
-            this.label33.Location = new System.Drawing.Point(108, 3);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(521, 43);
-            this.label33.TabIndex = 14;
-            this.label33.Text = resources.GetString("label33.Text");
+            this.label36.AutoSize = true;
+            this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label36.Location = new System.Drawing.Point(8, 317);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(151, 16);
+            this.label36.TabIndex = 18;
+            this.label36.Text = "Import Arbeitsablauf:";
             // 
-            // label34
+            // CbImportWorkflowAuto
             // 
-            this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(16, 240);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(130, 13);
-            this.label34.TabIndex = 24;
-            this.label34.Text = "\"Alle Spalten überprüfen\":";
-            // 
-            // label35
-            // 
-            this.label35.Location = new System.Drawing.Point(152, 234);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(389, 28);
-            this.label35.TabIndex = 25;
-            this.label35.Text = "Diese Auswahl legt fest, ob alle angegebenen Spalten leer bzw. nicht leer sein so" +
-    "llten. Sonst wird nur überprüft ob eine Spalte leer bzw. nicht leer ist";
+            this.CbImportWorkflowAuto.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CbImportWorkflowAuto.Location = new System.Drawing.Point(11, 336);
+            this.CbImportWorkflowAuto.Name = "CbImportWorkflowAuto";
+            this.CbImportWorkflowAuto.Size = new System.Drawing.Size(338, 35);
+            this.CbImportWorkflowAuto.TabIndex = 19;
+            this.CbImportWorkflowAuto.Text = "Automatische Zuweisung von Einträgen aus \"Suchen && Ersetzen\" und \"Duplikate\", we" +
+    "nn der Name übereinstimmt";
+            this.CbImportWorkflowAuto.UseVisualStyleBackColor = true;
             // 
             // SettingForm
             // 
@@ -1087,5 +1112,7 @@
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.CheckBox CbImportWorkflowAuto;
+        private System.Windows.Forms.Label label36;
     }
 }
