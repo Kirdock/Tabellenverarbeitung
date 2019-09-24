@@ -118,7 +118,12 @@ namespace DataTableConverter.View
         private void clbValues_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             string changedValue = clbValues.Items[e.Index].ToString();
-            if (e.CurrentValue == CheckState.Checked || !ListContainsCustomExportItem(changedValue))
+            if (Properties.Settings.Default.SeparateSelectable)
+            {
+                SelectedItem.Values[changedValue] = e.NewValue == CheckState.Checked;
+                SetSumCount((e.NewValue == CheckState.Checked ? 1 : -1) * (clbValues.Items[e.Index] as CountListboxItem).Count);
+            }
+            else if (e.CurrentValue == CheckState.Checked || !ListContainsCustomExportItem(changedValue))
             {
                 SelectedItem.Values[changedValue] = e.NewValue == CheckState.Checked;
                 SetSumCount((e.NewValue == CheckState.Checked ? 1 : -1) * (clbValues.Items[e.Index] as CountListboxItem).Count);
@@ -131,7 +136,7 @@ namespace DataTableConverter.View
                     clbValues.SetItemCheckState(e.Index, e.CurrentValue);
                     clbValues.ItemCheck += clbValues_ItemCheck;
                 }));
-                
+
             }
         }
 
