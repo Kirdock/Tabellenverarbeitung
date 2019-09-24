@@ -117,11 +117,27 @@ namespace DataTableConverter.View
 
         private void clbValues_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-
             string changedValue = clbValues.Items[e.Index].ToString();
-            SelectedItem.Values[changedValue] = e.NewValue == CheckState.Checked;
+            if (e.CurrentValue == CheckState.Checked || !ListContainsCustomExportItem(changedValue))
+            {
+                SelectedItem.Values[changedValue] = e.NewValue == CheckState.Checked;
+                SetSumCount((e.NewValue == CheckState.Checked ? 1 : -1) * (clbValues.Items[e.Index] as CountListboxItem).Count);
+            }
+            else
+            {
+                clbValues.BeginInvoke(new MethodInvoker(() =>
+                {
+                    clbValues.ItemCheck -= clbValues_ItemCheck;
+                    clbValues.SetItemCheckState(e.Index, e.CurrentValue);
+                    clbValues.ItemCheck += clbValues_ItemCheck;
+                }));
+                
+            }
+        }
 
-            SetSumCount((e.NewValue == CheckState.Checked ? 1 : -1)*( clbValues.Items[e.Index] as CountListboxItem).Count);
+        private bool ListContainsCustomExportItem(string value)
+        {
+            return Items.SelectMany(item => item.SelectedValues).Contains(value);
         }
 
         private void CmBFileNames_SelectedIndexChanged(object sender, EventArgs e)

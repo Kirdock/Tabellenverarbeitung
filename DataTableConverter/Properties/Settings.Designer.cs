@@ -633,5 +633,17 @@ namespace DataTableConverter.Properties {
                 this["ImportWorkflowAuto"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SeparateSelectable {
+            get {
+                return ((bool)(this["SeparateSelectable"]));
+            }
+            set {
+                this["SeparateSelectable"] = value;
+            }
+        }
     }
 }

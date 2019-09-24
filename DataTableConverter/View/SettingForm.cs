@@ -66,6 +66,7 @@ namespace DataTableConverter.View
             CBPvmSaveTwice.Checked = Properties.Settings.Default.PVMSaveTwice;
             TxTPVMIdentifier.Text = Properties.Settings.Default.PVMIdentifier;
             CbImportWorkflowAuto.Checked = Properties.Settings.Default.ImportWorkflowAuto;
+            CbSeparateSelectable.Checked = Properties.Settings.Default.SeparateSelectable;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -93,6 +94,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.PVMIdentifier = TxTPVMIdentifier.Text;
                 Properties.Settings.Default.SeparateColor = PSeparateColor.BackColor;
                 Properties.Settings.Default.ImportWorkflowAuto = CbImportWorkflowAuto.Checked;
+                Properties.Settings.Default.SeparateSelectable = CbSeparateSelectable.Checked;
                 Properties.Settings.Default.Save();
             }
             else

@@ -61,6 +61,8 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.CbImportWorkflowAuto = new System.Windows.Forms.CheckBox();
+            this.label36 = new System.Windows.Forms.Label();
             this.TxTPVMIdentifier = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -111,8 +113,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label36 = new System.Windows.Forms.Label();
-            this.CbImportWorkflowAuto = new System.Windows.Forms.CheckBox();
+            this.label37 = new System.Windows.Forms.Label();
+            this.CbSeparateSelectable = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -468,6 +470,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.CbSeparateSelectable);
+            this.tabPage2.Controls.Add(this.label37);
             this.tabPage2.Controls.Add(this.CbImportWorkflowAuto);
             this.tabPage2.Controls.Add(this.label36);
             this.tabPage2.Controls.Add(this.TxTPVMIdentifier);
@@ -491,6 +495,27 @@
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // CbImportWorkflowAuto
+            // 
+            this.CbImportWorkflowAuto.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CbImportWorkflowAuto.Location = new System.Drawing.Point(11, 331);
+            this.CbImportWorkflowAuto.Name = "CbImportWorkflowAuto";
+            this.CbImportWorkflowAuto.Size = new System.Drawing.Size(338, 35);
+            this.CbImportWorkflowAuto.TabIndex = 19;
+            this.CbImportWorkflowAuto.Text = "Automatische Zuweisung von Einträgen aus \"Suchen && Ersetzen\" und \"Duplikate\", we" +
+    "nn der Name übereinstimmt";
+            this.CbImportWorkflowAuto.UseVisualStyleBackColor = true;
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label36.Location = new System.Drawing.Point(8, 312);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(151, 16);
+            this.label36.TabIndex = 18;
+            this.label36.Text = "Import Arbeitsablauf:";
             // 
             // TxTPVMIdentifier
             // 
@@ -971,26 +996,25 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // label36
+            // label37
             // 
-            this.label36.AutoSize = true;
-            this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label36.Location = new System.Drawing.Point(8, 317);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(151, 16);
-            this.label36.TabIndex = 18;
-            this.label36.Text = "Import Arbeitsablauf:";
+            this.label37.AutoSize = true;
+            this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label37.Location = new System.Drawing.Point(8, 382);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(69, 16);
+            this.label37.TabIndex = 20;
+            this.label37.Text = "Trennen:";
             // 
-            // CbImportWorkflowAuto
+            // CbSeparateSelectable
             // 
-            this.CbImportWorkflowAuto.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbImportWorkflowAuto.Location = new System.Drawing.Point(11, 336);
-            this.CbImportWorkflowAuto.Name = "CbImportWorkflowAuto";
-            this.CbImportWorkflowAuto.Size = new System.Drawing.Size(338, 35);
-            this.CbImportWorkflowAuto.TabIndex = 19;
-            this.CbImportWorkflowAuto.Text = "Automatische Zuweisung von Einträgen aus \"Suchen && Ersetzen\" und \"Duplikate\", we" +
-    "nn der Name übereinstimmt";
-            this.CbImportWorkflowAuto.UseVisualStyleBackColor = true;
+            this.CbSeparateSelectable.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CbSeparateSelectable.Location = new System.Drawing.Point(11, 412);
+            this.CbSeparateSelectable.Name = "CbSeparateSelectable";
+            this.CbSeparateSelectable.Size = new System.Drawing.Size(221, 17);
+            this.CbSeparateSelectable.TabIndex = 21;
+            this.CbSeparateSelectable.Text = "Bereits verwendete Einträge auswählbar";
+            this.CbSeparateSelectable.UseVisualStyleBackColor = true;
             // 
             // SettingForm
             // 
@@ -1114,5 +1138,7 @@
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.CheckBox CbImportWorkflowAuto;
         private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.CheckBox CbSeparateSelectable;
+        private System.Windows.Forms.Label label37;
     }
 }
