@@ -60,6 +60,18 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbSeparate = new System.Windows.Forms.GroupBox();
+            this.CbSeparateSaveAll = new System.Windows.Forms.CheckBox();
+            this.CmBSeparateFormat = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.TxtSeparateColumn = new System.Windows.Forms.TextBox();
+            this.LblSeparateColumn = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.btnSeparateDelete = new System.Windows.Forms.Button();
+            this.btnSeparateRename = new System.Windows.Forms.Button();
+            this.CmBSeparate = new System.Windows.Forms.ComboBox();
+            this.BtnSeparateAdd = new System.Windows.Forms.Button();
+            this.DgvSeparate = new System.Windows.Forms.DataGridView();
             this.gbPVMExport = new System.Windows.Forms.GroupBox();
             this.BtnSearchPVM = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
@@ -77,18 +89,6 @@
             this.lblCompareNewColumn = new System.Windows.Forms.Label();
             this.txtNewColumnCompare = new System.Windows.Forms.TextBox();
             this.cbCompareNewColumn = new System.Windows.Forms.CheckBox();
-            this.gbSeparate = new System.Windows.Forms.GroupBox();
-            this.CbSeparateSaveAll = new System.Windows.Forms.CheckBox();
-            this.CmBSeparateFormat = new System.Windows.Forms.ComboBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.TxtSeparateColumn = new System.Windows.Forms.TextBox();
-            this.LblSeparateColumn = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.btnSeparateDelete = new System.Windows.Forms.Button();
-            this.btnSeparateRename = new System.Windows.Forms.Button();
-            this.CmBSeparate = new System.Windows.Forms.ComboBox();
-            this.BtnSeparateAdd = new System.Windows.Forms.Button();
-            this.DgvSeparate = new System.Windows.Forms.DataGridView();
             this.gbMerge = new System.Windows.Forms.GroupBox();
             this.BtnMergeDefaultFormat = new System.Windows.Forms.Button();
             this.cbMergeOldColumn = new System.Windows.Forms.CheckBox();
@@ -230,6 +230,7 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
+            this.BtnSeparateLoadEntries = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -252,11 +253,11 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbSeparate.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).BeginInit();
             this.gbPVMExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).BeginInit();
             this.gbCompare.SuspendLayout();
-            this.gbSeparate.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).BeginInit();
             this.gbMerge.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.gbAddTableColumns.SuspendLayout();
@@ -735,6 +736,148 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // gbSeparate
+            // 
+            this.gbSeparate.Controls.Add(this.BtnSeparateLoadEntries);
+            this.gbSeparate.Controls.Add(this.CbSeparateSaveAll);
+            this.gbSeparate.Controls.Add(this.CmBSeparateFormat);
+            this.gbSeparate.Controls.Add(this.label14);
+            this.gbSeparate.Controls.Add(this.TxtSeparateColumn);
+            this.gbSeparate.Controls.Add(this.LblSeparateColumn);
+            this.gbSeparate.Controls.Add(this.label12);
+            this.gbSeparate.Controls.Add(this.btnSeparateDelete);
+            this.gbSeparate.Controls.Add(this.btnSeparateRename);
+            this.gbSeparate.Controls.Add(this.CmBSeparate);
+            this.gbSeparate.Controls.Add(this.BtnSeparateAdd);
+            this.gbSeparate.Controls.Add(this.DgvSeparate);
+            this.gbSeparate.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbSeparate.Location = new System.Drawing.Point(0, 92);
+            this.gbSeparate.Name = "gbSeparate";
+            this.gbSeparate.Size = new System.Drawing.Size(245, 643);
+            this.gbSeparate.TabIndex = 26;
+            this.gbSeparate.TabStop = false;
+            this.gbSeparate.Text = "Spaltenangabe";
+            // 
+            // CbSeparateSaveAll
+            // 
+            this.CbSeparateSaveAll.AutoSize = true;
+            this.CbSeparateSaveAll.Location = new System.Drawing.Point(8, 160);
+            this.CbSeparateSaveAll.Name = "CbSeparateSaveAll";
+            this.CbSeparateSaveAll.Size = new System.Drawing.Size(160, 17);
+            this.CbSeparateSaveAll.TabIndex = 30;
+            this.CbSeparateSaveAll.Text = "Alle Werte einzeln speichern";
+            this.CbSeparateSaveAll.UseVisualStyleBackColor = true;
+            this.CbSeparateSaveAll.CheckedChanged += new System.EventHandler(this.CbSeparateSaveAll_CheckedChanged);
+            // 
+            // CmBSeparateFormat
+            // 
+            this.CmBSeparateFormat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CmBSeparateFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CmBSeparateFormat.FormattingEnabled = true;
+            this.CmBSeparateFormat.Items.AddRange(new object[] {
+            "CSV",
+            "DBASE",
+            "Excel"});
+            this.CmBSeparateFormat.Location = new System.Drawing.Point(112, 121);
+            this.CmBSeparateFormat.Name = "CmBSeparateFormat";
+            this.CmBSeparateFormat.Size = new System.Drawing.Size(121, 21);
+            this.CmBSeparateFormat.TabIndex = 29;
+            this.CmBSeparateFormat.SelectedIndexChanged += new System.EventHandler(this.CmBSeparateFormat_SelectedIndexChanged);
+            // 
+            // label14
+            // 
+            this.label14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(111, 101);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(64, 13);
+            this.label14.TabIndex = 28;
+            this.label14.Text = "Dateiformat:";
+            // 
+            // TxtSeparateColumn
+            // 
+            this.TxtSeparateColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSeparateColumn.Location = new System.Drawing.Point(7, 123);
+            this.TxtSeparateColumn.Name = "TxtSeparateColumn";
+            this.TxtSeparateColumn.Size = new System.Drawing.Size(94, 20);
+            this.TxtSeparateColumn.TabIndex = 27;
+            this.TxtSeparateColumn.TextChanged += new System.EventHandler(this.TxtSeparateColumn_TextChanged);
+            // 
+            // LblSeparateColumn
+            // 
+            this.LblSeparateColumn.AutoSize = true;
+            this.LblSeparateColumn.Location = new System.Drawing.Point(5, 101);
+            this.LblSeparateColumn.Name = "LblSeparateColumn";
+            this.LblSeparateColumn.Size = new System.Drawing.Size(40, 13);
+            this.LblSeparateColumn.TabIndex = 26;
+            this.LblSeparateColumn.Text = "Spalte:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 52);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(47, 13);
+            this.label12.TabIndex = 25;
+            this.label12.Text = "Dateien:";
+            // 
+            // btnSeparateDelete
+            // 
+            this.btnSeparateDelete.Location = new System.Drawing.Point(195, 20);
+            this.btnSeparateDelete.Name = "btnSeparateDelete";
+            this.btnSeparateDelete.Size = new System.Drawing.Size(75, 23);
+            this.btnSeparateDelete.TabIndex = 24;
+            this.btnSeparateDelete.Text = "Löschen";
+            this.btnSeparateDelete.UseVisualStyleBackColor = true;
+            this.btnSeparateDelete.Click += new System.EventHandler(this.BtnSeparateDelete_Click);
+            // 
+            // btnSeparateRename
+            // 
+            this.btnSeparateRename.Location = new System.Drawing.Point(90, 19);
+            this.btnSeparateRename.Name = "btnSeparateRename";
+            this.btnSeparateRename.Size = new System.Drawing.Size(100, 23);
+            this.btnSeparateRename.TabIndex = 23;
+            this.btnSeparateRename.Text = "Umbenennen";
+            this.btnSeparateRename.UseVisualStyleBackColor = true;
+            this.btnSeparateRename.Click += new System.EventHandler(this.BtnSeparateRename_Click);
+            // 
+            // CmBSeparate
+            // 
+            this.CmBSeparate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CmBSeparate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CmBSeparate.FormattingEnabled = true;
+            this.CmBSeparate.Location = new System.Drawing.Point(6, 67);
+            this.CmBSeparate.Name = "CmBSeparate";
+            this.CmBSeparate.Size = new System.Drawing.Size(229, 21);
+            this.CmBSeparate.TabIndex = 22;
+            this.CmBSeparate.SelectedIndexChanged += new System.EventHandler(this.CmBSeparate_SelectedIndexChanged);
+            // 
+            // BtnSeparateAdd
+            // 
+            this.BtnSeparateAdd.Location = new System.Drawing.Point(6, 20);
+            this.BtnSeparateAdd.Name = "BtnSeparateAdd";
+            this.BtnSeparateAdd.Size = new System.Drawing.Size(78, 23);
+            this.BtnSeparateAdd.TabIndex = 21;
+            this.BtnSeparateAdd.Text = "Hinzufügen";
+            this.BtnSeparateAdd.UseVisualStyleBackColor = true;
+            this.BtnSeparateAdd.Click += new System.EventHandler(this.BtnSeparateAdd_Click);
+            // 
+            // DgvSeparate
+            // 
+            this.DgvSeparate.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.DgvSeparate.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.DgvSeparate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DgvSeparate.Location = new System.Drawing.Point(6, 208);
+            this.DgvSeparate.Name = "DgvSeparate";
+            this.DgvSeparate.RowHeadersVisible = false;
+            this.DgvSeparate.Size = new System.Drawing.Size(230, 414);
+            this.DgvSeparate.TabIndex = 16;
+            this.DgvSeparate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            // 
             // gbPVMExport
             // 
             this.gbPVMExport.Controls.Add(this.BtnSearchPVM);
@@ -928,147 +1071,6 @@
             this.cbCompareNewColumn.Text = "Ergebnis in neue Spalte schreiben?";
             this.cbCompareNewColumn.UseVisualStyleBackColor = true;
             this.cbCompareNewColumn.CheckedChanged += new System.EventHandler(this.cbCompareNewColumn_CheckedChanged);
-            // 
-            // gbSeparate
-            // 
-            this.gbSeparate.Controls.Add(this.CbSeparateSaveAll);
-            this.gbSeparate.Controls.Add(this.CmBSeparateFormat);
-            this.gbSeparate.Controls.Add(this.label14);
-            this.gbSeparate.Controls.Add(this.TxtSeparateColumn);
-            this.gbSeparate.Controls.Add(this.LblSeparateColumn);
-            this.gbSeparate.Controls.Add(this.label12);
-            this.gbSeparate.Controls.Add(this.btnSeparateDelete);
-            this.gbSeparate.Controls.Add(this.btnSeparateRename);
-            this.gbSeparate.Controls.Add(this.CmBSeparate);
-            this.gbSeparate.Controls.Add(this.BtnSeparateAdd);
-            this.gbSeparate.Controls.Add(this.DgvSeparate);
-            this.gbSeparate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbSeparate.Location = new System.Drawing.Point(0, 92);
-            this.gbSeparate.Name = "gbSeparate";
-            this.gbSeparate.Size = new System.Drawing.Size(245, 643);
-            this.gbSeparate.TabIndex = 26;
-            this.gbSeparate.TabStop = false;
-            this.gbSeparate.Text = "Spaltenangabe";
-            // 
-            // CbSeparateSaveAll
-            // 
-            this.CbSeparateSaveAll.AutoSize = true;
-            this.CbSeparateSaveAll.Location = new System.Drawing.Point(8, 160);
-            this.CbSeparateSaveAll.Name = "CbSeparateSaveAll";
-            this.CbSeparateSaveAll.Size = new System.Drawing.Size(160, 17);
-            this.CbSeparateSaveAll.TabIndex = 30;
-            this.CbSeparateSaveAll.Text = "Alle Werte einzeln speichern";
-            this.CbSeparateSaveAll.UseVisualStyleBackColor = true;
-            this.CbSeparateSaveAll.CheckedChanged += new System.EventHandler(this.CbSeparateSaveAll_CheckedChanged);
-            // 
-            // CmBSeparateFormat
-            // 
-            this.CmBSeparateFormat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CmBSeparateFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CmBSeparateFormat.FormattingEnabled = true;
-            this.CmBSeparateFormat.Items.AddRange(new object[] {
-            "CSV",
-            "DBASE",
-            "Excel"});
-            this.CmBSeparateFormat.Location = new System.Drawing.Point(112, 121);
-            this.CmBSeparateFormat.Name = "CmBSeparateFormat";
-            this.CmBSeparateFormat.Size = new System.Drawing.Size(121, 21);
-            this.CmBSeparateFormat.TabIndex = 29;
-            this.CmBSeparateFormat.SelectedIndexChanged += new System.EventHandler(this.CmBSeparateFormat_SelectedIndexChanged);
-            // 
-            // label14
-            // 
-            this.label14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(111, 101);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(64, 13);
-            this.label14.TabIndex = 28;
-            this.label14.Text = "Dateiformat:";
-            // 
-            // TxtSeparateColumn
-            // 
-            this.TxtSeparateColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtSeparateColumn.Location = new System.Drawing.Point(7, 123);
-            this.TxtSeparateColumn.Name = "TxtSeparateColumn";
-            this.TxtSeparateColumn.Size = new System.Drawing.Size(94, 20);
-            this.TxtSeparateColumn.TabIndex = 27;
-            this.TxtSeparateColumn.TextChanged += new System.EventHandler(this.TxtSeparateColumn_TextChanged);
-            // 
-            // LblSeparateColumn
-            // 
-            this.LblSeparateColumn.AutoSize = true;
-            this.LblSeparateColumn.Location = new System.Drawing.Point(5, 101);
-            this.LblSeparateColumn.Name = "LblSeparateColumn";
-            this.LblSeparateColumn.Size = new System.Drawing.Size(40, 13);
-            this.LblSeparateColumn.TabIndex = 26;
-            this.LblSeparateColumn.Text = "Spalte:";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 52);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(47, 13);
-            this.label12.TabIndex = 25;
-            this.label12.Text = "Dateien:";
-            // 
-            // btnSeparateDelete
-            // 
-            this.btnSeparateDelete.Location = new System.Drawing.Point(195, 20);
-            this.btnSeparateDelete.Name = "btnSeparateDelete";
-            this.btnSeparateDelete.Size = new System.Drawing.Size(75, 23);
-            this.btnSeparateDelete.TabIndex = 24;
-            this.btnSeparateDelete.Text = "Löschen";
-            this.btnSeparateDelete.UseVisualStyleBackColor = true;
-            this.btnSeparateDelete.Click += new System.EventHandler(this.BtnSeparateDelete_Click);
-            // 
-            // btnSeparateRename
-            // 
-            this.btnSeparateRename.Location = new System.Drawing.Point(90, 19);
-            this.btnSeparateRename.Name = "btnSeparateRename";
-            this.btnSeparateRename.Size = new System.Drawing.Size(100, 23);
-            this.btnSeparateRename.TabIndex = 23;
-            this.btnSeparateRename.Text = "Umbenennen";
-            this.btnSeparateRename.UseVisualStyleBackColor = true;
-            this.btnSeparateRename.Click += new System.EventHandler(this.BtnSeparateRename_Click);
-            // 
-            // CmBSeparate
-            // 
-            this.CmBSeparate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CmBSeparate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CmBSeparate.FormattingEnabled = true;
-            this.CmBSeparate.Location = new System.Drawing.Point(6, 67);
-            this.CmBSeparate.Name = "CmBSeparate";
-            this.CmBSeparate.Size = new System.Drawing.Size(229, 21);
-            this.CmBSeparate.TabIndex = 22;
-            this.CmBSeparate.SelectedIndexChanged += new System.EventHandler(this.CmBSeparate_SelectedIndexChanged);
-            // 
-            // BtnSeparateAdd
-            // 
-            this.BtnSeparateAdd.Location = new System.Drawing.Point(6, 20);
-            this.BtnSeparateAdd.Name = "BtnSeparateAdd";
-            this.BtnSeparateAdd.Size = new System.Drawing.Size(78, 23);
-            this.BtnSeparateAdd.TabIndex = 21;
-            this.BtnSeparateAdd.Text = "Hinzufügen";
-            this.BtnSeparateAdd.UseVisualStyleBackColor = true;
-            this.BtnSeparateAdd.Click += new System.EventHandler(this.BtnSeparateAdd_Click);
-            // 
-            // DgvSeparate
-            // 
-            this.DgvSeparate.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.DgvSeparate.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.DgvSeparate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DgvSeparate.Location = new System.Drawing.Point(6, 208);
-            this.DgvSeparate.Name = "DgvSeparate";
-            this.DgvSeparate.RowHeadersVisible = false;
-            this.DgvSeparate.Size = new System.Drawing.Size(230, 414);
-            this.DgvSeparate.TabIndex = 16;
-            this.DgvSeparate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
             // gbMerge
             // 
@@ -2808,6 +2810,16 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
+            // BtnSeparateLoadEntries
+            // 
+            this.BtnSeparateLoadEntries.Location = new System.Drawing.Point(5, 179);
+            this.BtnSeparateLoadEntries.Name = "BtnSeparateLoadEntries";
+            this.BtnSeparateLoadEntries.Size = new System.Drawing.Size(228, 23);
+            this.BtnSeparateLoadEntries.TabIndex = 31;
+            this.BtnSeparateLoadEntries.Text = "Werte aus geladener Tabelle einfügen";
+            this.BtnSeparateLoadEntries.UseVisualStyleBackColor = true;
+            this.BtnSeparateLoadEntries.Click += new System.EventHandler(this.BtnSeparateLoadEntries_Click);
+            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2845,14 +2857,14 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbSeparate.ResumeLayout(false);
+            this.gbSeparate.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).EndInit();
             this.gbPVMExport.ResumeLayout(false);
             this.gbPVMExport.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).EndInit();
             this.gbCompare.ResumeLayout(false);
             this.gbCompare.PerformLayout();
-            this.gbSeparate.ResumeLayout(false);
-            this.gbSeparate.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).EndInit();
             this.gbMerge.ResumeLayout(false);
             this.gbMerge.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
@@ -3126,5 +3138,6 @@
         private System.Windows.Forms.CheckBox CbSeparateSaveAll;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Button BtnImportWorkflow;
+        private System.Windows.Forms.Button BtnSeparateLoadEntries;
     }
 }

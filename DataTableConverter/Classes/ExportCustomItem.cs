@@ -16,6 +16,19 @@ namespace DataTableConverter.Classes
         internal IEnumerable<string> AllValues => GetAllValues();
         internal bool CheckedAllValues;
 
+        internal ExportCustomItem() { }
+
+        internal ExportCustomItem(string name, string column, IEnumerable<string> values)
+        {
+            Name = name;
+            Column = column;
+            Values = new Dictionary<string, bool>();
+            foreach(string value in values)
+            {
+                Values.Add(value, true);
+            }
+        }
+
         internal ExportCustomItem(string name, string column) {
             Name = name;
             Column = column;

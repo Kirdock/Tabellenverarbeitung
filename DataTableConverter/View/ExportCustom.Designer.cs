@@ -205,7 +205,7 @@
             // 
             // BtnUncheckAll
             // 
-            this.BtnUncheckAll.Location = new System.Drawing.Point(321, 147);
+            this.BtnUncheckAll.Location = new System.Drawing.Point(321, 149);
             this.BtnUncheckAll.Name = "BtnUncheckAll";
             this.BtnUncheckAll.Size = new System.Drawing.Size(108, 23);
             this.BtnUncheckAll.TabIndex = 21;

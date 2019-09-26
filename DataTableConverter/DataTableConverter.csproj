@@ -251,6 +251,12 @@
     <Compile Include="View\SettingForm.Designer.cs">
       <DependentUpon>SettingForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\WorkProcViews\SeparateLoadEntries.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\SeparateLoadEntries.Designer.cs">
+      <DependentUpon>SeparateLoadEntries.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\WorkProcViews\SortForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -356,6 +362,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\SelectDuplicateColumns.resx">
       <DependentUpon>SelectDuplicateColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\SeparateLoadEntries.resx">
+      <DependentUpon>SeparateLoadEntries.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\SortForm.resx">
       <DependentUpon>SortForm.cs</DependentUpon>

@@ -2,6 +2,7 @@
 using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
+using DataTableConverter.View.WorkProcViews;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,10 +39,13 @@ namespace DataTableConverter.View
         private ViewHelper ViewHelper;
         private Dictionary<Type, Action<WorkProc>> assignControls;
         private MemoryStream ProceduresBefore, WorkflowsBefore, TolerancesBefore, CasesBefore;
+        private object[] Headers;
+        private DataTable Table;
 
-        internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances)
+        internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
         {
             InitializeComponent();
+            Table = table;
             SetSize();
             AssignGroupBoxToEnum();
             SetHeaders(headers);
@@ -248,6 +252,7 @@ namespace DataTableConverter.View
             {
                 checkedComboBox.Items.AddRange(headers);
             }
+            Headers = headers;
         }
 
         private void AssignGroupBoxToEnum()
@@ -2204,6 +2209,31 @@ namespace DataTableConverter.View
                 }
             }
             return valid;
+        }
+
+        private void BtnSeparateLoadEntries_Click(object sender, EventArgs e)
+        {
+            if (Table != null)
+            {
+                ExportSeparate selectedItem = GetSeparateSelectedItem();
+                SeparateLoadEntries form = new SeparateLoadEntries(selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, Table);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    selectedItem.Column = TxtSeparateColumn.Text = form.SelectedItem.Column;
+                    selectedItem.Table.BeginLoadData();
+                    selectedItem.Table.Rows.Clear();
+                    foreach(string item in form.SelectedItem.SelectedValues)
+                    {
+                        selectedItem.Table.Rows.Add(item);
+                    }
+                    selectedItem.Table.EndLoadData();
+                }
+                form.Dispose();
+            }
+            else
+            {
+                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es wurde keine Tabelle geladen!");
+            }
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

@@ -37,7 +37,7 @@ namespace DataTableConverter.View.CustomControls
                     {
                         using (Brush brush = new SolidBrush(contains ? Properties.Settings.Default.SeparateColor : Color.Black))
                         {
-                            e.Graphics.DrawString(text + $" (Anzahl: {item.Count})", Font, brush, new Rectangle(e.Bounds.Height, e.Bounds.Top, e.Bounds.Width - e.Bounds.Height, e.Bounds.Height), sf);
+                            e.Graphics.DrawString(text + (item.Count > 0 ? $" (Anzahl: {item.Count})" : string.Empty), Font, brush, new Rectangle(e.Bounds.Height, e.Bounds.Top, e.Bounds.Width - e.Bounds.Height, e.Bounds.Height), sf);
                         }
                     }
                 }

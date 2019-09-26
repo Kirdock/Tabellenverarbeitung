@@ -1012,7 +1012,7 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(sourceTable?.HeadersOfDataTable() ?? new object[0], contextGlobal, procedures,workflows,cases,tolerances);
+            Administration form = new Administration(sourceTable?.HeadersOfDataTable() ?? new object[0], contextGlobal, procedures,workflows,cases,tolerances, sourceTable);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show();
         }

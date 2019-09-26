@@ -129,6 +129,11 @@ namespace DataTableConverter.Extensions
             return pair;
         }
 
+        internal static Dictionary<string, int> GroupCountOfColumn(this DataTable table, string column)
+        {
+            return table.GroupCountOfColumn(table.Columns.IndexOf(column));
+        }
+
         internal static List<int> HeaderIndices(this DataTable table, string[] columns)
         {
             return columns.Select(column => table.Columns.IndexOf(column)).Where(index => index != -1).ToList();
