@@ -27,9 +27,13 @@ namespace DataTableConverter.Assisstant
                     ShowError(ErrorMessage);
                 }
             }
+            catch (IOException)
+            {
+                ShowError($"Es kann nicht auf die Datei \"Logs.log\" zugegriffen werden{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text);
+            }
             catch (Exception ex)
             {
-                ShowError(ErrorMessage + '\n' + ex.ToString());
+                ShowError(ErrorMessage + $"{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text + $"{Environment.NewLine}Log Fehler:{Environment.NewLine}" + ex.ToString());
             }
         }
 
