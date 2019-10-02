@@ -74,6 +74,7 @@
     <Compile Include="Assisstant\ErrorHelper.cs" />
     <Compile Include="Assisstant\HistoryHelper.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
+    <Compile Include="Assisstant\TextFileEncodingDetector.cs" />
     <Compile Include="Assisstant\UpdateHelper.cs" />
     <Compile Include="Assisstant\WorkflowHelper.cs" />
     <Compile Include="Classes\CellMatrix.cs" />

@@ -89,8 +89,8 @@
             // 
             this.nbNumberStart.Location = new System.Drawing.Point(12, 87);
             this.nbNumberStart.Maximum = new decimal(new int[] {
-            1000000,
-            0,
+            1410065408,
+            2,
             0,
             0});
             this.nbNumberStart.Minimum = new decimal(new int[] {

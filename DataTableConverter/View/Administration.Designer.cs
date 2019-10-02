@@ -61,6 +61,7 @@
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.gbSeparate = new System.Windows.Forms.GroupBox();
+            this.BtnSeparateLoadEntries = new System.Windows.Forms.Button();
             this.CbSeparateSaveAll = new System.Windows.Forms.CheckBox();
             this.CmBSeparateFormat = new System.Windows.Forms.ComboBox();
             this.label14 = new System.Windows.Forms.Label();
@@ -230,7 +231,6 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.BtnSeparateLoadEntries = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -554,20 +554,20 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPadding);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCount);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCompare);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCount);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbOrder);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbDefDuplicate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbProcedure);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbUpLowCase);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbNumber);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPadding);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbReplaceWhole);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMain);
@@ -757,6 +757,16 @@
             this.gbSeparate.TabIndex = 26;
             this.gbSeparate.TabStop = false;
             this.gbSeparate.Text = "Spaltenangabe";
+            // 
+            // BtnSeparateLoadEntries
+            // 
+            this.BtnSeparateLoadEntries.Location = new System.Drawing.Point(5, 179);
+            this.BtnSeparateLoadEntries.Name = "BtnSeparateLoadEntries";
+            this.BtnSeparateLoadEntries.Size = new System.Drawing.Size(228, 23);
+            this.BtnSeparateLoadEntries.TabIndex = 31;
+            this.BtnSeparateLoadEntries.Text = "Werte aus geladener Tabelle einfügen";
+            this.BtnSeparateLoadEntries.UseVisualStyleBackColor = true;
+            this.BtnSeparateLoadEntries.Click += new System.EventHandler(this.BtnSeparateLoadEntries_Click);
             // 
             // CbSeparateSaveAll
             // 
@@ -1372,8 +1382,8 @@
             // 
             this.nbCount.Location = new System.Drawing.Point(84, 106);
             this.nbCount.Maximum = new decimal(new int[] {
-            1000,
-            0,
+            1410065408,
+            2,
             0,
             0});
             this.nbCount.Minimum = new decimal(new int[] {
@@ -1876,13 +1886,13 @@
             // 
             this.nbNumberEnd.Location = new System.Drawing.Point(127, 87);
             this.nbNumberEnd.Maximum = new decimal(new int[] {
-            1000000,
-            0,
+            1410065408,
+            2,
             0,
             0});
             this.nbNumberEnd.Minimum = new decimal(new int[] {
-            1000000,
-            0,
+            1410065408,
+            2,
             0,
             -2147483648});
             this.nbNumberEnd.Name = "nbNumberEnd";
@@ -1913,13 +1923,13 @@
             // 
             this.nbNumberStart.Location = new System.Drawing.Point(6, 87);
             this.nbNumberStart.Maximum = new decimal(new int[] {
-            1000000,
-            0,
+            1410065408,
+            2,
             0,
             0});
             this.nbNumberStart.Minimum = new decimal(new int[] {
-            1000000,
-            0,
+            1410065408,
+            2,
             0,
             -2147483648});
             this.nbNumberStart.Name = "nbNumberStart";
@@ -2809,16 +2819,6 @@
             this.BtnDiscard.Text = "Verwerfen";
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
-            // 
-            // BtnSeparateLoadEntries
-            // 
-            this.BtnSeparateLoadEntries.Location = new System.Drawing.Point(5, 179);
-            this.BtnSeparateLoadEntries.Name = "BtnSeparateLoadEntries";
-            this.BtnSeparateLoadEntries.Size = new System.Drawing.Size(228, 23);
-            this.BtnSeparateLoadEntries.TabIndex = 31;
-            this.BtnSeparateLoadEntries.Text = "Werte aus geladener Tabelle einfügen";
-            this.BtnSeparateLoadEntries.UseVisualStyleBackColor = true;
-            this.BtnSeparateLoadEntries.Click += new System.EventHandler(this.BtnSeparateLoadEntries_Click);
             // 
             // Administration
             // 

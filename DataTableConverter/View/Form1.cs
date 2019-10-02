@@ -1099,6 +1099,7 @@ namespace DataTableConverter
                 StopLoadingBar();
                 SaveFinished();
             }
+            formula.Dispose();
         }
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
