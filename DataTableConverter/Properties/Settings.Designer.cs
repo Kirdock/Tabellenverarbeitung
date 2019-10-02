@@ -645,5 +645,17 @@ namespace DataTableConverter.Properties {
                 this["SeparateSelectable"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RecognizeEncoding {
+            get {
+                return ((bool)(this["RecognizeEncoding"]));
+            }
+            set {
+                this["RecognizeEncoding"] = value;
+            }
+        }
     }
 }

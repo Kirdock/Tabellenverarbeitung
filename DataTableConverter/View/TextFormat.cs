@@ -89,7 +89,7 @@ namespace DataTableConverter.View
 
             cmbEncoding.DisplayMember = "DisplayName";
             cmbEncoding.ValueMember = "CodePage";
-            SetEncoding(TextFileEncodingDetector.DetectTextFileEncoding(path).CodePage);
+            SetEncoding(Properties.Settings.Default.RecognizeEncoding ? TextFileEncodingDetector.DetectTextFileEncoding(path).CodePage : Properties.Settings.Default.Encoding);
         }
 
         private void SetEncoding(int encoding)
