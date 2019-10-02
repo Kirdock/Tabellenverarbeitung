@@ -154,6 +154,12 @@
     <Compile Include="View\ExcelSheets.Designer.cs">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\SelectHeader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\SelectHeader.Designer.cs">
+      <DependentUpon>SelectHeader.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\WorkProcViews\ExportCount.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -305,6 +311,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\ExcelSheets.resx">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\SelectHeader.resx">
+      <DependentUpon>SelectHeader.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\ExportCount.resx">
       <DependentUpon>ExportCount.cs</DependentUpon>

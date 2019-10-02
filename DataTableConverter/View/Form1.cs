@@ -1067,7 +1067,10 @@ namespace DataTableConverter
             {
                 pgbLoading.Invoke(new MethodInvoker(() =>
                 {
-                    pgbLoading.Value++;
+                    if (pgbLoading.Value < pgbLoading.Maximum)
+                    {
+                        pgbLoading.Value++;
+                    }
                 }));
             }
             catch (Exception ex)
@@ -1455,6 +1458,64 @@ namespace DataTableConverter
             {
                 StartSingleWorkflow(form.Procedure);
             }
+        }
+
+        private void PrüfzifferToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataTable table = GetDataSource();
+            SelectHeader headerForm = new SelectHeader(table.HeadersOfDataTable());
+            if (headerForm.ShowDialog() == DialogResult.OK)
+            {
+                string column = headerForm.Column;
+                bool continueLoop = false;
+                StartLoadingBarCount(table.Rows.Count);
+                new Thread(() =>
+                {
+                    for (int i = 0; i < table.Rows.Count; i++)
+                    {
+                        DataRow row = table.Rows[i];
+                        string value = row[column].ToString();
+                        int checkSum = ChecksumEAN9(value);
+                        if (checkSum == -1 && !continueLoop)
+                        {
+                            DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Ungültige Zahl in Zeile {i + 1}. Trotzdem fortfahren?");
+                            if (result == DialogResult.No)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                continueLoop = true;
+                            }
+                        }
+                        else
+                        {
+                            row[column] = value + checkSum;
+                        }
+                        UpdateLoadingBar();
+                    }
+                    StopLoadingBar();
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        AddDataSourceValueChange(table);
+                    }));
+                }).Start();
+            }
+            headerForm.Dispose();
+        }
+
+        private int ChecksumEAN9(string data)
+        {
+            int result = -1;
+            if (data.Length == 8 && int.TryParse(data, out int _))
+            {
+                int sum1 = (int)(char.GetNumericValue(data[6]) + char.GetNumericValue(data[4]) + char.GetNumericValue(data[2]) + char.GetNumericValue(data[0]));
+                int sum2 = 3 * (int)(char.GetNumericValue(data[7]) + char.GetNumericValue(data[5]) + char.GetNumericValue(data[3]) + char.GetNumericValue(data[1]));
+                int checksum_digit = 10 - ((sum1 + sum2) % 10);
+
+                result = checksum_digit == 10 ? 0 : checksum_digit;
+            }
+            return result;
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

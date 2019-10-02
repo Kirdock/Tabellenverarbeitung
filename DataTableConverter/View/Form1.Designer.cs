@@ -89,6 +89,7 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.prüfzifferToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -170,6 +171,7 @@
             this.zeileToolStripMenuItem,
             this.großKleinschreibungToolStripMenuItem,
             this.nummerierenToolStripMenuItem,
+            this.prüfzifferToolStripMenuItem,
             this.spaltenAusTabelleHinzufügenToolStripMenuItem,
             this.rundenToolStripMenuItem,
             this.spaltenVergleichenToolStripMenuItem,
@@ -361,14 +363,14 @@
             // pVMToolStripMenuItem
             // 
             this.pVMToolStripMenuItem.Name = "pVMToolStripMenuItem";
-            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.pVMToolStripMenuItem.Text = "PVM";
             this.pVMToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
             // 
             // trennenToolStripMenuItem
             // 
             this.trennenToolStripMenuItem.Name = "trennenToolStripMenuItem";
-            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.trennenToolStripMenuItem.Text = "Trennen";
             this.trennenToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 
@@ -544,6 +546,13 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // prüfzifferToolStripMenuItem
+            // 
+            this.prüfzifferToolStripMenuItem.Name = "prüfzifferToolStripMenuItem";
+            this.prüfzifferToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.prüfzifferToolStripMenuItem.Text = "Prüfziffer";
+            this.prüfzifferToolStripMenuItem.Click += new System.EventHandler(this.PrüfzifferToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -630,6 +639,7 @@
         private System.Windows.Forms.ToolStripMenuItem benutzerdefiniertesSpeichernToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem pVMToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem trennenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem prüfzifferToolStripMenuItem;
     }
 }
 
