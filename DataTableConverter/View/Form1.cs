@@ -1507,11 +1507,21 @@ namespace DataTableConverter
         private int ChecksumEAN9(string data)
         {
             int result = -1;
-            if (data.Length == 8 && int.TryParse(data, out int _))
+            if (int.TryParse(data, out int _))
             {
-                int sum1 = (int)(char.GetNumericValue(data[6]) + char.GetNumericValue(data[4]) + char.GetNumericValue(data[2]) + char.GetNumericValue(data[0]));
-                int sum2 = 3 * (int)(char.GetNumericValue(data[7]) + char.GetNumericValue(data[5]) + char.GetNumericValue(data[3]) + char.GetNumericValue(data[1]));
-                int checksum_digit = 10 - ((sum1 + sum2) % 10);
+                int sum1 = 0;
+                for(int i = data.Length-2; i >= 0; i -= 2)
+                {
+                    sum1 += (int) char.GetNumericValue(data[i]);
+                }
+
+                int sum2 = 0;
+                for (int i = data.Length - 1; i >= 0; i -= 2)
+                {
+                    sum2 += (int)char.GetNumericValue(data[i]);
+                }
+
+                int checksum_digit = 10 - ((sum1 + (sum2*3)) % 10);
 
                 result = checksum_digit == 10 ? 0 : checksum_digit;
             }
@@ -1527,6 +1537,7 @@ namespace DataTableConverter
                 SetSorting(form.SortString);
                 AssignDataSource();
             }
+            form.Dispose();
         }
     }
 }
