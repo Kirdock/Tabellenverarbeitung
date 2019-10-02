@@ -541,7 +541,7 @@
             // 
             // TxTPVMIdentifier
             // 
-            this.TxTPVMIdentifier.Location = new System.Drawing.Point(217, 264);
+            this.TxTPVMIdentifier.Location = new System.Drawing.Point(247, 264);
             this.TxTPVMIdentifier.Name = "TxTPVMIdentifier";
             this.TxTPVMIdentifier.Size = new System.Drawing.Size(132, 20);
             this.TxTPVMIdentifier.TabIndex = 17;
@@ -599,7 +599,7 @@
             // 
             // BtnSearchFolder
             // 
-            this.BtnSearchFolder.Location = new System.Drawing.Point(544, 300);
+            this.BtnSearchFolder.Location = new System.Drawing.Point(569, 296);
             this.BtnSearchFolder.Name = "BtnSearchFolder";
             this.BtnSearchFolder.Size = new System.Drawing.Size(75, 23);
             this.BtnSearchFolder.TabIndex = 7;
@@ -609,7 +609,7 @@
             // 
             // TxtSettingPath
             // 
-            this.TxtSettingPath.Location = new System.Drawing.Point(217, 302);
+            this.TxtSettingPath.Location = new System.Drawing.Point(247, 299);
             this.TxtSettingPath.Name = "TxtSettingPath";
             this.TxtSettingPath.ReadOnly = true;
             this.TxtSettingPath.Size = new System.Drawing.Size(308, 20);
@@ -646,7 +646,7 @@
             // 
             // txtOldAffix
             // 
-            this.txtOldAffix.Location = new System.Drawing.Point(217, 108);
+            this.txtOldAffix.Location = new System.Drawing.Point(247, 108);
             this.txtOldAffix.Name = "txtOldAffix";
             this.txtOldAffix.Size = new System.Drawing.Size(132, 20);
             this.txtOldAffix.TabIndex = 2;
