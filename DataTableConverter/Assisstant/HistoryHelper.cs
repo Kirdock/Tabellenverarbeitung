@@ -193,7 +193,7 @@ namespace DataTableConverter.Assisstant
                 case State.HeadersChange:
                     string[] oldHeaders = his.Row[0].Cast<string>().ToArray();
                     object[] newHeaders = table.HeadersOfDataTable();
-                    table.OverrideHeaders(oldHeaders);
+                    table.OverrideHeaders(oldHeaders, true);
                     his.Row[0] = newHeaders;
                     break;
 

@@ -542,6 +542,7 @@ namespace DataTableConverter
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
             }
+            dialog.Dispose();
         }
 
         private void SetFileName(string path)

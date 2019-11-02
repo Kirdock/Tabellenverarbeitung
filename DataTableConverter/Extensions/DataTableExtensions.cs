@@ -56,12 +56,11 @@ namespace DataTableConverter.Extensions
             OverrideHeaders(sourceTable, table.HeadersOfDataTableAsString());
         }
 
-        internal static void OverrideHeaders(this DataTable table, string[] headers)
+        internal static void OverrideHeaders(this DataTable table, string[] headers, bool isHistory = false)
         {
             for (int i = 0; i < headers.Length && i < table.Columns.Count; i++)
             {
                 int index;
-
                 if ((index = table.Columns.IndexOf(headers[i])) != -1)
                 {
                     int counter = 1;
@@ -69,6 +68,20 @@ namespace DataTableConverter.Extensions
                     table.Columns[index].ColumnName = table.Columns[index].ColumnName + counter;
                 }
                 table.Columns[i].ColumnName = headers[i];
+            }
+            if(headers.Length > table.Columns.Count)
+            {
+                for(int i = table.Columns.Count; i < headers.Length; i++)
+                {
+                    table.TryAddColumn(headers[i]);
+                }
+            }
+            else if (isHistory)
+            {
+                while(table.Columns.Count > headers.Length)
+                {
+                    table.Columns.RemoveAt(table.Columns.Count - 1);
+                }
             }
         }
 
