@@ -56,7 +56,7 @@ namespace DataTableConverter.View
             DataTable table = new DataTable { TableName = "Columns" };
             table.Columns.Add("Überschrift", typeof(string));
             dgvHeaders.DataSource = table;
-            ViewHelper.AddContextMenuToDataGridView(dgvHeaders, true);
+            ViewHelper.AddContextMenuToDataGridView(dgvHeaders, this, true);
         }
 
         private void SetSize()
@@ -89,7 +89,7 @@ namespace DataTableConverter.View
 
             cmbEncoding.DisplayMember = "DisplayName";
             cmbEncoding.ValueMember = "CodePage";
-            SetEncoding(Properties.Settings.Default.RecognizeEncoding ? TextFileEncodingDetector.DetectTextFileEncoding(path).CodePage : Properties.Settings.Default.Encoding);
+            SetEncoding(Properties.Settings.Default.Encoding);
         }
 
         private void SetEncoding(int encoding)
@@ -580,7 +580,7 @@ namespace DataTableConverter.View
 
         private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, dgvSetting_CellValidating, dgvSetting_CellValueChanged);
+            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, this, dgvSetting_CellValidating, dgvSetting_CellValueChanged);
         }
 
         private void txtBegin_TextChanged(object sender, EventArgs e)

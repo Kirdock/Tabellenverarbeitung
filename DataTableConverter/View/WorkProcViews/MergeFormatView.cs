@@ -145,7 +145,7 @@ namespace DataTableConverter.View
                 DataTable table = dgTable.DataSource as DataTable;
                 HeaderSelect form = new HeaderSelect(Headers, e.ColumnIndex == 0 ? table.Rows[e.RowIndex][(int)MergeFormat.MergeColumns.Empty]?.ToString() : table.Rows[e.RowIndex][(int)MergeFormat.MergeColumns.NotEmpty].ToString());
 
-                if (form.ShowDialog() == DialogResult.OK)
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     if (e.ColumnIndex == 0) //Empty Column
                     {
@@ -157,6 +157,7 @@ namespace DataTableConverter.View
                     }
                     dgTable.Refresh();
                 }
+                form.Dispose();
             }
         }
 

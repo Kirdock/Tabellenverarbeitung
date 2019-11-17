@@ -115,7 +115,6 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.CBRecognizeEncoding = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -471,7 +470,6 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.CBRecognizeEncoding);
             this.tabPage2.Controls.Add(this.CbSeparateSelectable);
             this.tabPage2.Controls.Add(this.label37);
             this.tabPage2.Controls.Add(this.CbImportWorkflowAuto);
@@ -501,7 +499,7 @@
             // CbSeparateSelectable
             // 
             this.CbSeparateSelectable.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbSeparateSelectable.Location = new System.Drawing.Point(8, 432);
+            this.CbSeparateSelectable.Location = new System.Drawing.Point(8, 398);
             this.CbSeparateSelectable.Name = "CbSeparateSelectable";
             this.CbSeparateSelectable.Size = new System.Drawing.Size(254, 17);
             this.CbSeparateSelectable.TabIndex = 21;
@@ -512,7 +510,7 @@
             // 
             this.label37.AutoSize = true;
             this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label37.Location = new System.Drawing.Point(5, 402);
+            this.label37.Location = new System.Drawing.Point(5, 368);
             this.label37.Name = "label37";
             this.label37.Size = new System.Drawing.Size(69, 16);
             this.label37.TabIndex = 20;
@@ -521,7 +519,7 @@
             // CbImportWorkflowAuto
             // 
             this.CbImportWorkflowAuto.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbImportWorkflowAuto.Location = new System.Drawing.Point(8, 351);
+            this.CbImportWorkflowAuto.Location = new System.Drawing.Point(8, 317);
             this.CbImportWorkflowAuto.Name = "CbImportWorkflowAuto";
             this.CbImportWorkflowAuto.Size = new System.Drawing.Size(338, 35);
             this.CbImportWorkflowAuto.TabIndex = 19;
@@ -533,7 +531,7 @@
             // 
             this.label36.AutoSize = true;
             this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label36.Location = new System.Drawing.Point(5, 332);
+            this.label36.Location = new System.Drawing.Point(5, 298);
             this.label36.Name = "label36";
             this.label36.Size = new System.Drawing.Size(151, 16);
             this.label36.TabIndex = 18;
@@ -541,7 +539,7 @@
             // 
             // TxTPVMIdentifier
             // 
-            this.TxTPVMIdentifier.Location = new System.Drawing.Point(247, 264);
+            this.TxTPVMIdentifier.Location = new System.Drawing.Point(247, 230);
             this.TxTPVMIdentifier.Name = "TxTPVMIdentifier";
             this.TxTPVMIdentifier.Size = new System.Drawing.Size(132, 20);
             this.TxTPVMIdentifier.TabIndex = 17;
@@ -549,7 +547,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(8, 267);
+            this.label25.Location = new System.Drawing.Point(8, 233);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(166, 13);
             this.label25.TabIndex = 16;
@@ -558,7 +556,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(287, 223);
+            this.label8.Location = new System.Drawing.Point(287, 189);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(42, 13);
             this.label8.TabIndex = 15;
@@ -572,7 +570,7 @@
             "CSV",
             "DBASE",
             "Excel"});
-            this.cbPVMSaveFormat.Location = new System.Drawing.Point(335, 218);
+            this.cbPVMSaveFormat.Location = new System.Drawing.Point(335, 184);
             this.cbPVMSaveFormat.Name = "cbPVMSaveFormat";
             this.cbPVMSaveFormat.Size = new System.Drawing.Size(121, 21);
             this.cbPVMSaveFormat.TabIndex = 14;
@@ -580,7 +578,7 @@
             // cbSplitPVM
             // 
             this.cbSplitPVM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cbSplitPVM.Location = new System.Drawing.Point(8, 222);
+            this.cbSplitPVM.Location = new System.Drawing.Point(8, 188);
             this.cbSplitPVM.Name = "cbSplitPVM";
             this.cbSplitPVM.Size = new System.Drawing.Size(254, 17);
             this.cbSplitPVM.TabIndex = 13;
@@ -590,7 +588,7 @@
             // CBPvmSaveTwice
             // 
             this.CBPvmSaveTwice.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CBPvmSaveTwice.Location = new System.Drawing.Point(8, 184);
+            this.CBPvmSaveTwice.Location = new System.Drawing.Point(8, 150);
             this.CBPvmSaveTwice.Name = "CBPvmSaveTwice";
             this.CBPvmSaveTwice.Size = new System.Drawing.Size(254, 17);
             this.CBPvmSaveTwice.TabIndex = 8;
@@ -599,7 +597,7 @@
             // 
             // BtnSearchFolder
             // 
-            this.BtnSearchFolder.Location = new System.Drawing.Point(569, 296);
+            this.BtnSearchFolder.Location = new System.Drawing.Point(569, 262);
             this.BtnSearchFolder.Name = "BtnSearchFolder";
             this.BtnSearchFolder.Size = new System.Drawing.Size(75, 23);
             this.BtnSearchFolder.TabIndex = 7;
@@ -609,7 +607,7 @@
             // 
             // TxtSettingPath
             // 
-            this.TxtSettingPath.Location = new System.Drawing.Point(247, 299);
+            this.TxtSettingPath.Location = new System.Drawing.Point(247, 265);
             this.TxtSettingPath.Name = "TxtSettingPath";
             this.TxtSettingPath.ReadOnly = true;
             this.TxtSettingPath.Size = new System.Drawing.Size(308, 20);
@@ -618,7 +616,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(8, 302);
+            this.label16.Location = new System.Drawing.Point(8, 268);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(137, 13);
             this.label16.TabIndex = 5;
@@ -627,7 +625,7 @@
             // cbFullWidthImport
             // 
             this.cbFullWidthImport.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cbFullWidthImport.Location = new System.Drawing.Point(8, 45);
+            this.cbFullWidthImport.Location = new System.Drawing.Point(8, 41);
             this.cbFullWidthImport.Name = "cbFullWidthImport";
             this.cbFullWidthImport.Size = new System.Drawing.Size(254, 17);
             this.cbFullWidthImport.TabIndex = 4;
@@ -637,7 +635,7 @@
             // cbAutoSavePVM
             // 
             this.cbAutoSavePVM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cbAutoSavePVM.Location = new System.Drawing.Point(8, 149);
+            this.cbAutoSavePVM.Location = new System.Drawing.Point(8, 115);
             this.cbAutoSavePVM.Name = "cbAutoSavePVM";
             this.cbAutoSavePVM.Size = new System.Drawing.Size(254, 17);
             this.cbAutoSavePVM.TabIndex = 3;
@@ -646,7 +644,7 @@
             // 
             // txtOldAffix
             // 
-            this.txtOldAffix.Location = new System.Drawing.Point(247, 108);
+            this.txtOldAffix.Location = new System.Drawing.Point(247, 74);
             this.txtOldAffix.Name = "txtOldAffix";
             this.txtOldAffix.Size = new System.Drawing.Size(132, 20);
             this.txtOldAffix.TabIndex = 2;
@@ -654,7 +652,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(8, 111);
+            this.label9.Location = new System.Drawing.Point(10, 77);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(169, 13);
             this.label9.TabIndex = 1;
@@ -1017,16 +1015,6 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // CBRecognizeEncoding
-            // 
-            this.CBRecognizeEncoding.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CBRecognizeEncoding.Location = new System.Drawing.Point(8, 77);
-            this.CBRecognizeEncoding.Name = "CBRecognizeEncoding";
-            this.CBRecognizeEncoding.Size = new System.Drawing.Size(254, 17);
-            this.CBRecognizeEncoding.TabIndex = 22;
-            this.CBRecognizeEncoding.Text = "Kodierung beim Einlesen automatisch erkennen";
-            this.CBRecognizeEncoding.UseVisualStyleBackColor = true;
-            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1151,6 +1139,5 @@
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.CheckBox CbSeparateSelectable;
         private System.Windows.Forms.Label label37;
-        private System.Windows.Forms.CheckBox CBRecognizeEncoding;
     }
 }

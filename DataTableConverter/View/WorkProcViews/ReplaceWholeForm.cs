@@ -24,7 +24,7 @@ namespace DataTableConverter.View
             InitializeComponent();
             InitDataTable(headers);
             UIHelper = new ViewHelper(ctxRow, null, null);
-            UIHelper.AddContextMenuToDataGridView(dgTable, false);
+            UIHelper.AddContextMenuToDataGridView(dgTable, this, false);
             ViewHelper.AdjustComboBoxGridView(dgTable, ComboBoxIndex, headers);
             ViewHelper.SetDataGridViewStyle(dgTable);
         }

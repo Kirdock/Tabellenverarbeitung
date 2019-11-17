@@ -140,7 +140,7 @@ namespace DataTableConverter.View
         private void spalteAufteilenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SplitForm form = new SplitForm(getTable()?.HeadersOfDataTable() ?? new object[0]);
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 DataTable table = getDataView().Table;
                 string splitString = form.getSplitString();
@@ -168,6 +168,7 @@ namespace DataTableConverter.View
                 table.Columns.RemoveAt(column);
 
             }
+            form.Dispose();
         }
 
         private void dgTable_ColumnDisplayIndexChanged(object sender, DataGridViewColumnEventArgs e)

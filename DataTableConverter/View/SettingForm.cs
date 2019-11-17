@@ -67,7 +67,6 @@ namespace DataTableConverter.View
             TxTPVMIdentifier.Text = Properties.Settings.Default.PVMIdentifier;
             CbImportWorkflowAuto.Checked = Properties.Settings.Default.ImportWorkflowAuto;
             CbSeparateSelectable.Checked = Properties.Settings.Default.SeparateSelectable;
-            CBRecognizeEncoding.Checked = Properties.Settings.Default.RecognizeEncoding;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -96,7 +95,6 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.SeparateColor = PSeparateColor.BackColor;
                 Properties.Settings.Default.ImportWorkflowAuto = CbImportWorkflowAuto.Checked;
                 Properties.Settings.Default.SeparateSelectable = CbSeparateSelectable.Checked;
-                Properties.Settings.Default.RecognizeEncoding = CBRecognizeEncoding.Checked;
                 Properties.Settings.Default.Save();
             }
             else
@@ -134,7 +132,7 @@ namespace DataTableConverter.View
         {
             Panel sender = ((Panel)s);
             colorDialog1.Color = sender.BackColor;
-            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            if (colorDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 sender.BackColor = colorDialog1.Color;
             }
@@ -154,7 +152,7 @@ namespace DataTableConverter.View
                 CheckPathExists = true,
                 FileName = "Ordnerauswahl"
             };
-            if (folderBrowser.ShowDialog() == DialogResult.OK)
+            if (folderBrowser.ShowDialog(this) == DialogResult.OK)
             {
                 string folderPath = Path.Combine(Path.GetDirectoryName(folderBrowser.FileName), ExportHelper.ProjectName);
                 if (!Directory.Exists(folderPath))

@@ -302,14 +302,6 @@ namespace DataTableConverter.Extensions
             return table.AsEnumerable().Select(row => row[column]?.ToString()).ToArray();
         }
 
-        internal static void SetColumnsTypeString(this DataTable table)
-        {
-            foreach (DataColumn col in table.Columns)
-            {
-                col.DataType = typeof(string);
-            }
-        }
-
         internal static DataTable SetColumnsTypeStringWithContainingData(this DataTable table)
         {
             DataTable dtCloned = table.Clone();

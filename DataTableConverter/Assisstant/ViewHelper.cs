@@ -24,17 +24,17 @@ namespace DataTableConverter
         internal static void AdjustComboBoxGridView(DataGridView dataGridView, int comboBoxIndex, object[] headers)
         {
             dataGridView.EditMode = DataGridViewEditMode.EditOnEnter;
-            dataGridView.CellFormatting += (sender, e) => dataGridView_CellFormatting(sender, e, comboBoxIndex, headers);
+            dataGridView.CellFormatting += (sender, e) => DataGridView_CellFormatting(sender, e, comboBoxIndex, headers);
             dataGridView.EditingControlShowing += dataGridView_EditingControlShowing;
         }
-        private static void dataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
+
+        private static void DataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
         {
             if (e.ColumnIndex == comboBoxIndex && string.IsNullOrWhiteSpace(e.Value?.ToString()))
             {
                 e.Value = headers[0];
             }
         }
-
 
         private static void dataGridView_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
@@ -96,7 +96,7 @@ namespace DataTableConverter
             e.Handled = !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar);
         }
 
-        internal static void InsertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, DataGridViewCellValidatingEventHandler dgEvent = null, Action<object, DataGridViewCellEventArgs> myfunc = null)
+        internal static void InsertClipboardToDataGridView(DataGridView myDataGridView, int rowIndex, Form mainForm, DataGridViewCellValidatingEventHandler dgEvent = null, Action<object, DataGridViewCellEventArgs> myfunc = null)
         {
             rowIndex = rowIndex < 0 ? 0 : rowIndex;
             Thread thread = new Thread(() =>
@@ -122,7 +122,12 @@ namespace DataTableConverter
                     }
 
                     ClipboardForm form = new ClipboardForm(clipboardTable);
-                    if (form.ShowDialog() == DialogResult.OK)
+                    DialogResult result = DialogResult.Cancel;
+                    mainForm.Invoke(new MethodInvoker(() =>
+                    {
+                        result = form.ShowDialog(mainForm);
+                    }));
+                    if (result == DialogResult.OK)
                     {
                         foreach (DataRow row in form.getTable().Rows)
                         {
@@ -185,12 +190,12 @@ namespace DataTableConverter
             return dict;
         }
 
-        internal void AddContextMenuToDataGridView(DataGridView view,bool clipboard)
+        internal void AddContextMenuToDataGridView(DataGridView view, Form mainForm, bool clipboard)
         {
-            view.MouseClick +=(sender, e)=> DataGridView_MouseClick((DataGridView)sender, e, clipboard);
+            view.MouseClick +=(sender, e)=> DataGridView_MouseClick((DataGridView)sender, e, mainForm, clipboard);
         }
 
-        private void DataGridView_MouseClick(DataGridView view, MouseEventArgs e, bool clipboard)
+        private void DataGridView_MouseClick(DataGridView view, MouseEventArgs e, Form mainForm, bool clipboard)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -204,7 +209,7 @@ namespace DataTableConverter
                     view[selectedColumn, selectedRow].Selected = true;
                 }
 
-                ClipboardItem.Click += CtxRowClipboard = (sender2, e2) => InsertClipboardToDataGridView(view, selectedRow);
+                ClipboardItem.Click += CtxRowClipboard = (sender2, e2) => InsertClipboardToDataGridView(view, selectedRow, mainForm);
 
                 if (DeleteRowItem.Visible = (selectedRow > -1 && selectedRow != view.Rows.Count - 1))
                 {

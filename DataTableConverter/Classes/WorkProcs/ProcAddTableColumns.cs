@@ -58,14 +58,19 @@ namespace DataTableConverter.Classes.WorkProcs
             if (!CheckFile(filePath, ref path)) //find file
             {
                 OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(false);
-                if(dialog.ShowDialog() == DialogResult.OK)
+                DialogResult result = DialogResult.Cancel;
+                invokeForm.Invoke(new MethodInvoker(() =>
+                {
+                    result = dialog.ShowDialog(invokeForm);
+                }));
+                if (result == DialogResult.OK)
                 {
                     path = dialog.FileName;
                 }
             }
             if (!string.IsNullOrWhiteSpace(path))
             {
-                DataTable newTable = ImportHelper.ImportFile(path, false, null, ctxRow, null); //load file
+                DataTable newTable = ImportHelper.ImportFile(path, false, null, ctxRow, null, invokeForm); //load file
                 if (newTable != null) {
                     object[] ImportHeaders = newTable.HeadersOfDataTable();
                     List<string> notFoundHeaders = new List<string>();
@@ -89,7 +94,12 @@ namespace DataTableConverter.Classes.WorkProcs
                         {
                             Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
                         };
-                        if (form.ShowDialog() == DialogResult.OK)
+                        DialogResult result = DialogResult.Cancel;
+                        invokeForm.Invoke(new MethodInvoker(() =>
+                        {
+                            result = form.ShowDialog(invokeForm);
+                        }));
+                        if (result == DialogResult.OK)
                         {
                             string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
                             string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();

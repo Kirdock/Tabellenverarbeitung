@@ -216,13 +216,13 @@ namespace DataTableConverter.View
 
             foreach (DataGridView dataGridView in dataGridViewsClipboard)
             {
-                ViewHelper.AddContextMenuToDataGridView(dataGridView, true);
+                ViewHelper.AddContextMenuToDataGridView(dataGridView, this, true);
                 ViewHelper.SetDataGridViewStyle(dataGridView);
             }
             
             foreach(DataGridView dataGridView in dataGridViews)
             {
-                ViewHelper.AddContextMenuToDataGridView(dataGridView, false);
+                ViewHelper.AddContextMenuToDataGridView(dataGridView, this, false);
                 ViewHelper.SetDataGridViewStyle(dataGridView);
             }
         }
@@ -745,7 +745,8 @@ namespace DataTableConverter.View
                 }
                 
                 MergeFormatView view = new MergeFormatView(row[(int)ProcMerge.ConditionColumn.Format] as MergeFormat);
-                view.ShowDialog();
+                view.ShowDialog(this);
+                view.Dispose();
                 dgvMerge.Refresh();
             }
         }
@@ -1464,7 +1465,7 @@ namespace DataTableConverter.View
 
         private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
         {
-            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow);
+            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, this);
         }
 
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -1967,7 +1968,7 @@ namespace DataTableConverter.View
                 CheckPathExists = true,
                 FileName = "Ordnerauswahl"
             };
-            if (folderBrowser.ShowDialog() == DialogResult.OK)
+            if (folderBrowser.ShowDialog(this) == DialogResult.OK)
             {
                 TxtPVMPath.Text = (GetSelectedWorkProcedure() as ProcPVMExport).SecondFileName = Path.GetDirectoryName(folderBrowser.FileName);
             }
@@ -2074,7 +2075,7 @@ namespace DataTableConverter.View
                 RestoreDirectory = true,
                 Multiselect = true
             };
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog(this) == DialogResult.OK)
             {
                 int lastId = -1;
                 bool abort = false;
@@ -2103,7 +2104,7 @@ namespace DataTableConverter.View
                     if (cases.Count > 0)
                     {
                         SelectDuplicateColumns form = new SelectDuplicateColumns(cases.Select(c => c.Name).ToArray(), Cases.Select(c => c.Name).ToArray(), false, "Zuweisung der Einträge in \"Duplikate\"", "Einträge");
-                        if (form.ShowDialog() == DialogResult.OK)
+                        if (form.ShowDialog(this) == DialogResult.OK)
                         {
                             for (int i = 0; i < form.Table.Rows.Count; i++)
                             {
@@ -2144,7 +2145,7 @@ namespace DataTableConverter.View
                     if (!abort && procs.Count > 0)
                     {
                         SelectDuplicateColumns form = new SelectDuplicateColumns(procs.Select(c => c.Name).ToArray(), Procedures.Select(c => c.Name).ToArray(), false, "Zuweisung der Einträge in \"Suchen & Ersetzen\"", "Einträge");
-                        if (form.ShowDialog() == DialogResult.OK)
+                        if (form.ShowDialog(this) == DialogResult.OK)
                         {
                             for (int i = 0; i < form.Table.Rows.Count; i++)
                             {
@@ -2195,7 +2196,7 @@ namespace DataTableConverter.View
             if (!valid)
             {
                 CustomMessageBox box = new CustomMessageBox(MessageBoxIcon.Warning,$"Es gibt bereits einen Arbeitsablauf mit dem Namen \"{work.Name}\"", "Überschreiben", "Umbenennen", "Abbrechen");
-                DialogResult res = box.ShowDialog();
+                DialogResult res = box.ShowDialog(this);
                 box.Dispose();
                 if (res == DialogResult.OK)
                 {
@@ -2217,7 +2218,7 @@ namespace DataTableConverter.View
             {
                 ExportSeparate selectedItem = GetSeparateSelectedItem();
                 SeparateLoadEntries form = new SeparateLoadEntries(selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, Table);
-                if (form.ShowDialog() == DialogResult.OK)
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     selectedItem.Column = TxtSeparateColumn.Text = form.SelectedItem.Column;
                     selectedItem.Table.BeginLoadData();
@@ -2245,7 +2246,7 @@ namespace DataTableConverter.View
         {
             MergeFormat format = (GetSelectedWorkProcedure() as ProcMerge).Format;
             MergeFormatView view = new MergeFormatView(format);
-            if(view.ShowDialog() == DialogResult.OK)
+            if(view.ShowDialog(this) == DialogResult.OK)
             {
                 txtFormula.Text = format.ToString();
             }

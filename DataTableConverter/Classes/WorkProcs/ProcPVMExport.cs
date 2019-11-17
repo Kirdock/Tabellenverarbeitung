@@ -61,8 +61,15 @@ namespace DataTableConverter.Classes.WorkProcs
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
-
-            if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
+            DialogResult result = DialogResult.Cancel;
+            if (path == null)
+            {
+                invokeForm.Invoke(new MethodInvoker(() =>
+                {
+                    result = saveFileDialog1.ShowDialog(invokeForm);
+                }));
+            }
+            if (path != null || result == DialogResult.OK)
             {
                 path = path ?? saveFileDialog1.FileName;
                 try
@@ -73,7 +80,15 @@ namespace DataTableConverter.Classes.WorkProcs
                     {
                         if((string.IsNullOrWhiteSpace(SecondFileName) || !Directory.Exists(SecondFileName)))
                         {
-                            if (saveFileDialog2.ShowDialog() == DialogResult.OK)
+                            DialogResult result2 = DialogResult.Cancel;
+                            if (path == null)
+                            {
+                                invokeForm.Invoke(new MethodInvoker(() =>
+                                {
+                                    result2 = saveFileDialog2.ShowDialog(invokeForm);
+                                }));
+                            }
+                            if (result2 == DialogResult.OK)
                             {
                                 path = saveFileDialog2.FileName;
                                 ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);

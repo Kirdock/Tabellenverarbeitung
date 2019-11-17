@@ -26,7 +26,7 @@ namespace DataTableConverter.View
             Proc = new ProcMerge();
             InitDataGridView(headers);
             UIHelper = new ViewHelper(ctxRow, null, null);
-            UIHelper.AddContextMenuToDataGridView(dgvMerge, false);
+            UIHelper.AddContextMenuToDataGridView(dgvMerge, this, false);
             ViewHelper.SetDataGridViewStyle(dgvMerge);
             
         }
@@ -123,7 +123,7 @@ namespace DataTableConverter.View
         private void BtnFormat_Click(object sender, EventArgs e)
         {
             MergeFormatView view = new MergeFormatView(Proc.Format, Headers);
-            if(view.ShowDialog() == DialogResult.OK)
+            if(view.ShowDialog(this) == DialogResult.OK)
             {
                 txtFormula.Text = Proc.Format.ToString();
             }
@@ -155,7 +155,7 @@ namespace DataTableConverter.View
                 }
 
                 MergeFormatView view = new MergeFormatView(row[(int)ProcMerge.ConditionColumn.Format] as MergeFormat, Headers);
-                view.ShowDialog();
+                view.ShowDialog(this);
                 dgvMerge.Refresh();
             }
         }

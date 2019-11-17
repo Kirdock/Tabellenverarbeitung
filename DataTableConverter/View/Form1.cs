@@ -416,7 +416,7 @@ namespace DataTableConverter
                     }
                 }
                 SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), table.HeadersOfDataTable(), false);
-                if (form.ShowDialog() == DialogResult.OK) {
+                if (form.ShowDialog(this) == DialogResult.OK) {
                     string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
                     string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
 
@@ -493,15 +493,14 @@ namespace DataTableConverter
             DataTable oldTable = GetDataSource();
             string mergePath = string.Empty;
             bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
-            if (validMerge || dialog.ShowDialog() == DialogResult.OK)
+            if (validMerge || dialog.ShowDialog(this) == DialogResult.OK)
             {
                 string[] filenames = validMerge ? new string[1] {mergePath} : dialog.FileNames;
-
+                ProgressBar loadingBar = pgbLoading;
                 Thread thread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     bool fileNameSet = state != ImportState.None;
-                    StartLoadingBar();
                     bool multipleFiles = filenames.Length > 1;
                     Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
                     DataTable newTable = null;
@@ -512,7 +511,8 @@ namespace DataTableConverter
                         {
 
                             string filename = Path.GetFileName(file);
-                            DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, pgbLoading);
+                            
+                            DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this);
                             if (table != null)
                             {
                                 if (newTable != null)
@@ -634,7 +634,8 @@ namespace DataTableConverter
                             if (!sourceTable.Columns.Contains(invalidColumnName))
                             {
                                 SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, sourceTable.HeadersOfDataTable(), true);
-                                if (f.ShowDialog() == DialogResult.OK)
+                                
+                                if (f.ShowDialog(this) == DialogResult.OK)
                                 {
                                     invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
                                     sourceTable.SplitDataTable(FilePath, invalidColumnName);
@@ -664,7 +665,7 @@ namespace DataTableConverter
         {
             MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
             bool result;
-            if (result = (form.ShowDialog() == DialogResult.OK))
+            if (result = (form.ShowDialog(this) == DialogResult.OK))
             {
                 importColumns = form.getSelectedColumns();
                 sourceMergeIndex = form.getSelectedOriginal();
@@ -689,7 +690,7 @@ namespace DataTableConverter
             if (dgTable.DataSource != null)
             {
                 TrimForm form = new TrimForm();
-                if(form.ShowDialog() == DialogResult.OK)
+                if(form.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
                     DataTable table = GetDataSource();
@@ -719,7 +720,7 @@ namespace DataTableConverter
         private void procedure_Click(object sender, EventArgs e, Proc procedure)
         {
             Formula formula = new Formula(FormulaState.Procedure, sourceTable.HeadersOfDataTable());
-            if (formula.ShowDialog() == DialogResult.OK)
+            if (formula.ShowDialog(this) == DialogResult.OK)
             {
                 string[] columns = formula.SelectedHeaders();
 
@@ -787,7 +788,7 @@ namespace DataTableConverter
                     RestoreDirectory = true
                 };
 
-                if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
+                if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
                     StartLoadingBar();
@@ -882,7 +883,7 @@ namespace DataTableConverter
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Merge formula = new Merge(sourceTable.HeadersOfDataTable(), contextGlobal);
-            if (formula.ShowDialog() == DialogResult.OK)
+            if (formula.ShowDialog(this) == DialogResult.OK)
             {
                 StartSingleWorkflow(formula.Proc);
             }
@@ -899,7 +900,7 @@ namespace DataTableConverter
                     RestoreDirectory = true
                 };
 
-                if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
+                if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
                     DataTable table = GetDataSource(true);
@@ -1040,7 +1041,7 @@ namespace DataTableConverter
                     RestoreDirectory = true
                 };
                 
-                if (path != null || saveFileDialog1.ShowDialog() == DialogResult.OK)
+                if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
                     StartLoadingBarCount(table.Rows.Count);
@@ -1096,7 +1097,7 @@ namespace DataTableConverter
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Formula formula = new Formula(FormulaState.Export, sourceTable.HeadersOfDataTable());
-            if(formula.ShowDialog() == DialogResult.OK)
+            if(formula.ShowDialog(this) == DialogResult.OK)
             {
                 StartLoadingBarCount(Properties.Settings.Default.PVMSaveTwice ? sourceTable.Rows.Count * 2 : sourceTable.Rows.Count);
                 new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType, this, out int[] newIndices);
@@ -1109,7 +1110,7 @@ namespace DataTableConverter
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ExportCustom export = new ExportCustom(sourceTable.HeadersOfDataTable(), sourceTable);
-            if(export.ShowDialog() == DialogResult.OK)
+            if(export.ShowDialog(this) == DialogResult.OK)
             {
                 StartLoadingBar();
                 ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished);
@@ -1138,7 +1139,7 @@ namespace DataTableConverter
         {
             ExportCount export = new ExportCount(sourceTable.HeadersOfDataTable(), sourceTable);
             
-            if(export.ShowDialog() == DialogResult.OK)
+            if(export.ShowDialog(this) == DialogResult.OK)
             {
                 StartLoadingBar();
                 Thread thread = new Thread(() =>
@@ -1272,7 +1273,7 @@ namespace DataTableConverter
         private void großKleinschreibungToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UpLowCaseForm form = new UpLowCaseForm(sourceTable.HeadersOfDataTable());
-            if (form.ShowDialog() == DialogResult.OK) {
+            if (form.ShowDialog(this) == DialogResult.OK) {
                 StartSingleWorkflow(form.Procedure);
             }
         }
@@ -1280,7 +1281,7 @@ namespace DataTableConverter
         private void rundenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             RoundForm form = new RoundForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 StartSingleWorkflow(form.Procedure);
             }
@@ -1315,7 +1316,7 @@ namespace DataTableConverter
             DataTable table = GetDataSource();
             
             MergeColumns form = new MergeColumns(table.HeadersOfDataTable());
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 string identifier = form.Identifier;
                 int identifierIndex = form.IdentifierIndex;
@@ -1349,7 +1350,7 @@ namespace DataTableConverter
         private void zeichenAuffüllenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PaddingForm form = new PaddingForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 StartSingleWorkflow(form.Proc);
             }
@@ -1375,7 +1376,7 @@ namespace DataTableConverter
         private void nummerierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NumerationForm form = new NumerationForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 StartSingleWorkflow(form.Procedure);
             }
@@ -1398,7 +1399,7 @@ namespace DataTableConverter
         private void substringToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SubstringForm form = new SubstringForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 StartSingleWorkflow(form.Procedure);
             }
@@ -1407,7 +1408,7 @@ namespace DataTableConverter
         private void textErsetzenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             ReplaceWholeForm form = new ReplaceWholeForm(sourceTable.HeadersOfDataTable(), contextGlobal);
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 ProcReplaceWhole proc = new ProcReplaceWhole(form.Table);
                 StartSingleWorkflow(proc);
@@ -1455,7 +1456,7 @@ namespace DataTableConverter
         private void spaltenVergleichenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CompareForm form = new CompareForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 StartSingleWorkflow(form.Procedure);
             }
@@ -1465,7 +1466,7 @@ namespace DataTableConverter
         {
             DataTable table = GetDataSource();
             SelectHeader headerForm = new SelectHeader(table.HeadersOfDataTable());
-            if (headerForm.ShowDialog() == DialogResult.OK)
+            if (headerForm.ShowDialog(this) == DialogResult.OK)
             {
                 string column = headerForm.Column;
                 bool continueLoop = false;
@@ -1532,7 +1533,7 @@ namespace DataTableConverter
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SortForm form = new SortForm(sourceTable.HeadersOfDataTable(), SortingOrder, OrderType);
-            if(form.ShowDialog() == DialogResult.OK)
+            if(form.ShowDialog(this) == DialogResult.OK)
             {
                 OrderType = form.OrderType;
                 SetSorting(form.SortString);
