@@ -634,8 +634,12 @@ namespace DataTableConverter
                             if (!sourceTable.Columns.Contains(invalidColumnName))
                             {
                                 SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, sourceTable.HeadersOfDataTable(), true);
-                                
-                                if (f.ShowDialog(this) == DialogResult.OK)
+                                DialogResult res = DialogResult.Cancel;
+                                this.Invoke(new MethodInvoker(() =>
+                                {
+                                    res = f.ShowDialog(this);
+                                }));
+                                if (res == DialogResult.OK)
                                 {
                                     invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
                                     sourceTable.SplitDataTable(FilePath, invalidColumnName);
@@ -665,7 +669,12 @@ namespace DataTableConverter
         {
             MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
             bool result;
-            if (result = (form.ShowDialog(this) == DialogResult.OK))
+            DialogResult res = DialogResult.Cancel;
+            this.Invoke(new MethodInvoker(() =>
+            {
+                res = form.ShowDialog(this);
+            }));
+            if (result = ( res == DialogResult.OK))
             {
                 importColumns = form.getSelectedColumns();
                 sourceMergeIndex = form.getSelectedOriginal();
