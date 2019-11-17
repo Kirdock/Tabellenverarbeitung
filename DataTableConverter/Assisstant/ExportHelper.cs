@@ -432,14 +432,11 @@ namespace DataTableConverter
             query = CreateQuery(table, filename, max);
             
             OleDbConnection con = new OleDbConnection(GetConnection(path));
-            OleDbCommand cmd = new OleDbCommand
-            {
-                Connection = con
-            };
+            OleDbCommand cmd = new OleDbCommand(query, con);
             con.Open();
-            cmd.CommandText = query;
             cmd.ExecuteNonQuery();
             con.Close();
+            cmd.Dispose();
         }
 
         private static string CreateQuery(DataTable table, string filename, int[] max)

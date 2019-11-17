@@ -36,6 +36,7 @@
             // 
             this.ClBHeaders.CheckOnClick = true;
             this.ClBHeaders.FormattingEnabled = true;
+            this.ClBHeaders.HorizontalScrollbar = true;
             this.ClBHeaders.Location = new System.Drawing.Point(12, 12);
             this.ClBHeaders.Name = "ClBHeaders";
             this.ClBHeaders.Size = new System.Drawing.Size(347, 259);

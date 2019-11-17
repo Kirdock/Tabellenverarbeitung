@@ -187,6 +187,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.clbValues.CheckOnClick = true;
             this.clbValues.FormattingEnabled = true;
+            this.clbValues.HorizontalScrollbar = true;
             this.clbValues.Location = new System.Drawing.Point(12, 184);
             this.clbValues.Name = "clbValues";
             this.clbValues.Size = new System.Drawing.Size(417, 229);

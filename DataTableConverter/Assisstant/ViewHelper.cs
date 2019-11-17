@@ -2,6 +2,7 @@
 using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
 using DataTableConverter.View;
+using DataTableConverter.View.CustomControls;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -89,6 +90,40 @@ namespace DataTableConverter
                 TextBox tx = e.Control as TextBox;
                 tx.KeyPress += new KeyPressEventHandler(Tx_KeyPress);
             }
+        }
+
+        internal static void ResizeCountListBox(CountListbox clbValues)
+        {
+            int maxWidth = 0;
+
+            for (int i = 0; i < clbValues.Items.Count; i++)
+            {
+                int testWidth = TextRenderer.MeasureText(clbValues.Items[i].ToString() + $" (Anzahl: {(clbValues.Items[i] as CountListboxItem)?.Count})",
+                                                            clbValues.Font).Width;
+                if (testWidth > maxWidth)
+                {
+                    maxWidth = testWidth;
+                }
+            }
+
+            clbValues.HorizontalExtent = maxWidth + 50;
+        }
+
+        internal static void ResizePlusListBox(PlusListbox clBHeaders)
+        {
+            int maxWidth = 0;
+
+            for (int i = 0; i < clBHeaders.Items.Count; i++)
+            {
+                int testWidth = TextRenderer.MeasureText(clBHeaders.Items[i].ToString(),
+                                                            clBHeaders.Font).Width;
+                if (testWidth > maxWidth)
+                {
+                    maxWidth = testWidth;
+                }
+            }
+
+            clBHeaders.HorizontalExtent = maxWidth + 20;
         }
 
         internal static void Tx_KeyPress(object sender, KeyPressEventArgs e)

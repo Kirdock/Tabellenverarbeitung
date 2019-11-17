@@ -45,6 +45,7 @@
             // 
             this.clBoxHeaders.CheckOnClick = true;
             this.clBoxHeaders.FormattingEnabled = true;
+            this.clBoxHeaders.HorizontalScrollbar = true;
             this.clBoxHeaders.Location = new System.Drawing.Point(12, 51);
             this.clBoxHeaders.Name = "clBoxHeaders";
             this.clBoxHeaders.Size = new System.Drawing.Size(316, 379);
@@ -105,6 +106,7 @@
             // 
             this.lBoxSelectedHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lBoxSelectedHeaders.FormattingEnabled = true;
+            this.lBoxSelectedHeaders.HorizontalScrollbar = true;
             this.lBoxSelectedHeaders.Location = new System.Drawing.Point(350, 51);
             this.lBoxSelectedHeaders.Name = "lBoxSelectedHeaders";
             this.lBoxSelectedHeaders.Size = new System.Drawing.Size(316, 381);

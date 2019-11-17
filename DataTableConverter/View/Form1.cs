@@ -557,7 +557,6 @@ namespace DataTableConverter
 
         private void FinishImport(DataTable table, ImportState state, DataTable oldTable, string filename)
         {
-            StopLoadingBar();
             if(table != null) {
                 switch (state)
                 {
@@ -582,6 +581,7 @@ namespace DataTableConverter
                         break;
                 }
             }
+            StopLoadingBar();
         }
 
         private void StartMerge(DataTable importTable, DataTable sourceTable, string filename)

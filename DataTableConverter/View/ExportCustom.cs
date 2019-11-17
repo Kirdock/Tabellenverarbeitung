@@ -106,6 +106,7 @@ namespace DataTableConverter.View
                 clbValues.Items.Add(new CountListboxItem(pair[key], key));
             }
             clbValues.EndUpdate();
+            ViewHelper.ResizeCountListBox(clbValues);
         }
 
         private void btnDeleteFile_Click(object sender, EventArgs e)

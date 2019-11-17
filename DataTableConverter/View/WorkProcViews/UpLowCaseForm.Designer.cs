@@ -38,6 +38,7 @@
             // 
             this.clbHeaders.CheckOnClick = true;
             this.clbHeaders.FormattingEnabled = true;
+            this.clbHeaders.HorizontalScrollbar = true;
             this.clbHeaders.Location = new System.Drawing.Point(12, 73);
             this.clbHeaders.Name = "clbHeaders";
             this.clbHeaders.Size = new System.Drawing.Size(205, 184);

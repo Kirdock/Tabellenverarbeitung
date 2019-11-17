@@ -99,6 +99,7 @@
             // 
             this.CLBValues.CheckOnClick = true;
             this.CLBValues.FormattingEnabled = true;
+            this.CLBValues.HorizontalScrollbar = true;
             this.CLBValues.Location = new System.Drawing.Point(12, 112);
             this.CLBValues.Name = "CLBValues";
             this.CLBValues.Size = new System.Drawing.Size(257, 214);
@@ -121,7 +122,7 @@
             this.MaximizeBox = false;
             this.Name = "SeparateLoadEntries";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "SeparateLoadEntries";
+            this.Text = "Trennen";
             this.ResumeLayout(false);
             this.PerformLayout();
 

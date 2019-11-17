@@ -65,6 +65,7 @@
             // 
             this.clbColumns.CheckOnClick = true;
             this.clbColumns.FormattingEnabled = true;
+            this.clbColumns.HorizontalScrollbar = true;
             this.clbColumns.Location = new System.Drawing.Point(377, 61);
             this.clbColumns.Name = "clbColumns";
             this.clbColumns.Size = new System.Drawing.Size(294, 289);

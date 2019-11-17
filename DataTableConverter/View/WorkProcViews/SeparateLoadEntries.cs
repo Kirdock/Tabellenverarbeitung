@@ -97,6 +97,8 @@ namespace DataTableConverter.View.WorkProcViews
                 CLBValues.Items.Add(new CountListboxItem(0, key));
             }
             CLBValues.EndUpdate();
+
+            ViewHelper.ResizeCountListBox(CLBValues);
         }
 
         private void CmBColumns_SelectedIndexChanged(object sender, EventArgs e)
