@@ -71,61 +71,70 @@ namespace DataTableConverter.Classes.WorkProcs
             if (!string.IsNullOrWhiteSpace(path))
             {
                 DataTable newTable = ImportHelper.ImportFile(path, false, null, ctxRow, null, invokeForm); //load file
-                if (newTable != null) {
-                    object[] ImportHeaders = newTable.HeadersOfDataTable();
-                    List<string> notFoundHeaders = new List<string>();
-                    string[] importColumns = new string[0];
-                    if (!newTable.Columns.Contains(IdentifyAppend))
+                if (newTable != null)
+                {
+                    DialogResult res = DialogResult.Yes;
+                    if (table.Rows.Count != newTable.Rows.Count)
                     {
-                        notFoundHeaders.Add(IdentifyAppend);
+                        res = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {newTable.Rows.Count})!\nTrotzdem fortfahren?");
                     }
-                    else if (!newTable.Columns.Contains(invalidColumnName))
+                    if (res == DialogResult.Yes)
                     {
-                        notFoundHeaders.Add(invalidColumnName);
-                    }
-                    else
-                    {
-                        importColumns = ImportHeaders.Cast<string>().ToArray();
-                    }
-
-                    if (notFoundHeaders.Count > 0)
-                    {
-                        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders, true)
+                        object[] ImportHeaders = newTable.HeadersOfDataTable();
+                        List<string> notFoundHeaders = new List<string>();
+                        string[] importColumns = new string[0];
+                        if (!newTable.Columns.Contains(IdentifyAppend))
                         {
-                            Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
-                        };
-                        DialogResult result = DialogResult.Cancel;
-                        invokeForm.Invoke(new MethodInvoker(() =>
+                            notFoundHeaders.Add(IdentifyAppend);
+                        }
+                        else if (!newTable.Columns.Contains(invalidColumnName))
                         {
-                            result = form.ShowDialog(invokeForm);
-                        }));
-                        if (result == DialogResult.OK)
+                            notFoundHeaders.Add(invalidColumnName);
+                        }
+                        else
                         {
-                            string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
-                            string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
-
-                            for (int i = 0; i < from.Length; i++)
-                            {
-                                if(from[i] == invalidColumnName)
-                                {
-                                    invalidColumnName = to[i];
-                                }
-                                if (from[i] == IdentifyAppend)
-                                {
-                                    IdentifyAppend = to[i];
-                                }
-                            }
-                            notFoundHeaders.Clear();
                             importColumns = ImportHeaders.Cast<string>().ToArray();
                         }
-                    }
-                    if(notFoundHeaders.Count == 0)
-                    {
-                        table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
-                        newOrderIndices = newIndices;
-                        if (Properties.Settings.Default.SplitPVM)
+
+                        if (notFoundHeaders.Count > 0)
                         {
-                            table.SplitDataTable(filePath, invalidColumnName);
+                            SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders, true)
+                            {
+                                Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
+                            };
+                            DialogResult result = DialogResult.Cancel;
+                            invokeForm.Invoke(new MethodInvoker(() =>
+                            {
+                                result = form.ShowDialog(invokeForm);
+                            }));
+                            if (result == DialogResult.OK)
+                            {
+                                string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
+                                string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
+
+                                for (int i = 0; i < from.Length; i++)
+                                {
+                                    if (from[i] == invalidColumnName)
+                                    {
+                                        invalidColumnName = to[i];
+                                    }
+                                    if (from[i] == IdentifyAppend)
+                                    {
+                                        IdentifyAppend = to[i];
+                                    }
+                                }
+                                notFoundHeaders.Clear();
+                                importColumns = ImportHeaders.Cast<string>().ToArray();
+                            }
+                        }
+                        if (notFoundHeaders.Count == 0)
+                        {
+                            table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
+                            newOrderIndices = newIndices;
+                            if (Properties.Settings.Default.SplitPVM)
+                            {
+                                table.SplitDataTable(filePath, invalidColumnName);
+                            }
                         }
                     }
                 }
