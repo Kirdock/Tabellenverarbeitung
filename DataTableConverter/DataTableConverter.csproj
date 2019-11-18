@@ -153,6 +153,12 @@
     <Compile Include="View\ExcelSheets.Designer.cs">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\ProcedureForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\ProcedureForm.Designer.cs">
+      <DependentUpon>ProcedureForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\SelectEncoding.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -316,6 +322,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\ExcelSheets.resx">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\ProcedureForm.resx">
+      <DependentUpon>ProcedureForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\SelectEncoding.resx">
       <DependentUpon>SelectEncoding.cs</DependentUpon>

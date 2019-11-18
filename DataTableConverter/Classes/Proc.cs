@@ -13,14 +13,22 @@ namespace DataTableConverter.Classes
         public string Name { get; set; }
         public int Id { get; set; }
         public DataTable Replace { get; set; }
-        internal bool CheckTotal { get; set; }
-        internal bool Locked { get; set; }
+        public bool CheckTotal { get; set; }
+        public bool Locked { get; set; }
+        public bool CheckWord { get; set; }
 
         public Proc(string name, DataTable replace, int id)
         {
             Name = name;
             Replace = replace;
             Id = id;
+        }
+
+        public Proc(DataTable replace, bool checkTotal, bool checkWord)
+        {
+            Replace = replace;
+            CheckTotal = checkTotal;
+            CheckWord = checkWord;
         }
 
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -86,6 +87,14 @@ namespace DataTableConverter.Classes.WorkProcs
                             else
                             {
                                 row[index] = value;
+                            }
+                        }
+                        else if (procedure.CheckWord)
+                        {
+                            foreach (DataRow rep in replaces)
+                            {
+                                string pattern = @"\b" + Regex.Escape(rep[0].ToString()) + @"\b";
+                                row[index] = Regex.Replace(value, pattern,rep[1].ToString());
                             }
                         }
                         else

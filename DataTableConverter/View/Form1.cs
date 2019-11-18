@@ -310,11 +310,16 @@ namespace DataTableConverter
             ersetzenToolStripMenuItem.DropDownItems.Clear();
             
             procedures = proc ?? ImportHelper.LoadProcedures();
+
+            ToolStripMenuItem tempProcedure = new ToolStripMenuItem("Temporäre Eingabe");
+            tempProcedure.Click += TempProcedure_Click;
+            ersetzenToolStripMenuItem.DropDownItems.Add(tempProcedure);
+
             for (int i = 0; i < procedures.Count; i++)
             {
                 int index = i;
                 ToolStripMenuItem item = new ToolStripMenuItem(procedures[i].Name);
-                item.Click += (sender, e) => procedure_Click(sender, e, procedures[index]);
+                item.Click += (sender, e) => procedure_Click(procedures[index]);
                 ersetzenToolStripMenuItem.DropDownItems.Add(item);
             }   
         }
@@ -733,7 +738,18 @@ namespace DataTableConverter
             }
         }
 
-        private void procedure_Click(object sender, EventArgs e, Proc procedure)
+        private void TempProcedure_Click(object sender, EventArgs e)
+        {
+            ProcedureForm form = new ProcedureForm(contextGlobal);
+            if(form.ShowDialog(this) == DialogResult.OK)
+            {
+                Proc proc = new Proc(form.Table,form.CheckTotal, form.CheckWord);
+                procedure_Click(proc);
+            }
+            form.Dispose();
+        }
+
+        private void procedure_Click(Proc procedure)
         {
             Formula formula = new Formula(FormulaState.Procedure, sourceTable.HeadersOfDataTable());
             if (formula.ShowDialog(this) == DialogResult.OK)

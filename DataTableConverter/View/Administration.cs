@@ -1488,11 +1488,6 @@ namespace DataTableConverter.View
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 
-        private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
-        {
-            ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, this);
-        }
-
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             WorkProc selecteWorkProc = GetSelectedWorkProcedure();
@@ -1669,6 +1664,10 @@ namespace DataTableConverter.View
             if (lbProcedures.SelectedIndex != -1)
             {
                 selectedProc.CheckTotal = cbCheckTotal.Checked;
+                if (selectedProc.CheckTotal)
+                {
+                    selectedProc.CheckWord = CbProcWordCheck.Checked = false;
+                }
             }
         }
 
@@ -2268,6 +2267,18 @@ namespace DataTableConverter.View
             ImportHelper.KeyVal item = (CmBPresetPVMImport.SelectedItem as ImportHelper.KeyVal);
             proc.PresetType = item.Val;
             proc.SettingPreset = item.Key;
+        }
+
+        private void CbProcWordCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lbProcedures.SelectedIndex != -1)
+            {
+                selectedProc.CheckWord = CbProcWordCheck.Checked;
+                if (selectedProc.CheckWord)
+                {
+                    selectedProc.CheckTotal = cbCheckTotal.Checked = false;
+                }
+            }
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

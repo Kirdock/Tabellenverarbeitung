@@ -44,6 +44,7 @@
             this.zeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nummerierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.prüfzifferToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spaltenAusTabelleHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rundenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spaltenVergleichenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,7 +90,6 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.prüfzifferToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -207,6 +207,13 @@
             this.nummerierenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.nummerierenToolStripMenuItem.Text = "Nummerieren";
             this.nummerierenToolStripMenuItem.Click += new System.EventHandler(this.nummerierenToolStripMenuItem_Click);
+            // 
+            // prüfzifferToolStripMenuItem
+            // 
+            this.prüfzifferToolStripMenuItem.Name = "prüfzifferToolStripMenuItem";
+            this.prüfzifferToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.prüfzifferToolStripMenuItem.Text = "Prüfziffer";
+            this.prüfzifferToolStripMenuItem.Click += new System.EventHandler(this.PrüfzifferToolStripMenuItem_Click);
             // 
             // spaltenAusTabelleHinzufügenToolStripMenuItem
             // 
@@ -545,13 +552,6 @@
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
-            // 
-            // prüfzifferToolStripMenuItem
-            // 
-            this.prüfzifferToolStripMenuItem.Name = "prüfzifferToolStripMenuItem";
-            this.prüfzifferToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.prüfzifferToolStripMenuItem.Text = "Prüfziffer";
-            this.prüfzifferToolStripMenuItem.Click += new System.EventHandler(this.PrüfzifferToolStripMenuItem_Click);
             // 
             // Form1
             // 
