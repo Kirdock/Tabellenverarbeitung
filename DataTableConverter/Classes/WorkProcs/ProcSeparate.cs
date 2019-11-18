@@ -32,11 +32,23 @@ namespace DataTableConverter.Classes.WorkProcs
                 DataTable tableSkeleton = table.Clone();
                 if (item.CheckedAllValues)
                 {
-                    foreach (string value in table.GroupCountOfColumn(table.Columns.IndexOf(item.Column)).Keys)
+                    foreach (string value in table.GroupCountOfColumn(item.Column).Keys)
                     {
                         DataTable dictTable = tableSkeleton.Copy();
                         dictTable.TableName = $"{item.Name}_{value}";
                         Dict.Add(value, dictTable);
+                    }
+                }
+                else if (item.SaveRemaining)
+                {
+                    DataTable temp = tableSkeleton.Copy();
+                    temp.TableName = item.Name;
+                    foreach (string value in table.GroupCountOfColumn(item.Column).Keys.Where(key => !Files.Any(file => file.Column == item.Column && file.Values.Contains(key))))
+                    {
+                        if (!Dict.ContainsKey(value))
+                        {
+                            Dict.Add(value, temp);
+                        }
                     }
                 }
                 else
@@ -45,7 +57,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     temp.TableName = item.Name;
                     foreach (string value in item.Values)
                     {
-                        if (!Dict.TryGetValue(value, out DataTable tables))
+                        if (!Dict.ContainsKey(value))
                         {
                             Dict.Add(value, temp);
                         }

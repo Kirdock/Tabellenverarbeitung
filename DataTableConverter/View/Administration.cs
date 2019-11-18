@@ -107,6 +107,14 @@ namespace DataTableConverter.View
             SetTolerancesBefore(tolerances);
         }
 
+        private void ClearDataBefore()
+        {
+            ProceduresBefore.Dispose();
+            CasesBefore.Dispose();
+            TolerancesBefore.Dispose();
+            WorkflowsBefore.Dispose();
+        }
+
         private void SetProceduresBefore(List<Proc> procedures)
         {
             ProceduresBefore = new MemoryStream();
@@ -340,6 +348,10 @@ namespace DataTableConverter.View
             {
                 DialogResult result = this.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
                 e.Cancel = result == DialogResult.No;
+            }
+            if (!e.Cancel)
+            {
+                ClearDataBefore();
             }
         }
 
@@ -996,6 +1008,10 @@ namespace DataTableConverter.View
             CbSeparateSaveAll.CheckedChanged -= CbSeparateSaveAll_CheckedChanged;
             CbSeparateSaveAll.Checked = false;
             CbSeparateSaveAll.CheckedChanged += CbSeparateSaveAll_CheckedChanged;
+
+            CbSeparateSaveRemaining.CheckedChanged -= CbSeparateSaveRemaining_CheckedChanged;
+            CbSeparateSaveRemaining.Checked = false;
+            CbSeparateSaveRemaining.CheckedChanged += CbSeparateSaveRemaining_CheckedChanged;
 
             CmBSeparate.DataSource = proc.Files;
             CmBSeparate.DisplayMember = "Name";
@@ -2071,13 +2087,21 @@ namespace DataTableConverter.View
             TxtSeparateColumn.Text = selectedItem.Column;
             CmBSeparateFormat.SelectedIndex = selectedItem.Format;
             CbSeparateSaveAll.Checked = selectedItem.CheckedAllValues;
+            CbSeparateSaveRemaining.Checked = selectedItem.SaveRemaining;
 
             DgvSeparate.DataSource = selectedItem.Table;
         }
 
         private void CbSeparateSaveAll_CheckedChanged(object sender, EventArgs e)
         {
-            GetSeparateSelectedItem().CheckedAllValues = CbSeparateSaveAll.Checked;
+            ExportSeparate selectedItem = GetSeparateSelectedItem();
+            selectedItem.CheckedAllValues = CbSeparateSaveAll.Checked;
+            if (selectedItem.CheckedAllValues)
+            {
+                selectedItem.SaveRemaining = CbSeparateSaveRemaining.Checked = false;
+            }
+
+            
             SetSeparateEnabled();
         }
 
@@ -2278,6 +2302,16 @@ namespace DataTableConverter.View
                 {
                     selectedProc.CheckTotal = cbCheckTotal.Checked = false;
                 }
+            }
+        }
+
+        private void CbSeparateSaveRemaining_CheckedChanged(object sender, EventArgs e)
+        {
+            ExportSeparate selectedItem = GetSeparateSelectedItem();
+            selectedItem.SaveRemaining = CbSeparateSaveRemaining.Checked;
+            if (selectedItem.SaveRemaining)
+            {
+                selectedItem.CheckedAllValues = CbSeparateSaveAll.Checked = false;
             }
         }
 

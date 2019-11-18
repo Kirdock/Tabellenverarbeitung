@@ -17,6 +17,7 @@ namespace DataTableConverter.Classes
         public DataTable Table;
         internal IEnumerable<string> Values => Table.ColumnValuesAsString(0);
         internal bool CheckedAllValues;
+        public bool SaveRemaining;
 
         internal ExportSeparate(string name, string column)
         {

@@ -225,6 +225,7 @@
             this.BtnDiscard = new System.Windows.Forms.Button();
             this.CmBPresetPVMImport = new System.Windows.Forms.ComboBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.CbProcWordCheck = new System.Windows.Forms.CheckBox();
             this.cbHeadersPad = new CheckComboBoxTest.CheckedComboBox();
             this.clbHeadersRound = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeadersPVMExport = new CheckComboBoxTest.CheckedComboBox();
@@ -233,7 +234,7 @@
             this.clbUpLowHeader = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeadersReplaceWhole = new CheckComboBoxTest.CheckedComboBox();
             this.cbSubstringHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.CbProcWordCheck = new System.Windows.Forms.CheckBox();
+            this.CbSeparateSaveRemaining = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -560,8 +561,8 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPadding);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCount);
@@ -746,6 +747,7 @@
             // 
             // gbSeparate
             // 
+            this.gbSeparate.Controls.Add(this.CbSeparateSaveRemaining);
             this.gbSeparate.Controls.Add(this.BtnSeparateLoadEntries);
             this.gbSeparate.Controls.Add(this.CbSeparateSaveAll);
             this.gbSeparate.Controls.Add(this.CmBSeparateFormat);
@@ -768,7 +770,7 @@
             // 
             // BtnSeparateLoadEntries
             // 
-            this.BtnSeparateLoadEntries.Location = new System.Drawing.Point(5, 179);
+            this.BtnSeparateLoadEntries.Location = new System.Drawing.Point(5, 194);
             this.BtnSeparateLoadEntries.Name = "BtnSeparateLoadEntries";
             this.BtnSeparateLoadEntries.Size = new System.Drawing.Size(228, 23);
             this.BtnSeparateLoadEntries.TabIndex = 31;
@@ -779,7 +781,7 @@
             // CbSeparateSaveAll
             // 
             this.CbSeparateSaveAll.AutoSize = true;
-            this.CbSeparateSaveAll.Location = new System.Drawing.Point(8, 160);
+            this.CbSeparateSaveAll.Location = new System.Drawing.Point(8, 149);
             this.CbSeparateSaveAll.Name = "CbSeparateSaveAll";
             this.CbSeparateSaveAll.Size = new System.Drawing.Size(160, 17);
             this.CbSeparateSaveAll.TabIndex = 30;
@@ -889,10 +891,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DgvSeparate.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.DgvSeparate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DgvSeparate.Location = new System.Drawing.Point(6, 208);
+            this.DgvSeparate.Location = new System.Drawing.Point(6, 226);
             this.DgvSeparate.Name = "DgvSeparate";
             this.DgvSeparate.RowHeadersVisible = false;
-            this.DgvSeparate.Size = new System.Drawing.Size(230, 414);
+            this.DgvSeparate.Size = new System.Drawing.Size(230, 396);
             this.DgvSeparate.TabIndex = 16;
             this.DgvSeparate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
@@ -2725,6 +2727,18 @@
             this.label15.TabIndex = 5;
             this.label15.Text = "Vorlage:";
             // 
+            // CbProcWordCheck
+            // 
+            this.CbProcWordCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CbProcWordCheck.AutoSize = true;
+            this.CbProcWordCheck.Location = new System.Drawing.Point(578, 53);
+            this.CbProcWordCheck.Name = "CbProcWordCheck";
+            this.CbProcWordCheck.Size = new System.Drawing.Size(128, 17);
+            this.CbProcWordCheck.TabIndex = 11;
+            this.CbProcWordCheck.Text = "Wortübereinstimmung";
+            this.CbProcWordCheck.UseVisualStyleBackColor = true;
+            this.CbProcWordCheck.CheckedChanged += new System.EventHandler(this.CbProcWordCheck_CheckedChanged);
+            // 
             // cbHeadersPad
             // 
             this.cbHeadersPad.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -2853,17 +2867,16 @@
             this.cbSubstringHeaders.ValueSeparator = ", ";
             this.cbSubstringHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbSubstringHeaders_ItemCheck);
             // 
-            // CbProcWordCheck
+            // CbSeparateSaveRemaining
             // 
-            this.CbProcWordCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CbProcWordCheck.AutoSize = true;
-            this.CbProcWordCheck.Location = new System.Drawing.Point(578, 53);
-            this.CbProcWordCheck.Name = "CbProcWordCheck";
-            this.CbProcWordCheck.Size = new System.Drawing.Size(128, 17);
-            this.CbProcWordCheck.TabIndex = 11;
-            this.CbProcWordCheck.Text = "Wortübereinstimmung";
-            this.CbProcWordCheck.UseVisualStyleBackColor = true;
-            this.CbProcWordCheck.CheckedChanged += new System.EventHandler(this.CbProcWordCheck_CheckedChanged);
+            this.CbSeparateSaveRemaining.AutoSize = true;
+            this.CbSeparateSaveRemaining.Location = new System.Drawing.Point(8, 172);
+            this.CbSeparateSaveRemaining.Name = "CbSeparateSaveRemaining";
+            this.CbSeparateSaveRemaining.Size = new System.Drawing.Size(172, 17);
+            this.CbSeparateSaveRemaining.TabIndex = 32;
+            this.CbSeparateSaveRemaining.Text = "Alle restlichen Werte speichern";
+            this.CbSeparateSaveRemaining.UseVisualStyleBackColor = true;
+            this.CbSeparateSaveRemaining.CheckedChanged += new System.EventHandler(this.CbSeparateSaveRemaining_CheckedChanged);
             // 
             // Administration
             // 
@@ -3187,5 +3200,6 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.ComboBox CmBPresetPVMImport;
         private System.Windows.Forms.CheckBox CbProcWordCheck;
+        private System.Windows.Forms.CheckBox CbSeparateSaveRemaining;
     }
 }
