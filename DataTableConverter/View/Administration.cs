@@ -327,9 +327,9 @@ namespace DataTableConverter.View
             SaveSize();
             Properties.Settings.Default.Save();
 
-            if ((ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases)))
+            if ((ExportHelper.SaveWorkflows(Workflows, this) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases)))
             {
-                DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
+                DialogResult result = this.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
                 e.Cancel = result == DialogResult.No;
             }
         }
@@ -408,7 +408,7 @@ namespace DataTableConverter.View
                 int id = Procedures[ltbProcedures.SelectedIndex].Id;
                 if (IsProcedureUsed(id, out string usedWorkflows, typeof(ProcUser)))
                 {
-                    result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Diese Funktion wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
+                    result = this.MessagesYesNo(MessageBoxIcon.Warning, "Diese Funktion wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
                 }
                 if (result == null || result == DialogResult.Yes)
                 {
@@ -1420,7 +1420,7 @@ namespace DataTableConverter.View
                 int id = ((Case)lbCases.SelectedItem).Id;
                 if (IsProcedureUsed(id, out string usedWorkflows, typeof(ProcDuplicate)))
                 {
-                    result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Dieser Fall wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
+                    result = this.MessagesYesNo(MessageBoxIcon.Warning, "Dieser Fall wird von anderen Arbeitsabläufen verwendet!\nArbeitsabläufe die diese Funktion verwenden:\n" + usedWorkflows + "\nTrotzdem löschen?");
                 }
                 if (result == null || result == DialogResult.Yes)
                 {
@@ -1858,26 +1858,26 @@ namespace DataTableConverter.View
 
         private void BtnSave_Click(object sender, EventArgs e)
         {
-            if (ExportHelper.SaveWorkflows(Workflows) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
+            if (ExportHelper.SaveWorkflows(Workflows, this) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
             {
-                MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!");
+                this.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!");
             }
             else
             {
                 SetDataBefore(Procedures, Cases, Workflows, Tolerances);
-                MessageHandler.MessagesOK(MessageBoxIcon.Information, "Gespeichert!");
+                this.MessagesOK(MessageBoxIcon.Information, "Gespeichert!");
             }
         }
 
         private void BtnDiscard_Click(object sender, EventArgs e)
         {
-            if (MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen sie die getätigten Änderungen wirklich verwerfen?") == DialogResult.Yes)
+            if (this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen sie die getätigten Änderungen wirklich verwerfen?") == DialogResult.Yes)
             {
                 DiscardProcedures();
                 DiscardTolerances();
                 DiscardWorkflows();
                 DiscardCases();
-                MessageHandler.MessagesOK(MessageBoxIcon.Information, "Änderungen wurden verworfen");
+                this.MessagesOK(MessageBoxIcon.Information, "Änderungen wurden verworfen");
             }
         }
 
@@ -1983,7 +1983,7 @@ namespace DataTableConverter.View
             {
                 if (selectedProc.Files.Cast<ExportSeparate>().Select(item => item.Name).Contains(newText))
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
                     BtnSeparateAdd_Click(sender, e);
                 }
                 else
@@ -2029,7 +2029,7 @@ namespace DataTableConverter.View
                 {
                     if (newText != selectedItem.Name && CmBSeparate.Items.Cast<ExportSeparate>().Select(item => item.Name).Contains(newText))
                     {
-                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                        this.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
                         BtnSeparateRename_Click(sender, e);
                     }
                     else
@@ -2233,7 +2233,7 @@ namespace DataTableConverter.View
             }
             else
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es wurde keine Tabelle geladen!");
+                this.MessagesOK(MessageBoxIcon.Warning, "Es wurde keine Tabelle geladen!");
             }
         }
 

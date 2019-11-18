@@ -276,7 +276,7 @@ namespace DataTableConverter.View
             // sync preview
             ViewHelper.EndDataGridViewEdit(dgvSetting);
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, true, null);
+            dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, true, null, this);
         }
 
         private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)
@@ -322,7 +322,7 @@ namespace DataTableConverter.View
         {
             if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
-                dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null, this);
             }
         }
 
@@ -338,7 +338,7 @@ namespace DataTableConverter.View
                 string path = Path.Combine(ExportHelper.ProjectPresets, $"{filename}.bin");
                 if (File.Exists(path))
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Datei mit demselben Namen!");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Datei mit demselben Namen!");
                     btnSavePreset_Click(null, null);
                 }
                 else
@@ -373,7 +373,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gefunden werden");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gefunden werden");
                 }
             }
         }
@@ -386,7 +386,7 @@ namespace DataTableConverter.View
                     if (row.Cells[0].Value != null && row.Cells[0].Value.Equals(e.FormattedValue) && row.Index != e.RowIndex)
                     {
                         e.Cancel = true;
-                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit dieser Bezeichnung!");
+                        this.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit dieser Bezeichnung!");
                         break;
                     }
                 }
@@ -394,7 +394,7 @@ namespace DataTableConverter.View
             else if(e.ColumnIndex > 0 && cmbVariant.SelectedIndex != 0 && !checkFromToEntered(e))
             {
                 e.Cancel = true;
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "\"Von\" darf \"Bis\"nicht überschreiten!");
+                this.MessagesOK(MessageBoxIcon.Warning, "\"Von\" darf \"Bis\"nicht überschreiten!");
             }
         }
 
@@ -407,7 +407,7 @@ namespace DataTableConverter.View
         {
             if (cmbPresets.SelectedIndex != -1)
             {
-                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
+                DialogResult result = this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
                 if (result == DialogResult.Yes)
                 {
                     string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.bin");
@@ -439,7 +439,7 @@ namespace DataTableConverter.View
                 {
                     if (!string.IsNullOrWhiteSpace(message))
                     {
-                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, message);
+                        this.MessagesOK(MessageBoxIcon.Warning, message);
                     }
                     return;
                 }
@@ -514,7 +514,7 @@ namespace DataTableConverter.View
             dgvPreview.DataSource = null;
             if (txtSeparator.ReadOnly = txtBegin.ReadOnly = txtEnd.ReadOnly = rbTab.Checked)
             {
-                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true, null);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true, null, this);
             }
             
             else if ((txtBegin.ReadOnly = txtEnd.ReadOnly = rbSep.Checked))
@@ -522,7 +522,7 @@ namespace DataTableConverter.View
                 txtSeparator.ReadOnly = false;
                 if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
                 {
-                    dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null);
+                    dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null, this);
                 }
             }
             else if (txtSeparator.ReadOnly = rbBetween.Checked)
@@ -530,7 +530,7 @@ namespace DataTableConverter.View
                 txtBegin.ReadOnly = txtEnd.ReadOnly = false;
                 if (checkBetweenText())
                 {
-                    dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true,null);
+                    dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true,null, this);
                 }
             }
         }
@@ -587,7 +587,7 @@ namespace DataTableConverter.View
         {
             if (checkBetweenText())
             {
-                dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true, null);
+                dgvPreview.DataSource = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true, null, this);
             }
             else
             {
@@ -611,7 +611,7 @@ namespace DataTableConverter.View
                 {
                     if (cmbPresets.Items.Contains(newName))
                     {
-                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Vorlage mit demselben Namen\nBitte wählen Sie einen anderen");
+                        this.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Vorlage mit demselben Namen\nBitte wählen Sie einen anderen");
                         BtnRenamePreset_Click(sender, e);
                     }
                     else
@@ -653,7 +653,7 @@ namespace DataTableConverter.View
                 string path = Path.Combine(ExportHelper.ProjectHeaderPresets, filename + ".bin");
                 if (File.Exists(path))
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Überschriftenvorlage mit demselben Namen!");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Es existiert bereits eine Überschriftenvorlage mit demselben Namen!");
                     btnHeaderSave_Click(sender, e);
                 }
                 else
@@ -697,7 +697,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gefunden werden");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gefunden werden");
                 }
             }
         }
@@ -706,7 +706,7 @@ namespace DataTableConverter.View
         {
             if (cmbHeaderPresets.SelectedIndex != -1)
             {
-                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
+                DialogResult result = this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
                 if (result == DialogResult.Yes)
                 {
                     string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString()+".bin");
@@ -730,7 +730,7 @@ namespace DataTableConverter.View
                 {
                     if (cmbHeaderPresets.Items.Contains(newName))
                     {
-                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Vorlage mit demselben Namen\nBitte wählen Sie einen anderen");
+                        this.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Vorlage mit demselben Namen\nBitte wählen Sie einen anderen");
                         btnHeaderRename_Click(sender, e);
                     }
                     else

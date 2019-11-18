@@ -65,7 +65,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 table.CopyColumns(columns);
             }
             bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
-            string c = newCol && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+            string c = newCol && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
             bool intoNewCol = c != null;
             
 

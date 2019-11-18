@@ -7,49 +7,71 @@ using System.Windows.Forms;
 
 namespace DataTableConverter
 {
-    class MessageHandler
+    internal static class MessageHandler
     {
         private static readonly string WarningText = "Warnung!";
         private static readonly string ErrorText = "Warnung!";
         private static readonly string InfoText = "Info";
 
-        public static DialogResult MessagesYesNo(MessageBoxIcon messageBoxIcon, string text)
+        internal static DialogResult MessagesYesNo(this Form mainForm, MessageBoxIcon messageBoxIcon, string text)
         {
             string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : ((messageBoxIcon == MessageBoxIcon.Error)) ? ErrorText : InfoText;
-            return MessageBox.Show(text,
+            DialogResult result = DialogResult.Cancel;
+            mainForm.Invoke(new MethodInvoker(() =>
+            {
+                result = MessageBox.Show(mainForm,
+                                text,
                                 warnung,
                                 MessageBoxButtons.YesNo,
                                 messageBoxIcon,
                                 MessageBoxDefaultButton.Button1);
+            }));
+            return result;
         }
 
-        public static DialogResult MessagesYesNoCancel(MessageBoxIcon messageBoxIcon, string text)
+        internal static DialogResult MessagesYesNoCancel(this Form mainForm, MessageBoxIcon messageBoxIcon, string text)
         {
             string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : ((messageBoxIcon == MessageBoxIcon.Error)) ? ErrorText : InfoText;
-            return MessageBox.Show(text,
+            DialogResult result = DialogResult.Cancel;
+            mainForm.Invoke(new MethodInvoker(() =>
+            {
+                result = MessageBox.Show(mainForm,
+                                text,
                                 warnung,
                                 MessageBoxButtons.YesNoCancel,
                                 messageBoxIcon,
                                 MessageBoxDefaultButton.Button1);
+            }));
+            return result;
         }
 
-        public static DialogResult MessagesOkCancel(MessageBoxIcon messageBoxIcon, string text)
+        internal static DialogResult MessagesOkCancel(this Form mainForm, MessageBoxIcon messageBoxIcon, string text)
         {
             string warnung = (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : ((messageBoxIcon == MessageBoxIcon.Error)) ? ErrorText : InfoText;
-            return MessageBox.Show(text,
+            DialogResult result = DialogResult.Cancel;
+            mainForm.Invoke(new MethodInvoker(() =>
+            {
+                result = MessageBox.Show(mainForm,
+                                text,
                                 warnung,
                                 MessageBoxButtons.OKCancel,
                                 messageBoxIcon,
                                 MessageBoxDefaultButton.Button1);
+            }));
+            return result;
         }
 
-        public static void MessagesOK(MessageBoxIcon messageBoxIcon, string text)
+        internal static void MessagesOK(this Form mainForm, MessageBoxIcon messageBoxIcon, string text)
         {
-            MessageBox.Show(text,
-                            (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : (messageBoxIcon == MessageBoxIcon.Error) ? ErrorText : InfoText,
-                            MessageBoxButtons.OK,
-                            messageBoxIcon,
-                            MessageBoxDefaultButton.Button1);
+            mainForm.Invoke(new MethodInvoker(() =>
+            {
+                MessageBox.Show(mainForm,
+                                text,
+                                (messageBoxIcon == MessageBoxIcon.Exclamation) ? WarningText : (messageBoxIcon == MessageBoxIcon.Error) ? ErrorText : InfoText,
+                                MessageBoxButtons.OK,
+                                messageBoxIcon,
+                                MessageBoxDefaultButton.Button1);
+            }));
         }
     }
 }

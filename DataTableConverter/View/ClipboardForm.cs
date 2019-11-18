@@ -102,7 +102,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    if (MessageHandler.MessagesOkCancel(MessageBoxIcon.Warning,"Der Spaltenname wird bereits verwendet. Bitte geben Sie einen anderen ein.") == DialogResult.OK)
+                    if (this.MessagesOkCancel(MessageBoxIcon.Warning,"Der Spaltenname wird bereits verwendet. Bitte geben Sie einen anderen ein.") == DialogResult.OK)
                     {
                         spalteHinzufügenToolStripMenuItem_Click(sender, e);
                     }

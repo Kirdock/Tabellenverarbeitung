@@ -67,7 +67,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
 
             bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
-            string c = newCol && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+            string c = newCol && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
             bool intoNewCol = c != null;
             if (!newCol || c != null)
             {

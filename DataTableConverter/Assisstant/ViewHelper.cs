@@ -178,9 +178,9 @@ namespace DataTableConverter
                             {
                                 if (!errorMessageShown)
                                 {
-                                    MessageHandler.MessagesOK(MessageBoxIcon.Error, "Typen stimmen nicht überein! Es kann kein Text in ein Nummernfeld eingegeben werden!");
+                                    mainForm.MessagesOK(MessageBoxIcon.Error, "Typen stimmen nicht überein! Es kann kein Text in ein Nummernfeld eingegeben werden!");
                                     errorMessageShown = true;
-                                    ErrorHelper.LogMessage(ex, false);
+                                    ErrorHelper.LogMessage(ex, mainForm, false);
                                 }
                             } //Error, wenn Typen wie int nicht übereinstimmen
                         }

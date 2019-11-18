@@ -42,7 +42,7 @@ namespace DataTableConverter.View
         {
             if(TxtCharacter.Text.Length == 0)
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie ein Zeichen ein!");
+                this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie ein Zeichen ein!");
             }
             else
             {

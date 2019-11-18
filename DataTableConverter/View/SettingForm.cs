@@ -118,7 +118,7 @@ namespace DataTableConverter.View
             {
                 if (string.IsNullOrWhiteSpace(textBox.Text))
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie eine Bezeichnung ein");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie eine Bezeichnung ein");
                     valid = false;
                     tabSettings.SelectedIndex = 1;
                     textBox.Focus();

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
 {
@@ -12,34 +13,34 @@ namespace DataTableConverter.Assisstant
         private static readonly string path = Path.Combine(ExportHelper.ProjectPath,"Logs.log");
         private static readonly string ErrorMessage = "Es ist ein Fehler aufgetreten!\nBitte kontaktieren Sie Ihren Administrator.";
 
-        internal static void LogMessage(Exception exception, bool showMessage = true)
+        internal static void LogMessage(Exception exception, Form mainForm, bool showMessage = true)
         {
-            LogMessage(exception.ToString(), showMessage);
+            LogMessage(exception.ToString(), mainForm, showMessage);
         }
 
-        internal static void LogMessage(string text, bool showMessage = true)
+        internal static void LogMessage(string text, Form mainForm, bool showMessage = true)
         {
             try
             {
                 File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Today} {text}{Environment.NewLine}");
                 if (showMessage)
                 {
-                    ShowError(ErrorMessage);
+                    ShowError(ErrorMessage, mainForm);
                 }
             }
             catch (IOException)
             {
-                ShowError($"Es kann nicht auf die Datei \"Logs.log\" zugegriffen werden{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text);
+                ShowError($"Es kann nicht auf die Datei \"Logs.log\" zugegriffen werden{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text, mainForm);
             }
             catch (Exception ex)
             {
-                ShowError(ErrorMessage + $"{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text + $"{Environment.NewLine}Log Fehler:{Environment.NewLine}" + ex.ToString());
+                ShowError(ErrorMessage + $"{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text + $"{Environment.NewLine}Log Fehler:{Environment.NewLine}" + ex.ToString(), mainForm);
             }
         }
 
-        private static void ShowError(string Message)
+        private static void ShowError(string Message, Form mainForm)
         {
-            MessageHandler.MessagesOK(System.Windows.Forms.MessageBoxIcon.Error, Message);
+            mainForm.MessagesOK(MessageBoxIcon.Error, Message);
         }
     }
 }

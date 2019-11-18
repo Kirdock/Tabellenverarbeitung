@@ -46,11 +46,11 @@ namespace DataTableConverter.View.WorkProcViews
         {
             if(cbFirstColumn.SelectedItem == cbSecondColumn.SelectedItem)
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es kann nicht zwei mal dieselbe Spalte ausgewählt werden!");
+                this.MessagesOK(MessageBoxIcon.Warning, "Es kann nicht zwei mal dieselbe Spalte ausgewählt werden!");
             }
             else if(cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtNewColumn.Text))
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
+                this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
             }
             else
             {

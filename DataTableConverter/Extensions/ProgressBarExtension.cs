@@ -10,7 +10,7 @@ namespace DataTableConverter.Extensions
 {
     internal static class ProgressBarExtension
     {
-        internal static void StartLoadingBar(this ProgressBar progressBar, int max)
+        internal static void StartLoadingBar(this ProgressBar progressBar, int max, Form mainForm)
         {
             try
             {
@@ -23,11 +23,11 @@ namespace DataTableConverter.Extensions
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex, false);
+                ErrorHelper.LogMessage(ex, mainForm, false);
             }
         }
 
-        internal static void UpdateLoadingBar(this ProgressBar progressBar)
+        internal static void UpdateLoadingBar(this ProgressBar progressBar, Form mainForm)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace DataTableConverter.Extensions
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex, false);
+                ErrorHelper.LogMessage(ex, mainForm, false);
             }
         }
     }

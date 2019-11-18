@@ -18,7 +18,7 @@ using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
 {
-    class ImportHelper : MessageHandler
+    class ImportHelper
     {
 
         internal static readonly string ProjectWorkflows = ExportHelper.ProjectWorkflows;
@@ -40,11 +40,11 @@ namespace DataTableConverter.Assisstant
 
             if (extension == ".dbf")
             {
-                table = OpenDBF(file, progressBar);
+                table = OpenDBF(file, progressBar, mainForm);
             }
             else if (extension != string.Empty && AccessExt.Contains(extension))
             {
-                table = OpenMSAccess(file, progressBar);
+                table = OpenMSAccess(file, progressBar, mainForm);
             }
             else if (extension != string.Empty && ExcelExt.Contains(extension))
             {
@@ -58,15 +58,15 @@ namespace DataTableConverter.Assisstant
 
                     if (settings.Values != null)
                     {
-                        table = OpenTextFixed(file, settings.Values, settings.Headers, settings.CodePage,false, progressBar);
+                        table = OpenTextFixed(file, settings.Values, settings.Headers, settings.CodePage,false, progressBar, mainForm);
                     }
                     else if (settings.Separator != null)
                     {
-                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar);
+                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar, mainForm);
                     }
                     else
                     {
-                        table = OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar);
+                        table = OpenTextBetween(file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar, mainForm);
                     }
 
                 }
@@ -115,7 +115,7 @@ namespace DataTableConverter.Assisstant
             };
         }
 
-        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar)
+        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
             DataTable dt = new DataTable();
 
@@ -145,11 +145,11 @@ namespace DataTableConverter.Assisstant
 
                 if (isPreview)
                 {
-                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator, null);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator, null, mainForm);
                 }
                 else
                 {
-                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator, progressBar);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator, progressBar, mainForm);
                 }
 
                 //File.ReadLines doesn't read all lines, it returns a IEnumerable, and lines are lazy evaluated,
@@ -157,22 +157,22 @@ namespace DataTableConverter.Assisstant
             }
             catch (IOException)
             {
-                MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm benutzt und kann nicht geöffnet werden.");
+                mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm benutzt und kann nicht geöffnet werden.");
             }
             catch (ArgumentException)
             {
-                MessagesOK(MessageBoxIcon.Warning, "Die Zeile hat mehr Spalten als erlaubt");
+                mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Zeile hat mehr Spalten als erlaubt");
                 dt = null;
             }
             return dt;
         }
 
-        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator, ProgressBar progressBar)
+        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator, ProgressBar progressBar, Form mainForm)
         {
             IEnumerable<string[]> enumerableArray = enumerable.Skip(skip)
                     .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None));
 
-            progressBar?.StartLoadingBar(enumerableArray.Count());
+            progressBar?.StartLoadingBar(enumerableArray.Count(), mainForm);
             enumerableArray.ToList()
                     .ForEach(line =>
                     {
@@ -183,11 +183,11 @@ namespace DataTableConverter.Assisstant
                             dt.TryAddColumn("Spalte" + dt.Columns.Count);
                         }
                         dt.Rows.Add(temp);
-                        progressBar?.UpdateLoadingBar();
+                        progressBar?.UpdateLoadingBar(mainForm);
                     });
         }
 
-        internal static DataTable OpenTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar)
+        internal static DataTable OpenTextBetween(string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
             DataTable dt = new DataTable();
             try
@@ -222,7 +222,7 @@ namespace DataTableConverter.Assisstant
                     var list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(skip);
                     lines = File.ReadLines(path, Encoding.GetEncoding(codePage)).Skip(skip).ToArray();
                 }
-                progressBar?.StartLoadingBar(lines.Length);
+                progressBar?.StartLoadingBar(lines.Length, mainForm);
 
                 foreach(string line in lines)
                 {
@@ -231,13 +231,13 @@ namespace DataTableConverter.Assisstant
                     {
                         dt.TryAddColumn("Spalte" + dt.Columns.Count);
                     }
-                    progressBar?.UpdateLoadingBar();
+                    progressBar?.UpdateLoadingBar(mainForm);
                     dt.Rows.Add(row);
                 }
             }
             catch (IOException)
             {
-                MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm benutzt und kann nicht geöffnet werden.");
+                mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm benutzt und kann nicht geöffnet werden.");
             }
 
             return dt;
@@ -294,7 +294,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static DataTable OpenDBF(string path, ProgressBar progressBar)
+        internal static DataTable OpenDBF(string path, ProgressBar progressBar, Form mainForm)
         {
             DataTable data = new DataTable();
             string directory = Path.GetDirectoryName(path);
@@ -304,25 +304,25 @@ namespace DataTableConverter.Assisstant
 
             var sql = $@"select * from [{ shortPath}]";
             con.Open();
-            progressBar?.StartLoadingBar(GetDataReaderRowCount(con,shortPath));
+            progressBar?.StartLoadingBar(GetDataReaderRowCount(con,shortPath, mainForm), mainForm);
 
 
-            data.RowChanged += (sender, e) => FillDataTableNewRow(e, progressBar);
+            data.RowChanged += (sender, e) => FillDataTableNewRow(e, progressBar, mainForm);
             OleDbDataAdapter da = new OleDbDataAdapter(new OleDbCommand(sql, con));
             da.Fill(data);
             da.Dispose();
             return data.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? data : data.SetColumnsTypeStringWithContainingData();
         }
 
-        private static void FillDataTableNewRow(DataRowChangeEventArgs e, ProgressBar progressBar)
+        private static void FillDataTableNewRow(DataRowChangeEventArgs e, ProgressBar progressBar, Form mainForm)
         {
             if (e.Action == DataRowAction.Add)
             {
-                progressBar?.UpdateLoadingBar();
+                progressBar?.UpdateLoadingBar(mainForm);
             }
         }
 
-        private static int GetDataReaderRowCount(OleDbConnection con, string path)
+        private static int GetDataReaderRowCount(OleDbConnection con, string path, Form mainForm)
         {
             int count = 0;
             try
@@ -333,13 +333,13 @@ namespace DataTableConverter.Assisstant
             }
             catch(Exception ex)
             {
-                ErrorHelper.LogMessage(ex, false);
+                ErrorHelper.LogMessage(ex, mainForm, false);
             }
             
             return count;
         }
 
-        private static int GetDataReaderTablesRowCount(OleDbConnection con, DataTable tables)
+        private static int GetDataReaderTablesRowCount(OleDbConnection con, DataTable tables, Form mainForm)
         {
             int count = 0;
             foreach(DataRow row in tables.Rows)
@@ -347,13 +347,13 @@ namespace DataTableConverter.Assisstant
                 if (row["TABLE_TYPE"].ToString() == "TABLE")
                 {
                     string tableName = row["TABLE_NAME"].ToString();
-                    count += GetDataReaderRowCount(con, tableName);
+                    count += GetDataReaderRowCount(con, tableName, mainForm);
                 }
             }
             return count;
         }
 
-        internal static DataTable OpenMSAccess(string path, ProgressBar progressBar)
+        internal static DataTable OpenMSAccess(string path, ProgressBar progressBar, Form mainForm)
         {
             DataTable table = new DataTable();
 
@@ -365,7 +365,7 @@ namespace DataTableConverter.Assisstant
                 };
                 con.Open();
                 DataTable tables = con.GetSchema("Tables");
-                progressBar?.StartLoadingBar(GetDataReaderTablesRowCount(con, tables));
+                progressBar?.StartLoadingBar(GetDataReaderTablesRowCount(con, tables, mainForm), mainForm);
                 
                 foreach (DataRow row in tables.Rows)
                 {
@@ -376,7 +376,7 @@ namespace DataTableConverter.Assisstant
                         {
                             string fileName = Path.GetFileName(path) + "; " + tableName;
                             DataTable temp = new DataTable();
-                            temp.RowChanged += (sender, e) => FillDataTableNewRow(e, progressBar);
+                            temp.RowChanged += (sender, e) => FillDataTableNewRow(e, progressBar, mainForm);
                             dbAdapter.Fill(temp);
                             temp = temp.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? temp : temp.SetColumnsTypeStringWithContainingData();
                             table.ConcatTable(temp, fileName, fileName);
@@ -387,7 +387,7 @@ namespace DataTableConverter.Assisstant
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex);
+                ErrorHelper.LogMessage(ex, mainForm);
             }
             return table;
         }
@@ -465,9 +465,9 @@ namespace DataTableConverter.Assisstant
                         continue;
                     }
 
-                    progressBar?.StartLoadingBar(rows);
+                    progressBar?.StartLoadingBar(rows, mainForm);
 
-                    RangeToDataTable(objSHT, objXL, rows, cols, data, fileNameColumn ? path + "; " + sheetName : null, progressBar);
+                    RangeToDataTable(objSHT, objXL, rows, cols, data, fileNameColumn ? path + "; " + sheetName : null, progressBar, mainForm);
                     Marshal.ReleaseComObject(objSHT);
                 }
                 if (fileNameColumn)
@@ -477,7 +477,7 @@ namespace DataTableConverter.Assisstant
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex);
+                ErrorHelper.LogMessage(ex, mainForm);
             }
             finally
             {
@@ -510,7 +510,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, DataTable table, string fileName, ProgressBar progressBar)
+        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, DataTable table, string fileName, ProgressBar progressBar, Form mainForm)
         {
             List<string> headers = SetHeaderOfExcel(table, objSHT, cols);
             Clipboard.Clear();
@@ -525,7 +525,7 @@ namespace DataTableConverter.Assisstant
                 range.Copy();
                 IDataObject data = Clipboard.GetDataObject();
                 string content = (string)data.GetData(DataFormats.UnicodeText);
-                GetDataOfString(content, table, fileName, headers,progressBar);
+                GetDataOfString(content, table, fileName, headers,progressBar, mainForm);
                 i = rowCount;
             }
         }
@@ -548,7 +548,7 @@ namespace DataTableConverter.Assisstant
             return GetHeadersOfContent(content, table);
         }
 
-        private static void GetDataOfString(string content, DataTable table, string fileName, List<string> headers, ProgressBar progressBar)
+        private static void GetDataOfString(string content, DataTable table, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm)
         {
             int maxLength = content.Length;
             StringBuilder cellBuilder = new StringBuilder();
@@ -562,7 +562,7 @@ namespace DataTableConverter.Assisstant
             {
                 if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
                 {
-                    progressBar?.UpdateLoadingBar();
+                    progressBar?.UpdateLoadingBar(mainForm);
                     if (!generatedMulti)
                     {
                         SetContentRowValue(row, headers[headerCounter], cellBuilder);
@@ -721,7 +721,7 @@ namespace DataTableConverter.Assisstant
         }
         #endregion
 
-        internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar)
+        internal static DataTable OpenTextFixed(string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
             DataTable dt = new DataTable();
             if (header == null || config == null || header.Count == 0 || config.Count == 0)
@@ -735,7 +735,7 @@ namespace DataTableConverter.Assisstant
 
                 StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding));
                 FileInfo info = new FileInfo(path);
-                progressBar?.StartLoadingBar((int) (info.Length/config.Sum()));
+                progressBar?.StartLoadingBar((int) (info.Length/config.Sum()), mainForm);
 
 
                 while (!stream.EndOfStream && (!isPreview || dt.Rows.Count < 3))
@@ -753,7 +753,7 @@ namespace DataTableConverter.Assisstant
 
                         itemArray[i] = new string(body);
                     }
-                    progressBar?.UpdateLoadingBar();
+                    progressBar?.UpdateLoadingBar(mainForm);
                     dt.Rows.Add(itemArray);
 
                     int charCode;
@@ -766,7 +766,7 @@ namespace DataTableConverter.Assisstant
             }
             catch (IOException)
             {
-                MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm verwendet und kann nicht geöffnet werden.");
+                mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm verwendet und kann nicht geöffnet werden.");
             }
             return dt;
         }
@@ -792,7 +792,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static List<Work> LoadWorkflows()
+        internal static List<Work> LoadWorkflows(Form mainForm)
         {
             List<Work> data = new List<Work>();
             if (File.Exists(ProjectWorkflows))
@@ -809,7 +809,7 @@ namespace DataTableConverter.Assisstant
                 catch (IOException)
                 {
                 }
-                if (!ExportHelper.SaveWorkflows(data))
+                if (!ExportHelper.SaveWorkflows(data, mainForm))
                 {
                     File.Delete(ProjectWorkflows);
                 }
@@ -834,12 +834,12 @@ namespace DataTableConverter.Assisstant
                     catch (Exception ex)
                     {
                         error = true;
-                        ErrorHelper.LogMessage(ex, false);
+                        ErrorHelper.LogMessage(ex, mainForm, false);
                     }
                 }
                 if (error)
                 {
-                    MessagesOK(MessageBoxIcon.Error, "Es konnten nicht alle Arbeitsabläufe geladen werden");
+                    mainForm.MessagesOK(MessageBoxIcon.Error, "Es konnten nicht alle Arbeitsabläufe geladen werden");
                 }
             }
             return data;

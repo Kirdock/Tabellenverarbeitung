@@ -215,7 +215,7 @@ namespace DataTableConverter.Extensions
             return result;
         }
 
-        internal static void SplitDataTable(this DataTable table, string path, string columnName = null)
+        internal static void SplitDataTable(this DataTable table, string path, Form mainForm, string columnName = null)
         {
             DataTable table1 = new DataTable() { TableName = path.AppendFileName(Properties.Settings.Default.FailAddressText) };
             string invalidColumnName = columnName ?? Properties.Settings.Default.InvalidColumnName;
@@ -260,14 +260,14 @@ namespace DataTableConverter.Extensions
                     //Dbase
                     case 1:
                         {
-                            ExportHelper.ExportDbase(FileName, Table, path);
+                            ExportHelper.ExportDbase(FileName, Table, path, mainForm);
                         }
                         break;
 
                     //Excel
                     case 2:
                         {
-                            ExportHelper.ExportExcel(Table, path, FileName);
+                            ExportHelper.ExportExcel(Table, path, FileName, mainForm);
                         }
                         break;
                 }
@@ -357,7 +357,7 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] importColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, ProgressBar pgbLoading = null)
+        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] importColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, Form mainForm, ProgressBar pgbLoading = null)
         {
             int oldCount = sourceTable.Columns.Count;
             int newColumnIndex = oldCount + importColumns.Length - 1; //-1: without identifier
@@ -377,7 +377,7 @@ namespace DataTableConverter.Extensions
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex, false);
+                ErrorHelper.LogMessage(ex, mainForm, false);
             }
 
 
@@ -416,7 +416,7 @@ namespace DataTableConverter.Extensions
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex, false);
+                    ErrorHelper.LogMessage(ex, mainForm, false);
                 }
             }
 
@@ -581,9 +581,9 @@ namespace DataTableConverter.Extensions
         /// <param name="additionalColumns"></param>
         /// <param name="progressBar"></param>
         /// <returns>The temporary sort-column that is created for the history</returns>
-        internal static string MergeRows(this DataTable table, string identifier, List<PlusListboxItem> additionalColumns, ProgressBar progressBar)
+        internal static string MergeRows(this DataTable table, string identifier, List<PlusListboxItem> additionalColumns, ProgressBar progressBar, Form mainForm)
         {
-            progressBar.StartLoadingBar(table.Rows.Count);
+            progressBar.StartLoadingBar(table.Rows.Count, mainForm);
 
             int lastIndex = table.Columns.Count;
             string name = table.TryAddColumn(TempSort);
@@ -642,7 +642,7 @@ namespace DataTableConverter.Extensions
                     }
                     dict.Add(key, info);
                 }
-                progressBar.UpdateLoadingBar();
+                progressBar.UpdateLoadingBar(mainForm);
             }
 
             foreach(MergeRowsInfo info in dict.Values)
@@ -655,12 +655,12 @@ namespace DataTableConverter.Extensions
             return name;
         }
 
-        internal static bool AddColumnWithDialog(this DataTable table, string column)
+        internal static bool AddColumnWithDialog(this DataTable table, string column, Form mainForm)
         {
             bool inserted = true;
             if (table.Columns.Contains(column))
             {
-                inserted = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Es gibt bereits eine Spalte mit der Bezeichnung \"{column}\".\nSpalte überschreiben?") == DialogResult.Yes;
+                inserted = mainForm.MessagesYesNo(MessageBoxIcon.Warning, $"Es gibt bereits eine Spalte mit der Bezeichnung \"{column}\".\nSpalte überschreiben?") == DialogResult.Yes;
                 if (inserted)
                 {
                     foreach(DataRow row in table.Rows)

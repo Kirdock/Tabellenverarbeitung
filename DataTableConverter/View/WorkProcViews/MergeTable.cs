@@ -66,7 +66,7 @@ namespace DataTableConverter.View
         {
             if (!SameRowCount)
             {
-                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Warning, "Die Zeilenanzahl der beiden Tabellen stimmt nicht überein! Trotzdem fortfahren?");
+                DialogResult result = this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Die Zeilenanzahl der beiden Tabellen stimmt nicht überein! Trotzdem fortfahren?");
                 if(result != DialogResult.Abort)
                 {
                     DialogResult = result;

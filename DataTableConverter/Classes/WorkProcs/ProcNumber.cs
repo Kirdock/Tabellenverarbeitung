@@ -31,7 +31,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
-            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
             if (column != null)
             {
                 int count = Start;

@@ -185,7 +185,7 @@ namespace DataTableConverter.View
             {
                 if (CmBFileNames.Items.Cast<ExportCustomItem>().Select(item => item.Name).Contains(newText))
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
                     BtnAdd_Click(null, null);
                 }
                 else
@@ -225,7 +225,7 @@ namespace DataTableConverter.View
                 {
                     if (newText != SelectedItem.Name && CmBFileNames.Items.Cast<ExportCustomItem>().Select(item => item.Name).Contains(newText))
                     {
-                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
+                        this.MessagesOK(MessageBoxIcon.Warning, "Der Dateiname ist bereits vergeben!");
                         BtnRename_Click(null, null);
                     }
                     else

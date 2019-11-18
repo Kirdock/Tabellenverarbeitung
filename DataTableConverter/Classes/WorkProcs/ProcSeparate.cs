@@ -75,14 +75,14 @@ namespace DataTableConverter.Classes.WorkProcs
                         //Dbase
                         case 1:
                             {
-                                ExportHelper.ExportDbase(FileName, dictTable, path);
+                                ExportHelper.ExportDbase(FileName, dictTable, path, invokeForm);
                             }
                             break;
 
                         //Excel
                         case 2:
                             {
-                                ExportHelper.ExportExcel(dictTable, path, FileName);
+                                ExportHelper.ExportExcel(dictTable, path, FileName, invokeForm);
                             }
                             break;
                     }

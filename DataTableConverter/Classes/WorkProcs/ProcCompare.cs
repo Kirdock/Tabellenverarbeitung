@@ -42,7 +42,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             else if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                column = table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+                column = table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
             }
 
             if (column != null)

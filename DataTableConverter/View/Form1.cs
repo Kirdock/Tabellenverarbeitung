@@ -65,7 +65,7 @@ namespace DataTableConverter
                 AddDataSourceNewTable(table);
             }
             ViewHelper.SetDataGridViewStyle(dgTable);
-            UpdateHelper.CheckUpdate(true, pgbLoading);
+            UpdateHelper.CheckUpdate(true, pgbLoading, this);
         }
 
         private void SetMenuEnabled(bool status)
@@ -322,7 +322,7 @@ namespace DataTableConverter
         {
             arbeitsablaufToolStripMenuItem.DropDownItems.Clear();
 
-            workflows = work ?? ImportHelper.LoadWorkflows();
+            workflows = work ?? ImportHelper.LoadWorkflows(this);
 
             List<Work> workflowsCopy = GetCopyOfWorkflows(workflows);
 
@@ -473,10 +473,10 @@ namespace DataTableConverter
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex);
+                    ErrorHelper.LogMessage(ex, this);
                 }
                 StopLoadingBar();
-                MessageHandler.MessagesOK(MessageBoxIcon.Information, "Arbeitsablauf ausgeführt!");
+                this.MessagesOK(MessageBoxIcon.Information, "Arbeitsablauf ausgeführt!");
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -534,7 +534,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex);
+                            ErrorHelper.LogMessage(ex, this);
                         }
                     }
                     FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]));
@@ -605,18 +605,18 @@ namespace DataTableConverter
                         result = DialogResult.Yes;
                         if (sourceTable.Rows.Count != importTable.Rows.Count)
                         {
-                            result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({sourceTable.Rows.Count} zu {importTable.Rows.Count})!\nTrotzdem fortfahren?");
+                            result = this.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({sourceTable.Rows.Count} zu {importTable.Rows.Count})!\nTrotzdem fortfahren?");
                         }
                     }
                     else
                     {
-                        MessageHandler.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabelle \"{filename}\" hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
+                        this.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabelle \"{filename}\" hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
                         result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
                     }
                 }
                 else
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
+                    this.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
                     result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
                 }
             }
@@ -626,7 +626,7 @@ namespace DataTableConverter
                 Thread thread = new Thread(() =>
                 {
                     try {
-                        sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, pgbLoading);
+                        sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, this, pgbLoading);
 
                         if (Properties.Settings.Default.SplitPVM)
                         {
@@ -642,12 +642,12 @@ namespace DataTableConverter
                                 if (res == DialogResult.OK)
                                 {
                                     invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
-                                    sourceTable.SplitDataTable(FilePath, invalidColumnName);
+                                    sourceTable.SplitDataTable(FilePath, this, invalidColumnName);
                                 }
                             }
                             else
                             {
-                                sourceTable.SplitDataTable(FilePath, invalidColumnName);
+                                sourceTable.SplitDataTable(FilePath, this, invalidColumnName);
                             }
                         }
 
@@ -657,7 +657,7 @@ namespace DataTableConverter
                     }
                     catch (Exception ex)
                     {
-                        ErrorHelper.LogMessage(ex);
+                        ErrorHelper.LogMessage(ex, this);
                     }
                 });
                 thread.SetApartmentState(ApartmentState.STA);
@@ -718,7 +718,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex);
+                            ErrorHelper.LogMessage(ex, this);
                         }
                         StopLoadingBar();
                     }).Start();
@@ -755,7 +755,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex);
+                            ErrorHelper.LogMessage(ex, this);
                         }
                     }).Start();
                 }
@@ -807,13 +807,13 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportExcel(table, Path.GetDirectoryName(path),path);
+                            ExportHelper.ExportExcel(table, Path.GetDirectoryName(path),path, this);
                             StopLoadingBar();
                             SaveFinished();
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex);
+                            ErrorHelper.LogMessage(ex, this);
                         }
                     }).Start();
                 }
@@ -919,7 +919,7 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            bool saved = ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path), UpdateLoadingBar);
+                            bool saved = ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path), this, UpdateLoadingBar);
                             StopLoadingBar();
                             if (saved)
                             {
@@ -928,7 +928,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex);
+                            ErrorHelper.LogMessage(ex, this);
                         }
                     }).Start();
                 }
@@ -957,7 +957,7 @@ namespace DataTableConverter
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex);
+                    ErrorHelper.LogMessage(ex, this);
                 }
             }).Start();
             
@@ -989,7 +989,7 @@ namespace DataTableConverter
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex);
+                    ErrorHelper.LogMessage(ex, this);
                 }
             }).Start();
         }
@@ -1065,7 +1065,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex);
+                            ErrorHelper.LogMessage(ex, this);
                         }
                     }).Start();
                 }
@@ -1086,7 +1086,7 @@ namespace DataTableConverter
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} Maximum:{pgbLoading.Maximum}; Minimum:{pgbLoading.Minimum} Value:{pgbLoading.Value}",false);
+                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} Maximum:{pgbLoading.Maximum}; Minimum:{pgbLoading.Minimum} Value:{pgbLoading.Value}",this, false);
             }
         }
 
@@ -1100,7 +1100,7 @@ namespace DataTableConverter
 
         private void SaveFinished()
         {
-            MessageHandler.MessagesOK(MessageBoxIcon.Information, "Gespeichert");
+            this.MessagesOK(MessageBoxIcon.Information, "Gespeichert");
         }
 
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1122,7 +1122,7 @@ namespace DataTableConverter
             if(export.ShowDialog(this) == DialogResult.OK)
             {
                 StartLoadingBar();
-                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished);
+                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished, this);
             }
             export.Dispose();
         }
@@ -1317,7 +1317,7 @@ namespace DataTableConverter
 
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UpdateHelper.CheckUpdate(false, pgbLoading);
+            UpdateHelper.CheckUpdate(false, pgbLoading, this);
         }
 
         private void zeilenZusammenfügenToolStripMenuItem_Click_1(object sender, EventArgs e)
@@ -1335,7 +1335,7 @@ namespace DataTableConverter
                 {
                     try
                     {
-                        string tempSortName = table.MergeRows(identifier, additionalColumns, pgbLoading);
+                        string tempSortName = table.MergeRows(identifier, additionalColumns, pgbLoading, this);
 
                         dgTable.Invoke(new MethodInvoker(() =>
                         {
@@ -1347,7 +1347,7 @@ namespace DataTableConverter
                     }
                     catch (Exception ex)
                     {
-                        ErrorHelper.LogMessage(ex);
+                        ErrorHelper.LogMessage(ex, this);
                     }
                     StopLoadingBar();
 
@@ -1489,7 +1489,7 @@ namespace DataTableConverter
                         int checkSum = ChecksumEAN9(value);
                         if (checkSum == -1 && !continueLoop)
                         {
-                            DialogResult result = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Ungültige Zahl in Zeile {i + 1}. Trotzdem fortfahren?");
+                            DialogResult result = this.MessagesYesNo(MessageBoxIcon.Warning, $"Ungültige Zahl in Zeile {i + 1}. Trotzdem fortfahren?");
                             if (result == DialogResult.No)
                             {
                                 break;

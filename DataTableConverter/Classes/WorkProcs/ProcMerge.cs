@@ -115,7 +115,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
                 else if(!CopyOldColumn)
                 {
-                    if (!table.AddColumnWithDialog(NewColumn))
+                    if (!table.AddColumnWithDialog(NewColumn, invokeForm))
                     {
                         column = null;
                     }
@@ -143,13 +143,13 @@ namespace DataTableConverter.Classes.WorkProcs
                         });
                         MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
 
-                        row[column] = format.IsStringFormat() ? GetFormat(row, format.Formula, table.Columns) : GetFormat(row, format, table.Columns);
+                        row[column] = format.IsStringFormat() ? GetFormat(row, format.Formula, table.Columns, invokeForm) : GetFormat(row, format, table.Columns);
                     }
                 }
             }
             else
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, $"{ClassName}: Der Name der neu anzulegenden Spalte darf nicht leer sein!");
+                invokeForm.MessagesOK(MessageBoxIcon.Warning, $"{ClassName}: Der Name der neu anzulegenden Spalte darf nicht leer sein!");
             }
         }
 
@@ -202,7 +202,7 @@ namespace DataTableConverter.Classes.WorkProcs
         }
 
 
-        private string GetFormat(DataRow row, string formula, DataColumnCollection tableColumns)
+        private string GetFormat(DataRow row, string formula, DataColumnCollection tableColumns, Form mainForm)
         {
             string[] columns = GetHeaderOfFormula(formula).ToArray();
             Dictionary<FormatIdentifier, bool> emptyAfterHeader = GetEmptyAfterHeaders(columns, row, tableColumns);
@@ -237,7 +237,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     if (counter > columns.Length)
                     {
-                        ErrorHelper.LogMessage($"Ungültiges Format? Format:{formula}");
+                        ErrorHelper.LogMessage($"Ungültiges Format? Format:{formula}", mainForm);
                         continue;
                     }
                     string header = columns[counter];

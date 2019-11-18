@@ -26,15 +26,15 @@ namespace DataTableConverter.View.WorkProcViews
         {
             if(cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtNewColumn.Text))
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an.");
+                this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an.");
             }
             else if(cbNewColumn.Checked && cbHeaders.Items.Contains(txtNewColumn.Text))
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Spaltenname wird bereits verwendet. Bitte verwenden Sie einen anderen.");
+                this.MessagesOK(MessageBoxIcon.Warning, "Der Spaltenname wird bereits verwendet. Bitte verwenden Sie einen anderen.");
             }
             else if(cbHeaders.CheckedItems.Count < 1)
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte wählen Sie zumindest eine Spatle aus, auf die der Vorgang angewendet werden soll.");
+                this.MessagesOK(MessageBoxIcon.Warning, "Bitte wählen Sie zumindest eine Spatle aus, auf die der Vorgang angewendet werden soll.");
             }
             else
             {

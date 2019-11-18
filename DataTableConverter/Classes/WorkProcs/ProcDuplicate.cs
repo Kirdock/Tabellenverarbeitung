@@ -57,7 +57,7 @@ namespace DataTableConverter.Classes.WorkProcs
             int[] subStringEnd = duplicateCase.getEndSubstring();
 
 
-            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn) ? NewColumn : null;
+            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
 
             if (column != null)
             {

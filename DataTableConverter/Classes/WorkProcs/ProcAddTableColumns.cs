@@ -76,7 +76,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     DialogResult res = DialogResult.Yes;
                     if (table.Rows.Count != newTable.Rows.Count)
                     {
-                        res = MessageHandler.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {newTable.Rows.Count})!\nTrotzdem fortfahren?");
+                        res = invokeForm.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {newTable.Rows.Count})!\nTrotzdem fortfahren?");
                     }
                     if (res == DialogResult.Yes)
                     {
@@ -133,7 +133,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             newOrderIndices = newIndices;
                             if (Properties.Settings.Default.SplitPVM)
                             {
-                                table.SplitDataTable(filePath, invalidColumnName);
+                                table.SplitDataTable(filePath, invokeForm, invalidColumnName);
                             }
                         }
                     }

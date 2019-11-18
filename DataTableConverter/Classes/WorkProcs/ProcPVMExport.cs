@@ -103,7 +103,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex);
+                    ErrorHelper.LogMessage(ex, invokeForm);
                 }
             }
             saveFileDialog1.Dispose();

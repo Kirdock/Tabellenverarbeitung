@@ -23,7 +23,7 @@ namespace DataTableConverter.View.WorkProcViews
         {
             if(TxtTrimText.Text == string.Empty)
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Das Zeichen darf nicht leer sein");
+                this.MessagesOK(MessageBoxIcon.Warning, "Das Zeichen darf nicht leer sein");
             }
             else
             {

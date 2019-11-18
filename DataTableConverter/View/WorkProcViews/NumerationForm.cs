@@ -28,7 +28,7 @@ namespace DataTableConverter.View.WorkProcViews
             {
                 if (Headers.Contains(txtNewColumn.Text))
                 {
-                    MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Der Spaltenname wird bereits verwendet. Bitte verwenden Sie einen anderen");
+                    this.MessagesOK(MessageBoxIcon.Warning, "Der Spaltenname wird bereits verwendet. Bitte verwenden Sie einen anderen");
                 }
                 else
                 {
@@ -38,7 +38,7 @@ namespace DataTableConverter.View.WorkProcViews
             }
             else
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an");
+                this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an");
             }
         }
     }

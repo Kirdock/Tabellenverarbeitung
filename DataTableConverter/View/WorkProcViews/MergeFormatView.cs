@@ -187,7 +187,7 @@ namespace DataTableConverter.View
                 DataTable table = (dgTable.DataSource as DataTable);
                 if (table.GetChanges() != null)
                 {
-                    DialogResult res = MessageHandler.MessagesYesNo(MessageBoxIcon.Information, "Möchten Sie die Änderung wirklich verwerfen?");
+                    DialogResult res = this.MessagesYesNo(MessageBoxIcon.Information, "Möchten Sie die Änderung wirklich verwerfen?");
                     e.Cancel = res == DialogResult.No;
                     if (!e.Cancel)
                     {

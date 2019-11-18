@@ -17,7 +17,7 @@ using System.Threading;
 
 namespace DataTableConverter
 {
-    class ExportHelper : MessageHandler
+    class ExportHelper
     {
         [DllImport("gdi32.dll", EntryPoint = "AddFontResourceW", SetLastError = true)]
         public static extern int AddFontResource([In][MarshalAs(UnmanagedType.LPWStr)]
@@ -107,7 +107,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool SaveWorkflows(List<Work> workflows)
+        internal static bool SaveWorkflows(List<Work> workflows, Form mainForm)
         {
             bool error = false;
             List<string> files = new List<string>(GetWorkflows());
@@ -126,7 +126,7 @@ namespace DataTableConverter
                 catch (Exception ex)
                 {
                     error = true;
-                    ErrorHelper.LogMessage(ex, false);
+                    ErrorHelper.LogMessage(ex, mainForm, false);
                 }
             }
             if (!error)
@@ -212,7 +212,7 @@ namespace DataTableConverter
             
         }
 
-        internal static string ExportExcel(DataTable dt, string directory, string filename)
+        internal static string ExportExcel(DataTable dt, string directory, string filename, Form mainForm)
         {
             string path = null;
             try
@@ -283,8 +283,8 @@ namespace DataTableConverter
                 }
                 catch(Exception ex)
                 {
-                    MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gespeichert werden! Wird die Datei gerade verwendet?");
-                    ErrorHelper.LogMessage(ex,false);
+                    mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gespeichert werden! Wird die Datei gerade verwendet?");
+                    ErrorHelper.LogMessage(ex,mainForm, false);
                 }
                 workbook.Close(false, Type.Missing, Type.Missing);
                 excel.Quit();
@@ -297,12 +297,12 @@ namespace DataTableConverter
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex);
+                ErrorHelper.LogMessage(ex, mainForm);
             }
             return path;
         }
 
-        internal static bool ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Action updateLoadingBar = null)
+        internal static bool ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Form mainForm, Action updateLoadingBar = null)
         {
             bool saved = false;
             string fileName = originalFileName.ToUpper();
@@ -317,7 +317,7 @@ namespace DataTableConverter
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex);
+                ErrorHelper.LogMessage(ex, mainForm);
                 return saved;
             }
             string fullpath = Path.Combine(path,fileName+".DBF");
@@ -340,7 +340,7 @@ namespace DataTableConverter
                 catch (Exception ex)
                 {
                     DeleteDirectory(path);
-                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", dataTable.HeadersOfDataTableAsString())}]");
+                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", dataTable.HeadersOfDataTableAsString())}]", mainForm);
                     return saved;
                 }
 
@@ -387,7 +387,7 @@ namespace DataTableConverter
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex);
+                    ErrorHelper.LogMessage(ex, mainForm);
                 }
                 finally
                 {
@@ -397,7 +397,7 @@ namespace DataTableConverter
             else
             {
                 DeleteDirectory(path);
-                MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
+                mainForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
             }
             return saved;
         }
@@ -484,7 +484,7 @@ namespace DataTableConverter
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
-        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished)
+        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished, Form mainForm)
         {
             new Thread(() =>
             {
@@ -539,14 +539,14 @@ namespace DataTableConverter
                             //Dbase
                             case 1:
                                 {
-                                    ExportDbase(FileName, table, path);
+                                    ExportDbase(FileName, table, path, mainForm);
                                 }
                                 break;
 
                             //Excel
                             case 2:
                                 {
-                                    ExportExcel(table, path, FileName);
+                                    ExportExcel(table, path, FileName, mainForm);
                                 }
                                 break;
                         }

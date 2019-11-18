@@ -28,7 +28,7 @@ namespace DataTableConverter.View
         {
             if(txtSplitString.Text.Length == 0)
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Länge von 0 ist ungültig!");
+                this.MessagesOK(MessageBoxIcon.Warning, "Länge von 0 ist ungültig!");
             }
             else
             {

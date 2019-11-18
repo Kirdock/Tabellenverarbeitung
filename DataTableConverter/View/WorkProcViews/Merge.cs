@@ -84,11 +84,11 @@ namespace DataTableConverter.View
         {
             if (string.IsNullOrWhiteSpace(txtHeader.Text))
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
+                this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
             }
             else if (!cbMergeOldColumn.Checked && IsDuplicate(txtHeader.Text))
             {
-                MessageHandler.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit diesem Namen.\nBitte geben Sie einen anderen an");
+                this.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit diesem Namen.\nBitte geben Sie einen anderen an");
             }
             else
             {

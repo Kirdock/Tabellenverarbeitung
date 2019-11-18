@@ -20,7 +20,7 @@ namespace DataTableConverter.Assisstant
         private readonly static string FileName = FileNameWithoutExtension+".zip";
         private readonly static string Download = Repository+"/download/{0}/"+FileName;
         
-        internal static void CheckUpdate(bool prompt, ProgressBar progressBar)
+        internal static void CheckUpdate(bool prompt, ProgressBar progressBar, Form mainForm)
         {
             if (!prompt || !Properties.Settings.Default.UpdateDialogShowed)
             {
@@ -39,7 +39,7 @@ namespace DataTableConverter.Assisstant
                         {
                             if (prompt)
                             {
-                                DialogResult result = MessageHandler.MessagesYesNoCancel(MessageBoxIcon.Information, "Eine neue Version steht zur Verfügung. Möchten Sie sie runterladen?");
+                                DialogResult result = mainForm.MessagesYesNoCancel(MessageBoxIcon.Information, "Eine neue Version steht zur Verfügung. Möchten Sie sie runterladen?");
                                 if (result == DialogResult.Yes)
                                 {
                                     SetUpdateShowed(false);
@@ -57,13 +57,13 @@ namespace DataTableConverter.Assisstant
                         }
                         else if (!prompt)
                         {
-                            MessageHandler.MessagesOK(MessageBoxIcon.Information, "Sie besitzen bereits die aktuellste Version");
+                            mainForm.MessagesOK(MessageBoxIcon.Information, "Sie besitzen bereits die aktuellste Version");
                         }
                     }
                     catch (Exception ex)
                     {
-                        ErrorHelper.LogMessage(ex, false);
-                        ErrorHelper.LogMessage("Update nicht möglich! Besteht eine Internetverbindung?");
+                        ErrorHelper.LogMessage(ex, mainForm, false);
+                        ErrorHelper.LogMessage("Update nicht möglich! Besteht eine Internetverbindung?", mainForm);
                     }
                 }).Start();
             
