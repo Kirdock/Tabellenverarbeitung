@@ -31,12 +31,33 @@ namespace DataTableConverter.Assisstant
         internal static readonly string CsvExt = "*.csv";
         internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
 
+        internal class KeyVal : IEquatable<KeyVal>
+        {
+            internal string Key;
+            internal int Val;
+            internal KeyVal(string key, int val)
+            {
+                Key = key;
+                Val = val;
+            }
 
-        internal static DataTable ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar, Form mainForm, ImportSettings settings = null)
+            public bool Equals(KeyVal other)
+            {
+                return Key == other.Key && Val == other.Val;
+            }
+
+            public override string ToString()
+            {
+                return Key.ToString();
+            }
+        }
+
+        internal static DataTable ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar, Form mainForm, ref int fileEncoding, ImportSettings settings = null)
         {
             string filename = Path.GetFileName(file);
             string extension = Path.GetExtension(file).ToLower();
             DataTable table = null;
+            
 
             if (extension == ".dbf")
             {
@@ -78,14 +99,15 @@ namespace DataTableConverter.Assisstant
                     {
                         result = form.ShowDialog(mainForm);
                     }));
-                    form.Dispose();
+
                     if (result == DialogResult.OK)
                     {
                         if (form.TakeOver && fileImportSettings != null)
                         {
                             fileImportSettings.Add(extension, form.ImportSettings);
                         }
-                        return ImportFile(file, multipleFiles, fileImportSettings, ctxRow, progressBar, mainForm, form.ImportSettings);
+                        fileEncoding = form.ImportSettings.CodePage;
+                        return ImportFile(file, multipleFiles, fileImportSettings, ctxRow, progressBar, mainForm, ref fileEncoding, form.ImportSettings);
                     }
                 }
             }
@@ -113,6 +135,36 @@ namespace DataTableConverter.Assisstant
                 RestoreDirectory = true,
                 Multiselect = status
             };
+        }
+
+        internal static string[] LoadPresetsByName()
+        {
+            return Directory.GetFiles(ExportHelper.ProjectPresets, "*.bin")
+                                         .Select(Path.GetFileNameWithoutExtension)
+                                         .ToArray();
+        }
+
+        internal static string[] LoadHeaderPresetsByName()
+        {
+            return Directory.GetFiles(ExportHelper.ProjectHeaderPresets, "*.bin")
+                                         .Select(Path.GetFileNameWithoutExtension)
+                                         .ToArray();
+        }
+
+        internal static KeyVal[] LoadAllPresetsByName()
+        {
+
+            List<KeyVal> presets = new List<KeyVal>();
+            foreach(string name in LoadHeaderPresetsByName())
+            {
+                presets.Add(new KeyVal(name,0));
+            }
+            foreach (string name in LoadPresetsByName())
+            {
+                presets.Add(new KeyVal(name, 1));
+            }
+
+            return presets.AsEnumerable().OrderBy(name => name.Key, new NaturalStringComparer(SortOrder.Ascending)).ThenBy(name => name.Val).ToArray();
         }
 
         internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
@@ -467,7 +519,7 @@ namespace DataTableConverter.Assisstant
 
                     progressBar?.StartLoadingBar(rows, mainForm);
 
-                    RangeToDataTable(objSHT, objXL, rows, cols, data, fileNameColumn ? path + "; " + sheetName : null, progressBar, mainForm);
+                    RangeToDataTable(objSHT, objXL, rows, cols, data, fileNameColumn ? Path.GetFileName(path) + "; " + sheetName : null, progressBar, mainForm);
                     Marshal.ReleaseComObject(objSHT);
                 }
                 if (fileNameColumn)
@@ -900,7 +952,7 @@ namespace DataTableConverter.Assisstant
 
         internal static TextImportTemplate LoadTextImportTemplate(string path)
         {
-            TextImportTemplate data = new TextImportTemplate();
+            TextImportTemplate data = null;
             if (File.Exists(path))
             {
                 try
@@ -941,6 +993,42 @@ namespace DataTableConverter.Assisstant
                 form.Dispose();
                 return checkedSheets;
             }
+        }
+
+        internal static ImportSettings GenerateSettingsThroughPreset(int presetType, string settingPreset)
+        {
+            ImportSettings setting = null;
+            if (presetType == 0)
+            {
+                TextImportTemplate template = LoadTextImportTemplate(Path.Combine(ExportHelper.ProjectHeaderPresets, $"{settingPreset}.bin"));
+                if (template != null)
+                {
+                    switch (template.SelectedSeparated)
+                    {
+                        case TextImportTemplate.SelectedSeparatedState.Between:
+                            setting = new ImportSettings(template.Encoding, template.BeginSeparator, template.EndSeparator, template.ContainsHeaders, template.Table.ColumnValues(0));
+                            break;
+
+                        case TextImportTemplate.SelectedSeparatedState.Tab:
+                            setting = new ImportSettings("\t", template.Encoding, template.ContainsHeaders, template.Table.ColumnValues(0));
+                            break;
+
+                        case TextImportTemplate.SelectedSeparatedState.TabCharacter:
+                        default:
+                            setting = new ImportSettings(template.StringSeparator, template.Encoding, template.ContainsHeaders, template.Table.ColumnValues(0));
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                TextImportTemplate template = LoadTextImportTemplate(Path.Combine(ExportHelper.ProjectPresets, $"{settingPreset}.bin"));
+                if (template != null)
+                {
+                    setting = new ImportSettings(template.Table.ColumnValuesAsInt(0).ToList(), template.Table.ColumnValuesAsString(1).ToList(), template.Encoding);
+                }
+            }
+            return setting;
         }
 
         internal static string GetShortFileName(string path)

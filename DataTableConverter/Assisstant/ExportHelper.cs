@@ -14,6 +14,7 @@ using System.Text;
 using System.Windows.Forms;
 using DataTableConverter.Extensions;
 using System.Threading;
+using DataTableConverter.View;
 
 namespace DataTableConverter
 {
@@ -198,18 +199,38 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static void ExportCsv(DataTable dt, string directory, string filename, Action updateLoadingBar = null)
+        internal static void ExportCsv(DataTable dt, string directory, string filename, int codePage, Form mainForm, Action updateLoadingBar = null)
         {
-            StreamWriter writer = File.CreateText(Path.Combine(directory, filename + ".csv"));
-            
-            writer.WriteLine(string.Join(CSVSeparator, dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName)));
-            foreach (DataRow row in dt.Rows)
+            string path = Path.Combine(directory, filename + ".csv");
+            StreamWriter writer;
+            FileStream fileStream = null;
+            if (codePage == 0)
             {
-                writer.WriteLine(string.Join(CSVSeparator, row.ItemArray.Select(field => field.ToString())));
-                updateLoadingBar?.Invoke();
+                SelectEncoding form = new SelectEncoding();
+                DialogResult result = DialogResult.Cancel;
+                mainForm.Invoke(new MethodInvoker(() =>
+                {
+                    result = form.ShowDialog(mainForm);
+                }));
+                if(result == DialogResult.OK)
+                {
+                    codePage = form.FileEncoding;
+                }
             }
-            writer.Close();
-            
+            if (codePage != 0)
+            {
+                fileStream = new FileStream(path, FileMode.Create);
+                writer = new StreamWriter(fileStream, Encoding.GetEncoding(codePage));
+
+                writer.WriteLine(string.Join(CSVSeparator, dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName)));
+                foreach (DataRow row in dt.Rows)
+                {
+                    writer.WriteLine(string.Join(CSVSeparator, row.ItemArray.Select(field => field.ToString())));
+                    updateLoadingBar?.Invoke();
+                }
+                writer.Close();
+                fileStream.Close();
+            }
         }
 
         internal static string ExportExcel(DataTable dt, string directory, string filename, Form mainForm)
@@ -484,7 +505,7 @@ namespace DataTableConverter
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
-        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished, Form mainForm)
+        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished, int codePage, Form mainForm)
         {
             new Thread(() =>
             {
@@ -532,7 +553,7 @@ namespace DataTableConverter
                             //CSV
                             case 0:
                                 {
-                                    ExportCsv(table, path, FileName);
+                                    ExportCsv(table, path, FileName, codePage, mainForm);
                                 }
                                 break;
 

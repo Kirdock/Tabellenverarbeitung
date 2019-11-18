@@ -33,7 +33,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
             DataTable saveTable = table.Copy().GetSortedView(sortingOrder, orderType).ToTable();
@@ -74,7 +74,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 path = path ?? saveFileDialog1.FileName;
                 try
                 {
-                    ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
+                    ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), invokeForm.FileEncoding, invokeForm, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
                     
                     if(Properties.Settings.Default.PVMSaveTwice)
                     {
@@ -91,13 +91,13 @@ namespace DataTableConverter.Classes.WorkProcs
                             if (result2 == DialogResult.OK)
                             {
                                 path = saveFileDialog2.FileName;
-                                ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
+                                ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), invokeForm.FileEncoding, invokeForm, UpdateLoadingBar);
                             }
                         }
                         else
                         {
                             path = Path.Combine(SecondFileName, Path.GetFileNameWithoutExtension(path));
-                            ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
+                            ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), invokeForm.FileEncoding, invokeForm, UpdateLoadingBar);
                         }
                     }
                 }

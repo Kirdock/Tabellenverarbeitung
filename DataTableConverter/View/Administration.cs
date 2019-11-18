@@ -62,6 +62,7 @@ namespace DataTableConverter.View
             LoadTolerances(tolerances);
             LoadCases(cases);
             LoadWorkflows(workflows);
+            LoadPresets();
 
             ViewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
             
@@ -71,6 +72,14 @@ namespace DataTableConverter.View
             AddContextMenuAndDataGridViewStyle();
             RestoreSplitterDistance();
             SetColors();
+        }
+
+        private void LoadPresets()
+        {
+            CmBPresetPVMImport.Items.Add(new ImportHelper.KeyVal(string.Empty, -1));
+            CmBPresetPVMImport.Items.AddRange(ImportHelper.LoadAllPresetsByName());
+            CmBPresetPVMImport.DisplayMember = "Key";
+            CmBPresetPVMImport.ValueMember = "Key";
         }
 
         private void SetListBoxStyle()
@@ -289,7 +298,7 @@ namespace DataTableConverter.View
                 { typeof(ProcNumber), SetNumberControls },
                 { typeof(ProcSubstring), SetSubstringControls },
                 { typeof(ProcReplaceWhole), SetReplaceWholeControls },
-                { typeof(ProcAddTableColumns), SetAddTableColumnsControls },
+                { typeof(ProcAddTableColumns), SetPVMImportColumnsControls },
                 { typeof(ProcCompare), SetCompareControls },
                 { typeof(ProcPVMExport), SetPVMExportControls },
                 { typeof(ProcCount), SetCountControls },
@@ -801,12 +810,28 @@ namespace DataTableConverter.View
 
         }
 
-        private void SetAddTableColumnsControls(WorkProc selectedProc)
+        private void SetPVMImportColumnsControls(WorkProc selectedProc)
         {
             ProcAddTableColumns proc = selectedProc as ProcAddTableColumns;
             lblOriginalNameText.Text = ProcAddTableColumns.ClassName;
             txtIdentifierSource.Text = proc.IdentifySource;
             txtIdentifierAppend.Text = proc.IdentifyAppend;
+
+            int index = -1;
+            for(int i = 0; i < CmBPresetPVMImport.Items.Count; i++)
+            {
+                ImportHelper.KeyVal item = CmBPresetPVMImport.Items[i] as ImportHelper.KeyVal;
+                if(item.Key == proc.SettingPreset && item.Val == proc.PresetType)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index != -1)
+            {
+                CmBPresetPVMImport.SelectedIndex = index;
+            }
         }
 
         private void SetCompareControls(WorkProc selectedProc)
@@ -2235,6 +2260,14 @@ namespace DataTableConverter.View
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Es wurde keine Tabelle geladen!");
             }
+        }
+
+        private void CmBPresetPVMImport_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ProcAddTableColumns proc = GetSelectedWorkProcedure() as ProcAddTableColumns;
+            ImportHelper.KeyVal item = (CmBPresetPVMImport.SelectedItem as ImportHelper.KeyVal);
+            proc.PresetType = item.Val;
+            proc.SettingPreset = item.Key;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

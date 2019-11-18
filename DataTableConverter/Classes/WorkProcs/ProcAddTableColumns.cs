@@ -16,6 +16,8 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcAddTableColumns : WorkProc
     {
         public string IdentifySource, IdentifyAppend;
+        public string SettingPreset;
+        public int PresetType;
         internal static string ClassName = "PVM Import";
         //internal bool ImportAll = true;
 
@@ -42,7 +44,7 @@ namespace DataTableConverter.Classes.WorkProcs
             IdentifySource = null;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form invokeForm, out int[] newOrderIndices)
+        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             //I should first load the File (before workflow.start; right after header-check)
             //additional method in WorkProc and only this class overrides it
@@ -70,7 +72,19 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             if (!string.IsNullOrWhiteSpace(path))
             {
-                DataTable newTable = ImportHelper.ImportFile(path, false, null, ctxRow, null, invokeForm); //load file
+                Dictionary<string, ImportSettings> dict = null;
+                ImportSettings setting = ImportHelper.GenerateSettingsThroughPreset(PresetType, SettingPreset);
+                int fileEncoding = 0;
+                if (setting != null)
+                {
+                    dict = new Dictionary<string, ImportSettings>
+                    {
+                        { Path.GetExtension(path).ToLower(), setting }
+                    };
+                    fileEncoding = setting.CodePage;
+                }
+                
+                DataTable newTable = ImportHelper.ImportFile(path, false, dict, ctxRow, null,invokeForm, ref fileEncoding); //load file
                 if (newTable != null)
                 {
                     DialogResult res = DialogResult.Yes;
@@ -133,7 +147,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             newOrderIndices = newIndices;
                             if (Properties.Settings.Default.SplitPVM)
                             {
-                                table.SplitDataTable(filePath, invokeForm, invalidColumnName);
+                                table.SplitDataTable(filePath, invokeForm, fileEncoding, invalidColumnName);
                             }
                         }
                     }

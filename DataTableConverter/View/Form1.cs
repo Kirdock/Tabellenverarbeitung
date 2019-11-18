@@ -40,6 +40,7 @@ namespace DataTableConverter
         private OrderType OrderType = OrderType.Windows;
         private Dictionary<string, int> ColumnWidths;
         private readonly int ColumnWidthTolerance = 10;
+        internal int FileEncoding = 0;
 
         internal Form1(DataTable table = null)
         {
@@ -505,14 +506,14 @@ namespace DataTableConverter
                     Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
                     DataTable newTable = null;
                     string fileNameBefore = Path.GetFileName(filenames[0]);
+                    int fileEncoding = 0;
                     foreach (string file in filenames)
                     {
                         try
                         {
 
                             string filename = Path.GetFileName(file);
-                            
-                            DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this);
+                            DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding);
                             if (table != null)
                             {
                                 if (newTable != null)
@@ -527,7 +528,7 @@ namespace DataTableConverter
                                 if (!fileNameSet)
                                 {
                                     fileNameSet = true;
-                                    SetFileName(file);
+                                    SetFileMeta(file, fileEncoding);
                                 }
 
                             }
@@ -537,12 +538,18 @@ namespace DataTableConverter
                             ErrorHelper.LogMessage(ex, this);
                         }
                     }
-                    FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]));
+                    FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]), fileEncoding);
                 });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
             }
             dialog.Dispose();
+        }
+
+        private void SetFileMeta(string file, int encoding)
+        {
+            SetFileName(file);
+            FileEncoding = encoding;
         }
 
         private void SetFileName(string path)
@@ -555,13 +562,13 @@ namespace DataTableConverter
             FilePath = path;
         }
 
-        private void FinishImport(DataTable table, ImportState state, DataTable oldTable, string filename)
+        private void FinishImport(DataTable table, ImportState state, DataTable oldTable, string filename, int encoding)
         {
             if(table != null) {
                 switch (state)
                 {
                     case ImportState.Merge:
-                        StartMerge(table, oldTable, filename);
+                        StartMerge(table, oldTable, filename, encoding);
                         break;
 
                     case ImportState.Append:
@@ -584,7 +591,7 @@ namespace DataTableConverter
             StopLoadingBar();
         }
 
-        private void StartMerge(DataTable importTable, DataTable sourceTable, string filename)
+        private void StartMerge(DataTable importTable, DataTable sourceTable, string filename, int encoding)
         {
             string[] importColumns = new string[0];
             int sourceMergeIndex = -1;
@@ -635,19 +642,19 @@ namespace DataTableConverter
                             {
                                 SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, sourceTable.HeadersOfDataTable(), true);
                                 DialogResult res = DialogResult.Cancel;
-                                this.Invoke(new MethodInvoker(() =>
+                                Invoke(new MethodInvoker(() =>
                                 {
                                     res = f.ShowDialog(this);
                                 }));
                                 if (res == DialogResult.OK)
                                 {
                                     invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
-                                    sourceTable.SplitDataTable(FilePath, this, invalidColumnName);
+                                    sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
                                 }
                             }
                             else
                             {
-                                sourceTable.SplitDataTable(FilePath, this, invalidColumnName);
+                                sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
                             }
                         }
 
@@ -670,7 +677,7 @@ namespace DataTableConverter
             MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
             bool result;
             DialogResult res = DialogResult.Cancel;
-            this.Invoke(new MethodInvoker(() =>
+            Invoke(new MethodInvoker(() =>
             {
                 res = form.ShowDialog(this);
             }));
@@ -1059,7 +1066,7 @@ namespace DataTableConverter
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), UpdateLoadingBar);
+                            ExportHelper.ExportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), FileEncoding, this, UpdateLoadingBar);
                             StopLoadingBar();
                             SaveFinished();
                         }
@@ -1122,7 +1129,7 @@ namespace DataTableConverter
             if(export.ShowDialog(this) == DialogResult.OK)
             {
                 StartLoadingBar();
-                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished, this);
+                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, this);
             }
             export.Dispose();
         }

@@ -31,7 +31,7 @@ namespace DataTableConverter.View
             SetHeaderDataGridView();
             SetSize();
             this.path = path;
-            setEncodingCmb();
+            ViewHelper.SetEncodingCmb(cmbEncoding);
             MultipleFiles = multipleFiles;
             cbTakeOver.Visible = multipleFiles;
             SetDataGridViewStyle();
@@ -81,20 +81,6 @@ namespace DataTableConverter.View
             loadSettings();
             radioButton_CheckedChanged(null, null);
             cmbEncoding.SelectedIndexChanged += (sender2, e2) => cmbEncoding_SelectedIndexChanged(sender2, e2);
-        }
-
-        private void setEncodingCmb()
-        {
-            cmbEncoding.DataSource = Encoding.GetEncodings().OrderBy(encoding => encoding.DisplayName, new NaturalStringComparer(SortOrder.Ascending)).ToArray();
-
-            cmbEncoding.DisplayMember = "DisplayName";
-            cmbEncoding.ValueMember = "CodePage";
-            SetEncoding(Properties.Settings.Default.Encoding);
-        }
-
-        private void SetEncoding(int encoding)
-        {
-            cmbEncoding.SelectedValue = encoding;
         }
 
         private void cmbEncoding_SelectedIndexChanged(object sender, EventArgs e)
@@ -161,9 +147,7 @@ namespace DataTableConverter.View
             try
             {
                 cmbPresets.Items.Clear();
-                cmbPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectPresets, "*.bin")
-                                         .Select(Path.GetFileNameWithoutExtension)
-                                         .ToArray());
+                cmbPresets.Items.AddRange(ImportHelper.LoadPresetsByName());
                 if (cmbPresets.Items.Count > 0)
                 {
                     cmbPresets.SelectedIndex = 0;
@@ -177,9 +161,7 @@ namespace DataTableConverter.View
             try
             {
                 cmbHeaderPresets.Items.Clear();
-                cmbHeaderPresets.Items.AddRange(Directory.GetFiles(ExportHelper.ProjectHeaderPresets, "*.bin")
-                                         .Select(Path.GetFileNameWithoutExtension)
-                                         .ToArray());
+                cmbHeaderPresets.Items.AddRange(ImportHelper.LoadHeaderPresetsByName());
                 if (cmbHeaderPresets.Items.Count > 0)
                 {
                     cmbHeaderPresets.SelectedIndex = 0;
@@ -243,14 +225,12 @@ namespace DataTableConverter.View
             {
                 ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked,headers);
                 valid = true;
-                //DataTable = ImportHelper.OpenTextBetween(path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, headers);
             }
 
             if(separator != null)
             {
                 valid = true;
                 ImportSettings = new ImportSettings(separator, getCodePage(), cbContainsHeaders.Checked, headers);
-                //DataTable = ImportHelper.OpenText(path, separator, getCodePage(), cbContainsHeaders.Checked, headers);
             }
 
             if(valid)
@@ -268,7 +248,6 @@ namespace DataTableConverter.View
         {
             getDataGridViewItems(out List<int> values, out List<string> headers);
             ImportSettings = new ImportSettings(values, headers, getCodePage());
-            //DataTable = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, false, null);
         }
 
         private void dgvSetting_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -363,13 +342,15 @@ namespace DataTableConverter.View
                 if (File.Exists(path))
                 {
                     TextImportTemplate template = ImportHelper.LoadTextImportTemplate(path);
+                    if (template != null)
+                    {
+                        cmbVariant.SelectedIndex = template.Variant;
+                        cmbEncoding.SelectedValue = template.Encoding;
 
-                    cmbVariant.SelectedIndex = template.Variant;
-                    SetEncoding(template.Encoding);
-                    
-                    dgvSetting.DataSource = template.Table;
-                    SetSortMode();
-                    dgvSetting_CellValueChanged(null, null);
+                        dgvSetting.DataSource = template.Table;
+                        SetSortMode();
+                        dgvSetting_CellValueChanged(null, null);
+                    }
                 }
                 else
                 {
@@ -682,18 +663,21 @@ namespace DataTableConverter.View
                 if(File.Exists(path))
                 {
                     TextImportTemplate template = ImportHelper.LoadTextImportTemplate(path);
-                    SetEncoding(template.Encoding);
+                    if (template != null)
+                    {
+                        cmbEncoding.SelectedValue = template.Encoding;
 
-                    rbTab.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.Tab;
-                    rbSep.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.TabCharacter;
-                    rbBetween.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.Between;
+                        rbTab.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.Tab;
+                        rbSep.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.TabCharacter;
+                        rbBetween.Checked = template.SelectedSeparated == TextImportTemplate.SelectedSeparatedState.Between;
 
-                    txtBegin.Text = template.BeginSeparator;
-                    txtEnd.Text = template.EndSeparator;
-                    txtSeparator.Text = template.StringSeparator;
-                    dgvHeaders.DataSource = template.Table;
-                    cbContainsHeaders.Checked = template.ContainsHeaders;
-                    radioButton2_CheckedChanged(null, null);
+                        txtBegin.Text = template.BeginSeparator;
+                        txtEnd.Text = template.EndSeparator;
+                        txtSeparator.Text = template.StringSeparator;
+                        dgvHeaders.DataSource = template.Table;
+                        cbContainsHeaders.Checked = template.ContainsHeaders;
+                        radioButton2_CheckedChanged(null, null);
+                    }
                 }
                 else
                 {

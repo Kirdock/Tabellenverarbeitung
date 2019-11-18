@@ -11,18 +11,15 @@ namespace DataTableConverter.Classes
     class TextImportTemplate
     {
         public enum SelectedSeparatedState { Tab, TabCharacter, Between}
-        internal DataTable Table;
-        internal int Encoding;
-        internal bool ContainsHeaders;
-        internal string StringSeparator;
-        internal string BeginSeparator;
-        internal string EndSeparator;
-        internal SelectedSeparatedState SelectedSeparated;
-        internal int Variant;
-
+        public DataTable Table;
+        public int Encoding;
+        public bool ContainsHeaders;
+        public string StringSeparator;
+        public string BeginSeparator;
+        public string EndSeparator;
+        public SelectedSeparatedState SelectedSeparated;
+        public int Variant;
 
         internal TextImportTemplate() { }
-
-        
     }
 }

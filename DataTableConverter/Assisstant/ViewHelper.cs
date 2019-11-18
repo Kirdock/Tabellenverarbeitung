@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -470,6 +471,15 @@ namespace DataTableConverter
         internal static void EndDataGridViewEdit(DataGridView dgTable)
         {
             dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
+        }
+
+        internal static void SetEncodingCmb(ComboBox cmbEncoding)
+        {
+            cmbEncoding.DataSource = Encoding.GetEncodings().OrderBy(encoding => encoding.DisplayName, new NaturalStringComparer(SortOrder.Ascending)).ToArray();
+
+            cmbEncoding.DisplayMember = "DisplayName";
+            cmbEncoding.ValueMember = "CodePage";
+            cmbEncoding.SelectedValue = Properties.Settings.Default.Encoding;
         }
     }
 }

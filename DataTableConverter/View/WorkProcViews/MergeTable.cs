@@ -8,14 +8,12 @@ namespace DataTableConverter.View
 {
     public partial class MergeTable : Form
     {
-        private object[] Headers;
         private bool SameRowCount;
 
         internal MergeTable(object[] headersOriginal, object[] headersMerge, string filename, int sourceCount, int importCount)
         {
             InitializeComponent();
             SetListBoxStyle();
-            Headers = headersOriginal;
             setCmbItems(cmbIdentifierOriginal, headersOriginal);
             setCmbItems(cmbIdentifierMerge, headersMerge);
             setListItems(headersMerge);

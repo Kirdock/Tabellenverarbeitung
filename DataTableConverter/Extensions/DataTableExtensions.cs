@@ -215,7 +215,7 @@ namespace DataTableConverter.Extensions
             return result;
         }
 
-        internal static void SplitDataTable(this DataTable table, string path, Form mainForm, string columnName = null)
+        internal static void SplitDataTable(this DataTable table, string path, Form1 mainForm, int fileEncoding, string columnName = null)
         {
             DataTable table1 = new DataTable() { TableName = path.AppendFileName(Properties.Settings.Default.FailAddressText) };
             string invalidColumnName = columnName ?? Properties.Settings.Default.InvalidColumnName;
@@ -253,7 +253,7 @@ namespace DataTableConverter.Extensions
                     //CSV
                     case 0:
                         {
-                            ExportHelper.ExportCsv(Table, path, FileName);
+                            ExportHelper.ExportCsv(Table, path, FileName, fileEncoding, mainForm);
                         }
                         break;
 
@@ -300,6 +300,11 @@ namespace DataTableConverter.Extensions
         internal static string[] ColumnValuesAsString(this DataTable table, int column)
         {
             return table.AsEnumerable().Select(row => row[column]?.ToString()).ToArray();
+        }
+
+        internal static IEnumerable<int> ColumnValuesAsInt(this DataTable table, int column)
+        {
+            return table.AsEnumerable().Select(row => (int)row[column]);
         }
 
         internal static DataTable SetColumnsTypeStringWithContainingData(this DataTable table)
