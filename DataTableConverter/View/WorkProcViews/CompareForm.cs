@@ -14,9 +14,11 @@ namespace DataTableConverter.View.WorkProcViews
     public partial class CompareForm : Form
     {
         internal ProcCompare Procedure;
-        internal CompareForm(object[] headers)
+        private DataTable Table;
+        internal CompareForm(object[] headers, DataTable table)
         {
             InitializeComponent();
+            Table = table;
             cbFirstColumn.Items.AddRange(headers);
             cbSecondColumn.Items.AddRange(headers);
             cbFirstColumn.SelectedIndex = cbSecondColumn.SelectedIndex = 0;
@@ -56,6 +58,16 @@ namespace DataTableConverter.View.WorkProcViews
             {
                 Procedure = new ProcCompare(txtNewColumn.Text, cbOldColumn.Checked, cbFirstColumn.SelectedItem.ToString(), cbSecondColumn.SelectedItem.ToString());
                 DialogResult = DialogResult.OK;
+            }
+        }
+
+        private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string firstColumn = cbFirstColumn.SelectedItem?.ToString();
+            string secondColumn = cbSecondColumn.SelectedItem?.ToString();
+            if (firstColumn != null && secondColumn != null)
+            {
+                LblCount.Text = Table.AsEnumerable().Count(row => row[firstColumn].ToString() == row[secondColumn].ToString()).ToString();
             }
         }
     }

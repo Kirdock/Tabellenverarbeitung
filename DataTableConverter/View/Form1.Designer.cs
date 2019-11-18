@@ -90,6 +90,7 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.längsteZeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -170,6 +171,7 @@
             this.funktionenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zeileToolStripMenuItem,
             this.großKleinschreibungToolStripMenuItem,
+            this.längsteZeileToolStripMenuItem,
             this.nummerierenToolStripMenuItem,
             this.prüfzifferToolStripMenuItem,
             this.spaltenAusTabelleHinzufügenToolStripMenuItem,
@@ -553,6 +555,13 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // längsteZeileToolStripMenuItem
+            // 
+            this.längsteZeileToolStripMenuItem.Name = "längsteZeileToolStripMenuItem";
+            this.längsteZeileToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.längsteZeileToolStripMenuItem.Text = "Längste Zeile";
+            this.längsteZeileToolStripMenuItem.Click += new System.EventHandler(this.längsteZeileToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -640,6 +649,7 @@
         private System.Windows.Forms.ToolStripMenuItem pVMToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem trennenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem prüfzifferToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem längsteZeileToolStripMenuItem;
     }
 }
 

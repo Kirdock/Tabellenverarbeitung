@@ -1487,11 +1487,12 @@ namespace DataTableConverter
 
         private void spaltenVergleichenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CompareForm form = new CompareForm(sourceTable.HeadersOfDataTable());
+            CompareForm form = new CompareForm(sourceTable.HeadersOfDataTable(), sourceTable);
             if(form.ShowDialog(this) == DialogResult.OK)
             {
                 StartSingleWorkflow(form.Procedure);
             }
+            form.Dispose();
         }
 
         private void PrüfzifferToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1560,6 +1561,51 @@ namespace DataTableConverter
                 result = checksum_digit == 10 ? 0 : checksum_digit;
             }
             return result;
+        }
+
+        private void längsteZeileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MaxRowLengthForm form = new MaxRowLengthForm();
+
+            if (form.ShowDialog(this) == DialogResult.OK)
+            {
+                DataTable table = GetDataSource();
+                string shortcut = form.Shortcut;
+                string newColumn = form.NewColumn;
+                StartLoadingBar();
+                Thread thread = new Thread(() =>
+                {
+                    int maxIndex = 0;
+                    int maxLength = 0;
+                    for (int i = 0; i < table.Rows.Count; i++)
+                    {
+                        int max = table.Rows[i].ItemArray.Sum(item => item.ToString().Length);
+                        if (max > maxLength)
+                        {
+                            maxLength = max;
+                            maxIndex = i;
+                        }
+                    }
+
+                    if (shortcut != string.Empty && newColumn != string.Empty)
+                    {
+
+                        newColumn = table.TryAddColumn(newColumn);
+                        table.Rows[maxIndex][newColumn] = shortcut;
+                        AddDataSourceValueChange(table);
+                    }
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        dgTable.ClearSelection();
+                        dgTable[0, maxIndex].Selected = true;
+                        dgTable.FirstDisplayedScrollingRowIndex = maxIndex;
+                    }));
+                    StopLoadingBar();
+                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+            }
+            form.Dispose();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

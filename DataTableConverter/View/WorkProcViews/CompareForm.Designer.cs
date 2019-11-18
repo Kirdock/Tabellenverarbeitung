@@ -37,6 +37,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnConfirm = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.LblCount = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // cbOldColumn
@@ -84,6 +86,7 @@
             this.cbFirstColumn.Name = "cbFirstColumn";
             this.cbFirstColumn.Size = new System.Drawing.Size(384, 21);
             this.cbFirstColumn.TabIndex = 42;
+            this.cbFirstColumn.SelectedIndexChanged += new System.EventHandler(this.ComboBox_SelectedIndexChanged);
             // 
             // cbSecondColumn
             // 
@@ -93,6 +96,7 @@
             this.cbSecondColumn.Name = "cbSecondColumn";
             this.cbSecondColumn.Size = new System.Drawing.Size(384, 21);
             this.cbSecondColumn.TabIndex = 43;
+            this.cbSecondColumn.SelectedIndexChanged += new System.EventHandler(this.ComboBox_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -114,7 +118,7 @@
             // 
             // btnConfirm
             // 
-            this.btnConfirm.Location = new System.Drawing.Point(149, 194);
+            this.btnConfirm.Location = new System.Drawing.Point(10, 200);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(106, 23);
             this.btnConfirm.TabIndex = 46;
@@ -122,11 +126,31 @@
             this.btnConfirm.UseVisualStyleBackColor = true;
             this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(133, 205);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.TabIndex = 48;
+            this.label3.Text = "Anzahl:";
+            // 
+            // LblCount
+            // 
+            this.LblCount.AutoSize = true;
+            this.LblCount.Location = new System.Drawing.Point(173, 205);
+            this.LblCount.Name = "LblCount";
+            this.LblCount.Size = new System.Drawing.Size(13, 13);
+            this.LblCount.TabIndex = 50;
+            this.LblCount.Text = "0";
+            // 
             // CompareForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(409, 235);
+            this.Controls.Add(this.LblCount);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -156,5 +180,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnConfirm;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label LblCount;
     }
 }
