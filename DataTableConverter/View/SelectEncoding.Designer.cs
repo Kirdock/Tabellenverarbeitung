@@ -60,6 +60,8 @@
             this.ClientSize = new System.Drawing.Size(295, 48);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.CmBEncoding);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "SelectEncoding";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "CodePage";

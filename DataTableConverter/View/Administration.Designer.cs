@@ -36,6 +36,7 @@
             this.ltbProcedures = new System.Windows.Forms.ListBox();
             this.btnDeleteProcedure = new System.Windows.Forms.Button();
             this.gbSearchAndReplace = new System.Windows.Forms.GroupBox();
+            this.CbProcWordCheck = new System.Windows.Forms.CheckBox();
             this.cbCheckTotal = new System.Windows.Forms.CheckBox();
             this.dgvReplaces = new System.Windows.Forms.DataGridView();
             this.lblProcName = new System.Windows.Forms.Label();
@@ -61,6 +62,7 @@
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.gbSeparate = new System.Windows.Forms.GroupBox();
+            this.CbSeparateSaveRemaining = new System.Windows.Forms.CheckBox();
             this.BtnSeparateLoadEntries = new System.Windows.Forms.Button();
             this.CbSeparateSaveAll = new System.Windows.Forms.CheckBox();
             this.CmBSeparateFormat = new System.Windows.Forms.ComboBox();
@@ -73,6 +75,13 @@
             this.CmBSeparate = new System.Windows.Forms.ComboBox();
             this.BtnSeparateAdd = new System.Windows.Forms.Button();
             this.DgvSeparate = new System.Windows.Forms.DataGridView();
+            this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.CmBPresetPVMImport = new System.Windows.Forms.ComboBox();
+            this.txtIdentifierAppend = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtIdentifierSource = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.gbPadding = new System.Windows.Forms.GroupBox();
             this.cbPadOldColumn = new System.Windows.Forms.CheckBox();
             this.RbRight = new System.Windows.Forms.RadioButton();
@@ -133,11 +142,6 @@
             this.txtFormula = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.txtNewColumnMerge = new System.Windows.Forms.TextBox();
-            this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
-            this.txtIdentifierAppend = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtIdentifierSource = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.gbTrim = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.CbTrimDeleteDouble = new System.Windows.Forms.CheckBox();
@@ -223,9 +227,8 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.CmBPresetPVMImport = new System.Windows.Forms.ComboBox();
-            this.label15 = new System.Windows.Forms.Label();
-            this.CbProcWordCheck = new System.Windows.Forms.CheckBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.CmBPVMImportEncoding = new System.Windows.Forms.ComboBox();
             this.cbHeadersPad = new CheckComboBoxTest.CheckedComboBox();
             this.clbHeadersRound = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeadersPVMExport = new CheckComboBoxTest.CheckedComboBox();
@@ -234,7 +237,6 @@
             this.clbUpLowHeader = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeadersReplaceWhole = new CheckComboBoxTest.CheckedComboBox();
             this.cbSubstringHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.CbSeparateSaveRemaining = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -259,6 +261,7 @@
             this.splitWorkflowProperties.SuspendLayout();
             this.gbSeparate.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).BeginInit();
+            this.gbAddTableColumns.SuspendLayout();
             this.gbPadding.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbPadCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPadColumns)).BeginInit();
@@ -273,7 +276,6 @@
             this.gbCompare.SuspendLayout();
             this.gbMerge.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
-            this.gbAddTableColumns.SuspendLayout();
             this.gbTrim.SuspendLayout();
             this.gbOrder.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).BeginInit();
@@ -418,6 +420,18 @@
             this.gbSearchAndReplace.Text = "Bearbeiten";
             this.gbSearchAndReplace.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
             // 
+            // CbProcWordCheck
+            // 
+            this.CbProcWordCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CbProcWordCheck.AutoSize = true;
+            this.CbProcWordCheck.Location = new System.Drawing.Point(578, 53);
+            this.CbProcWordCheck.Name = "CbProcWordCheck";
+            this.CbProcWordCheck.Size = new System.Drawing.Size(128, 17);
+            this.CbProcWordCheck.TabIndex = 11;
+            this.CbProcWordCheck.Text = "Wortübereinstimmung";
+            this.CbProcWordCheck.UseVisualStyleBackColor = true;
+            this.CbProcWordCheck.CheckedChanged += new System.EventHandler(this.CbProcWordCheck_CheckedChanged);
+            // 
             // cbCheckTotal
             // 
             this.cbCheckTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -561,8 +575,8 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPadding);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCount);
@@ -768,6 +782,17 @@
             this.gbSeparate.TabStop = false;
             this.gbSeparate.Text = "Spaltenangabe";
             // 
+            // CbSeparateSaveRemaining
+            // 
+            this.CbSeparateSaveRemaining.AutoSize = true;
+            this.CbSeparateSaveRemaining.Location = new System.Drawing.Point(8, 172);
+            this.CbSeparateSaveRemaining.Name = "CbSeparateSaveRemaining";
+            this.CbSeparateSaveRemaining.Size = new System.Drawing.Size(172, 17);
+            this.CbSeparateSaveRemaining.TabIndex = 32;
+            this.CbSeparateSaveRemaining.Text = "Alle restlichen Werte speichern";
+            this.CbSeparateSaveRemaining.UseVisualStyleBackColor = true;
+            this.CbSeparateSaveRemaining.CheckedChanged += new System.EventHandler(this.CbSeparateSaveRemaining_CheckedChanged);
+            // 
             // BtnSeparateLoadEntries
             // 
             this.BtnSeparateLoadEntries.Location = new System.Drawing.Point(5, 194);
@@ -897,6 +922,84 @@
             this.DgvSeparate.Size = new System.Drawing.Size(230, 396);
             this.DgvSeparate.TabIndex = 16;
             this.DgvSeparate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            // 
+            // gbAddTableColumns
+            // 
+            this.gbAddTableColumns.Controls.Add(this.CmBPVMImportEncoding);
+            this.gbAddTableColumns.Controls.Add(this.label20);
+            this.gbAddTableColumns.Controls.Add(this.label15);
+            this.gbAddTableColumns.Controls.Add(this.CmBPresetPVMImport);
+            this.gbAddTableColumns.Controls.Add(this.txtIdentifierAppend);
+            this.gbAddTableColumns.Controls.Add(this.label3);
+            this.gbAddTableColumns.Controls.Add(this.txtIdentifierSource);
+            this.gbAddTableColumns.Controls.Add(this.label1);
+            this.gbAddTableColumns.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbAddTableColumns.Location = new System.Drawing.Point(0, 92);
+            this.gbAddTableColumns.Name = "gbAddTableColumns";
+            this.gbAddTableColumns.Size = new System.Drawing.Size(245, 643);
+            this.gbAddTableColumns.TabIndex = 21;
+            this.gbAddTableColumns.TabStop = false;
+            this.gbAddTableColumns.Text = "Spaltenangabe";
+            this.gbAddTableColumns.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(7, 142);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(46, 13);
+            this.label15.TabIndex = 5;
+            this.label15.Text = "Vorlage:";
+            // 
+            // CmBPresetPVMImport
+            // 
+            this.CmBPresetPVMImport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CmBPresetPVMImport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CmBPresetPVMImport.FormattingEnabled = true;
+            this.CmBPresetPVMImport.Location = new System.Drawing.Point(6, 160);
+            this.CmBPresetPVMImport.Name = "CmBPresetPVMImport";
+            this.CmBPresetPVMImport.Size = new System.Drawing.Size(234, 21);
+            this.CmBPresetPVMImport.TabIndex = 4;
+            this.CmBPresetPVMImport.SelectedIndexChanged += new System.EventHandler(this.CmBPresetPVMImport_SelectedIndexChanged);
+            // 
+            // txtIdentifierAppend
+            // 
+            this.txtIdentifierAppend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtIdentifierAppend.Location = new System.Drawing.Point(6, 104);
+            this.txtIdentifierAppend.Name = "txtIdentifierAppend";
+            this.txtIdentifierAppend.Size = new System.Drawing.Size(233, 20);
+            this.txtIdentifierAppend.TabIndex = 3;
+            this.txtIdentifierAppend.TextChanged += new System.EventHandler(this.txtIdentifierAppend_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 81);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(202, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Identifizierung der einzulesenden Tabelle:";
+            // 
+            // txtIdentifierSource
+            // 
+            this.txtIdentifierSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtIdentifierSource.Location = new System.Drawing.Point(6, 42);
+            this.txtIdentifierSource.Name = "txtIdentifierSource";
+            this.txtIdentifierSource.Size = new System.Drawing.Size(233, 20);
+            this.txtIdentifierSource.TabIndex = 1;
+            this.txtIdentifierSource.TextChanged += new System.EventHandler(this.txtIdentifierSource_TextChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 19);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(231, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Identifizierung der bereits eingelesenen Tabelle:";
             // 
             // gbPadding
             // 
@@ -1364,9 +1467,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TxtPVMPath.Location = new System.Drawing.Point(7, 95);
             this.TxtPVMPath.Name = "TxtPVMPath";
-            this.TxtPVMPath.ReadOnly = true;
             this.TxtPVMPath.Size = new System.Drawing.Size(160, 20);
             this.TxtPVMPath.TabIndex = 20;
+            this.TxtPVMPath.TextChanged += new System.EventHandler(this.TxtPVMPath_TextChanged);
             // 
             // label5
             // 
@@ -1605,61 +1708,6 @@
             this.txtNewColumnMerge.Size = new System.Drawing.Size(233, 20);
             this.txtNewColumnMerge.TabIndex = 2;
             this.txtNewColumnMerge.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
-            // 
-            // gbAddTableColumns
-            // 
-            this.gbAddTableColumns.Controls.Add(this.label15);
-            this.gbAddTableColumns.Controls.Add(this.CmBPresetPVMImport);
-            this.gbAddTableColumns.Controls.Add(this.txtIdentifierAppend);
-            this.gbAddTableColumns.Controls.Add(this.label3);
-            this.gbAddTableColumns.Controls.Add(this.txtIdentifierSource);
-            this.gbAddTableColumns.Controls.Add(this.label1);
-            this.gbAddTableColumns.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbAddTableColumns.Location = new System.Drawing.Point(0, 92);
-            this.gbAddTableColumns.Name = "gbAddTableColumns";
-            this.gbAddTableColumns.Size = new System.Drawing.Size(245, 643);
-            this.gbAddTableColumns.TabIndex = 21;
-            this.gbAddTableColumns.TabStop = false;
-            this.gbAddTableColumns.Text = "Spaltenangabe";
-            this.gbAddTableColumns.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
-            // 
-            // txtIdentifierAppend
-            // 
-            this.txtIdentifierAppend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtIdentifierAppend.Location = new System.Drawing.Point(6, 104);
-            this.txtIdentifierAppend.Name = "txtIdentifierAppend";
-            this.txtIdentifierAppend.Size = new System.Drawing.Size(233, 20);
-            this.txtIdentifierAppend.TabIndex = 3;
-            this.txtIdentifierAppend.TextChanged += new System.EventHandler(this.txtIdentifierAppend_TextChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 81);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(202, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Identifizierung der einzulesenden Tabelle:";
-            // 
-            // txtIdentifierSource
-            // 
-            this.txtIdentifierSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtIdentifierSource.Location = new System.Drawing.Point(6, 42);
-            this.txtIdentifierSource.Name = "txtIdentifierSource";
-            this.txtIdentifierSource.Size = new System.Drawing.Size(233, 20);
-            this.txtIdentifierSource.TabIndex = 1;
-            this.txtIdentifierSource.TextChanged += new System.EventHandler(this.txtIdentifierSource_TextChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(231, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Identifizierung der bereits eingelesenen Tabelle:";
             // 
             // gbTrim
             // 
@@ -2706,38 +2754,26 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // CmBPresetPVMImport
+            // label20
             // 
-            this.CmBPresetPVMImport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(6, 203);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(60, 13);
+            this.label20.TabIndex = 6;
+            this.label20.Text = "CodePage:";
+            // 
+            // CmBPVMImportEncoding
+            // 
+            this.CmBPVMImportEncoding.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CmBPresetPVMImport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CmBPresetPVMImport.FormattingEnabled = true;
-            this.CmBPresetPVMImport.Location = new System.Drawing.Point(6, 168);
-            this.CmBPresetPVMImport.Name = "CmBPresetPVMImport";
-            this.CmBPresetPVMImport.Size = new System.Drawing.Size(234, 21);
-            this.CmBPresetPVMImport.TabIndex = 4;
-            this.CmBPresetPVMImport.SelectedIndexChanged += new System.EventHandler(this.CmBPresetPVMImport_SelectedIndexChanged);
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(7, 150);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(46, 13);
-            this.label15.TabIndex = 5;
-            this.label15.Text = "Vorlage:";
-            // 
-            // CbProcWordCheck
-            // 
-            this.CbProcWordCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CbProcWordCheck.AutoSize = true;
-            this.CbProcWordCheck.Location = new System.Drawing.Point(578, 53);
-            this.CbProcWordCheck.Name = "CbProcWordCheck";
-            this.CbProcWordCheck.Size = new System.Drawing.Size(128, 17);
-            this.CbProcWordCheck.TabIndex = 11;
-            this.CbProcWordCheck.Text = "Wortübereinstimmung";
-            this.CbProcWordCheck.UseVisualStyleBackColor = true;
-            this.CbProcWordCheck.CheckedChanged += new System.EventHandler(this.CbProcWordCheck_CheckedChanged);
+            this.CmBPVMImportEncoding.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CmBPVMImportEncoding.FormattingEnabled = true;
+            this.CmBPVMImportEncoding.Location = new System.Drawing.Point(7, 231);
+            this.CmBPVMImportEncoding.Name = "CmBPVMImportEncoding";
+            this.CmBPVMImportEncoding.Size = new System.Drawing.Size(233, 21);
+            this.CmBPVMImportEncoding.TabIndex = 7;
+            this.CmBPVMImportEncoding.SelectedIndexChanged += new System.EventHandler(this.CmBPVMImportEncoding_SelectedIndexChanged);
             // 
             // cbHeadersPad
             // 
@@ -2867,17 +2903,6 @@
             this.cbSubstringHeaders.ValueSeparator = ", ";
             this.cbSubstringHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbSubstringHeaders_ItemCheck);
             // 
-            // CbSeparateSaveRemaining
-            // 
-            this.CbSeparateSaveRemaining.AutoSize = true;
-            this.CbSeparateSaveRemaining.Location = new System.Drawing.Point(8, 172);
-            this.CbSeparateSaveRemaining.Name = "CbSeparateSaveRemaining";
-            this.CbSeparateSaveRemaining.Size = new System.Drawing.Size(172, 17);
-            this.CbSeparateSaveRemaining.TabIndex = 32;
-            this.CbSeparateSaveRemaining.Text = "Alle restlichen Werte speichern";
-            this.CbSeparateSaveRemaining.UseVisualStyleBackColor = true;
-            this.CbSeparateSaveRemaining.CheckedChanged += new System.EventHandler(this.CbSeparateSaveRemaining_CheckedChanged);
-            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2918,6 +2943,8 @@
             this.gbSeparate.ResumeLayout(false);
             this.gbSeparate.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).EndInit();
+            this.gbAddTableColumns.ResumeLayout(false);
+            this.gbAddTableColumns.PerformLayout();
             this.gbPadding.ResumeLayout(false);
             this.gbPadding.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbPadCount)).EndInit();
@@ -2938,8 +2965,6 @@
             this.gbMerge.ResumeLayout(false);
             this.gbMerge.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
-            this.gbAddTableColumns.ResumeLayout(false);
-            this.gbAddTableColumns.PerformLayout();
             this.gbTrim.ResumeLayout(false);
             this.gbTrim.PerformLayout();
             this.gbOrder.ResumeLayout(false);
@@ -3201,5 +3226,7 @@
         private System.Windows.Forms.ComboBox CmBPresetPVMImport;
         private System.Windows.Forms.CheckBox CbProcWordCheck;
         private System.Windows.Forms.CheckBox CbSeparateSaveRemaining;
+        private System.Windows.Forms.ComboBox CmBPVMImportEncoding;
+        private System.Windows.Forms.Label label20;
     }
 }

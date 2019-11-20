@@ -27,7 +27,7 @@ namespace DataTableConverter.Classes.WorkProcs
             DataTable newTable = ExportHelper.ExportCount(Column, CountChecked ? Count : 0, ShowFromTo, table, orderType);
             invokeForm.BeginInvoke(new MethodInvoker(() =>
             {
-                new Form1(newTable).Show();
+                new Form1(newTable).Show(invokeForm);
             }));
         }
 

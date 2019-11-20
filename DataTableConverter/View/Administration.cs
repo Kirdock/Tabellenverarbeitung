@@ -45,6 +45,9 @@ namespace DataTableConverter.View
         internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
         {
             InitializeComponent();
+            CmBPVMImportEncoding.SelectedIndexChanged -= CmBPVMImportEncoding_SelectedIndexChanged;
+            ViewHelper.SetEncodingCmb(CmBPVMImportEncoding, true);
+            CmBPVMImportEncoding.SelectedIndexChanged += CmBPVMImportEncoding_SelectedIndexChanged;
             Table = table;
             SetSize();
             AssignGroupBoxToEnum();
@@ -839,11 +842,8 @@ namespace DataTableConverter.View
                     break;
                 }
             }
-
-            if (index != -1)
-            {
-                CmBPresetPVMImport.SelectedIndex = index;
-            }
+            CmBPresetPVMImport.SelectedIndex = index == -1 ? 0 : index;
+            CmBPVMImportEncoding.SelectedValue = proc.FileEncoding;
         }
 
         private void SetCompareControls(WorkProc selectedProc)
@@ -1878,7 +1878,7 @@ namespace DataTableConverter.View
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            new SettingForm(SettingForm.Tabs.Help).Show();
+            new SettingForm(SettingForm.Tabs.Help).Show(this);
         }
 
         private void cbMergeOldColumn_CheckedChanged(object sender, EventArgs e)
@@ -2313,6 +2313,16 @@ namespace DataTableConverter.View
             {
                 selectedItem.CheckedAllValues = CbSeparateSaveAll.Checked = false;
             }
+        }
+
+        private void TxtPVMPath_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcPVMExport).SecondFileName = TxtPVMPath.Text;
+        }
+
+        private void CmBPVMImportEncoding_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcAddTableColumns).FileEncoding = (int)CmBPVMImportEncoding.SelectedValue;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

@@ -473,13 +473,17 @@ namespace DataTableConverter
             dgTable.BindingContext[dgTable.DataSource].EndCurrentEdit();
         }
 
-        internal static void SetEncodingCmb(ComboBox cmbEncoding)
+        internal static void SetEncodingCmb(ComboBox cmbEncoding, bool emptySelectable = false)
         {
-            cmbEncoding.DataSource = Encoding.GetEncodings().OrderBy(encoding => encoding.DisplayName, new NaturalStringComparer(SortOrder.Ascending)).ToArray();
-
+            cmbEncoding.DataSource = (emptySelectable ? (new NewEncodingInfo[] { new NewEncodingInfo(string.Empty, 0) }).Concat(GetEncodings()) : GetEncodings()).ToArray();
             cmbEncoding.DisplayMember = "DisplayName";
             cmbEncoding.ValueMember = "CodePage";
             cmbEncoding.SelectedValue = Properties.Settings.Default.Encoding;
+        }
+
+        private static IEnumerable<NewEncodingInfo> GetEncodings()
+        {
+            return Encoding.GetEncodings().Select(encoding => new NewEncodingInfo(encoding.DisplayName, encoding.CodePage)).OrderBy(encoding => encoding.DisplayName, new NaturalStringComparer(SortOrder.Ascending));
         }
     }
 }

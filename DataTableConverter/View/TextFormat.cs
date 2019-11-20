@@ -194,7 +194,7 @@ namespace DataTableConverter.View
             Properties.Settings.Default.TextSeparated = rbSeparated.Checked;
             Properties.Settings.Default.Separator = txtSeparator.Text;
             Properties.Settings.Default.TabSelected = rbTab.Checked ? 0 : rbSep.Checked ? 1 : 2;
-            Properties.Settings.Default.Encoding = ((EncodingInfo)cmbEncoding.SelectedItem).CodePage;
+            Properties.Settings.Default.Encoding = (int)cmbEncoding.SelectedValue;
             Properties.Settings.Default.TextBegin = txtBegin.Text;
             Properties.Settings.Default.TextEnd = txtEnd.Text;
             Properties.Settings.Default.TakeOverAllFiles = cbTakeOver.Checked;
@@ -307,7 +307,7 @@ namespace DataTableConverter.View
 
         private int getCodePage()
         {
-            return ((EncodingInfo)cmbEncoding.SelectedItem).CodePage;
+            return (int)cmbEncoding.SelectedValue;
         }
         private void btnSavePreset_Click(object sender, EventArgs e)
         {
@@ -324,7 +324,7 @@ namespace DataTableConverter.View
                 {
                     TextImportTemplate template = new TextImportTemplate()
                     {
-                        Encoding = ((EncodingInfo)cmbEncoding.SelectedItem).CodePage,
+                        Encoding = (int)cmbEncoding.SelectedValue,
                         Table = (dgvSetting.DataSource as DataTable),
                         Variant = cmbVariant.SelectedIndex
                     };
@@ -641,7 +641,7 @@ namespace DataTableConverter.View
                 {
                     TextImportTemplate template = new TextImportTemplate()
                     {
-                        Encoding = ((EncodingInfo)cmbEncoding.SelectedItem).CodePage,
+                        Encoding = (int)cmbEncoding.SelectedValue,
                         Table = (dgvHeaders.DataSource as DataTable),
                         ContainsHeaders = cbContainsHeaders.Checked,
                         BeginSeparator = txtBegin.Text,

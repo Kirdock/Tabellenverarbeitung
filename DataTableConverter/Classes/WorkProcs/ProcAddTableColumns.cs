@@ -18,6 +18,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public string IdentifySource, IdentifyAppend;
         public string SettingPreset;
         public int PresetType;
+        public int FileEncoding = 0;
         internal static string ClassName = "PVM Import";
         //internal bool ImportAll = true;
 
@@ -69,6 +70,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     path = dialog.FileName;
                 }
+                dialog.Dispose();
             }
             if (!string.IsNullOrWhiteSpace(path))
             {
@@ -147,7 +149,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             newOrderIndices = newIndices;
                             if (Properties.Settings.Default.SplitPVM)
                             {
-                                table.SplitDataTable(filePath, invokeForm, fileEncoding, invalidColumnName);
+                                table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
                             }
                         }
                     }

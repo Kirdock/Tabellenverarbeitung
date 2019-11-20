@@ -117,7 +117,7 @@ namespace DataTableConverter.View
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            new SettingForm(SettingForm.Tabs.Help).Show();
+            new SettingForm(SettingForm.Tabs.Help).Show(this);
         }
 
         private void BtnFormat_Click(object sender, EventArgs e)

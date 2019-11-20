@@ -1048,7 +1048,7 @@ namespace DataTableConverter
         {
             Administration form = new Administration(sourceTable?.HeadersOfDataTable() ?? new object[0], contextGlobal, procedures,workflows,cases,tolerances, sourceTable);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
-            form.Show();
+            form.Show(this);
         }
 
         private void administrationFormClosed(object sender, FormClosedEventArgs e)
@@ -1179,7 +1179,7 @@ namespace DataTableConverter
                     DataTable newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, GetDataSource(), OrderType);
                     BeginInvoke(new MethodInvoker(() =>
                     {
-                        new Form1(newTable).Show();
+                        new Form1(newTable).Show(this);
                     }));
                     StopLoadingBar();
                 });
@@ -1452,7 +1452,7 @@ namespace DataTableConverter
             SettingForm form = new SettingForm();
             int oldHeight = Properties.Settings.Default.RowHeight;
             form.FormClosed += (s2, e2) => SettingForm_FormClosed(s2, e2, oldHeight);
-            form.Show();
+            form.Show(this);
         }
 
         private void SettingForm_FormClosed(object sender, FormClosedEventArgs e, int oldHeight)

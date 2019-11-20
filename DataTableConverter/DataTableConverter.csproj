@@ -86,6 +86,7 @@
     <Compile Include="Classes\ImportSettings.cs" />
     <Compile Include="Classes\MergeFormat.cs" />
     <Compile Include="Classes\MergeRowsInfo.cs" />
+    <Compile Include="Classes\NewEncodingInfo.cs" />
     <Compile Include="Classes\NotFoundHeaders.cs" />
     <Compile Include="Classes\PlusListboxItem.cs" />
     <Compile Include="Classes\Proc.cs" />
