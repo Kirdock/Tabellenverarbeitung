@@ -17,6 +17,7 @@ namespace DataTableConverter.Classes.WorkProcs
         internal static readonly string ClassName = "PVM Export";
         private Action UpdateLoadingBar;
         public string SecondFileName;
+        public int FileEncoding = 0;
         public ProcPVMExport(int ordinal, int id, string name) : base(ordinal, id, name) { }
         public ProcPVMExport(string[] headers, Action updateLoadingBar = null)
         {
@@ -74,11 +75,13 @@ namespace DataTableConverter.Classes.WorkProcs
                 path = path ?? saveFileDialog1.FileName;
                 try
                 {
-                    ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), invokeForm.FileEncoding, invokeForm, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
+                    int fileEncoding = invokeForm.FileEncoding == 0 ? FileEncoding : invokeForm.FileEncoding;
+                    ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), fileEncoding, invokeForm, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
                     
                     if(Properties.Settings.Default.PVMSaveTwice)
                     {
-                        if((string.IsNullOrWhiteSpace(SecondFileName) || !Directory.Exists(SecondFileName)))
+                        
+                        if ((string.IsNullOrWhiteSpace(SecondFileName) || !Directory.Exists(SecondFileName)))
                         {
                             DialogResult result2 = DialogResult.Cancel;
                             if (path == null)
@@ -91,13 +94,13 @@ namespace DataTableConverter.Classes.WorkProcs
                             if (result2 == DialogResult.OK)
                             {
                                 path = saveFileDialog2.FileName;
-                                ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), invokeForm.FileEncoding, invokeForm, UpdateLoadingBar);
+                                ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), fileEncoding, invokeForm, UpdateLoadingBar);
                             }
                         }
                         else
                         {
                             path = Path.Combine(SecondFileName, Path.GetFileNameWithoutExtension(path));
-                            ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), invokeForm.FileEncoding, invokeForm, UpdateLoadingBar);
+                            ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), fileEncoding, invokeForm, UpdateLoadingBar);
                         }
                     }
                 }

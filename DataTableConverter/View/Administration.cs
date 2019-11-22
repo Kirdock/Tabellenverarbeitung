@@ -45,9 +45,8 @@ namespace DataTableConverter.View
         internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
         {
             InitializeComponent();
-            CmBPVMImportEncoding.SelectedIndexChanged -= CmBPVMImportEncoding_SelectedIndexChanged;
-            ViewHelper.SetEncodingCmb(CmBPVMImportEncoding, true);
-            CmBPVMImportEncoding.SelectedIndexChanged += CmBPVMImportEncoding_SelectedIndexChanged;
+            
+            SetEncodingCmBs();
             Table = table;
             SetSize();
             AssignGroupBoxToEnum();
@@ -75,6 +74,17 @@ namespace DataTableConverter.View
             AddContextMenuAndDataGridViewStyle();
             RestoreSplitterDistance();
             SetColors();
+        }
+
+        private void SetEncodingCmBs()
+        {
+            CmBPVMImportEncoding.SelectedIndexChanged -= CmBPVMImportEncoding_SelectedIndexChanged;
+            ViewHelper.SetEncodingCmb(CmBPVMImportEncoding, true);
+            CmBPVMImportEncoding.SelectedIndexChanged += CmBPVMImportEncoding_SelectedIndexChanged;
+
+            CmBPVMExportEncodings.SelectedIndexChanged -= CmBPVMExportEncodings_SelectedIndexChanged;
+            ViewHelper.SetEncodingCmb(CmBPVMExportEncodings, true);
+            CmBPVMExportEncodings.SelectedIndexChanged += CmBPVMExportEncodings_SelectedIndexChanged;
         }
 
         private void LoadPresets()
@@ -832,7 +842,7 @@ namespace DataTableConverter.View
             txtIdentifierSource.Text = proc.IdentifySource;
             txtIdentifierAppend.Text = proc.IdentifyAppend;
 
-            int index = -1;
+            int index = 0;
             for(int i = 0; i < CmBPresetPVMImport.Items.Count; i++)
             {
                 ImportHelper.KeyVal item = CmBPresetPVMImport.Items[i] as ImportHelper.KeyVal;
@@ -842,7 +852,7 @@ namespace DataTableConverter.View
                     break;
                 }
             }
-            CmBPresetPVMImport.SelectedIndex = index == -1 ? 0 : index;
+            CmBPresetPVMImport.SelectedIndex = index;
             CmBPVMImportEncoding.SelectedValue = proc.FileEncoding;
         }
 
@@ -976,7 +986,9 @@ namespace DataTableConverter.View
         {
             SetHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcPVMExport.ClassName;
-            TxtPVMPath.Text = (selectedProc as ProcPVMExport).SecondFileName;
+            ProcPVMExport proc = selectedProc as ProcPVMExport;
+            TxtPVMPath.Text = proc.SecondFileName;
+            CmBPVMExportEncodings.SelectedValue = proc.FileEncoding;
             SetDataSource(dgvPVMExport, selectedProc.Columns);
         }
 
@@ -2323,6 +2335,11 @@ namespace DataTableConverter.View
         private void CmBPVMImportEncoding_SelectedIndexChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcAddTableColumns).FileEncoding = (int)CmBPVMImportEncoding.SelectedValue;
+        }
+
+        private void CmBPVMExportEncodings_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcPVMExport).FileEncoding = (int)CmBPVMExportEncodings.SelectedValue;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)
