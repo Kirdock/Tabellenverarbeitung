@@ -708,12 +708,29 @@ namespace DataTableConverter.Assisstant
         private static void AddHeaderOfContent(DataTable table, List<string> headers, StringBuilder header)
         {
             string headerString = header.ToString();
-            headers.Add(headerString);
-            if (!table.Columns.Contains(headerString))
+            string newColumn = TryAddColumn(headers, headerString);
+            if (!table.Columns.Contains(newColumn))
             {
-                table.Columns.Add(headerString, typeof(string));
+                table.Columns.Add(newColumn, typeof(string));
             }
             header.Clear();
+        }
+
+        private static string TryAddColumn(List<string> headers, string headerName, int counter = 0)
+        {
+            string result;
+            string name = counter == 0 ? headerName : headerName + counter;
+            if (headers.Contains(name))
+            {
+                counter++;
+                result = TryAddColumn(headers, headerName, counter);
+            }
+            else
+            {
+                result = name;
+                headers.Add(name);
+            }
+            return result;
         }
 
         private static void GenerateMultiCell(string content, DataTable table, DataRow row, string header, ref int i)

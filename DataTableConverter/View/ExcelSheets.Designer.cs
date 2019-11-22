@@ -52,6 +52,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cList.CheckOnClick = true;
             this.cList.FormattingEnabled = true;
+            this.cList.HorizontalScrollbar = true;
             this.cList.Location = new System.Drawing.Point(0, 25);
             this.cList.Name = "cList";
             this.cList.Size = new System.Drawing.Size(275, 214);
