@@ -30,6 +30,13 @@ namespace DataTableConverter.Assisstant
         internal static readonly string DbfExt = "*.dbf";
         internal static readonly string CsvExt = "*.csv";
         internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        private static extern int GetShortPathName(
+            [MarshalAs(UnmanagedType.LPTStr)]
+        string path,
+            [MarshalAs(UnmanagedType.LPTStr)]
+        StringBuilder shortPath,
+            int shortPathLength);
 
         internal class KeyVal : IEquatable<KeyVal>
         {
@@ -1060,14 +1067,6 @@ namespace DataTableConverter.Assisstant
         {
             return new FileInfo(shortName).FullName;
         }
-
-        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
-        private static extern int GetShortPathName(
-            [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)]
-        string path,
-            [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)]
-        StringBuilder shortPath,
-            int shortPathLength);
 
     }
 }

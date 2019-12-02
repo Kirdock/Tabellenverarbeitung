@@ -2215,7 +2215,7 @@ namespace DataTableConverter.View
                                 }
                                 else
                                 {
-                                    Proc proc = Procedures.Find(c => c.Name == form.Table.Rows[i][0].ToString());
+                                    Proc proc = Procedures.Find(c => c.Name == form.Table.Rows[i][1].ToString());
                                     procs[i].ProcedureId = proc.Id;
                                     procs[i].Name = proc.Name;
                                 }

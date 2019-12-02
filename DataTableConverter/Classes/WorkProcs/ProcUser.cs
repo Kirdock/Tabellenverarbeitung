@@ -57,13 +57,14 @@ namespace DataTableConverter.Classes.WorkProcs
             bool newCol = false;
 
 
-            IEnumerable<DataRow> replaces = procedure.Replace.Rows.Cast<DataRow>().Where(row => !string.IsNullOrWhiteSpace(row[0]?.ToString()));
+            IEnumerable<DataRow> replaces = procedure.Replace.Rows.Cast<DataRow>().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));
+            IEnumerable<DataRow> replaceWithoutEmpty = replaces.Where(replace => replace[0].ToString() != string.Empty);
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
                 table.CopyColumns(columns);
             }
-            else if ((newCol= !string.IsNullOrWhiteSpace(NewColumn)))
+            else if ((newCol = !string.IsNullOrWhiteSpace(NewColumn)))
             {
                 newColumn = table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
             }
@@ -91,15 +92,15 @@ namespace DataTableConverter.Classes.WorkProcs
                         }
                         else if (procedure.CheckWord)
                         {
-                            foreach (DataRow rep in replaces)
+                            foreach (DataRow rep in replaceWithoutEmpty)
                             {
                                 string pattern = @"\b" + Regex.Escape(rep[0].ToString()) + @"\b";
-                                row[index] = Regex.Replace(value, pattern,rep[1].ToString());
+                                row[index] = Regex.Replace(value, pattern, rep[1].ToString());
                             }
                         }
                         else
                         {
-                            foreach (DataRow rep in replaces)
+                            foreach (DataRow rep in replaceWithoutEmpty)
                             {
                                 value = value.Replace(rep[0].ToString(), rep[1].ToString());
                             }
