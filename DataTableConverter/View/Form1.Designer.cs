@@ -43,6 +43,7 @@
             this.funktionenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.längsteZeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nummerierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.prüfzifferToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spaltenAusTabelleHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,7 +91,7 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.längsteZeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.suchenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -179,6 +180,7 @@
             this.spaltenVergleichenToolStripMenuItem,
             this.zeilenZusammenfügenToolStripMenuItem1,
             this.substringToolStripMenuItem,
+            this.suchenToolStripMenuItem,
             this.textErsetzenToolStripMenuItem1,
             this.trimToolStripMenuItem,
             this.zählenToolStripMenuItem1,
@@ -202,6 +204,13 @@
             this.großKleinschreibungToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.großKleinschreibungToolStripMenuItem.Text = "Groß-/Kleinschreibung";
             this.großKleinschreibungToolStripMenuItem.Click += new System.EventHandler(this.großKleinschreibungToolStripMenuItem_Click);
+            // 
+            // längsteZeileToolStripMenuItem
+            // 
+            this.längsteZeileToolStripMenuItem.Name = "längsteZeileToolStripMenuItem";
+            this.längsteZeileToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.längsteZeileToolStripMenuItem.Text = "Längste Zeile";
+            this.längsteZeileToolStripMenuItem.Click += new System.EventHandler(this.längsteZeileToolStripMenuItem_Click);
             // 
             // nummerierenToolStripMenuItem
             // 
@@ -555,12 +564,12 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
-            // längsteZeileToolStripMenuItem
+            // suchenToolStripMenuItem
             // 
-            this.längsteZeileToolStripMenuItem.Name = "längsteZeileToolStripMenuItem";
-            this.längsteZeileToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.längsteZeileToolStripMenuItem.Text = "Längste Zeile";
-            this.längsteZeileToolStripMenuItem.Click += new System.EventHandler(this.längsteZeileToolStripMenuItem_Click);
+            this.suchenToolStripMenuItem.Name = "suchenToolStripMenuItem";
+            this.suchenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.suchenToolStripMenuItem.Text = "Suchen";
+            this.suchenToolStripMenuItem.Click += new System.EventHandler(this.suchenToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -650,6 +659,7 @@
         private System.Windows.Forms.ToolStripMenuItem trennenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem prüfzifferToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem längsteZeileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem suchenToolStripMenuItem;
     }
 }
 

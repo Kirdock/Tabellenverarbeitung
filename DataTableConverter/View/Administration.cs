@@ -76,6 +76,167 @@ namespace DataTableConverter.View
             SetColors();
         }
 
+        #region Adjust all custom GroupBoxes
+        private void AssignGroupBoxToEnum()
+        {
+            gbState = new Dictionary<GroupBox, Type>
+            {
+                { gbDefDuplicate, typeof(ProcDuplicate) },
+                { gbMerge, typeof(ProcMerge) },
+                { gbProcedure, typeof(ProcUser) },
+                { gbOrder, typeof(ProcOrder) },
+                { gbUpLowCase, typeof(ProcUpLowCase) },
+                { gbRound, typeof(ProcRound) },
+                { gbPadding, typeof(ProcPadding) },
+                { gbNumber, typeof(ProcNumber) },
+                { gbSubstring, typeof(ProcSubstring) },
+                { gbReplaceWhole, typeof(ProcReplaceWhole) },
+                { gbAddTableColumns, typeof(ProcAddTableColumns) },
+                { gbCompare, typeof(ProcCompare) },
+                { gbPVMExport, typeof(ProcPVMExport) },
+                { gbCount, typeof(ProcCount) },
+                { gbTrim, typeof(ProcTrim) },
+                { gbSeparate, typeof(ProcSeparate) },
+                { GbSearch, typeof(ProcSearch) }
+            };
+
+            assignControls = new Dictionary<Type, Action<WorkProc>> {
+                { typeof(ProcUser), SetUserControls},
+                { typeof(ProcDuplicate), SetDuplicateControls },
+                { typeof(ProcMerge), SetMergeControls },
+                { typeof(ProcOrder), SetOrderControls },
+                { typeof(ProcUpLowCase), SetUpLowCaseControls },
+                { typeof(ProcRound), SetRoundControls },
+                { typeof(ProcTrim), SetTrimControls },
+                { typeof(ProcPadding), SetPaddingControls },
+                { typeof(ProcNumber), SetNumberControls },
+                { typeof(ProcSubstring), SetSubstringControls },
+                { typeof(ProcReplaceWhole), SetReplaceWholeControls },
+                { typeof(ProcAddTableColumns), SetPVMImportColumnsControls },
+                { typeof(ProcCompare), SetCompareControls },
+                { typeof(ProcPVMExport), SetPVMExportControls },
+                { typeof(ProcCount), SetCountControls },
+                { typeof(ProcSeparate), SetSeparateControls },
+                {typeof(ProcSearch), SetSearchControls }
+            };
+        }
+
+        private void GenerateProceduresForWorkflow()
+        {
+            SystemProc = new List<Proc>
+            {
+                new Proc(ProcTrim.ClassName, null, 1),
+                new Proc(ProcMerge.ClassName, null, 2),
+                new Proc(ProcOrder.ClassName, null, 3),
+                new Proc(ProcUpLowCase.ClassName, null, 4),
+                new Proc(ProcRound.ClassName, null, 5),
+                new Proc(ProcPadding.ClassName, null, 6),
+                new Proc(ProcNumber.ClassName, null, 7),
+                new Proc(ProcSubstring.ClassName, null, 8),
+                new Proc(ProcReplaceWhole.ClassName, null, 9),
+                new Proc(ProcAddTableColumns.ClassName, null, 10),
+                new Proc(ProcCompare.ClassName, null, 11),
+                new Proc(ProcPVMExport.ClassName, null, 12),
+                new Proc(ProcCount.ClassName, null, 13),
+                new Proc(ProcSeparate.ClassName, null, 14),
+                new Proc(ProcSearch.ClassName, null, 15)
+            };
+            SystemProc.Sort();
+            GenerateDuplicateProc();
+        }
+
+        private void SetColors()
+        {
+            Label[] labels = new Label[]
+            {
+                lblNumberColumnName,
+                lblSubstringNewColumn,
+                lblWorkProcName,
+                lblWorkName,
+                lblPadNewColumn,
+                lblNewColumn,
+                lblNewColumnRound,
+                lblProcName,
+                lblCaseName,
+                lblTotalShortcut,
+                lblPartialShortcut,
+                lblToleranceName,
+                lblNewColumnMerge,
+                lblUsedColumnsPadding,
+                lblHeaders,
+                lblUsedColumnsReplaceWhole,
+                lblUsedColumnsReplaceWhole,
+                lblUsedColumnsUpLowCase,
+                lblUsedColumnsRound,
+                lblCompareFirstColumn,
+                lblCompareSecondColumn,
+                lblCompareNewColumn,
+                lblCountColumn,
+                lblTrimCharacter,
+                LblSeparateColumn
+            };
+            foreach (Label label in labels)
+            {
+                label.ForeColor = Properties.Settings.Default.RequiredField;
+            }
+        }
+
+        private void AddContextMenuAndDataGridViewStyle()
+        {
+            DataGridView[] dataGridViewsClipboard = new DataGridView[]
+            {
+                dgTolerance,
+                dgCaseColumns,
+                dgvColumns,
+                dgvReplaces,
+                dgvRound,
+                dgUpLow,
+                dgvMerge,
+                dgvPadColumns,
+                dgvPadConditions,
+                dgvSubstringColumns,
+                dgvReplaceWhole,
+                dgvPVMExport,
+                DgvSeparate
+            };
+
+            DataGridView[] dataGridViews = new DataGridView[]
+            {
+                dgOrderColumns
+            };
+
+            foreach (DataGridView dataGridView in dataGridViewsClipboard)
+            {
+                ViewHelper.AddContextMenuToDataGridView(dataGridView, this, true);
+                ViewHelper.SetDataGridViewStyle(dataGridView);
+            }
+
+            foreach (DataGridView dataGridView in dataGridViews)
+            {
+                ViewHelper.AddContextMenuToDataGridView(dataGridView, this, false);
+                ViewHelper.SetDataGridViewStyle(dataGridView);
+            }
+        }
+        private void SetHeaders(object[] headers)
+        {
+            CheckedComboBox[] checkedComboBoxes = new CheckedComboBox[]
+            {
+                clbHeaderOrder,
+                clbHeaderProcedure,
+                clbHeadersRound,
+                clbUpLowHeader,
+                cbSubstringHeaders,
+                cbHeadersReplaceWhole,
+                cbHeadersPVMExport
+            };
+            foreach (CheckedComboBox checkedComboBox in checkedComboBoxes)
+            {
+                checkedComboBox.Items.AddRange(headers);
+            }
+            Headers = headers;
+        }
+        #endregion
+
         private void SetEncodingCmBs()
         {
             CmBPVMImportEncoding.SelectedIndexChanged -= CmBPVMImportEncoding_SelectedIndexChanged;
@@ -173,42 +334,6 @@ namespace DataTableConverter.View
             lbUsedProcedures_SelectedIndexChanged(null, null);
         }
 
-        private void SetColors()
-        {
-            Label[] labels = new Label[]
-            {
-                lblNumberColumnName,
-                lblSubstringNewColumn,
-                lblWorkProcName,
-                lblWorkName,
-                lblPadNewColumn,
-                lblNewColumn,
-                lblNewColumnRound,
-                lblProcName,
-                lblCaseName,
-                lblTotalShortcut,
-                lblPartialShortcut,
-                lblToleranceName,
-                lblNewColumnMerge,
-                lblUsedColumnsPadding,
-                lblHeaders,
-                lblUsedColumnsReplaceWhole,
-                lblUsedColumnsReplaceWhole,
-                lblUsedColumnsUpLowCase,
-                lblUsedColumnsRound,
-                lblCompareFirstColumn,
-                lblCompareSecondColumn,
-                lblCompareNewColumn,
-                lblCountColumn,
-                lblTrimCharacter,
-                LblSeparateColumn
-            };
-            foreach (Label label in labels)
-            {
-                label.ForeColor = Properties.Settings.Default.RequiredField;
-            }
-        }
-
         private void RestoreSplitterDistance()
         {
             splitCases.SplitterDistance = Properties.Settings.Default.splitCases;
@@ -220,43 +345,6 @@ namespace DataTableConverter.View
             splitWorkflowProperties.SplitterDistance = Properties.Settings.Default.splitWorkflowProperties;
         }
 
-        private void AddContextMenuAndDataGridViewStyle()
-        {
-            DataGridView[] dataGridViewsClipboard = new DataGridView[]
-            {
-                dgTolerance,
-                dgCaseColumns,
-                dgvColumns,
-                dgvReplaces,
-                dgvRound,
-                dgUpLow,
-                dgvMerge,
-                dgvPadColumns,
-                dgvPadConditions,
-                dgvSubstringColumns,
-                dgvReplaceWhole,
-                dgvPVMExport,
-                DgvSeparate
-            };
-
-            DataGridView[] dataGridViews = new DataGridView[]
-            {
-                dgOrderColumns
-            };
-
-            foreach (DataGridView dataGridView in dataGridViewsClipboard)
-            {
-                ViewHelper.AddContextMenuToDataGridView(dataGridView, this, true);
-                ViewHelper.SetDataGridViewStyle(dataGridView);
-            }
-            
-            foreach(DataGridView dataGridView in dataGridViews)
-            {
-                ViewHelper.AddContextMenuToDataGridView(dataGridView, this, false);
-                ViewHelper.SetDataGridViewStyle(dataGridView);
-            }
-        }
-
         private void SetOrderList()
         {
             OrderList = new List<KeyValuePair<string, bool>>
@@ -264,90 +352,6 @@ namespace DataTableConverter.View
                 new KeyValuePair<string, bool>("Aufsteigend", false),
                 new KeyValuePair<string, bool>("Absteigend", true)
             };
-        }
-
-        private void SetHeaders(object[] headers)
-        {
-            CheckedComboBox[] checkedComboBoxes = new CheckedComboBox[]
-            {
-                clbHeaderOrder,
-                clbHeaderProcedure,
-                clbHeadersRound,
-                clbUpLowHeader,
-                cbSubstringHeaders,
-                cbHeadersReplaceWhole,
-                cbHeadersPVMExport
-            };
-            foreach(CheckedComboBox checkedComboBox in checkedComboBoxes)
-            {
-                checkedComboBox.Items.AddRange(headers);
-            }
-            Headers = headers;
-        }
-
-        private void AssignGroupBoxToEnum()
-        {
-            gbState = new Dictionary<GroupBox, Type>
-            {
-                { gbDefDuplicate, typeof(ProcDuplicate) },
-                { gbMerge, typeof(ProcMerge) },
-                { gbProcedure, typeof(ProcUser) },
-                { gbOrder, typeof(ProcOrder) },
-                { gbUpLowCase, typeof(ProcUpLowCase) },
-                { gbRound, typeof(ProcRound) },
-                { gbPadding, typeof(ProcPadding) },
-                { gbNumber, typeof(ProcNumber) },
-                { gbSubstring, typeof(ProcSubstring) },
-                { gbReplaceWhole, typeof(ProcReplaceWhole) },
-                { gbAddTableColumns, typeof(ProcAddTableColumns) },
-                { gbCompare, typeof(ProcCompare) },
-                { gbPVMExport, typeof(ProcPVMExport) },
-                { gbCount, typeof(ProcCount) },
-                { gbTrim, typeof(ProcTrim) },
-                { gbSeparate, typeof(ProcSeparate) }
-            };
-
-            assignControls = new Dictionary<Type, Action<WorkProc>> {
-                { typeof(ProcUser), SetUserControls},
-                { typeof(ProcDuplicate), SetDuplicateControls },
-                { typeof(ProcMerge), SetMergeControls },
-                { typeof(ProcOrder), SetOrderControls },
-                { typeof(ProcUpLowCase), SetUpLowCaseControls },
-                { typeof(ProcRound), SetRoundControls },
-                { typeof(ProcTrim), SetTrimControls },
-                { typeof(ProcPadding), SetPaddingControls },
-                { typeof(ProcNumber), SetNumberControls },
-                { typeof(ProcSubstring), SetSubstringControls },
-                { typeof(ProcReplaceWhole), SetReplaceWholeControls },
-                { typeof(ProcAddTableColumns), SetPVMImportColumnsControls },
-                { typeof(ProcCompare), SetCompareControls },
-                { typeof(ProcPVMExport), SetPVMExportControls },
-                { typeof(ProcCount), SetCountControls },
-                { typeof(ProcSeparate), SetSeparateControls }
-            };
-        }
-
-        private void GenerateProceduresForWorkflow()
-        {
-            SystemProc = new List<Proc>
-            {
-                new Proc(ProcTrim.ClassName, null, 1),
-                new Proc(ProcMerge.ClassName, null, 2),
-                new Proc(ProcOrder.ClassName, null, 3),
-                new Proc(ProcUpLowCase.ClassName, null, 4),
-                new Proc(ProcRound.ClassName, null, 5),
-                new Proc(ProcPadding.ClassName, null, 6),
-                new Proc(ProcNumber.ClassName, null, 7),
-                new Proc(ProcSubstring.ClassName, null, 8),
-                new Proc(ProcReplaceWhole.ClassName, null, 9),
-                new Proc(ProcAddTableColumns.ClassName, null, 10),
-                new Proc(ProcCompare.ClassName, null, 11),
-                new Proc(ProcPVMExport.ClassName, null, 12),
-                new Proc(ProcCount.ClassName, null, 13),
-                new Proc(ProcSeparate.ClassName, null, 14)
-            };
-            SystemProc.Sort();
-            GenerateDuplicateProc();
         }
 
         private void Administration_FormClosing(object sender, FormClosingEventArgs e)
@@ -913,8 +917,20 @@ namespace DataTableConverter.View
         {
             lblOriginalNameText.Text = ProcRound.ClassName;
             cbNewColumnRound.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
+            txtNewColumnRound.Text = selectedProc.NewColumn;
             SetDataSource(dgvRound, selectedProc.Columns);
             SetHeaderRound(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+        }
+
+        private void SetSearchControls(WorkProc selectedProc)
+        {
+            ProcSearch proc = selectedProc as ProcSearch;
+            lblOriginalNameText.Text = ProcSearch.ClassName;
+            TxtSearchText.Text = proc.SearchText;
+            NbSearchFrom.Value = proc.From;
+            NbSearchTo.Value = proc.To;
+            TxtSearchNewColumn.Text = selectedProc.NewColumn;
+            TxtSearchHeader.Text = proc.Header;
         }
 
         private void SetDuplicateControls(WorkProc selectedProc)
@@ -2340,6 +2356,31 @@ namespace DataTableConverter.View
         private void CmBPVMExportEncodings_SelectedIndexChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcPVMExport).FileEncoding = (int)CmBPVMExportEncodings.SelectedValue;
+        }
+
+        private void TxtSearchText_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSearch).SearchText = TxtSearchText.Text;
+        }
+
+        private void TxtSearchNewColumn_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSearch).NewColumn = TxtSearchNewColumn.Text;
+        }
+
+        private void NbSearchFrom_ValueChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSearch).From = (int)NbSearchFrom.Value;
+        }
+
+        private void NbSearchTo_ValueChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSearch).To = (int)NbSearchTo.Value;
+        }
+
+        private void TxtSearchHeader_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSearch).Header = TxtSearchHeader.Text;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

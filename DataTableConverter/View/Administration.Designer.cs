@@ -61,6 +61,15 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbPVMExport = new System.Windows.Forms.GroupBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.CmBPVMExportEncodings = new System.Windows.Forms.ComboBox();
+            this.BtnSearchPVM = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.TxtPVMPath = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cbHeadersPVMExport = new CheckComboBoxTest.CheckedComboBox();
+            this.dgvPVMExport = new System.Windows.Forms.DataGridView();
             this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
             this.CmBPVMImportEncoding = new System.Windows.Forms.ComboBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -121,13 +130,6 @@
             this.cbShowFromTo = new System.Windows.Forms.CheckBox();
             this.nbCount = new System.Windows.Forms.NumericUpDown();
             this.cbCount = new System.Windows.Forms.CheckBox();
-            this.gbPVMExport = new System.Windows.Forms.GroupBox();
-            this.BtnSearchPVM = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.TxtPVMPath = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.cbHeadersPVMExport = new CheckComboBoxTest.CheckedComboBox();
-            this.dgvPVMExport = new System.Windows.Forms.DataGridView();
             this.gbCompare = new System.Windows.Forms.GroupBox();
             this.label13 = new System.Windows.Forms.Label();
             this.lblCompareSecondColumn = new System.Windows.Forms.Label();
@@ -237,8 +239,17 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.CmBPVMExportEncodings = new System.Windows.Forms.ComboBox();
-            this.label22 = new System.Windows.Forms.Label();
+            this.GbSearch = new System.Windows.Forms.GroupBox();
+            this.NbSearchTo = new System.Windows.Forms.NumericUpDown();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label32 = new System.Windows.Forms.Label();
+            this.NbSearchFrom = new System.Windows.Forms.NumericUpDown();
+            this.TxtSearchNewColumn = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label34 = new System.Windows.Forms.Label();
+            this.TxtSearchText = new System.Windows.Forms.TextBox();
+            this.TxtSearchHeader = new System.Windows.Forms.TextBox();
+            this.label36 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -261,6 +272,8 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbPVMExport.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).BeginInit();
             this.gbAddTableColumns.SuspendLayout();
             this.gbSeparate.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).BeginInit();
@@ -273,8 +286,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvRound)).BeginInit();
             this.gbCount.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbCount)).BeginInit();
-            this.gbPVMExport.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).BeginInit();
             this.gbCompare.SuspendLayout();
             this.gbMerge.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
@@ -316,6 +327,9 @@
             this.gbCaseShortcuts.SuspendLayout();
             this.gbCaseColumns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).BeginInit();
+            this.GbSearch.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -577,6 +591,7 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.GbSearch);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
@@ -760,6 +775,114 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // gbPVMExport
+            // 
+            this.gbPVMExport.Controls.Add(this.label22);
+            this.gbPVMExport.Controls.Add(this.CmBPVMExportEncodings);
+            this.gbPVMExport.Controls.Add(this.BtnSearchPVM);
+            this.gbPVMExport.Controls.Add(this.label6);
+            this.gbPVMExport.Controls.Add(this.TxtPVMPath);
+            this.gbPVMExport.Controls.Add(this.label5);
+            this.gbPVMExport.Controls.Add(this.cbHeadersPVMExport);
+            this.gbPVMExport.Controls.Add(this.dgvPVMExport);
+            this.gbPVMExport.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbPVMExport.Location = new System.Drawing.Point(0, 92);
+            this.gbPVMExport.Name = "gbPVMExport";
+            this.gbPVMExport.Size = new System.Drawing.Size(245, 643);
+            this.gbPVMExport.TabIndex = 23;
+            this.gbPVMExport.TabStop = false;
+            this.gbPVMExport.Text = "Spaltenangabe";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(4, 71);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(60, 13);
+            this.label22.TabIndex = 24;
+            this.label22.Text = "CodePage:";
+            // 
+            // CmBPVMExportEncodings
+            // 
+            this.CmBPVMExportEncodings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CmBPVMExportEncodings.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CmBPVMExportEncodings.FormattingEnabled = true;
+            this.CmBPVMExportEncodings.Location = new System.Drawing.Point(6, 87);
+            this.CmBPVMExportEncodings.Name = "CmBPVMExportEncodings";
+            this.CmBPVMExportEncodings.Size = new System.Drawing.Size(239, 21);
+            this.CmBPVMExportEncodings.TabIndex = 23;
+            this.CmBPVMExportEncodings.SelectedIndexChanged += new System.EventHandler(this.CmBPVMExportEncodings_SelectedIndexChanged);
+            // 
+            // BtnSearchPVM
+            // 
+            this.BtnSearchPVM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnSearchPVM.Location = new System.Drawing.Point(169, 135);
+            this.BtnSearchPVM.Name = "BtnSearchPVM";
+            this.BtnSearchPVM.Size = new System.Drawing.Size(75, 23);
+            this.BtnSearchPVM.TabIndex = 22;
+            this.BtnSearchPVM.Text = "Suchen";
+            this.BtnSearchPVM.UseVisualStyleBackColor = true;
+            this.BtnSearchPVM.Click += new System.EventHandler(this.BtnSearchPVM_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(4, 121);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(117, 13);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Pfad der zweiten Datei:";
+            // 
+            // TxtPVMPath
+            // 
+            this.TxtPVMPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtPVMPath.Location = new System.Drawing.Point(7, 138);
+            this.TxtPVMPath.Name = "TxtPVMPath";
+            this.TxtPVMPath.Size = new System.Drawing.Size(157, 20);
+            this.TxtPVMPath.TabIndex = 20;
+            this.TxtPVMPath.TextChanged += new System.EventHandler(this.TxtPVMPath_TextChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(2, 23);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(209, 13);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // cbHeadersPVMExport
+            // 
+            this.cbHeadersPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbHeadersPVMExport.CheckOnClick = true;
+            this.cbHeadersPVMExport.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cbHeadersPVMExport.DropDownHeight = 1;
+            this.cbHeadersPVMExport.FormattingEnabled = true;
+            this.cbHeadersPVMExport.IntegralHeight = false;
+            this.cbHeadersPVMExport.Location = new System.Drawing.Point(5, 42);
+            this.cbHeadersPVMExport.Name = "cbHeadersPVMExport";
+            this.cbHeadersPVMExport.Size = new System.Drawing.Size(240, 21);
+            this.cbHeadersPVMExport.TabIndex = 18;
+            this.cbHeadersPVMExport.ValueSeparator = ", ";
+            this.cbHeadersPVMExport.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeadersPVMExport_ItemCheck);
+            // 
+            // dgvPVMExport
+            // 
+            this.dgvPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvPVMExport.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvPVMExport.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvPVMExport.Location = new System.Drawing.Point(6, 179);
+            this.dgvPVMExport.Name = "dgvPVMExport";
+            this.dgvPVMExport.RowHeadersVisible = false;
+            this.dgvPVMExport.Size = new System.Drawing.Size(230, 443);
+            this.dgvPVMExport.TabIndex = 16;
+            this.dgvPVMExport.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
             // gbAddTableColumns
             // 
@@ -1479,93 +1602,6 @@
             this.cbCount.Text = "Anzahl";
             this.cbCount.UseVisualStyleBackColor = true;
             this.cbCount.CheckedChanged += new System.EventHandler(this.cbCount_CheckedChanged);
-            // 
-            // gbPVMExport
-            // 
-            this.gbPVMExport.Controls.Add(this.label22);
-            this.gbPVMExport.Controls.Add(this.CmBPVMExportEncodings);
-            this.gbPVMExport.Controls.Add(this.BtnSearchPVM);
-            this.gbPVMExport.Controls.Add(this.label6);
-            this.gbPVMExport.Controls.Add(this.TxtPVMPath);
-            this.gbPVMExport.Controls.Add(this.label5);
-            this.gbPVMExport.Controls.Add(this.cbHeadersPVMExport);
-            this.gbPVMExport.Controls.Add(this.dgvPVMExport);
-            this.gbPVMExport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbPVMExport.Location = new System.Drawing.Point(0, 92);
-            this.gbPVMExport.Name = "gbPVMExport";
-            this.gbPVMExport.Size = new System.Drawing.Size(245, 643);
-            this.gbPVMExport.TabIndex = 23;
-            this.gbPVMExport.TabStop = false;
-            this.gbPVMExport.Text = "Spaltenangabe";
-            // 
-            // BtnSearchPVM
-            // 
-            this.BtnSearchPVM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnSearchPVM.Location = new System.Drawing.Point(169, 135);
-            this.BtnSearchPVM.Name = "BtnSearchPVM";
-            this.BtnSearchPVM.Size = new System.Drawing.Size(75, 23);
-            this.BtnSearchPVM.TabIndex = 22;
-            this.BtnSearchPVM.Text = "Suchen";
-            this.BtnSearchPVM.UseVisualStyleBackColor = true;
-            this.BtnSearchPVM.Click += new System.EventHandler(this.BtnSearchPVM_Click);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(4, 121);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(117, 13);
-            this.label6.TabIndex = 21;
-            this.label6.Text = "Pfad der zweiten Datei:";
-            // 
-            // TxtPVMPath
-            // 
-            this.TxtPVMPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtPVMPath.Location = new System.Drawing.Point(7, 138);
-            this.TxtPVMPath.Name = "TxtPVMPath";
-            this.TxtPVMPath.Size = new System.Drawing.Size(157, 20);
-            this.TxtPVMPath.TabIndex = 20;
-            this.TxtPVMPath.TextChanged += new System.EventHandler(this.TxtPVMPath_TextChanged);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(2, 23);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(209, 13);
-            this.label5.TabIndex = 19;
-            this.label5.Text = "Spalten aus geladener Tabelle hinzufügen:";
-            // 
-            // cbHeadersPVMExport
-            // 
-            this.cbHeadersPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbHeadersPVMExport.CheckOnClick = true;
-            this.cbHeadersPVMExport.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cbHeadersPVMExport.DropDownHeight = 1;
-            this.cbHeadersPVMExport.FormattingEnabled = true;
-            this.cbHeadersPVMExport.IntegralHeight = false;
-            this.cbHeadersPVMExport.Location = new System.Drawing.Point(5, 42);
-            this.cbHeadersPVMExport.Name = "cbHeadersPVMExport";
-            this.cbHeadersPVMExport.Size = new System.Drawing.Size(240, 21);
-            this.cbHeadersPVMExport.TabIndex = 18;
-            this.cbHeadersPVMExport.ValueSeparator = ", ";
-            this.cbHeadersPVMExport.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeadersPVMExport_ItemCheck);
-            // 
-            // dgvPVMExport
-            // 
-            this.dgvPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvPVMExport.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvPVMExport.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPVMExport.Location = new System.Drawing.Point(6, 179);
-            this.dgvPVMExport.Name = "dgvPVMExport";
-            this.dgvPVMExport.RowHeadersVisible = false;
-            this.dgvPVMExport.Size = new System.Drawing.Size(230, 443);
-            this.dgvPVMExport.TabIndex = 16;
-            this.dgvPVMExport.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
             // gbCompare
             // 
@@ -2907,26 +2943,137 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // CmBPVMExportEncodings
+            // GbSearch
             // 
-            this.CmBPVMExportEncodings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.GbSearch.Controls.Add(this.TxtSearchHeader);
+            this.GbSearch.Controls.Add(this.label36);
+            this.GbSearch.Controls.Add(this.TxtSearchText);
+            this.GbSearch.Controls.Add(this.label34);
+            this.GbSearch.Controls.Add(this.NbSearchTo);
+            this.GbSearch.Controls.Add(this.label31);
+            this.GbSearch.Controls.Add(this.label32);
+            this.GbSearch.Controls.Add(this.NbSearchFrom);
+            this.GbSearch.Controls.Add(this.TxtSearchNewColumn);
+            this.GbSearch.Controls.Add(this.label33);
+            this.GbSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GbSearch.Location = new System.Drawing.Point(0, 92);
+            this.GbSearch.Name = "GbSearch";
+            this.GbSearch.Size = new System.Drawing.Size(245, 643);
+            this.GbSearch.TabIndex = 27;
+            this.GbSearch.TabStop = false;
+            this.GbSearch.Text = "Spaltenangabe";
+            // 
+            // NbSearchTo
+            // 
+            this.NbSearchTo.Location = new System.Drawing.Point(125, 185);
+            this.NbSearchTo.Maximum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            0});
+            this.NbSearchTo.Minimum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            -2147483648});
+            this.NbSearchTo.Name = "NbSearchTo";
+            this.NbSearchTo.Size = new System.Drawing.Size(70, 20);
+            this.NbSearchTo.TabIndex = 23;
+            this.NbSearchTo.ValueChanged += new System.EventHandler(this.NbSearchTo_ValueChanged);
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(122, 165);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(66, 13);
+            this.label31.TabIndex = 22;
+            this.label31.Text = "Endnummer:";
+            this.toolTip1.SetToolTip(this.label31, "Bei Wert \"0\" gibt es kein Ende");
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(4, 163);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(69, 13);
+            this.label32.TabIndex = 21;
+            this.label32.Text = "Startnummer:";
+            // 
+            // NbSearchFrom
+            // 
+            this.NbSearchFrom.Location = new System.Drawing.Point(4, 185);
+            this.NbSearchFrom.Maximum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            0});
+            this.NbSearchFrom.Minimum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            -2147483648});
+            this.NbSearchFrom.Name = "NbSearchFrom";
+            this.NbSearchFrom.Size = new System.Drawing.Size(70, 20);
+            this.NbSearchFrom.TabIndex = 20;
+            this.NbSearchFrom.ValueChanged += new System.EventHandler(this.NbSearchFrom_ValueChanged);
+            // 
+            // TxtSearchNewColumn
+            // 
+            this.TxtSearchNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CmBPVMExportEncodings.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CmBPVMExportEncodings.FormattingEnabled = true;
-            this.CmBPVMExportEncodings.Location = new System.Drawing.Point(6, 87);
-            this.CmBPVMExportEncodings.Name = "CmBPVMExportEncodings";
-            this.CmBPVMExportEncodings.Size = new System.Drawing.Size(239, 21);
-            this.CmBPVMExportEncodings.TabIndex = 23;
-            this.CmBPVMExportEncodings.SelectedIndexChanged += new System.EventHandler(this.CmBPVMExportEncodings_SelectedIndexChanged);
+            this.TxtSearchNewColumn.Location = new System.Drawing.Point(4, 135);
+            this.TxtSearchNewColumn.Name = "TxtSearchNewColumn";
+            this.TxtSearchNewColumn.Size = new System.Drawing.Size(233, 20);
+            this.TxtSearchNewColumn.TabIndex = 19;
+            this.TxtSearchNewColumn.TextChanged += new System.EventHandler(this.TxtSearchNewColumn_TextChanged);
             // 
-            // label22
+            // label33
             // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(4, 71);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(60, 13);
-            this.label22.TabIndex = 24;
-            this.label22.Text = "CodePage:";
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(4, 116);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(122, 13);
+            this.label33.TabIndex = 18;
+            this.label33.Text = "Name der neuen Spalte:";
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(7, 17);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(52, 13);
+            this.label34.TabIndex = 24;
+            this.label34.Text = "Suchtext:";
+            // 
+            // TxtSearchText
+            // 
+            this.TxtSearchText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSearchText.Location = new System.Drawing.Point(6, 36);
+            this.TxtSearchText.Name = "TxtSearchText";
+            this.TxtSearchText.Size = new System.Drawing.Size(232, 20);
+            this.TxtSearchText.TabIndex = 25;
+            this.TxtSearchText.TextChanged += new System.EventHandler(this.TxtSearchText_TextChanged);
+            // 
+            // TxtSearchHeader
+            // 
+            this.TxtSearchHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSearchHeader.Location = new System.Drawing.Point(5, 85);
+            this.TxtSearchHeader.Name = "TxtSearchHeader";
+            this.TxtSearchHeader.Size = new System.Drawing.Size(232, 20);
+            this.TxtSearchHeader.TabIndex = 27;
+            this.TxtSearchHeader.TextChanged += new System.EventHandler(this.TxtSearchHeader_TextChanged);
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(6, 66);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(166, 13);
+            this.label36.TabIndex = 26;
+            this.label36.Text = "Spalte in der gesucht werden soll:";
             // 
             // Administration
             // 
@@ -2965,6 +3112,9 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbPVMExport.ResumeLayout(false);
+            this.gbPVMExport.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).EndInit();
             this.gbAddTableColumns.ResumeLayout(false);
             this.gbAddTableColumns.PerformLayout();
             this.gbSeparate.ResumeLayout(false);
@@ -2982,9 +3132,6 @@
             this.gbCount.ResumeLayout(false);
             this.gbCount.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbCount)).EndInit();
-            this.gbPVMExport.ResumeLayout(false);
-            this.gbPVMExport.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).EndInit();
             this.gbCompare.ResumeLayout(false);
             this.gbCompare.PerformLayout();
             this.gbMerge.ResumeLayout(false);
@@ -3039,6 +3186,10 @@
             this.gbCaseShortcuts.PerformLayout();
             this.gbCaseColumns.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).EndInit();
+            this.GbSearch.ResumeLayout(false);
+            this.GbSearch.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -3255,5 +3406,16 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.ComboBox CmBPVMExportEncodings;
+        private System.Windows.Forms.GroupBox GbSearch;
+        private System.Windows.Forms.NumericUpDown NbSearchTo;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.NumericUpDown NbSearchFrom;
+        private System.Windows.Forms.TextBox TxtSearchNewColumn;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TextBox TxtSearchText;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.TextBox TxtSearchHeader;
+        private System.Windows.Forms.Label label36;
     }
 }

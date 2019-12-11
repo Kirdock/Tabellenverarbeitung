@@ -19,7 +19,8 @@ namespace DataTableConverter.Classes.WorkProcs
         public string ReplaceText;
         public bool ReplaceChecked; //I need it because ReplaceText can also be empty
 
-        public ProcSubstring(int ordinal, int id, string name) : base(ordinal, id, name) {
+        public ProcSubstring(int ordinal, int id, string name) : base(ordinal, id, name)
+        {
             Start = 1;
         }
 

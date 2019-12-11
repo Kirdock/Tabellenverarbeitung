@@ -378,7 +378,7 @@ namespace DataTableConverter
             StartSingleWorkflow(procDuplicate);
         }
 
-        private void workflow_Click(object sender, EventArgs e, Work workflow)
+        private void workflow_Click(object sender, EventArgs e, Work workflow, Action finished = null)
         {
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
             DataTable table = GetDataSource();
@@ -409,7 +409,7 @@ namespace DataTableConverter
             }
             if (notFound.Count == 0)
             {
-                ReplaceThroughTemp(workflow.Procedures);
+                ReplaceThroughTemp(workflow.Procedures, finished);
             }
             else
             {
@@ -444,12 +444,12 @@ namespace DataTableConverter
                             }
                         }
                     }
-                    ReplaceThroughTemp(workflow.Procedures);
+                    ReplaceThroughTemp(workflow.Procedures, finished);
                 }
             }
         }
 
-        private void ReplaceThroughTemp(List<WorkProc> temp)
+        private void ReplaceThroughTemp(List<WorkProc> temp, Action finished)
         {
             DataTable table = GetDataSource();
             StartLoadingBar();
@@ -483,6 +483,7 @@ namespace DataTableConverter
                 }
                 StopLoadingBar();
                 this.MessagesOK(MessageBoxIcon.Information, "Arbeitsablauf ausgeführt!");
+                finished?.Invoke();
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -1414,9 +1415,9 @@ namespace DataTableConverter
             }
         }
 
-        private void StartSingleWorkflow(WorkProc proc)
+        private void StartSingleWorkflow(WorkProc proc, Action finished = null)
         {
-            workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { GetCopyOfWorkProc(proc) }, 0));
+            workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { GetCopyOfWorkProc(proc) }, 0), finished);
         }
 
         private WorkProc GetCopyOfWorkProc(WorkProc proc)
@@ -1594,18 +1595,49 @@ namespace DataTableConverter
                         table.Rows[maxIndex][newColumn] = shortcut;
                         AddDataSourceValueChange(table);
                     }
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        dgTable.ClearSelection();
-                        dgTable[0, maxIndex].Selected = true;
-                        dgTable.FirstDisplayedScrollingRowIndex = maxIndex;
-                    }));
+
+                    SelectDataGridViewRow(maxIndex);
                     StopLoadingBar();
                 });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
             }
             form.Dispose();
+        }
+
+        private void SelectDataGridViewRow(int index)
+        {
+            dgTable.Invoke(new MethodInvoker(() =>
+            {
+                dgTable.ClearSelection();
+                dgTable.Rows[index].Selected = true;
+                dgTable.FirstDisplayedScrollingRowIndex = index;
+            }));
+        }
+
+        private void suchenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SearchForm form = new SearchForm(sourceTable.HeadersOfDataTableAsString());
+            if(form.ShowDialog(this) == DialogResult.OK)
+            {
+                ProcSearch proc = new ProcSearch(form.SearchText, form.Header, form.From, form.To, form.NewColumn);
+                StartSingleWorkflow(proc, delegate { SearchAndSelect(proc.SearchText, proc.Header, sourceTable.GetSortedTable(SortingOrder,OrderType)); });
+            }
+            form.Dispose();
+        }
+
+        private void SearchAndSelect(string searchText, string header, IEnumerable<DataRow> table)
+        {
+            int index = 0;
+            foreach(DataRow row in table)
+            {
+                if(row[header].ToString() == searchText)
+                {
+                    SelectDataGridViewRow(index);
+                    break;
+                }
+                index++;
+            }
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
