@@ -40,6 +40,7 @@
             this.CmBHeader = new System.Windows.Forms.ComboBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.bestätigenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CBTotal = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -48,7 +49,7 @@
             // label36
             // 
             this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(8, 89);
+            this.label36.Location = new System.Drawing.Point(5, 112);
             this.label36.Name = "label36";
             this.label36.Size = new System.Drawing.Size(166, 13);
             this.label36.TabIndex = 36;
@@ -74,7 +75,7 @@
             // 
             // NbSearchTo
             // 
-            this.NbSearchTo.Location = new System.Drawing.Point(169, 208);
+            this.NbSearchTo.Location = new System.Drawing.Point(169, 231);
             this.NbSearchTo.Maximum = new decimal(new int[] {
             1410065408,
             2,
@@ -92,7 +93,7 @@
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(166, 188);
+            this.label31.Location = new System.Drawing.Point(167, 209);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(66, 13);
             this.label31.TabIndex = 32;
@@ -101,7 +102,7 @@
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(6, 186);
+            this.label32.Location = new System.Drawing.Point(3, 209);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(69, 13);
             this.label32.TabIndex = 31;
@@ -109,7 +110,7 @@
             // 
             // NbSearchFrom
             // 
-            this.NbSearchFrom.Location = new System.Drawing.Point(6, 208);
+            this.NbSearchFrom.Location = new System.Drawing.Point(8, 231);
             this.NbSearchFrom.Maximum = new decimal(new int[] {
             1410065408,
             2,
@@ -128,15 +129,15 @@
             // 
             this.TxtSearchNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtSearchNewColumn.Location = new System.Drawing.Point(6, 158);
+            this.TxtSearchNewColumn.Location = new System.Drawing.Point(8, 178);
             this.TxtSearchNewColumn.Name = "TxtSearchNewColumn";
-            this.TxtSearchNewColumn.Size = new System.Drawing.Size(233, 20);
+            this.TxtSearchNewColumn.Size = new System.Drawing.Size(231, 20);
             this.TxtSearchNewColumn.TabIndex = 3;
             // 
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(6, 139);
+            this.label33.Location = new System.Drawing.Point(3, 162);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(122, 13);
             this.label33.TabIndex = 28;
@@ -146,7 +147,7 @@
             // 
             this.CmBHeader.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CmBHeader.FormattingEnabled = true;
-            this.CmBHeader.Location = new System.Drawing.Point(9, 111);
+            this.CmBHeader.Location = new System.Drawing.Point(8, 138);
             this.CmBHeader.Name = "CmBHeader";
             this.CmBHeader.Size = new System.Drawing.Size(231, 21);
             this.CmBHeader.TabIndex = 2;
@@ -168,11 +169,22 @@
             this.bestätigenToolStripMenuItem.Text = "Bestätigen";
             this.bestätigenToolStripMenuItem.Click += new System.EventHandler(this.bestätigenToolStripMenuItem_Click);
             // 
+            // CBTotal
+            // 
+            this.CBTotal.AutoSize = true;
+            this.CBTotal.Location = new System.Drawing.Point(8, 85);
+            this.CBTotal.Name = "CBTotal";
+            this.CBTotal.Size = new System.Drawing.Size(148, 17);
+            this.CBTotal.TabIndex = 39;
+            this.CBTotal.Text = "Genaue Übereinstimmung";
+            this.CBTotal.UseVisualStyleBackColor = true;
+            // 
             // SearchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(245, 254);
+            this.ClientSize = new System.Drawing.Size(245, 275);
+            this.Controls.Add(this.CBTotal);
             this.Controls.Add(this.CmBHeader);
             this.Controls.Add(this.label36);
             this.Controls.Add(this.TxtSearchText);
@@ -212,5 +224,6 @@
         private System.Windows.Forms.ComboBox CmBHeader;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem bestätigenToolStripMenuItem;
+        private System.Windows.Forms.CheckBox CBTotal;
     }
 }

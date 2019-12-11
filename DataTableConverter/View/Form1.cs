@@ -1620,23 +1620,43 @@ namespace DataTableConverter
             SearchForm form = new SearchForm(sourceTable.HeadersOfDataTableAsString());
             if(form.ShowDialog(this) == DialogResult.OK)
             {
-                ProcSearch proc = new ProcSearch(form.SearchText, form.Header, form.From, form.To, form.NewColumn);
-                StartSingleWorkflow(proc, delegate { SearchAndSelect(proc.SearchText, proc.Header, sourceTable.GetSortedTable(SortingOrder,OrderType)); });
+                ProcSearch proc = new ProcSearch(form.SearchText, form.Header, form.From, form.To, form.NewColumn, form.CheckTotal);
+                StartSingleWorkflow(proc, delegate { SearchAndSelect(proc.SearchText, proc.Header, form.CheckTotal, sourceTable.GetSortedTable(SortingOrder,OrderType)); });
             }
             form.Dispose();
         }
 
-        private void SearchAndSelect(string searchText, string header, IEnumerable<DataRow> table)
+        private void SearchAndSelect(string searchText, string header, bool totalSearch, IEnumerable<DataRow> table)
         {
             int index = 0;
+            Func<string, string, bool> searchMethod;
+            if (totalSearch)
+            {
+                searchMethod = searchTotal;
+            }
+            else
+            {
+                searchMethod = searchPartial;
+            }
+
             foreach(DataRow row in table)
             {
-                if(row[header].ToString() == searchText)
+                if(searchMethod.Invoke(row[header].ToString(), searchText))
                 {
                     SelectDataGridViewRow(index);
                     break;
                 }
                 index++;
+            }
+
+            bool searchTotal(string value, string search)
+            {
+                return value == search;
+            }
+
+            bool searchPartial(string value, string search)
+            {
+                return value.Contains(search);
             }
         }
 

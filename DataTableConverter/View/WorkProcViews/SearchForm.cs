@@ -17,6 +17,7 @@ namespace DataTableConverter.View.WorkProcViews
         internal int From => (int)NbSearchFrom.Value;
         internal int To => (int)NbSearchTo.Value;
         internal string NewColumn => TxtSearchNewColumn.Text;
+        internal bool CheckTotal => CBTotal.Checked;
         internal SearchForm(string[] headers)
         {
             InitializeComponent();

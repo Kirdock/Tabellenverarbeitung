@@ -931,6 +931,7 @@ namespace DataTableConverter.View
             NbSearchTo.Value = proc.To;
             TxtSearchNewColumn.Text = selectedProc.NewColumn;
             TxtSearchHeader.Text = proc.Header;
+            CBSearchTotal.Checked = proc.TotalSearch;
         }
 
         private void SetDuplicateControls(WorkProc selectedProc)
@@ -2381,6 +2382,11 @@ namespace DataTableConverter.View
         private void TxtSearchHeader_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSearch).Header = TxtSearchHeader.Text;
+        }
+
+        private void CBSearchTotal_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSearch).TotalSearch = CBSearchTotal.Checked;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

@@ -61,6 +61,17 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.GbSearch = new System.Windows.Forms.GroupBox();
+            this.TxtSearchHeader = new System.Windows.Forms.TextBox();
+            this.label36 = new System.Windows.Forms.Label();
+            this.TxtSearchText = new System.Windows.Forms.TextBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.NbSearchTo = new System.Windows.Forms.NumericUpDown();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label32 = new System.Windows.Forms.Label();
+            this.NbSearchFrom = new System.Windows.Forms.NumericUpDown();
+            this.TxtSearchNewColumn = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
             this.gbPVMExport = new System.Windows.Forms.GroupBox();
             this.label22 = new System.Windows.Forms.Label();
             this.CmBPVMExportEncodings = new System.Windows.Forms.ComboBox();
@@ -239,17 +250,7 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.GbSearch = new System.Windows.Forms.GroupBox();
-            this.NbSearchTo = new System.Windows.Forms.NumericUpDown();
-            this.label31 = new System.Windows.Forms.Label();
-            this.label32 = new System.Windows.Forms.Label();
-            this.NbSearchFrom = new System.Windows.Forms.NumericUpDown();
-            this.TxtSearchNewColumn = new System.Windows.Forms.TextBox();
-            this.label33 = new System.Windows.Forms.Label();
-            this.label34 = new System.Windows.Forms.Label();
-            this.TxtSearchText = new System.Windows.Forms.TextBox();
-            this.TxtSearchHeader = new System.Windows.Forms.TextBox();
-            this.label36 = new System.Windows.Forms.Label();
+            this.CBSearchTotal = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -272,6 +273,9 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.GbSearch.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).BeginInit();
             this.gbPVMExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).BeginInit();
             this.gbAddTableColumns.SuspendLayout();
@@ -327,9 +331,6 @@
             this.gbCaseShortcuts.SuspendLayout();
             this.gbCaseColumns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).BeginInit();
-            this.GbSearch.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -775,6 +776,139 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // GbSearch
+            // 
+            this.GbSearch.Controls.Add(this.CBSearchTotal);
+            this.GbSearch.Controls.Add(this.TxtSearchHeader);
+            this.GbSearch.Controls.Add(this.label36);
+            this.GbSearch.Controls.Add(this.TxtSearchText);
+            this.GbSearch.Controls.Add(this.label34);
+            this.GbSearch.Controls.Add(this.NbSearchTo);
+            this.GbSearch.Controls.Add(this.label31);
+            this.GbSearch.Controls.Add(this.label32);
+            this.GbSearch.Controls.Add(this.NbSearchFrom);
+            this.GbSearch.Controls.Add(this.TxtSearchNewColumn);
+            this.GbSearch.Controls.Add(this.label33);
+            this.GbSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GbSearch.Location = new System.Drawing.Point(0, 92);
+            this.GbSearch.Name = "GbSearch";
+            this.GbSearch.Size = new System.Drawing.Size(245, 643);
+            this.GbSearch.TabIndex = 27;
+            this.GbSearch.TabStop = false;
+            this.GbSearch.Text = "Spaltenangabe";
+            // 
+            // TxtSearchHeader
+            // 
+            this.TxtSearchHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSearchHeader.Location = new System.Drawing.Point(6, 121);
+            this.TxtSearchHeader.Name = "TxtSearchHeader";
+            this.TxtSearchHeader.Size = new System.Drawing.Size(232, 20);
+            this.TxtSearchHeader.TabIndex = 27;
+            this.TxtSearchHeader.TextChanged += new System.EventHandler(this.TxtSearchHeader_TextChanged);
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(7, 102);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(166, 13);
+            this.label36.TabIndex = 26;
+            this.label36.Text = "Spalte in der gesucht werden soll:";
+            // 
+            // TxtSearchText
+            // 
+            this.TxtSearchText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSearchText.Location = new System.Drawing.Point(6, 36);
+            this.TxtSearchText.Name = "TxtSearchText";
+            this.TxtSearchText.Size = new System.Drawing.Size(232, 20);
+            this.TxtSearchText.TabIndex = 25;
+            this.TxtSearchText.TextChanged += new System.EventHandler(this.TxtSearchText_TextChanged);
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(7, 17);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(52, 13);
+            this.label34.TabIndex = 24;
+            this.label34.Text = "Suchtext:";
+            // 
+            // NbSearchTo
+            // 
+            this.NbSearchTo.Location = new System.Drawing.Point(126, 221);
+            this.NbSearchTo.Maximum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            0});
+            this.NbSearchTo.Minimum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            -2147483648});
+            this.NbSearchTo.Name = "NbSearchTo";
+            this.NbSearchTo.Size = new System.Drawing.Size(70, 20);
+            this.NbSearchTo.TabIndex = 23;
+            this.NbSearchTo.ValueChanged += new System.EventHandler(this.NbSearchTo_ValueChanged);
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(123, 201);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(66, 13);
+            this.label31.TabIndex = 22;
+            this.label31.Text = "Endnummer:";
+            this.toolTip1.SetToolTip(this.label31, "Bei Wert \"0\" gibt es kein Ende");
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(5, 199);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(69, 13);
+            this.label32.TabIndex = 21;
+            this.label32.Text = "Startnummer:";
+            // 
+            // NbSearchFrom
+            // 
+            this.NbSearchFrom.Location = new System.Drawing.Point(5, 221);
+            this.NbSearchFrom.Maximum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            0});
+            this.NbSearchFrom.Minimum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            -2147483648});
+            this.NbSearchFrom.Name = "NbSearchFrom";
+            this.NbSearchFrom.Size = new System.Drawing.Size(70, 20);
+            this.NbSearchFrom.TabIndex = 20;
+            this.NbSearchFrom.ValueChanged += new System.EventHandler(this.NbSearchFrom_ValueChanged);
+            // 
+            // TxtSearchNewColumn
+            // 
+            this.TxtSearchNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSearchNewColumn.Location = new System.Drawing.Point(5, 171);
+            this.TxtSearchNewColumn.Name = "TxtSearchNewColumn";
+            this.TxtSearchNewColumn.Size = new System.Drawing.Size(233, 20);
+            this.TxtSearchNewColumn.TabIndex = 19;
+            this.TxtSearchNewColumn.TextChanged += new System.EventHandler(this.TxtSearchNewColumn_TextChanged);
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(5, 152);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(122, 13);
+            this.label33.TabIndex = 18;
+            this.label33.Text = "Name der neuen Spalte:";
             // 
             // gbPVMExport
             // 
@@ -2943,137 +3077,16 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // GbSearch
+            // CBSearchTotal
             // 
-            this.GbSearch.Controls.Add(this.TxtSearchHeader);
-            this.GbSearch.Controls.Add(this.label36);
-            this.GbSearch.Controls.Add(this.TxtSearchText);
-            this.GbSearch.Controls.Add(this.label34);
-            this.GbSearch.Controls.Add(this.NbSearchTo);
-            this.GbSearch.Controls.Add(this.label31);
-            this.GbSearch.Controls.Add(this.label32);
-            this.GbSearch.Controls.Add(this.NbSearchFrom);
-            this.GbSearch.Controls.Add(this.TxtSearchNewColumn);
-            this.GbSearch.Controls.Add(this.label33);
-            this.GbSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GbSearch.Location = new System.Drawing.Point(0, 92);
-            this.GbSearch.Name = "GbSearch";
-            this.GbSearch.Size = new System.Drawing.Size(245, 643);
-            this.GbSearch.TabIndex = 27;
-            this.GbSearch.TabStop = false;
-            this.GbSearch.Text = "Spaltenangabe";
-            // 
-            // NbSearchTo
-            // 
-            this.NbSearchTo.Location = new System.Drawing.Point(125, 185);
-            this.NbSearchTo.Maximum = new decimal(new int[] {
-            1410065408,
-            2,
-            0,
-            0});
-            this.NbSearchTo.Minimum = new decimal(new int[] {
-            1410065408,
-            2,
-            0,
-            -2147483648});
-            this.NbSearchTo.Name = "NbSearchTo";
-            this.NbSearchTo.Size = new System.Drawing.Size(70, 20);
-            this.NbSearchTo.TabIndex = 23;
-            this.NbSearchTo.ValueChanged += new System.EventHandler(this.NbSearchTo_ValueChanged);
-            // 
-            // label31
-            // 
-            this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(122, 165);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(66, 13);
-            this.label31.TabIndex = 22;
-            this.label31.Text = "Endnummer:";
-            this.toolTip1.SetToolTip(this.label31, "Bei Wert \"0\" gibt es kein Ende");
-            // 
-            // label32
-            // 
-            this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(4, 163);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(69, 13);
-            this.label32.TabIndex = 21;
-            this.label32.Text = "Startnummer:";
-            // 
-            // NbSearchFrom
-            // 
-            this.NbSearchFrom.Location = new System.Drawing.Point(4, 185);
-            this.NbSearchFrom.Maximum = new decimal(new int[] {
-            1410065408,
-            2,
-            0,
-            0});
-            this.NbSearchFrom.Minimum = new decimal(new int[] {
-            1410065408,
-            2,
-            0,
-            -2147483648});
-            this.NbSearchFrom.Name = "NbSearchFrom";
-            this.NbSearchFrom.Size = new System.Drawing.Size(70, 20);
-            this.NbSearchFrom.TabIndex = 20;
-            this.NbSearchFrom.ValueChanged += new System.EventHandler(this.NbSearchFrom_ValueChanged);
-            // 
-            // TxtSearchNewColumn
-            // 
-            this.TxtSearchNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtSearchNewColumn.Location = new System.Drawing.Point(4, 135);
-            this.TxtSearchNewColumn.Name = "TxtSearchNewColumn";
-            this.TxtSearchNewColumn.Size = new System.Drawing.Size(233, 20);
-            this.TxtSearchNewColumn.TabIndex = 19;
-            this.TxtSearchNewColumn.TextChanged += new System.EventHandler(this.TxtSearchNewColumn_TextChanged);
-            // 
-            // label33
-            // 
-            this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(4, 116);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(122, 13);
-            this.label33.TabIndex = 18;
-            this.label33.Text = "Name der neuen Spalte:";
-            // 
-            // label34
-            // 
-            this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(7, 17);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(52, 13);
-            this.label34.TabIndex = 24;
-            this.label34.Text = "Suchtext:";
-            // 
-            // TxtSearchText
-            // 
-            this.TxtSearchText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtSearchText.Location = new System.Drawing.Point(6, 36);
-            this.TxtSearchText.Name = "TxtSearchText";
-            this.TxtSearchText.Size = new System.Drawing.Size(232, 20);
-            this.TxtSearchText.TabIndex = 25;
-            this.TxtSearchText.TextChanged += new System.EventHandler(this.TxtSearchText_TextChanged);
-            // 
-            // TxtSearchHeader
-            // 
-            this.TxtSearchHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtSearchHeader.Location = new System.Drawing.Point(5, 85);
-            this.TxtSearchHeader.Name = "TxtSearchHeader";
-            this.TxtSearchHeader.Size = new System.Drawing.Size(232, 20);
-            this.TxtSearchHeader.TabIndex = 27;
-            this.TxtSearchHeader.TextChanged += new System.EventHandler(this.TxtSearchHeader_TextChanged);
-            // 
-            // label36
-            // 
-            this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(6, 66);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(166, 13);
-            this.label36.TabIndex = 26;
-            this.label36.Text = "Spalte in der gesucht werden soll:";
+            this.CBSearchTotal.AutoSize = true;
+            this.CBSearchTotal.Location = new System.Drawing.Point(7, 68);
+            this.CBSearchTotal.Name = "CBSearchTotal";
+            this.CBSearchTotal.Size = new System.Drawing.Size(148, 17);
+            this.CBSearchTotal.TabIndex = 28;
+            this.CBSearchTotal.Text = "Genaue Übereinstimmung";
+            this.CBSearchTotal.UseVisualStyleBackColor = true;
+            this.CBSearchTotal.CheckedChanged += new System.EventHandler(this.CBSearchTotal_CheckedChanged);
             // 
             // Administration
             // 
@@ -3112,6 +3125,10 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.GbSearch.ResumeLayout(false);
+            this.GbSearch.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).EndInit();
             this.gbPVMExport.ResumeLayout(false);
             this.gbPVMExport.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).EndInit();
@@ -3186,10 +3203,6 @@
             this.gbCaseShortcuts.PerformLayout();
             this.gbCaseColumns.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).EndInit();
-            this.GbSearch.ResumeLayout(false);
-            this.GbSearch.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -3417,5 +3430,6 @@
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.TextBox TxtSearchHeader;
         private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.CheckBox CBSearchTotal;
     }
 }

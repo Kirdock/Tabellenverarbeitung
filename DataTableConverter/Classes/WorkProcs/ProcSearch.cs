@@ -16,16 +16,18 @@ namespace DataTableConverter.Classes.WorkProcs
         public string SearchText;
         public string Header;
         public int From, To;
+        public bool TotalSearch;
 
         public ProcSearch(int ordinal, int id, string name) : base(ordinal, id, name){}
 
-        public ProcSearch(string searchText, string header, int from, int to, string newColumn)
+        public ProcSearch(string searchText, string header, int from, int to, string newColumn, bool totalSearch)
         {
             SearchText = searchText;
             Header = header;
             From = from;
             To = to;
             NewColumn = newColumn;
+            TotalSearch = totalSearch;
         }
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
@@ -39,6 +41,15 @@ namespace DataTableConverter.Classes.WorkProcs
                     string col = table.TryAddColumn(NewColumn);
                     bool found = false;
                     int counter = From;
+                    Func<string, string, bool> search;
+                    if (TotalSearch)
+                    {
+                        search = SearchTotal;
+                    }
+                    else
+                    {
+                        search = PartialSearch;
+                    }
                     foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
                     {
                         if (found)
@@ -53,7 +64,7 @@ namespace DataTableConverter.Classes.WorkProcs
                                 counter++;
                             }
                         }
-                        else if (row[index].ToString() == SearchText)
+                        else if (search.Invoke(row[index].ToString(),SearchText))
                         {
                             row[col] = counter;
                             found = true;
@@ -62,6 +73,16 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
                 }
             }
+        }
+
+        private bool SearchTotal(string value, string searchText)
+        {
+            return value == searchText;
+        }
+
+        private bool PartialSearch(string value, string searchText)
+        {
+            return value.Contains(searchText);
         }
 
         public override string[] GetHeaders()

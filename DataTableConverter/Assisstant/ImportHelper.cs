@@ -715,7 +715,13 @@ namespace DataTableConverter.Assisstant
         private static void AddHeaderOfContent(DataTable table, List<string> headers, StringBuilder header)
         {
             string headerString = header.ToString();
-            string newColumn = TryAddColumn(headers, headerString);
+            int counter = 0;
+            if (string.IsNullOrWhiteSpace(headerString))
+            {
+                headerString = "Spalte";
+                counter = 1;
+            }
+            string newColumn = TryAddColumn(headers, headerString, counter);
             if (!table.Columns.Contains(newColumn))
             {
                 table.Columns.Add(newColumn, typeof(string));
