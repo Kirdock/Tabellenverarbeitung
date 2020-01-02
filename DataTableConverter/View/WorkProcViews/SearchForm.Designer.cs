@@ -41,9 +41,17 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.bestätigenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CBTotal = new System.Windows.Forms.CheckBox();
+            this.RbFromTo = new System.Windows.Forms.RadioButton();
+            this.RbShortcut = new System.Windows.Forms.RadioButton();
+            this.GBFromTo = new System.Windows.Forms.GroupBox();
+            this.GBShortcut = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.TxtShortcut = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.GBFromTo.SuspendLayout();
+            this.GBShortcut.SuspendLayout();
             this.SuspendLayout();
             // 
             // label36
@@ -75,7 +83,7 @@
             // 
             // NbSearchTo
             // 
-            this.NbSearchTo.Location = new System.Drawing.Point(169, 231);
+            this.NbSearchTo.Location = new System.Drawing.Point(172, 38);
             this.NbSearchTo.Maximum = new decimal(new int[] {
             1410065408,
             2,
@@ -93,7 +101,7 @@
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(167, 209);
+            this.label31.Location = new System.Drawing.Point(170, 16);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(66, 13);
             this.label31.TabIndex = 32;
@@ -102,7 +110,7 @@
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(3, 209);
+            this.label32.Location = new System.Drawing.Point(6, 16);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(69, 13);
             this.label32.TabIndex = 31;
@@ -110,7 +118,7 @@
             // 
             // NbSearchFrom
             // 
-            this.NbSearchFrom.Location = new System.Drawing.Point(8, 231);
+            this.NbSearchFrom.Location = new System.Drawing.Point(11, 38);
             this.NbSearchFrom.Maximum = new decimal(new int[] {
             1410065408,
             2,
@@ -179,20 +187,84 @@
             this.CBTotal.Text = "Genaue Übereinstimmung";
             this.CBTotal.UseVisualStyleBackColor = true;
             // 
+            // RbFromTo
+            // 
+            this.RbFromTo.AutoSize = true;
+            this.RbFromTo.Location = new System.Drawing.Point(6, 208);
+            this.RbFromTo.Name = "RbFromTo";
+            this.RbFromTo.Size = new System.Drawing.Size(61, 17);
+            this.RbFromTo.TabIndex = 40;
+            this.RbFromTo.TabStop = true;
+            this.RbFromTo.Text = "Von-Bis";
+            this.RbFromTo.UseVisualStyleBackColor = true;
+            this.RbFromTo.CheckedChanged += new System.EventHandler(this.RbFromTo_CheckedChanged);
+            // 
+            // RbShortcut
+            // 
+            this.RbShortcut.AutoSize = true;
+            this.RbShortcut.Location = new System.Drawing.Point(88, 208);
+            this.RbShortcut.Name = "RbShortcut";
+            this.RbShortcut.Size = new System.Drawing.Size(68, 17);
+            this.RbShortcut.TabIndex = 41;
+            this.RbShortcut.TabStop = true;
+            this.RbShortcut.Text = "Kennung";
+            this.RbShortcut.UseVisualStyleBackColor = true;
+            this.RbShortcut.CheckedChanged += new System.EventHandler(this.RbFromTo_CheckedChanged);
+            // 
+            // GBFromTo
+            // 
+            this.GBFromTo.Controls.Add(this.label32);
+            this.GBFromTo.Controls.Add(this.NbSearchFrom);
+            this.GBFromTo.Controls.Add(this.label31);
+            this.GBFromTo.Controls.Add(this.NbSearchTo);
+            this.GBFromTo.Location = new System.Drawing.Point(0, 231);
+            this.GBFromTo.Name = "GBFromTo";
+            this.GBFromTo.Size = new System.Drawing.Size(245, 73);
+            this.GBFromTo.TabIndex = 42;
+            this.GBFromTo.TabStop = false;
+            this.GBFromTo.Text = "Von-Bis";
+            // 
+            // GBShortcut
+            // 
+            this.GBShortcut.Controls.Add(this.TxtShortcut);
+            this.GBShortcut.Controls.Add(this.label1);
+            this.GBShortcut.Location = new System.Drawing.Point(0, 231);
+            this.GBShortcut.Name = "GBShortcut";
+            this.GBShortcut.Size = new System.Drawing.Size(245, 73);
+            this.GBShortcut.TabIndex = 43;
+            this.GBShortcut.TabStop = false;
+            this.GBShortcut.Text = "Kennung";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 16);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(72, 13);
+            this.label1.TabIndex = 31;
+            this.label1.Text = "Bezeichnung:";
+            // 
+            // TxtShortcut
+            // 
+            this.TxtShortcut.Location = new System.Drawing.Point(6, 37);
+            this.TxtShortcut.Name = "TxtShortcut";
+            this.TxtShortcut.Size = new System.Drawing.Size(233, 20);
+            this.TxtShortcut.TabIndex = 32;
+            // 
             // SearchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(245, 275);
+            this.ClientSize = new System.Drawing.Size(245, 310);
+            this.Controls.Add(this.GBShortcut);
+            this.Controls.Add(this.GBFromTo);
+            this.Controls.Add(this.RbShortcut);
+            this.Controls.Add(this.RbFromTo);
             this.Controls.Add(this.CBTotal);
             this.Controls.Add(this.CmBHeader);
             this.Controls.Add(this.label36);
             this.Controls.Add(this.TxtSearchText);
             this.Controls.Add(this.label34);
-            this.Controls.Add(this.NbSearchTo);
-            this.Controls.Add(this.label31);
-            this.Controls.Add(this.label32);
-            this.Controls.Add(this.NbSearchFrom);
             this.Controls.Add(this.TxtSearchNewColumn);
             this.Controls.Add(this.label33);
             this.Controls.Add(this.menuStrip1);
@@ -205,6 +277,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.GBFromTo.ResumeLayout(false);
+            this.GBFromTo.PerformLayout();
+            this.GBShortcut.ResumeLayout(false);
+            this.GBShortcut.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -225,5 +301,11 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem bestätigenToolStripMenuItem;
         private System.Windows.Forms.CheckBox CBTotal;
+        private System.Windows.Forms.RadioButton RbFromTo;
+        private System.Windows.Forms.RadioButton RbShortcut;
+        private System.Windows.Forms.GroupBox GBFromTo;
+        private System.Windows.Forms.GroupBox GBShortcut;
+        private System.Windows.Forms.TextBox TxtShortcut;
+        private System.Windows.Forms.Label label1;
     }
 }

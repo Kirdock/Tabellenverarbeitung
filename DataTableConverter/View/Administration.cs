@@ -927,11 +927,15 @@ namespace DataTableConverter.View
             ProcSearch proc = selectedProc as ProcSearch;
             lblOriginalNameText.Text = ProcSearch.ClassName;
             TxtSearchText.Text = proc.SearchText;
-            NbSearchFrom.Value = proc.From;
-            NbSearchTo.Value = proc.To;
             TxtSearchNewColumn.Text = selectedProc.NewColumn;
             TxtSearchHeader.Text = proc.Header;
             CBSearchTotal.Checked = proc.TotalSearch;
+            bool isFromTo = string.IsNullOrWhiteSpace(proc.Shortcut);
+            RBSearchFromTo.Checked = isFromTo;
+            RBSearchShortcut.Checked = !isFromTo;
+            TxtSearchShortcut.Text = proc.Shortcut;
+            NbSearchFrom.Value = proc.From;
+            NbSearchTo.Value = proc.To;
         }
 
         private void SetDuplicateControls(WorkProc selectedProc)
@@ -2387,6 +2391,26 @@ namespace DataTableConverter.View
         private void CBSearchTotal_CheckedChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSearch).TotalSearch = CBSearchTotal.Checked;
+        }
+
+        private void RBSearchFromTo_CheckedChanged(object sender, EventArgs e)
+        {
+            GBSearchFromTo.Visible = RBSearchFromTo.Checked;
+            GBSearchShortcut.Visible = RBSearchShortcut.Checked;
+            ProcSearch proc = (GetSelectedWorkProcedure() as ProcSearch);
+            if (RBSearchFromTo.Checked)
+            {
+                proc.Shortcut = string.Empty;
+            }
+            else
+            {
+                NbSearchFrom.Value = NbSearchTo.Value = 0;
+            }
+        }
+
+        private void TxtSearchShortcut_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSearch).Shortcut = TxtSearchShortcut.Text;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

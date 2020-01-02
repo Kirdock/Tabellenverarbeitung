@@ -1620,7 +1620,15 @@ namespace DataTableConverter
             SearchForm form = new SearchForm(sourceTable.HeadersOfDataTableAsString());
             if(form.ShowDialog(this) == DialogResult.OK)
             {
-                ProcSearch proc = new ProcSearch(form.SearchText, form.Header, form.From, form.To, form.NewColumn, form.CheckTotal);
+                ProcSearch proc;
+                if (form.FromToSelected)
+                {
+                    proc = new ProcSearch(form.SearchText, form.Header, form.From, form.To, form.NewColumn, form.CheckTotal);
+                }
+                else
+                {
+                    proc = new ProcSearch(form.SearchText, form.Header, form.NewColumn, form.CheckTotal, form.Shortcut);
+                }
                 StartSingleWorkflow(proc, delegate { SearchAndSelect(proc.SearchText, proc.Header, form.CheckTotal, sourceTable.GetSortedTable(SortingOrder,OrderType)); });
             }
             form.Dispose();

@@ -17,6 +17,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public string Header;
         public int From, To;
         public bool TotalSearch;
+        public string Shortcut;
 
         public ProcSearch(int ordinal, int id, string name) : base(ordinal, id, name){}
 
@@ -30,6 +31,15 @@ namespace DataTableConverter.Classes.WorkProcs
             TotalSearch = totalSearch;
         }
 
+        public ProcSearch(string searchText, string header, string newColumn, bool totalSearch, string shortcut)
+        {
+            SearchText = searchText;
+            Header = header;
+            TotalSearch = totalSearch;
+            Shortcut = shortcut;
+            NewColumn = newColumn;
+        }
+
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
@@ -39,8 +49,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 if (!string.IsNullOrWhiteSpace(NewColumn))
                 {
                     string col = table.TryAddColumn(NewColumn);
-                    bool found = false;
-                    int counter = From;
+                    
                     Func<string, string, bool> search;
                     if (TotalSearch)
                     {
@@ -50,25 +59,40 @@ namespace DataTableConverter.Classes.WorkProcs
                     {
                         search = PartialSearch;
                     }
-                    foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
+                    if (string.IsNullOrWhiteSpace(Shortcut))
                     {
-                        if (found)
+                        int counter = From;
+                        bool found = false;
+                        foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
                         {
-                            if (counter > To)
+                            if (found)
                             {
-                                break;
+                                if (counter > To)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    row[col] = counter;
+                                    counter++;
+                                }
                             }
-                            else
+                            else if (search.Invoke(row[index].ToString(), SearchText))
                             {
                                 row[col] = counter;
+                                found = true;
                                 counter++;
                             }
                         }
-                        else if (search.Invoke(row[index].ToString(),SearchText))
+                    }
+                    else
+                    {
+                        foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
                         {
-                            row[col] = counter;
-                            found = true;
-                            counter++;
+                            if (search.Invoke(row[index].ToString(), SearchText))
+                            {
+                                row[col] = Shortcut;
+                            }
                         }
                     }
                 }
