@@ -36,6 +36,7 @@
             this.ltbProcedures = new System.Windows.Forms.ListBox();
             this.btnDeleteProcedure = new System.Windows.Forms.Button();
             this.gbSearchAndReplace = new System.Windows.Forms.GroupBox();
+            this.CBLeaveEmpty = new System.Windows.Forms.CheckBox();
             this.CbProcWordCheck = new System.Windows.Forms.CheckBox();
             this.cbCheckTotal = new System.Windows.Forms.CheckBox();
             this.dgvReplaces = new System.Windows.Forms.DataGridView();
@@ -257,7 +258,6 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.CBLeaveEmpty = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -447,6 +447,18 @@
             this.gbSearchAndReplace.Text = "Bearbeiten";
             this.gbSearchAndReplace.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
             // 
+            // CBLeaveEmpty
+            // 
+            this.CBLeaveEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CBLeaveEmpty.AutoSize = true;
+            this.CBLeaveEmpty.Location = new System.Drawing.Point(525, 82);
+            this.CBLeaveEmpty.Name = "CBLeaveEmpty";
+            this.CBLeaveEmpty.Size = new System.Drawing.Size(201, 17);
+            this.CBLeaveEmpty.TabIndex = 12;
+            this.CBLeaveEmpty.Text = "Bei Nichtübereinstimmung leer lassen";
+            this.CBLeaveEmpty.UseVisualStyleBackColor = true;
+            this.CBLeaveEmpty.CheckedChanged += new System.EventHandler(this.CBLeaveEmpty_CheckedChanged);
+            // 
             // CbProcWordCheck
             // 
             this.CbProcWordCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -499,7 +511,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtName.Location = new System.Drawing.Point(22, 53);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(499, 20);
+            this.txtName.Size = new System.Drawing.Size(472, 20);
             this.txtName.TabIndex = 1;
             this.txtName.TextChanged += new System.EventHandler(this.txtName_TextChanged);
             // 
@@ -3168,17 +3180,6 @@
             this.BtnDiscard.Text = "Verwerfen";
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
-            // 
-            // CBLeaveEmpty
-            // 
-            this.CBLeaveEmpty.AutoSize = true;
-            this.CBLeaveEmpty.Location = new System.Drawing.Point(525, 82);
-            this.CBLeaveEmpty.Name = "CBLeaveEmpty";
-            this.CBLeaveEmpty.Size = new System.Drawing.Size(201, 17);
-            this.CBLeaveEmpty.TabIndex = 12;
-            this.CBLeaveEmpty.Text = "Bei Nichtübereinstimmung leer lassen";
-            this.CBLeaveEmpty.UseVisualStyleBackColor = true;
-            this.CBLeaveEmpty.CheckedChanged += new System.EventHandler(this.CBLeaveEmpty_CheckedChanged);
             // 
             // Administration
             // 

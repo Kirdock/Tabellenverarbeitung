@@ -30,7 +30,8 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
-            if(string.IsNullOrWhiteSpace(SourceColumn) || string.IsNullOrWhiteSpace(CompareColumn))
+            bool isNewColumn = !string.IsNullOrWhiteSpace(NewColumn);
+            if (string.IsNullOrWhiteSpace(SourceColumn) || string.IsNullOrWhiteSpace(CompareColumn))
             {
                 return;
             }
@@ -40,18 +41,29 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 table.CopyColumns(new string[] { SourceColumn });
             }
-            else if (!string.IsNullOrWhiteSpace(NewColumn))
+            else if (isNewColumn)
             {
                 column = table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
             }
 
             if (column != null)
             {
-                foreach (DataRow row in table.Rows)
+                if (isNewColumn)
                 {
-                    if (row[SourceColumn].ToString() == row[CompareColumn].ToString())
+                    foreach (DataRow row in table.Rows)
                     {
-                        row[column] = string.Empty;
+                        string source = row[SourceColumn].ToString();
+                        row[column] = source == row[CompareColumn].ToString() ? string.Empty : source;
+                    }
+                }
+                else
+                {
+                    foreach (DataRow row in table.Rows)
+                    {
+                        if (row[SourceColumn].ToString() == row[CompareColumn].ToString())
+                        {
+                            row[column] = string.Empty;
+                        }
                     }
                 }
             }
