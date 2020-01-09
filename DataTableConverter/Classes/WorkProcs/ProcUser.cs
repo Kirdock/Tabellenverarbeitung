@@ -80,6 +80,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                         if (procedure.CheckTotal)
                         {
+                            string defaultValue = procedure.LeaveEmpty ? string.Empty : value;
                             DataRow foundRows = replaces.FirstOrDefault(replace => replace[0].ToString() == value);
                             if (foundRows != null)
                             {
@@ -87,24 +88,27 @@ namespace DataTableConverter.Classes.WorkProcs
                             }
                             else
                             {
-                                row[index] = value;
+                                row[index] = defaultValue;
                             }
                         }
                         else if (procedure.CheckWord)
                         {
+                            string result = value;
                             foreach (DataRow rep in replaceWithoutEmpty)
                             {
                                 string pattern = @"\b" + Regex.Escape(rep[0].ToString()) + @"\b";
-                                row[index] = Regex.Replace(value, pattern, rep[1].ToString());
+                                result = Regex.Replace(result, pattern, rep[1].ToString());
                             }
+                            row[index] = procedure.LeaveEmpty && result == value ? string.Empty : result;
                         }
                         else
                         {
+                            string result = value;
                             foreach (DataRow rep in replaceWithoutEmpty)
                             {
-                                value = value.Replace(rep[0].ToString(), rep[1].ToString());
+                                result = result.Replace(rep[0].ToString(), rep[1].ToString());
                             }
-                            row[index] = value;
+                            row[index] = procedure.LeaveEmpty && result == value ? string.Empty : result;
                         }
                     }
                 }

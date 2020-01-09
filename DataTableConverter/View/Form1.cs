@@ -775,7 +775,7 @@ namespace DataTableConverter
             ProcedureForm form = new ProcedureForm(contextGlobal);
             if(form.ShowDialog(this) == DialogResult.OK)
             {
-                Proc proc = new Proc(form.Table,form.CheckTotal, form.CheckWord);
+                Proc proc = new Proc(form.Table,form.CheckTotal, form.CheckWord, form.LeaveEmpty);
                 procedure_Click(proc);
             }
             form.Dispose();
@@ -1597,13 +1597,15 @@ namespace DataTableConverter
 
         private void längsteZeileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MaxRowLengthForm form = new MaxRowLengthForm();
+            MaxRowLengthForm form = new MaxRowLengthForm(sourceTable.HeadersOfDataTable());
 
             if (form.ShowDialog(this) == DialogResult.OK)
             {
                 DataTable table = GetDataSource();
                 string shortcut = form.Shortcut;
                 string newColumn = form.NewColumn;
+                int minLength = form.MinLength;
+                string column = form.Column;
                 StartLoadingBar();
                 Thread thread = new Thread(() =>
                 {
@@ -1621,15 +1623,29 @@ namespace DataTableConverter
 
                     if (shortcut != string.Empty && newColumn != string.Empty)
                     {
-
                         newColumn = table.TryAddColumn(newColumn);
-                        table.Rows[maxIndex][newColumn] = shortcut;
+                        if (minLength != -1)
+                        {
+                            foreach(DataRow row in table.AsEnumerable())
+                            {
+                                if(row[column].ToString().Length >= minLength)
+                                {
+                                    row[newColumn] = shortcut;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            table.Rows[maxIndex][newColumn] = shortcut;
+                        }
                         dgTable.Invoke(new MethodInvoker(()=> {
                             AddDataSourceValueChange(table);
                         }));
                     }
-
-                    SelectDataGridViewRow(maxIndex);
+                    if (minLength != -1)
+                    {
+                        SelectDataGridViewRow(maxIndex);
+                    }
                     StopLoadingBar();
                 });
                 thread.SetApartmentState(ApartmentState.STA);

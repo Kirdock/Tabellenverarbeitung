@@ -2413,6 +2413,14 @@ namespace DataTableConverter.View
             (GetSelectedWorkProcedure() as ProcSearch).Shortcut = TxtSearchShortcut.Text;
         }
 
+        private void CBLeaveEmpty_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lbProcedures.SelectedIndex != -1)
+            {
+                selectedProc.LeaveEmpty = CBLeaveEmpty.Checked;
+            }
+        }
+
         private void txtSubstringText_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSubstring).ReplaceText = (sender as TextBox).Text;

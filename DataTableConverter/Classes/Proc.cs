@@ -16,6 +16,7 @@ namespace DataTableConverter.Classes
         public bool CheckTotal { get; set; }
         public bool Locked { get; set; }
         public bool CheckWord { get; set; }
+        public bool LeaveEmpty { get; set; }
 
         public Proc(string name, DataTable replace, int id)
         {
@@ -24,11 +25,12 @@ namespace DataTableConverter.Classes
             Id = id;
         }
 
-        public Proc(DataTable replace, bool checkTotal, bool checkWord)
+        public Proc(DataTable replace, bool checkTotal, bool checkWord, bool leaveEmpty)
         {
             Replace = replace;
             CheckTotal = checkTotal;
             CheckWord = checkWord;
+            LeaveEmpty = leaveEmpty;
         }
 
 

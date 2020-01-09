@@ -15,6 +15,7 @@ namespace DataTableConverter.View
         internal DataTable Table;
         internal bool CheckTotal => cbCheckTotal.Checked;
         internal bool CheckWord => CbCheckWord.Checked;
+        internal bool LeaveEmpty => CBLeaveEmpty.Checked;
         private ViewHelper Helper;
 
         public ProcedureForm(ContextMenuStrip ctxRow)
@@ -32,6 +33,7 @@ namespace DataTableConverter.View
 
         private void BtnConfirm_Click(object sender, EventArgs e)
         {
+            ViewHelper.EndDataGridViewEdit(DGVProcedure);
             if(Table.AsEnumerable().Any(row => row.ItemArray.Any(item => !string.IsNullOrEmpty(item.ToString()))))
             {
                 ViewHelper.EndDataGridViewEdit(DGVProcedure);

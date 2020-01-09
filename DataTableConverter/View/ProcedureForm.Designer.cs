@@ -31,14 +31,17 @@
             this.CbCheckWord = new System.Windows.Forms.CheckBox();
             this.cbCheckTotal = new System.Windows.Forms.CheckBox();
             this.DGVProcedure = new System.Windows.Forms.DataGridView();
-            this.BtnConfirm = new System.Windows.Forms.Button();
+            this.CBLeaveEmpty = new System.Windows.Forms.CheckBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.bestätigenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.DGVProcedure)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // CbCheckWord
             // 
             this.CbCheckWord.AutoSize = true;
-            this.CbCheckWord.Location = new System.Drawing.Point(185, 6);
+            this.CbCheckWord.Location = new System.Drawing.Point(188, 28);
             this.CbCheckWord.Name = "CbCheckWord";
             this.CbCheckWord.Size = new System.Drawing.Size(128, 17);
             this.CbCheckWord.TabIndex = 14;
@@ -48,7 +51,7 @@
             // cbCheckTotal
             // 
             this.cbCheckTotal.AutoSize = true;
-            this.cbCheckTotal.Location = new System.Drawing.Point(9, 6);
+            this.cbCheckTotal.Location = new System.Drawing.Point(12, 28);
             this.cbCheckTotal.Name = "cbCheckTotal";
             this.cbCheckTotal.Size = new System.Drawing.Size(148, 17);
             this.cbCheckTotal.TabIndex = 13;
@@ -62,36 +65,57 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DGVProcedure.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.DGVProcedure.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DGVProcedure.Location = new System.Drawing.Point(0, 31);
+            this.DGVProcedure.Location = new System.Drawing.Point(-1, 51);
             this.DGVProcedure.Name = "DGVProcedure";
             this.DGVProcedure.RowHeadersVisible = false;
-            this.DGVProcedure.Size = new System.Drawing.Size(474, 359);
+            this.DGVProcedure.Size = new System.Drawing.Size(536, 366);
             this.DGVProcedure.TabIndex = 12;
             // 
-            // BtnConfirm
+            // CBLeaveEmpty
             // 
-            this.BtnConfirm.Location = new System.Drawing.Point(0, 390);
-            this.BtnConfirm.Name = "BtnConfirm";
-            this.BtnConfirm.Size = new System.Drawing.Size(474, 32);
-            this.BtnConfirm.TabIndex = 15;
-            this.BtnConfirm.Text = "Bestätigen";
-            this.BtnConfirm.UseVisualStyleBackColor = true;
-            this.BtnConfirm.Click += new System.EventHandler(this.BtnConfirm_Click);
+            this.CBLeaveEmpty.AutoSize = true;
+            this.CBLeaveEmpty.Location = new System.Drawing.Point(332, 28);
+            this.CBLeaveEmpty.Name = "CBLeaveEmpty";
+            this.CBLeaveEmpty.Size = new System.Drawing.Size(201, 17);
+            this.CBLeaveEmpty.TabIndex = 16;
+            this.CBLeaveEmpty.Text = "Bei Nichtübereinstimmung leer lassen";
+            this.CBLeaveEmpty.UseVisualStyleBackColor = true;
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bestätigenToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(536, 24);
+            this.menuStrip1.TabIndex = 17;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // bestätigenToolStripMenuItem
+            // 
+            this.bestätigenToolStripMenuItem.Name = "bestätigenToolStripMenuItem";
+            this.bestätigenToolStripMenuItem.Size = new System.Drawing.Size(74, 20);
+            this.bestätigenToolStripMenuItem.Text = "Bestätigen";
+            this.bestätigenToolStripMenuItem.Click += new System.EventHandler(this.BtnConfirm_Click);
             // 
             // ProcedureForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(474, 420);
-            this.Controls.Add(this.BtnConfirm);
+            this.ClientSize = new System.Drawing.Size(536, 417);
+            this.Controls.Add(this.CBLeaveEmpty);
             this.Controls.Add(this.CbCheckWord);
             this.Controls.Add(this.cbCheckTotal);
             this.Controls.Add(this.DGVProcedure);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "ProcedureForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Suchen & Ersetzen";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ProcedureForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.DGVProcedure)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -102,6 +126,8 @@
         private System.Windows.Forms.CheckBox CbCheckWord;
         private System.Windows.Forms.CheckBox cbCheckTotal;
         private System.Windows.Forms.DataGridView DGVProcedure;
-        private System.Windows.Forms.Button BtnConfirm;
+        private System.Windows.Forms.CheckBox CBLeaveEmpty;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem bestätigenToolStripMenuItem;
     }
 }

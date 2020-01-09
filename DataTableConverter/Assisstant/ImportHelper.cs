@@ -515,7 +515,7 @@ namespace DataTableConverter.Assisstant
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
                     if (objSHT.AutoFilter != null)
                     {
-                        objSHT.AutoFilterMode = false;
+                        objSHT.AutoFilter.ShowAllData();
                     }
                     int rows = objSHT.UsedRange.Rows.Count;
                     int cols = objSHT.UsedRange.Columns.Count;
