@@ -215,13 +215,22 @@ namespace DataTableConverter.Extensions
             return result;
         }
 
-        internal static void SplitDataTable(this DataTable table, string path, Form1 mainForm, int fileEncoding, string columnName = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="path"></param>
+        /// <param name="mainForm"></param>
+        /// <param name="fileEncoding"></param>
+        /// <param name="columnName"></param>
+        /// <returns>Count of valid Rows</returns>
+        internal static int SplitDataTable(this DataTable table, string path, Form1 mainForm, int fileEncoding, string columnName = null)
         {
             DataTable table1 = new DataTable() { TableName = path.AppendFileName(Properties.Settings.Default.FailAddressText) };
             string invalidColumnName = columnName ?? Properties.Settings.Default.InvalidColumnName;
             if (!table.Columns.Contains(invalidColumnName))
             {
-                return;
+                return 0;
             }
             DataTable table2;
             foreach (DataColumn column in table.Columns)
@@ -272,6 +281,7 @@ namespace DataTableConverter.Extensions
                         break;
                 }
             }
+            return table2.Rows.Count;
         }
         internal static void RemoveNull(this DataTable table)
         {

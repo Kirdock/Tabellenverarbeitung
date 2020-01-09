@@ -513,6 +513,10 @@ namespace DataTableConverter.Assisstant
                 foreach (string sheetName in selectedSheets)
                 {
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
+                    if (objSHT.AutoFilter != null)
+                    {
+                        objSHT.AutoFilterMode = false;
+                    }
                     int rows = objSHT.UsedRange.Rows.Count;
                     int cols = objSHT.UsedRange.Columns.Count;
                     while (cols > 0 && objSHT.Cells[1, cols].Text == string.Empty)

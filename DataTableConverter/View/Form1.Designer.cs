@@ -51,6 +51,7 @@
             this.spaltenVergleichenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeilenZusammenfügenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.substringToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.suchenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textErsetzenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.trimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zählenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,8 +91,9 @@
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.suchenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.ValidRowsText = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ValidRowsLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -260,6 +262,14 @@
             this.substringToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.substringToolStripMenuItem.Text = "Substring";
             this.substringToolStripMenuItem.Click += new System.EventHandler(this.substringToolStripMenuItem_Click);
+            // 
+            // suchenToolStripMenuItem
+            // 
+            this.suchenToolStripMenuItem.Name = "suchenToolStripMenuItem";
+            this.suchenToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
+            this.suchenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.suchenToolStripMenuItem.Text = "Suchen";
+            this.suchenToolStripMenuItem.Click += new System.EventHandler(this.suchenToolStripMenuItem_Click);
             // 
             // textErsetzenToolStripMenuItem1
             // 
@@ -477,7 +487,9 @@
             this.lblFilename,
             this.toolStripStatusLabel3,
             this.lblRows,
-            this.StatusLabel});
+            this.StatusLabel,
+            this.ValidRowsText,
+            this.ValidRowsLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 426);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1056, 24);
@@ -543,14 +555,6 @@
             this.clipboardItem.Size = new System.Drawing.Size(209, 22);
             this.clipboardItem.Text = "Zwischenablage einfügen";
             // 
-            // suchenToolStripMenuItem
-            // 
-            this.suchenToolStripMenuItem.Name = "suchenToolStripMenuItem";
-            this.suchenToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.suchenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.suchenToolStripMenuItem.Text = "Suchen";
-            this.suchenToolStripMenuItem.Click += new System.EventHandler(this.suchenToolStripMenuItem_Click);
-            // 
             // dgTable
             // 
             this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -571,6 +575,21 @@
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
+            // 
+            // ValidRowsText
+            // 
+            this.ValidRowsText.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.ValidRowsText.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.ValidRowsText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.ValidRowsText.Name = "ValidRowsText";
+            this.ValidRowsText.Size = new System.Drawing.Size(109, 19);
+            this.ValidRowsText.Text = "Gültige Adressen:";
+            this.ValidRowsText.Visible = false;
+            // 
+            // ValidRowsLabel
+            // 
+            this.ValidRowsLabel.Name = "ValidRowsLabel";
+            this.ValidRowsLabel.Size = new System.Drawing.Size(0, 19);
             // 
             // Form1
             // 
@@ -661,6 +680,8 @@
         private System.Windows.Forms.ToolStripMenuItem prüfzifferToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem längsteZeileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem suchenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel ValidRowsText;
+        private System.Windows.Forms.ToolStripStatusLabel ValidRowsLabel;
     }
 }
 

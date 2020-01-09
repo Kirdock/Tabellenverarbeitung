@@ -149,7 +149,14 @@ namespace DataTableConverter.Classes.WorkProcs
                             newOrderIndices = newIndices;
                             if (Properties.Settings.Default.SplitPVM)
                             {
-                                table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
+                                int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
+                                if(count != 0)
+                                {
+                                    invokeForm.Invoke(new MethodInvoker(() =>
+                                    {
+                                        invokeForm.ValidRows = count;
+                                    }));
+                                }
                             }
                         }
                     }

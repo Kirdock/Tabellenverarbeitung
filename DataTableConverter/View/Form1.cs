@@ -41,6 +41,20 @@ namespace DataTableConverter
         private Dictionary<string, int> ColumnWidths;
         private readonly int ColumnWidthTolerance = 10;
         internal int FileEncoding = 0;
+        internal int ValidRows
+        {
+            get
+            {
+                int.TryParse(ValidRowsLabel.Text, out int result);
+                return result;
+            }
+
+            set
+            {
+                ValidRowsLabel.Text = value.ToString();
+                ValidRowsText.Visible = ValidRowsLabel.Visible = true;
+            }
+        }
 
         internal Form1(DataTable table = null)
         {
@@ -67,6 +81,14 @@ namespace DataTableConverter
             }
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
+        }
+
+        private void ResetValidRowLabel()
+        {
+            statusStrip1.Invoke(new MethodInvoker(() =>
+            {
+                ValidRowsLabel.Visible = ValidRowsText.Visible = false;
+            }));
         }
 
         private void SetMenuEnabled(bool status)
@@ -589,6 +611,7 @@ namespace DataTableConverter
                         break;
 
                     default:
+                        ResetValidRowLabel();
                         dgTable.BeginInvoke(new MethodInvoker(() => { AddDataSourceNewTable(table); }));
                         lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { SetRowCount(table.Rows.Count); }));
                         break;
@@ -640,7 +663,7 @@ namespace DataTableConverter
                 {
                     try {
                         sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, this, pgbLoading);
-
+                        int count = 0;
                         if (Properties.Settings.Default.SplitPVM)
                         {
                             string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
@@ -655,18 +678,26 @@ namespace DataTableConverter
                                 if (res == DialogResult.OK)
                                 {
                                     invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
-                                    sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
+                                    count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
                                 }
                             }
                             else
                             {
-                                sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
+                                count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
                             }
                         }
 
                         dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(sourceTable); }));
                         historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
+                        if (count != 0)
+                        {
+                            Console.WriteLine(count);
+                            Invoke(new MethodInvoker(() =>
+                            {
+                                ValidRows = count;
+                            }));
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -1593,7 +1624,9 @@ namespace DataTableConverter
 
                         newColumn = table.TryAddColumn(newColumn);
                         table.Rows[maxIndex][newColumn] = shortcut;
-                        AddDataSourceValueChange(table);
+                        dgTable.Invoke(new MethodInvoker(()=> {
+                            AddDataSourceValueChange(table);
+                        }));
                     }
 
                     SelectDataGridViewRow(maxIndex);
