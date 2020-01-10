@@ -22,11 +22,15 @@ namespace DataTableConverter.View
         internal bool TakeOver { get { return cbTakeOver.Checked; } }
         internal ImportSettings ImportSettings;
         private ViewHelper ViewHelper;
+        private List<string> Separators = new List<string>();
+        private readonly string MultiSeparatorText = "(Mehrfach)";
+        private readonly ContextMenuStrip GlobalContext;
 
         internal DataTable DataTable { get; set; }
         internal TextFormat(string path, bool multipleFiles, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
+            GlobalContext = ctxRow;
             ViewHelper = new ViewHelper(ctxRow, EndHeadersEdit, null);
             SetHeaderDataGridView();
             SetSize();
@@ -95,6 +99,10 @@ namespace DataTableConverter.View
             rbSeparated.Checked = Properties.Settings.Default.TextSeparated;
             rbFixed.Checked = !Properties.Settings.Default.TextSeparated;
             txtSeparator.Text = Properties.Settings.Default.Separator;
+            if(txtSeparator.Text.Length > 0)
+            {
+                Separators = new List<string> { txtSeparator.Text };
+            }
             txtBegin.Text = Properties.Settings.Default.TextBegin;
             txtEnd.Text = Properties.Settings.Default.TextEnd;
             cbTakeOver.Checked = Properties.Settings.Default.TakeOverAllFiles;
@@ -192,7 +200,10 @@ namespace DataTableConverter.View
         private void TextFormat_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.TextSeparated = rbSeparated.Checked;
-            Properties.Settings.Default.Separator = txtSeparator.Text;
+            if (txtSeparator.Text != MultiSeparatorText)
+            {
+                Properties.Settings.Default.Separator = txtSeparator.Text;
+            }
             Properties.Settings.Default.TabSelected = rbTab.Checked ? 0 : rbSep.Checked ? 1 : 2;
             Properties.Settings.Default.Encoding = (int)cmbEncoding.SelectedValue;
             Properties.Settings.Default.TextBegin = txtBegin.Text;
@@ -210,16 +221,16 @@ namespace DataTableConverter.View
 
         private void btnAcceptSeparate_Click(object sender, EventArgs e)
         {
-            string separator = null;
+            List<string> separator = null;
             object[] headers = GetHeaders();
             bool valid = false;
             if(rbSep.Checked && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
-                separator = txtSeparator.Text;
+                separator = txtSeparator.ReadOnly ? Separators : new List<string> { txtSeparator.Text };
             }
             else if (rbTab.Checked)
             {
-                separator = "\t";
+                separator = new List<string> { "\t" };
             }
             else if (rbBetween.Checked && checkBetweenText())
             {
@@ -255,7 +266,7 @@ namespace DataTableConverter.View
             // sync preview
             ViewHelper.EndDataGridViewEdit(dgvSetting);
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as EncodingInfo).CodePage, true, null, this);
+            dgvPreview.DataSource = ImportHelper.OpenTextFixed(path, values, headers, (cmbEncoding.SelectedItem as NewEncodingInfo).CodePage, true, null, this);
         }
 
         private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)
@@ -299,9 +310,9 @@ namespace DataTableConverter.View
 
         private void txtSeparator_TextChanged(object sender, EventArgs e)
         {
-            if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
+            if (!txtSeparator.ReadOnly && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
-                dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null, this);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, new List<string> { txtSeparator.Text }, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null, this);
             }
         }
 
@@ -495,15 +506,16 @@ namespace DataTableConverter.View
             dgvPreview.DataSource = null;
             if (txtSeparator.ReadOnly = txtBegin.ReadOnly = txtEnd.ReadOnly = rbTab.Checked)
             {
-                dgvPreview.DataSource = ImportHelper.OpenText(path, "\t", getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true, null, this);
+                dgvPreview.DataSource = ImportHelper.OpenText(path, new List<string> { "\t" }, getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true, null, this);
             }
             
             else if ((txtBegin.ReadOnly = txtEnd.ReadOnly = rbSep.Checked))
             {
-                txtSeparator.ReadOnly = false;
-                if (txtSeparator.Text != null && txtSeparator.Text.Length > 0)
+                bool multiSeparator = Separators.Count > 1;
+                txtSeparator.ReadOnly = multiSeparator;
+                if (multiSeparator || txtSeparator.Text != null && txtSeparator.Text.Length > 0)
                 {
-                    dgvPreview.DataSource = ImportHelper.OpenText(path, txtSeparator.Text, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null, this);
+                    dgvPreview.DataSource = ImportHelper.OpenText(path, multiSeparator ? Separators : new List<string> { txtSeparator.Text }, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null, this);
                 }
             }
             else if (txtSeparator.ReadOnly = rbBetween.Checked)
@@ -646,7 +658,7 @@ namespace DataTableConverter.View
                         ContainsHeaders = cbContainsHeaders.Checked,
                         BeginSeparator = txtBegin.Text,
                         EndSeparator = txtEnd.Text,
-                        StringSeparator = txtSeparator.Text,
+                        Separators = Separators.Count > 0 ? Separators : new List<string> { txtSeparator.Text },
                         SelectedSeparated = rbTab.Checked ? TextImportTemplate.SelectedSeparatedState.Tab : rbSep.Checked ? TextImportTemplate.SelectedSeparatedState.TabCharacter : TextImportTemplate.SelectedSeparatedState.Between
                     };
                     ExportHelper.SaveTextImportTemplate(template, path);
@@ -673,7 +685,9 @@ namespace DataTableConverter.View
 
                         txtBegin.Text = template.BeginSeparator;
                         txtEnd.Text = template.EndSeparator;
-                        txtSeparator.Text = template.StringSeparator;
+                        txtSeparator.ReadOnly = template.Separators.Count > 1;
+                        txtSeparator.Text = template.Separators.Count == 1 ? template.Separators.First() : template.separators.Count > 1 ? MultiSeparatorText : string.Empty;
+                        Separators = template.Separators;
                         dgvHeaders.DataSource = template.Table;
                         cbContainsHeaders.Checked = template.ContainsHeaders;
                         radioButton2_CheckedChanged(null, null);
@@ -752,6 +766,28 @@ namespace DataTableConverter.View
             }
             return isValid;
 
+        }
+
+        private void BtnEditSeparators_Click(object sender, EventArgs e)
+        {
+            if (rbSep.Checked)
+            {
+                SeparatorForm form = new SeparatorForm(Separators, GlobalContext);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    Separators = form.Separators;
+                    if((txtSeparator.ReadOnly = Separators.Count > 1))
+                    {
+                        txtSeparator.Text = MultiSeparatorText;
+                    }
+                    else if(Separators.Count == 1)
+                    {
+                        txtSeparator.Text = Separators.First();
+                    }
+                    dgvPreview.DataSource = ImportHelper.OpenText(path, Separators, getCodePage(), cbContainsHeaders.Checked, GetHeaders(), true, null, this);
+                }
+                form.Dispose();
+            }
         }
     }
 

@@ -14,7 +14,23 @@ namespace DataTableConverter.Classes
         public DataTable Table;
         public int Encoding;
         public bool ContainsHeaders;
-        public string StringSeparator;
+        public string StringSeparator; //deprecated but used for migration
+        public List<string> separators;
+        public List<string> Separators
+        {
+            get
+            {
+                if(separators == null)
+                {
+                    separators = StringSeparator != null ? new List<string> { StringSeparator } : new List<string>();
+                }
+                return separators;
+            }
+            set
+            {
+                separators = value;
+            }
+        }
         public string BeginSeparator;
         public string EndSeparator;
         public SelectedSeparatedState SelectedSeparated;

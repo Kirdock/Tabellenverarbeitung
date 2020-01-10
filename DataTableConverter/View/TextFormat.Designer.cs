@@ -69,6 +69,7 @@
             this.ctxRow = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.zeileLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zwischenablageEinfügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtnEditSeparators = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
@@ -152,6 +153,7 @@
             this.gbSeparated.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbSeparated.Controls.Add(this.BtnEditSeparators);
             this.gbSeparated.Controls.Add(this.btnHeaderRename);
             this.gbSeparated.Controls.Add(this.btnHeaderSave);
             this.gbSeparated.Controls.Add(this.btnHeaderDelete);
@@ -518,6 +520,16 @@
             this.zwischenablageEinfügenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.zwischenablageEinfügenToolStripMenuItem.Text = "Zwischenablage einfügen";
             // 
+            // BtnEditSeparators
+            // 
+            this.BtnEditSeparators.Location = new System.Drawing.Point(305, 58);
+            this.BtnEditSeparators.Name = "BtnEditSeparators";
+            this.BtnEditSeparators.Size = new System.Drawing.Size(25, 23);
+            this.BtnEditSeparators.TabIndex = 18;
+            this.BtnEditSeparators.Text = "+";
+            this.BtnEditSeparators.UseVisualStyleBackColor = true;
+            this.BtnEditSeparators.Click += new System.EventHandler(this.BtnEditSeparators_Click);
+            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -591,5 +603,6 @@
         private System.Windows.Forms.Button btnHeaderRename;
         private System.Windows.Forms.Button btnHeaderSave;
         private System.Windows.Forms.Button btnHeaderDelete;
+        private System.Windows.Forms.Button BtnEditSeparators;
     }
 }

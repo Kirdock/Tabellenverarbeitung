@@ -88,9 +88,9 @@ namespace DataTableConverter.Assisstant
                     {
                         table = OpenTextFixed(file, settings.Values, settings.Headers, settings.CodePage,false, progressBar, mainForm);
                     }
-                    else if (settings.Separator != null)
+                    else if (settings.Separators.Count > 0)
                     {
-                        table = OpenText(file, settings.Separator, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar, mainForm);
+                        table = OpenText(file, settings.Separators, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar, mainForm);
                     }
                     else
                     {
@@ -174,7 +174,7 @@ namespace DataTableConverter.Assisstant
             return presets.AsEnumerable().OrderBy(name => name.Key, new NaturalStringComparer(SortOrder.Ascending)).ThenBy(name => name.Val).ToArray();
         }
 
-        internal static DataTable OpenText(string path, string separator, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
+        internal static DataTable OpenText(string path, List<string> separators, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
             DataTable dt = new DataTable();
 
@@ -185,7 +185,7 @@ namespace DataTableConverter.Assisstant
                 {
                     skip = 1;
                     IEnumerable<string> list = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
-                    .SelectMany(x => x.Split(new string[] { separator }, StringSplitOptions.None))
+                    .SelectMany(x => x.Split(separators.ToArray(), StringSplitOptions.None))
                     .Select(ln => ln.Trim()).ToList();
 
                     foreach (string column in list)
@@ -204,11 +204,11 @@ namespace DataTableConverter.Assisstant
 
                 if (isPreview)
                 {
-                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separator, null, mainForm);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(4), dt, skip, separators, null, mainForm);
                 }
                 else
                 {
-                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separator, progressBar, mainForm);
+                    InsertTextIntoDataTable(File.ReadLines(path, Encoding.GetEncoding(codePage)), dt, skip, separators, progressBar, mainForm);
                 }
 
                 //File.ReadLines doesn't read all lines, it returns a IEnumerable, and lines are lazy evaluated,
@@ -226,10 +226,10 @@ namespace DataTableConverter.Assisstant
             return dt;
         }
 
-        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, string separator, ProgressBar progressBar, Form mainForm)
+        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, DataTable dt, int skip, List<string> separators, ProgressBar progressBar, Form mainForm)
         {
             IEnumerable<string[]> enumerableArray = enumerable.Skip(skip)
-                    .Select(x => x.Split(new string[] { separator }, StringSplitOptions.None));
+                    .Select(x => x.Split(separators.ToArray(), StringSplitOptions.None));
 
             progressBar?.StartLoadingBar(enumerableArray.Count(), mainForm);
             enumerableArray.ToList()
@@ -1044,12 +1044,12 @@ namespace DataTableConverter.Assisstant
                             break;
 
                         case TextImportTemplate.SelectedSeparatedState.Tab:
-                            setting = new ImportSettings("\t", template.Encoding, template.ContainsHeaders, template.Table.ColumnValues(0));
+                            setting = new ImportSettings(new List<string> { "\t" }, template.Encoding, template.ContainsHeaders, template.Table.ColumnValues(0));
                             break;
 
                         case TextImportTemplate.SelectedSeparatedState.TabCharacter:
                         default:
-                            setting = new ImportSettings(template.StringSeparator, template.Encoding, template.ContainsHeaders, template.Table.ColumnValues(0));
+                            setting = new ImportSettings(template.Separators, template.Encoding, template.ContainsHeaders, template.Table.ColumnValues(0));
                             break;
                     }
                 }
