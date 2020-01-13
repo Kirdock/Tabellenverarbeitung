@@ -185,8 +185,8 @@ namespace DataTableConverter
             DataTable table = sourceTable;
             if (table != null)
             {
-                EndEdit();
                 int rowCountBefore = table.Rows.Count;
+                EndEdit();
                 if (withSort)
                 {
                     table = GetDataView().ToTable();
@@ -294,7 +294,7 @@ namespace DataTableConverter
             historyHelper.AddHistory(new History { State = State.AddColumnsAndRows, ColumnIndex = columnIndex, RowIndex = rowIndex }, GetSorting());
         }
 
-        void AddDataSourceAddRow(int rowIndex, OrderType orderType = OrderType.Windows)
+        private void AddDataSourceAddRow(int rowIndex, OrderType orderType = OrderType.Windows)
         {
             historyHelper.AddHistory(new History { State = State.InsertRow, RowIndex = rowIndex, OrderType = orderType }, GetSorting());
         }
@@ -791,9 +791,9 @@ namespace DataTableConverter
                 if (columns.Length > 0)
                 {
                     ProcUser user = new ProcUser(columns, formula.HeaderName(), formula.OldColumn);
-                    DataTable newTable = GetDataSource();
 
-                    new Thread(() =>
+                    DataTable newTable = GetDataSource();
+                    Thread thread = new Thread(() =>
                     {
                         try
                         {
@@ -812,9 +812,12 @@ namespace DataTableConverter
                         {
                             ErrorHelper.LogMessage(ex, this);
                         }
-                    }).Start();
+                    });
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
                 }
             }
+            formula.Dispose();
         }
 
         private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp, out int[] newOrderIndices)
@@ -1063,11 +1066,15 @@ namespace DataTableConverter
         private void dgTable_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             tableValueBefore = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
-            rowBefore = e.RowIndex >= 0 && e.RowIndex < sourceTable.Rows.Count ? GetDataTableRowIndexOfDataGridView(e.RowIndex) : 0;
+            rowBefore = e.RowIndex >= 0 && e.RowIndex < sourceTable.Rows.Count ? GetDataTableRowIndexOfDataGridView(e.RowIndex) : e.RowIndex >= 0 ? e.RowIndex : 0;
         }
 
         private void dgTable_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
+            if(dgTable.Rows.Count-1 > sourceTable.Rows.Count)
+            {
+                AddDataSourceAddRow(sourceTable.Rows.Count, OrderType);
+            }
             SetRowCount();
         }
 

@@ -18,13 +18,14 @@ namespace DataTableConverter.Classes.WorkProcs
         public int End;
         public string ReplaceText;
         public bool ReplaceChecked; //I need it because ReplaceText can also be empty
+        public bool ReverseCheck;
 
         public ProcSubstring(int ordinal, int id, string name) : base(ordinal, id, name)
         {
             Start = 1;
         }
 
-        public ProcSubstring(string[] columns, string header, bool copyOldColumn, int start, int end, string replaceText, bool replaceChecked)
+        public ProcSubstring(string[] columns, string header, bool copyOldColumn, int start, int end, string replaceText, bool replaceChecked, bool reverseCheck)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
@@ -38,6 +39,7 @@ namespace DataTableConverter.Classes.WorkProcs
             End = end;
             ReplaceText = replaceText;
             ReplaceChecked = replaceChecked;
+            ReverseCheck = reverseCheck;
         }
 
         public override string[] GetHeaders()
@@ -73,7 +75,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
             string newColumn = newCol && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
-
+            Func<string, int, int, string> substring = ReverseCheck ? (Func<string, int, int, string>)SubstringReverse : Substring;
             if (!newCol || newColumn != null)
             {
                 if (!ReplaceChecked)
@@ -86,12 +88,12 @@ namespace DataTableConverter.Classes.WorkProcs
                             string col = newColumn ?? header;
                             if (End == 0)
                             {
-                                row[col] = Start > value.Length ? string.Empty : value.Substring(Start - 1);
+                                row[col] = Start > value.Length ? string.Empty : substring(value, Start-1, 0);
                             }
                             else
                             {
                                 int length = (End - Start);
-                                row[col] = Start > value.Length ? string.Empty : length + Start > value.Length ? value.Substring(Start - 1) : value.Substring(Start - 1, length + 1);
+                                row[col] = Start > value.Length ? string.Empty : length + Start > value.Length ? substring(value, Start-1,0) : substring(value,Start - 1, length + 1);
                             }
                         }
                     }
@@ -103,11 +105,11 @@ namespace DataTableConverter.Classes.WorkProcs
                         foreach (string header in columns)
                         {
                             string value = row[header].ToString();
-                            string result = Start > value.Length ? string.Empty : value.Substring(0, Start - 1) + ReplaceText;
+                            string result = Start > value.Length ? string.Empty : substring(value, 0, Start - 1) + ReplaceText;
 
                             if (End < value.Length && End != 0 && Start <= value.Length)
                             {
-                                result += value.Substring(End);
+                                result += substring(value,End,0);
                             }
 
                             row[newColumn ?? header] = result;
@@ -115,6 +117,16 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
                 }
             }
+        }
+
+        private string Substring(string value, int start, int end = 0)
+        {
+            return end == 0 ? value.Substring(start) : value.Substring(start, end);
+        }
+
+        private string SubstringReverse(string value, int start, int end = 0)
+        {
+            return end == 0 ? value.Substring(0, value.Length - start) : value.Substring(value.Length - end, end - start);
         }
 
     }

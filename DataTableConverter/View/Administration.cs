@@ -117,7 +117,7 @@ namespace DataTableConverter.View
                 { typeof(ProcPVMExport), SetPVMExportControls },
                 { typeof(ProcCount), SetCountControls },
                 { typeof(ProcSeparate), SetSeparateControls },
-                {typeof(ProcSearch), SetSearchControls }
+                { typeof(ProcSearch), SetSearchControls }
             };
         }
 
@@ -827,6 +827,7 @@ namespace DataTableConverter.View
             txtSubstringText.Text = proc.ReplaceText;
             txtSubstringText.Visible = cbSubstringText.Checked = proc.ReplaceChecked;
             cbSubstringOldColumn.Checked = proc.CopyOldColumn;
+            CBSubstringReverse.Checked = proc.ReverseCheck;
             SetDataSource(dgvSubstringColumns, proc.Columns);
         }
 
@@ -2419,6 +2420,11 @@ namespace DataTableConverter.View
             {
                 selectedProc.LeaveEmpty = CBLeaveEmpty.Checked;
             }
+        }
+
+        private void CBSubstringReverse_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSubstring).ReverseCheck = CBSubstringReverse.Checked;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

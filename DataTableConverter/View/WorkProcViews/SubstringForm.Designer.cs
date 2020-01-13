@@ -43,6 +43,7 @@
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.cbSubstringText = new System.Windows.Forms.CheckBox();
             this.txtSubstringText = new System.Windows.Forms.TextBox();
+            this.CBReverse = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nbEnd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbStart)).BeginInit();
             this.SuspendLayout();
@@ -194,11 +195,22 @@
             this.txtSubstringText.TabIndex = 38;
             this.txtSubstringText.Visible = false;
             // 
+            // CBReverse
+            // 
+            this.CBReverse.AutoSize = true;
+            this.CBReverse.Location = new System.Drawing.Point(222, 23);
+            this.CBReverse.Name = "CBReverse";
+            this.CBReverse.Size = new System.Drawing.Size(134, 17);
+            this.CBReverse.TabIndex = 39;
+            this.CBReverse.Text = "Von hinten nach vorne";
+            this.CBReverse.UseVisualStyleBackColor = true;
+            // 
             // SubstringForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(372, 260);
+            this.Controls.Add(this.CBReverse);
             this.Controls.Add(this.txtSubstringText);
             this.Controls.Add(this.cbSubstringText);
             this.Controls.Add(this.nbEnd);
@@ -239,5 +251,6 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.CheckBox cbSubstringText;
         private System.Windows.Forms.TextBox txtSubstringText;
+        private System.Windows.Forms.CheckBox CBReverse;
     }
 }

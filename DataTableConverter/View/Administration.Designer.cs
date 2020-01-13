@@ -258,6 +258,7 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
+            this.CBSubstringReverse = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -614,6 +615,7 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.GbSearch);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
@@ -630,7 +632,6 @@
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbUpLowCase);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbNumber);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbReplaceWhole);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMain);
             this.splitWorkflowProcProperties.Size = new System.Drawing.Size(845, 735);
             this.splitWorkflowProcProperties.SplitterDistance = 596;
@@ -2602,6 +2603,7 @@
             // 
             // gbSubstring
             // 
+            this.gbSubstring.Controls.Add(this.CBSubstringReverse);
             this.gbSubstring.Controls.Add(this.txtSubstringText);
             this.gbSubstring.Controls.Add(this.cbSubstringText);
             this.gbSubstring.Controls.Add(this.nbSubstringEnd);
@@ -2629,7 +2631,7 @@
             // 
             this.txtSubstringText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSubstringText.Location = new System.Drawing.Point(7, 81);
+            this.txtSubstringText.Location = new System.Drawing.Point(6, 96);
             this.txtSubstringText.Name = "txtSubstringText";
             this.txtSubstringText.Size = new System.Drawing.Size(232, 20);
             this.txtSubstringText.TabIndex = 26;
@@ -2639,7 +2641,7 @@
             // cbSubstringText
             // 
             this.cbSubstringText.AutoSize = true;
-            this.cbSubstringText.Location = new System.Drawing.Point(7, 60);
+            this.cbSubstringText.Location = new System.Drawing.Point(6, 75);
             this.cbSubstringText.Name = "cbSubstringText";
             this.cbSubstringText.Size = new System.Drawing.Size(229, 17);
             this.cbSubstringText.TabIndex = 25;
@@ -3181,6 +3183,17 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
+            // CBSubstringReverse
+            // 
+            this.CBSubstringReverse.AutoSize = true;
+            this.CBSubstringReverse.Location = new System.Drawing.Point(5, 51);
+            this.CBSubstringReverse.Name = "CBSubstringReverse";
+            this.CBSubstringReverse.Size = new System.Drawing.Size(134, 17);
+            this.CBSubstringReverse.TabIndex = 40;
+            this.CBSubstringReverse.Text = "Von hinten nach vorne";
+            this.CBSubstringReverse.UseVisualStyleBackColor = true;
+            this.CBSubstringReverse.CheckedChanged += new System.EventHandler(this.CBSubstringReverse_CheckedChanged);
+            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -3535,5 +3548,6 @@
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.GroupBox GBSearchFromTo;
         private System.Windows.Forms.CheckBox CBLeaveEmpty;
+        private System.Windows.Forms.CheckBox CBSubstringReverse;
     }
 }

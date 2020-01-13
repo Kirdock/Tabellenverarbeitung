@@ -15,13 +15,12 @@ namespace DataTableConverter.View
 {
     public partial class TextFormat : Form
     {
-        private string path;
+        private readonly string path;
         private EventHandler ctxRowDeleteRowHandler;
         private EventHandler ctxRowClipboard;
-        private bool MultipleFiles;
         internal bool TakeOver { get { return cbTakeOver.Checked; } }
         internal ImportSettings ImportSettings;
-        private ViewHelper ViewHelper;
+        private readonly ViewHelper ViewHelper;
         private List<string> Separators = new List<string>();
         private readonly string MultiSeparatorText = "(Mehrfach)";
         private readonly ContextMenuStrip GlobalContext;
@@ -36,7 +35,6 @@ namespace DataTableConverter.View
             SetSize();
             this.path = path;
             ViewHelper.SetEncodingCmb(cmbEncoding);
-            MultipleFiles = multipleFiles;
             cbTakeOver.Visible = multipleFiles;
             SetDataGridViewStyle();
         }
@@ -545,7 +543,7 @@ namespace DataTableConverter.View
                     zwischenablageEinfügenToolStripMenuItem.Click -= ctxRowClipboard;
                 }
 
-                zwischenablageEinfügenToolStripMenuItem.Click += ctxRowClipboard = (sender2, e2) => zwischenablageEinfügenToolStripMenuItem_Click(sender, e2, selectedRow);
+                zwischenablageEinfügenToolStripMenuItem.Click += ctxRowClipboard = (sender2, e2) => zwischenablageEinfügenToolStripMenuItem_Click(sender, selectedRow);
 
                 if (zeileLöschenToolStripMenuItem.Visible = (selectedRow > -1 && selectedRow != sender.Rows.Count - 1))
                 {
@@ -556,13 +554,13 @@ namespace DataTableConverter.View
                     List<int> selectedRows = ViewHelper.SelectedRows(sender);
 
                     zeileLöschenToolStripMenuItem.Text = (selectedRows.Count > 1) ? "Zeilen löschen" : "Zeile löschen";
-                    zeileLöschenToolStripMenuItem.Click += ctxRowDeleteRowHandler = (sender2, e2) => zeileLöschenToolStripMenuItem_Click(sender2, e2, sender, selectedRows);
+                    zeileLöschenToolStripMenuItem.Click += ctxRowDeleteRowHandler = (sender2, e2) => zeileLöschenToolStripMenuItem_Click(sender, selectedRows);
                 }
                 ctxRow.Show(sender, new Point(e.X, e.Y));
             }
         }
 
-        private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e, DataGridView dgView, List<int> rowIndizes)
+        private void zeileLöschenToolStripMenuItem_Click(DataGridView dgView, List<int> rowIndizes)
         {
             for (int i = rowIndizes.Count - 1; i >= 0; i--)
             {
@@ -571,7 +569,7 @@ namespace DataTableConverter.View
             dgvSetting_CellValueChanged(null, null);
         }
 
-        private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, EventArgs e, int selectedRow)
+        private void zwischenablageEinfügenToolStripMenuItem_Click(object sender, int selectedRow)
         {
             ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, this, dgvSetting_CellValidating, dgvSetting_CellValueChanged);
         }
@@ -595,8 +593,7 @@ namespace DataTableConverter.View
 
         private void BtnRenamePreset_Click(object sender, EventArgs e)
         {
-            int index;
-            if ((index = cmbPresets.SelectedIndex) != -1)
+            if (cmbPresets.SelectedIndex != -1)
             {
                 string oldName = cmbPresets.SelectedItem.ToString();
                 string newName = Microsoft.VisualBasic.Interaction.InputBox("Bitte Vorlagenname eingeben", "Vorlage umbenennen", oldName);
@@ -719,8 +716,7 @@ namespace DataTableConverter.View
 
         private void btnHeaderRename_Click(object sender, EventArgs e)
         {
-            int index;
-            if ((index = cmbHeaderPresets.SelectedIndex) != -1)
+            if (cmbHeaderPresets.SelectedIndex != -1)
             {
                 string oldName = cmbHeaderPresets.SelectedItem.ToString();
                 string newName = Microsoft.VisualBasic.Interaction.InputBox("Bitte Vorlagenname eingeben", "Vorlage umbenennen", oldName);

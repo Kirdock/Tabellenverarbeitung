@@ -38,7 +38,7 @@ namespace DataTableConverter.View.WorkProcViews
             }
             else
             {
-                Procedure = new ProcSubstring(cbHeaders.CheckedItems.Cast<string>().ToArray(), txtNewColumn.Text, cbOldColumn.Checked, (int)nbStart.Value, (int)nbEnd.Value, txtSubstringText.Text, cbSubstringText.Checked);
+                Procedure = new ProcSubstring(cbHeaders.CheckedItems.Cast<string>().ToArray(), txtNewColumn.Text, cbOldColumn.Checked, (int)nbStart.Value, (int)nbEnd.Value, txtSubstringText.Text, cbSubstringText.Checked, CBReverse.Checked);
                 DialogResult = DialogResult.OK;
             }
         }
