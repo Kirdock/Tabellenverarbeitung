@@ -522,6 +522,8 @@ namespace DataTableConverter.View
                 txtName.Text = selectedProc.Name;
                 SetDataSource(dgvReplaces, selectedProc.Replace);
                 cbCheckTotal.Checked = selectedProc.CheckTotal;
+                CBLeaveEmpty.Checked = selectedProc.LeaveEmpty;
+                CbProcWordCheck.Checked = selectedProc.CheckWord;
                 SetProcedureLock(selectedProc);
             }
         }
