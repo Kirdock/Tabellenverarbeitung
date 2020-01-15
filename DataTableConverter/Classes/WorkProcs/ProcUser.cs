@@ -77,39 +77,32 @@ namespace DataTableConverter.Classes.WorkProcs
                     {
                         string index = newColumn ?? column;
                         string value = row[column].ToString();
+                        string result = value;
 
                         if (procedure.CheckTotal)
                         {
-                            string defaultValue = procedure.LeaveEmpty ? string.Empty : value;
                             DataRow foundRows = replaces.FirstOrDefault(replace => replace[0].ToString() == value);
                             if (foundRows != null)
                             {
-                                row[index] = foundRows[1];
-                            }
-                            else
-                            {
-                                row[index] = defaultValue;
+                                result = foundRows[1].ToString();
                             }
                         }
                         else if (procedure.CheckWord)
                         {
-                            string result = value;
                             foreach (DataRow rep in replaceWithoutEmpty)
                             {
-                                string pattern = @"\b" + Regex.Escape(rep[0].ToString()) + @"\b";
+                                string pattern = @"(?<=^|[\s>])" + Regex.Escape(rep[0].ToString()) + @"(?!\w)";
                                 result = Regex.Replace(result, pattern, rep[1].ToString());
                             }
-                            row[index] = procedure.LeaveEmpty && result == value ? string.Empty : result;
                         }
                         else
                         {
-                            string result = value;
                             foreach (DataRow rep in replaceWithoutEmpty)
                             {
                                 result = result.Replace(rep[0].ToString(), rep[1].ToString());
                             }
-                            row[index] = procedure.LeaveEmpty && result == value ? string.Empty : result;
                         }
+                        row[index] = procedure.LeaveEmpty && result == value ? string.Empty : ProcTrim.Trim(result);
                     }
                 }
             }

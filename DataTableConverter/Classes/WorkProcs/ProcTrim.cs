@@ -97,6 +97,18 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
+        /// <summary>
+        /// trims leading and ending spaces including double appearences
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="character"></param>
+        /// <returns></returns>
+        internal static string Trim(string value)
+        {
+            Regex regex = new Regex("[ ]{2,}", RegexOptions.None);
+            return regex.Replace(value.Trim(), " ");
+        }
+
         private string GetTrimmed(string text, char[] charArray)
         {
             string result;
