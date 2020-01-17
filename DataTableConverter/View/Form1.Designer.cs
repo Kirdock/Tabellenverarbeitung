@@ -87,13 +87,13 @@
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblRows = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ValidRowsText = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ValidRowsLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.ValidRowsText = new System.Windows.Forms.ToolStripStatusLabel();
-            this.ValidRowsLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -528,6 +528,21 @@
             this.StatusLabel.Name = "StatusLabel";
             this.StatusLabel.Size = new System.Drawing.Size(0, 19);
             // 
+            // ValidRowsText
+            // 
+            this.ValidRowsText.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.ValidRowsText.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.ValidRowsText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.ValidRowsText.Name = "ValidRowsText";
+            this.ValidRowsText.Size = new System.Drawing.Size(109, 19);
+            this.ValidRowsText.Text = "Gültige Adressen:";
+            this.ValidRowsText.Visible = false;
+            // 
+            // ValidRowsLabel
+            // 
+            this.ValidRowsLabel.Name = "ValidRowsLabel";
+            this.ValidRowsLabel.Size = new System.Drawing.Size(0, 19);
+            // 
             // contextGlobal
             // 
             this.contextGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -576,23 +591,9 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
-            // ValidRowsText
-            // 
-            this.ValidRowsText.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-            this.ValidRowsText.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-            this.ValidRowsText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.ValidRowsText.Name = "ValidRowsText";
-            this.ValidRowsText.Size = new System.Drawing.Size(109, 19);
-            this.ValidRowsText.Text = "Gültige Adressen:";
-            this.ValidRowsText.Visible = false;
-            // 
-            // ValidRowsLabel
-            // 
-            this.ValidRowsLabel.Name = "ValidRowsLabel";
-            this.ValidRowsLabel.Size = new System.Drawing.Size(0, 19);
-            // 
             // Form1
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1056, 450);
@@ -605,6 +606,8 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Konvertierung";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ctxBody.ResumeLayout(false);

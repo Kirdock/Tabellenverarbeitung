@@ -2,6 +2,7 @@
 using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
+using DataTableConverter.Extensions;
 using DataTableConverter.View.WorkProcViews;
 using System;
 using System.Collections.Generic;
@@ -197,7 +198,8 @@ namespace DataTableConverter.View
                 dgvSubstringColumns,
                 dgvReplaceWhole,
                 dgvPVMExport,
-                DgvSeparate
+                DgvSeparate,
+                DGVTrimColumns
             };
 
             DataGridView[] dataGridViews = new DataGridView[]
@@ -227,7 +229,8 @@ namespace DataTableConverter.View
                 clbUpLowHeader,
                 cbSubstringHeaders,
                 cbHeadersReplaceWhole,
-                cbHeadersPVMExport
+                cbHeadersPVMExport,
+                CLBTrimHeaders
             };
             foreach (CheckedComboBox checkedComboBox in checkedComboBoxes)
             {
@@ -905,6 +908,10 @@ namespace DataTableConverter.View
                     break;
             }
             CbTrimDeleteDouble.Checked = proc.DeleteDouble;
+            CBTrimAllColumns.Checked = proc.AllColumns;
+            SetDataSource(DGVTrimColumns, proc.Columns);
+            SetHeaderTrim(proc.Columns.ColumnValuesAsString(0));
+
         }
 
         private void SetUserControls(WorkProc selectedProc)
@@ -913,7 +920,7 @@ namespace DataTableConverter.View
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             SetDataSource(dgvColumns, selectedProc.Columns);
 
-            SetHeaderProcedure(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderProcedure(selectedProc.Columns.ColumnValuesAsString(0));
         }
 
         private void SetRoundControls(WorkProc selectedProc)
@@ -1160,6 +1167,11 @@ namespace DataTableConverter.View
         private void SetHeaderRound(string[] headers)
         {
             SetChecked(clbHeadersRound, headers, clbHeadersRound_ItemCheck);
+        }
+
+        private void SetHeaderTrim(string[] headers)
+        {
+            SetChecked(CLBTrimHeaders, headers, CLBTrimHeaders_ItemCheck);
         }
 
         private void SetHeaderUpLowCase(string[] headers)
@@ -2427,6 +2439,17 @@ namespace DataTableConverter.View
         private void CBSubstringReverse_CheckedChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSubstring).ReverseCheck = CBSubstringReverse.Checked;
+        }
+
+        private void CBTrimAllColumns_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcTrim).AllColumns = CBTrimAllColumns.Checked;
+            CLBTrimHeaders.Enabled = DGVTrimColumns.Enabled = !CBTrimAllColumns.Checked;
+        }
+
+        private void CLBTrimHeaders_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(DGVTrimColumns, e, (CheckedListBox)sender);
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

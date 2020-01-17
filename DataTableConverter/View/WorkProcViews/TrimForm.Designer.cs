@@ -36,6 +36,11 @@
             this.lblTrimCharacter = new System.Windows.Forms.Label();
             this.TxtTrimText = new System.Windows.Forms.TextBox();
             this.BtnConfirm = new System.Windows.Forms.Button();
+            this.CCBHeaders = new CheckComboBoxTest.CheckedComboBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.BtnCheckAll = new System.Windows.Forms.Button();
+            this.BtnUncheckAll = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label10
@@ -112,19 +117,77 @@
             // 
             // BtnConfirm
             // 
-            this.BtnConfirm.Location = new System.Drawing.Point(106, 272);
+            this.BtnConfirm.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnConfirm.Location = new System.Drawing.Point(-1, 363);
             this.BtnConfirm.Name = "BtnConfirm";
-            this.BtnConfirm.Size = new System.Drawing.Size(75, 23);
+            this.BtnConfirm.Size = new System.Drawing.Size(299, 33);
             this.BtnConfirm.TabIndex = 22;
             this.BtnConfirm.Text = "Bestätigen";
             this.BtnConfirm.UseVisualStyleBackColor = true;
             this.BtnConfirm.Click += new System.EventHandler(this.BtnConfirm_Click);
             // 
+            // CCBHeaders
+            // 
+            this.CCBHeaders.CheckOnClick = true;
+            this.CCBHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.CCBHeaders.DropDownHeight = 1;
+            this.CCBHeaders.FormattingEnabled = true;
+            this.CCBHeaders.IntegralHeight = false;
+            this.CCBHeaders.Location = new System.Drawing.Point(12, 284);
+            this.CCBHeaders.Name = "CCBHeaders";
+            this.CCBHeaders.Size = new System.Drawing.Size(265, 21);
+            this.CCBHeaders.TabIndex = 24;
+            this.CCBHeaders.ValueSeparator = ", ";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(205, 151);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 25;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 268);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(109, 13);
+            this.label1.TabIndex = 26;
+            this.label1.Text = "Angewandte Spalten:";
+            // 
+            // BtnCheckAll
+            // 
+            this.BtnCheckAll.Location = new System.Drawing.Point(12, 311);
+            this.BtnCheckAll.Name = "BtnCheckAll";
+            this.BtnCheckAll.Size = new System.Drawing.Size(109, 23);
+            this.BtnCheckAll.TabIndex = 27;
+            this.BtnCheckAll.Text = "Alle auswählen";
+            this.BtnCheckAll.UseVisualStyleBackColor = true;
+            this.BtnCheckAll.Click += new System.EventHandler(this.BtnCheckAll_Click);
+            // 
+            // BtnUncheckAll
+            // 
+            this.BtnUncheckAll.Location = new System.Drawing.Point(168, 311);
+            this.BtnUncheckAll.Name = "BtnUncheckAll";
+            this.BtnUncheckAll.Size = new System.Drawing.Size(109, 23);
+            this.BtnUncheckAll.TabIndex = 28;
+            this.BtnUncheckAll.Text = "Alle abwählen";
+            this.BtnUncheckAll.UseVisualStyleBackColor = true;
+            this.BtnUncheckAll.Click += new System.EventHandler(this.BtnUncheckAll_Click);
+            // 
             // TrimForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(297, 319);
+            this.ClientSize = new System.Drawing.Size(297, 396);
+            this.Controls.Add(this.BtnUncheckAll);
+            this.Controls.Add(this.BtnCheckAll);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.CCBHeaders);
             this.Controls.Add(this.BtnConfirm);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.CbTrimDeleteDouble);
@@ -152,5 +215,10 @@
         private System.Windows.Forms.Label lblTrimCharacter;
         private System.Windows.Forms.TextBox TxtTrimText;
         private System.Windows.Forms.Button BtnConfirm;
+        private CheckComboBoxTest.CheckedComboBox CCBHeaders;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button BtnCheckAll;
+        private System.Windows.Forms.Button BtnUncheckAll;
     }
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DataTableConverter.Extensions;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
@@ -16,6 +17,8 @@ namespace DataTableConverter.Classes.WorkProcs
         internal static readonly string ClassName = "Trim";
         public string Characters;
         public bool DeleteDouble;
+        public bool AllColumns = true;
+
         public enum TrimType { Start, End, Both};
         public TrimType Type;
 
@@ -35,26 +38,45 @@ namespace DataTableConverter.Classes.WorkProcs
             DeleteDouble = true;
         }
 
-        public ProcTrim(string characters, TrimType type, bool deleteDouoble)
+        public ProcTrim(string characters, TrimType type, bool deleteDouble, bool allColumns, string[] columns)
         {
             Characters = characters;
             Type = type;
-            DeleteDouble = deleteDouoble;
+            DeleteDouble = deleteDouble;
+            AllColumns = allColumns;
+            Columns = new DataTable { TableName = "Columnnames" };
+            Columns.Columns.Add("Spalten", typeof(string));
+            foreach (string col in columns)
+            {
+                Columns.Rows.Add(col);
+            }
         }
 
         public override string[] GetHeaders()
         {
-            return new string[0];
+            return AllColumns ? new string[0] : WorkflowHelper.RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
         }
 
         public override void renameHeaders(string oldName, string newName)
         {
-            return;
+            if (!AllColumns)
+            {
+                foreach (DataRow row in Columns.Rows)
+                {
+                    if (row.ItemArray[0].ToString() == oldName)
+                    {
+                        row.SetField(0, newName);
+                    }
+                }
+            }
         }
 
         public override void removeHeader(string colName)
         {
-            return;
+            if (!AllColumns)
+            {
+                Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
+            }
         }
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
@@ -65,6 +87,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 Characters += (char)160;
             }
             char[] charArray = Characters.ToCharArray();
+            string[] columns = AllColumns ? table.HeadersOfDataTableAsString() : GetHeaders();
 
             if (DeleteDouble)
             {
@@ -73,9 +96,9 @@ namespace DataTableConverter.Classes.WorkProcs
                     foreach (char c in charArray)
                     {
                         Regex regex = new Regex("[" + c + "]{2,}", RegexOptions.None);
-                        for (int i = 0; i < row.ItemArray.Length; i++)
+                        foreach (string col in columns)
                         {
-                            row[i] = regex.Replace(GetTrimmed(row[i].ToString(), charArray), c.ToString());
+                            row[col] = regex.Replace(GetTrimmed(row[col].ToString(), charArray), c.ToString());
                         }
                     }
                 }
@@ -84,9 +107,9 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 foreach (DataRow row in table.Rows)
                 {
-                    for (int i = 0; i < row.ItemArray.Length; i++)
+                    foreach (string col in columns)
                     {
-                        row[i] = GetTrimmed(row[i].ToString(), charArray);
+                        row[col] = GetTrimmed(row[col].ToString(), charArray);
                     }
                 }
             }

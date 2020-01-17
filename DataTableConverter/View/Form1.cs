@@ -29,7 +29,7 @@ namespace DataTableConverter
         private List<Work> workflows;
         private List<Tolerance> tolerances;
         private List<Case> cases;
-        private HistoryHelper historyHelper;
+        private readonly HistoryHelper historyHelper;
         private string tableValueBefore;
         private DataTable sourceTable;
         private string SortingOrder;
@@ -38,7 +38,7 @@ namespace DataTableConverter
         private List<string> dictKeys;
         private string FilePath = string.Empty;
         private OrderType OrderType = OrderType.Windows;
-        private Dictionary<string, int> ColumnWidths;
+        private readonly Dictionary<string, int> ColumnWidths;
         private readonly int ColumnWidthTolerance = 10;
         internal int FileEncoding = 0;
         internal int ValidRows
@@ -56,7 +56,7 @@ namespace DataTableConverter
             }
         }
 
-        internal Form1(DataTable table = null)
+        internal Form1(DataTable table = null, string path = null)
         {
             dictSorting = new Dictionary<string, SortOrder>();
             ColumnWidths = new Dictionary<string, int>();
@@ -70,7 +70,7 @@ namespace DataTableConverter
             LoadCases();
             SetMenuEnabled(false);
             historyHelper = new HistoryHelper();
-            öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click(sender, e);
+            öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click();
             trimToolStripMenuItem.Click += (sender, e) => trimToolStripMenuItem_Click(sender, e);
             cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click(sender, e);
             dBASEToolStripMenuItem1.Click += (sender, e) => dBASEToolStripMenuItem_Click(sender, e);
@@ -81,6 +81,10 @@ namespace DataTableConverter
             }
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
+            if(path != null)
+            {
+                importToolStripMenuItem_Click(ImportState.None, new string[] { path });
+            }
         }
 
         private void ResetValidRowLabel()
@@ -358,7 +362,7 @@ namespace DataTableConverter
             {
                 int index = i;
                 ToolStripMenuItem item = new ToolStripMenuItem(workflowsCopy[i].Name);
-                item.Click += (sender, e) => workflow_Click(sender, e, workflowsCopy[index]);
+                item.Click += (sender, e) => workflow_Click(workflowsCopy[index]);
                 arbeitsablaufToolStripMenuItem.DropDownItems.Add(item);
             }
         }
@@ -386,12 +390,12 @@ namespace DataTableConverter
             {
                 int index = i;
                 ToolStripMenuItem item = new ToolStripMenuItem(cases[i].Name);
-                item.Click += (sender, e) => case_Click(sender, e, cases[index], null, GetDataSource());
+                item.Click += (sender, e) => case_Click(cases[index]);
                 duplikateToolStripMenuItem.DropDownItems.Add(item);
             }
         }
 
-        private void case_Click(object sender, EventArgs e, Case cas, string[] caseColumnsWorkflow, DataTable originalTable)
+        private void case_Click(Case cas)
         {
             ProcDuplicate procDuplicate = new ProcDuplicate(0, cas.Id, cas.Name)
             {
@@ -400,7 +404,7 @@ namespace DataTableConverter
             StartSingleWorkflow(procDuplicate);
         }
 
-        private void workflow_Click(object sender, EventArgs e, Work workflow, Action finished = null)
+        private void workflow_Click(Work workflow, Action finished = null)
         {
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
             DataTable table = GetDataSource();
@@ -468,6 +472,7 @@ namespace DataTableConverter
                     }
                     ReplaceThroughTemp(workflow.Procedures, finished);
                 }
+                form.Dispose();
             }
         }
 
@@ -516,15 +521,15 @@ namespace DataTableConverter
             return procedures.FindIndex(p => p.Id == id);
         }
 
-        private void importToolStripMenuItem_Click(object sender, EventArgs e, ImportState state = ImportState.None)
+        private void importToolStripMenuItem_Click(ImportState state = ImportState.None, string[] openFiles = null)
         {
             OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state == ImportState.None || state == ImportState.Append);
             DataTable oldTable = GetDataSource();
             string mergePath = string.Empty;
             bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
-            if (validMerge || dialog.ShowDialog(this) == DialogResult.OK)
+            if (openFiles != null || validMerge || dialog.ShowDialog(this) == DialogResult.OK)
             {
-                string[] filenames = validMerge ? new string[1] {mergePath} : dialog.FileNames;
+                string[] filenames = openFiles ?? (validMerge ? new string[1] { mergePath } : dialog.FileNames);
                 ProgressBar loadingBar = pgbLoading;
                 Thread thread = new Thread(() =>
                 {
@@ -742,7 +747,7 @@ namespace DataTableConverter
         {
             if (dgTable.DataSource != null)
             {
-                TrimForm form = new TrimForm();
+                TrimForm form = new TrimForm(sourceTable.HeadersOfDataTableAsString());
                 if(form.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
@@ -767,6 +772,7 @@ namespace DataTableConverter
                         StopLoadingBar();
                     }).Start();
                 }
+                form.Dispose();
             }
         }
 
@@ -1080,7 +1086,7 @@ namespace DataTableConverter
 
         private void tabellenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            importToolStripMenuItem_Click(null, null, ImportState.Merge);
+            importToolStripMenuItem_Click(ImportState.Merge);
         }
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1294,7 +1300,7 @@ namespace DataTableConverter
 
         private void tabelleHinzufügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            importToolStripMenuItem_Click(null, null, ImportState.Append);
+            importToolStripMenuItem_Click(ImportState.Append);
         }
 
         private void MergeTables(DataTable table, string filename)
@@ -1316,7 +1322,7 @@ namespace DataTableConverter
 
         private void überschriftenEinlesenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            importToolStripMenuItem_Click(null, null, ImportState.Header);
+            importToolStripMenuItem_Click(ImportState.Header);
         }
 
         private void dgTable_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
@@ -1455,7 +1461,7 @@ namespace DataTableConverter
 
         private void StartSingleWorkflow(WorkProc proc, Action finished = null)
         {
-            workflow_Click(null, null, new Work(string.Empty, new List<WorkProc> { GetCopyOfWorkProc(proc) }, 0), finished);
+            workflow_Click(new Work(string.Empty, new List<WorkProc> { GetCopyOfWorkProc(proc) }, 0), finished);
         }
 
         private WorkProc GetCopyOfWorkProc(WorkProc proc)
@@ -1721,6 +1727,19 @@ namespace DataTableConverter
             bool searchPartial(string value, string search)
             {
                 return value.Contains(search);
+            }
+        }
+
+        private void Form1_DragDrop(object sender, DragEventArgs e)
+        {
+            importToolStripMenuItem_Click(ImportState.None,(string[])e.Data.GetData(DataFormats.FileDrop));
+        }
+
+        private void Form1_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
             }
         }
 

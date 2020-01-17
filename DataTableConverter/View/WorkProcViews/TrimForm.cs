@@ -14,9 +14,10 @@ namespace DataTableConverter.View.WorkProcViews
     public partial class TrimForm : Form
     {
         internal ProcTrim Proc;
-        public TrimForm()
+        internal TrimForm(string[] headers)
         {
             InitializeComponent();
+            CCBHeaders.Items.AddRange(headers);
         }
 
         private void BtnConfirm_Click(object sender, EventArgs e)
@@ -28,9 +29,25 @@ namespace DataTableConverter.View.WorkProcViews
             else
             {
                 ProcTrim.TrimType type = RbTrimStart.Checked ? ProcTrim.TrimType.Start : RbTrimEnd.Checked ? ProcTrim.TrimType.End : ProcTrim.TrimType.Both;
-                Proc = new ProcTrim(TxtTrimText.Text, type, CbTrimDeleteDouble.Checked);
+                string[] checkedHeaders = GetSelectedHeaders();
+                Proc = new ProcTrim(TxtTrimText.Text, type, CbTrimDeleteDouble.Checked, checkedHeaders.Length == 0, checkedHeaders);
                 DialogResult = DialogResult.OK;
             }
+        }
+
+        internal string[] GetSelectedHeaders()
+        {
+            return ViewHelper.GetSelectedHeaders(CCBHeaders);
+        }
+
+        private void BtnCheckAll_Click(object sender, EventArgs e)
+        {
+            ViewHelper.CheckAllItemsOfCheckedCombobox(CCBHeaders, true);
+        }
+
+        private void BtnUncheckAll_Click(object sender, EventArgs e)
+        {
+            ViewHelper.CheckAllItemsOfCheckedCombobox(CCBHeaders, false);
         }
     }
 }
