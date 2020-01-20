@@ -40,6 +40,7 @@ namespace DataTableConverter
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
         internal static readonly int DbaseMaxFileLength = 8;
+        private static readonly int DbaseMaxHeaderLength = 10;
         private static readonly int DbaseMaxCharacterLength = 254;
         private static readonly int DbaseMaxRecordCharacterLength = 3999;
         private static readonly string FontFileName = "seguisym.ttf";
@@ -326,6 +327,27 @@ namespace DataTableConverter
         internal static bool ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Form mainForm, Action updateLoadingBar = null)
         {
             bool saved = false;
+
+            string headerBefore = string.Empty;
+            string adjustedHeaderBefore = string.Empty;
+            List<string> duplicates = new List<string>();
+            foreach(string header in dataTable.HeadersOfDataTableAsString().OrderBy(header => header))
+            {
+                string adjustedHeader = header.Length > DbaseMaxHeaderLength ? header.Substring(0, DbaseMaxHeaderLength) : header;
+                if (adjustedHeader == adjustedHeaderBefore)
+                {
+                    duplicates.Add($"\"{headerBefore}\" und \"{header}\"");
+                }
+                headerBefore = header;
+                adjustedHeaderBefore = adjustedHeader;
+            }
+
+            if(duplicates.Count > 0)
+            {
+                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE, gibt es Duplikate: \n"+string.Join(" ,\n",duplicates));
+                return saved;
+            }
+            
             string fileName = originalFileName.ToUpper();
             if (fileName.Length > DbaseMaxFileLength)
             {
