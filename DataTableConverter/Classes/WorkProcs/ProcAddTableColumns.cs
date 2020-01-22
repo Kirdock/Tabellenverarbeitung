@@ -145,7 +145,7 @@ namespace DataTableConverter.Classes.WorkProcs
                         }
                         if (notFoundHeaders.Count == 0)
                         {
-                            table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
+                            table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null, invalidColumnName);
                             newOrderIndices = newIndices;
                             if (Properties.Settings.Default.SplitPVM)
                             {

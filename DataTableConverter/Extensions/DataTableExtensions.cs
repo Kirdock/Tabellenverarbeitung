@@ -372,7 +372,7 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] importColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, Form mainForm, ProgressBar pgbLoading = null)
+        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] importColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, Form mainForm, string invalidColumnName, ProgressBar pgbLoading = null)
         {
             int oldCount = sourceTable.Columns.Count;
             int newColumnIndex = oldCount + importColumns.Length - 1; //-1: without identifier
@@ -406,12 +406,23 @@ namespace DataTableConverter.Extensions
                 }
             }
 
+            bool containsUnvalid = importTable.Columns.Contains(invalidColumnName);
+            bool sourceContainsUnvalid = sourceTable.Columns.Contains(invalidColumnName);
+
             for (int i = 0; i < importTable.Rows.Count; i++)
             {
                 string key = importTable.Rows[i][ImportMergeIndex].ToString();
                 if (sourceValues.TryGetValue(key, out int value))
                 {
                     importIndices[value] = i;
+                    if(containsUnvalid && importTable.Rows[i][invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue)
+                    {
+                        if (sourceContainsUnvalid)
+                        {
+                            sourceTable.Rows[value][invalidColumnName] = Properties.Settings.Default.FailAddressValue;
+                        }
+                        continue;
+                    }
                     int offset = 0;
                     for (int y = 0; y < importColumns.Length; y++)
                     {

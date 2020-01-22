@@ -328,23 +328,21 @@ namespace DataTableConverter
         {
             bool saved = false;
 
-            string headerBefore = string.Empty;
-            string adjustedHeaderBefore = string.Empty;
             List<string> duplicates = new List<string>();
-            foreach(string header in dataTable.HeadersOfDataTableAsString().OrderBy(header => header))
+            string[] headers = dataTable.HeadersOfDataTableAsString().OrderBy(header => header).ToArray();
+            for (int i = 1; i < headers.Length; i++)
             {
-                string adjustedHeader = header.Length > DbaseMaxHeaderLength ? header.Substring(0, DbaseMaxHeaderLength) : header;
-                if (adjustedHeader == adjustedHeaderBefore)
+                string header = headers[i].Length > DbaseMaxHeaderLength ? headers[i].Substring(0, DbaseMaxHeaderLength) : headers[i];
+                string headerBefore = headers[i-1].Length > DbaseMaxHeaderLength ? headers[i-1].Substring(0, DbaseMaxHeaderLength) : headers[i-1];
+                if (header == headerBefore)
                 {
-                    duplicates.Add($"\"{headerBefore}\" und \"{header}\"");
+                    duplicates.Add($"\"{headers[i-1]}\" und \"{headers[i]}\"");
                 }
-                headerBefore = header;
-                adjustedHeaderBefore = adjustedHeader;
             }
 
             if(duplicates.Count > 0)
             {
-                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE, gibt es Duplikate: \n"+string.Join(" ,\n",duplicates));
+                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n"+string.Join(" ,\n",duplicates));
                 return saved;
             }
             
