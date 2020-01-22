@@ -13,7 +13,7 @@ namespace DataTableConverter.Extensions
 {
     internal static class DataTableExtensions
     {
-        private static readonly string TempSort = "[TEMP_SORT]";
+        internal static readonly string TempSort = "[TEMP_SORT]";
         private static readonly string fileName = "Dateiname";
         internal static string FileName
         {
@@ -241,7 +241,7 @@ namespace DataTableConverter.Extensions
             table2.TableName = path.AppendFileName(Properties.Settings.Default.RightAddressText);
 
 
-            foreach (DataRow row in table.Rows)
+            foreach (DataRow row in table.Rows.Cast<DataRow>().Where(row => row.RowState != DataRowState.Deleted))
             {
                 string value = row[invalidColumnName].ToString();
                 if (value == Properties.Settings.Default.FailAddressValue)
@@ -254,6 +254,11 @@ namespace DataTableConverter.Extensions
                 }
             }
             path = Path.GetDirectoryName(path);
+            if (table1.Columns.Contains(TempSort))
+            {
+                table1.Columns.Remove(TempSort);
+                table2.Columns.Remove(TempSort);
+            }
             foreach (DataTable Table in new DataTable[] { table1, table2 })
             {
                 string FileName = Table.TableName;
@@ -372,8 +377,16 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] importColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, Form mainForm, string invalidColumnName, ProgressBar pgbLoading = null)
+        internal static void AddColumnsOfDataTable(this DataTable sourceTable, DataTable importTable, string[] importColumns, int SourceMergeIndex, int ImportMergeIndex, out int[] newIndices, Form mainForm, ProgressBar pgbLoading = null)
         {
+            sourceTable.Columns.Add(TempSort, typeof(string));
+            int counter = 0;
+            foreach (DataRow row in sourceTable.Rows)
+            {
+                row[TempSort] = counter++;
+            }
+            sourceTable.AcceptChanges();
+
             int oldCount = sourceTable.Columns.Count;
             int newColumnIndex = oldCount + importColumns.Length - 1; //-1: without identifier
             int[] importIndices = new int[sourceTable.Rows.Count];
@@ -385,6 +398,9 @@ namespace DataTableConverter.Extensions
                     sourceTable.TryAddColumn(importColumns[i]);
                 }
             }
+            
+
+            
 
             try
             {
@@ -406,8 +422,6 @@ namespace DataTableConverter.Extensions
                 }
             }
 
-            bool containsUnvalid = importTable.Columns.Contains(invalidColumnName);
-            bool sourceContainsUnvalid = sourceTable.Columns.Contains(invalidColumnName);
 
             for (int i = 0; i < importTable.Rows.Count; i++)
             {
@@ -415,14 +429,6 @@ namespace DataTableConverter.Extensions
                 if (sourceValues.TryGetValue(key, out int value))
                 {
                     importIndices[value] = i;
-                    if(containsUnvalid && importTable.Rows[i][invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue)
-                    {
-                        if (sourceContainsUnvalid)
-                        {
-                            sourceTable.Rows[value][invalidColumnName] = Properties.Settings.Default.FailAddressValue;
-                        }
-                        continue;
-                    }
                     int offset = 0;
                     for (int y = 0; y < importColumns.Length; y++)
                     {
@@ -435,6 +441,7 @@ namespace DataTableConverter.Extensions
                             sourceTable.Rows[value][oldCount + y - offset] = importTable.Rows[i][y];
                         }
                     }
+                    sourceValues.Remove(key);
                 }
                 try
                 {
@@ -446,7 +453,23 @@ namespace DataTableConverter.Extensions
                 }
             }
 
-            newIndices = importIndices;
+            List<int> indices = importIndices.ToList();
+            int markDelete = sourceTable.Rows.Count + 1;
+            foreach (int value in sourceValues.Values.OrderByDescending(value => value))
+            {
+                importIndices[value] = markDelete;
+                //sourceTable.Rows.RemoveAt(value);
+                //for (int i = 0; i < importIndices.Length; i++)
+                //{
+                //    if(importIndices[i] > value)
+                //    {
+                //        importIndices[i]--;
+                //    }
+                //}
+                //indices.RemoveAt(value);
+            }
+            //importIndices = indices.ToArray();
+            
             //set order of imported table
             IEnumerable<DataRow> sortedTable = sourceTable.Copy().AsEnumerable().Select((row, i) => new { row, i }).OrderBy(r => importIndices[r.i]).Select(r => r.row);
             sourceTable.Rows.Clear();
@@ -454,6 +477,12 @@ namespace DataTableConverter.Extensions
             {
                 sourceTable.ImportRow(row);
             }
+            for(int i = importTable.Rows.Count; i < sourceTable.Rows.Count; i++)
+            {
+                sourceTable.Rows[i].Delete();
+            }
+
+            newIndices = importIndices.Where(value => value != markDelete).ToArray();
         }
 
         internal static IEnumerable<DataRow> GetSortedTable(this DataTable table, string order, OrderType orderType, Action addHistory = null)

@@ -32,6 +32,11 @@ namespace DataTableConverter.Classes.WorkProcs
             ReplacesTable = true;
         }
 
+        internal override bool DeletesRows()
+        {
+            return true;
+        }
+
         public override void renameHeaders(string oldName, string newName)
         {
             if (IdentifySource == oldName)
@@ -145,11 +150,11 @@ namespace DataTableConverter.Classes.WorkProcs
                         }
                         if (notFoundHeaders.Count == 0)
                         {
-                            table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null, invalidColumnName);
+                            table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
                             newOrderIndices = newIndices;
                             if (Properties.Settings.Default.SplitPVM)
                             {
-                                int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
+                                int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding);
                                 if(count != 0)
                                 {
                                     invokeForm.Invoke(new MethodInvoker(() =>

@@ -490,12 +490,15 @@ namespace DataTableConverter
                         if (t.ReplacesTable)
                         {
                             historyHelper.AddHistory(new History { State = State.ValueChange, Table = table.ChangesOfDataTable() }, GetSorting());
-                        }
-                        ReplaceProcedure(table, null, t, out int[] newIndices);
-
-                        if (t.ReplacesTable)
-                        {
+                            ReplaceProcedure(table, null, t, out int[] newIndices);
+                            historyHelper.AddHistory(new History { State = State.ValueChange, Table = table.ChangesOfDataTable() }, GetSorting());
+                            table.Columns.Remove(Extensions.DataTableExtensions.TempSort);
+                            table.AcceptChanges();
                             historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
+                        }
+                        else
+                        {
+                            ReplaceProcedure(table, null, t, out _);
                         }
                     }
 
@@ -667,30 +670,42 @@ namespace DataTableConverter
                 Thread thread = new Thread(() =>
                 {
                     try {
-                        string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
-                        if (!importTable.Columns.Contains(invalidColumnName))
-                        {
-                            SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, importTable.HeadersOfDataTable(), true);
-                            DialogResult res = DialogResult.Cancel;
-                            Invoke(new MethodInvoker(() =>
-                            {
-                                res = f.ShowDialog(this);
-                            }));
-                            if (res == DialogResult.OK)
-                            {
-                                invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
-                            }
-                        }
-                        sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, this, invalidColumnName, pgbLoading);
+                        sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, this, pgbLoading);
                         int count = 0;
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                           count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
+                            string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
+                            if (!sourceTable.Columns.Contains(invalidColumnName))
+                            {
+                                SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, sourceTable.HeadersOfDataTable(), true);
+                                DialogResult res = DialogResult.Cancel;
+                                Invoke(new MethodInvoker(() =>
+                                {
+                                    res = f.ShowDialog(this);
+                                }));
+                                if (res == DialogResult.OK)
+                                {
+                                    invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
+                                    count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
+                                }
+                            }
+                            else
+                            {
+                                count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
+                            }
                         }
 
-                        dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(sourceTable); }));
+
+                        List<CellMatrix> oldValues = sourceTable.ChangesOfDataTable();
+                        historyHelper.AddHistory(new History { State = State.ValueChange, Table = oldValues }, GetSorting());
+                        sourceTable.Columns.Remove(Extensions.DataTableExtensions.TempSort);
+                        dgTable.Invoke(new MethodInvoker(()=> {
+                            AssignDataSource(sourceTable);
+                        }));
+
                         historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
+
                         if (count != 0)
                         {
                             Console.WriteLine(count);
