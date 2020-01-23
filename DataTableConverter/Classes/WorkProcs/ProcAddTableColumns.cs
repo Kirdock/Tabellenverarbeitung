@@ -32,11 +32,6 @@ namespace DataTableConverter.Classes.WorkProcs
             ReplacesTable = true;
         }
 
-        internal override bool DeletesRows()
-        {
-            return true;
-        }
-
         public override void renameHeaders(string oldName, string newName)
         {
             if (IdentifySource == oldName)
@@ -154,7 +149,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             newOrderIndices = newIndices;
                             if (Properties.Settings.Default.SplitPVM)
                             {
-                                int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding);
+                                int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
                                 if(count != 0)
                                 {
                                     invokeForm.Invoke(new MethodInvoker(() =>
@@ -162,6 +157,10 @@ namespace DataTableConverter.Classes.WorkProcs
                                         invokeForm.ValidRows = count;
                                     }));
                                 }
+                            }
+                            foreach (DataRow row in table.Rows.Cast<DataRow>().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
+                            {
+                                row.Delete();
                             }
                         }
                     }

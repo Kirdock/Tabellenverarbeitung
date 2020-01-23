@@ -670,29 +670,30 @@ namespace DataTableConverter
                 Thread thread = new Thread(() =>
                 {
                     try {
+                        string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
+                        if (!importTable.Columns.Contains(invalidColumnName))
+                        {
+                            SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, importTable.HeadersOfDataTable(), true);
+                            DialogResult res = DialogResult.Cancel;
+                            Invoke(new MethodInvoker(() =>
+                            {
+                                res = f.ShowDialog(this);
+                            }));
+                            if (res == DialogResult.OK)
+                            {
+                                invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
+                            }
+                        }
+
                         sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, this, pgbLoading);
                         int count = 0;
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
-                            if (!sourceTable.Columns.Contains(invalidColumnName))
-                            {
-                                SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, sourceTable.HeadersOfDataTable(), true);
-                                DialogResult res = DialogResult.Cancel;
-                                Invoke(new MethodInvoker(() =>
-                                {
-                                    res = f.ShowDialog(this);
-                                }));
-                                if (res == DialogResult.OK)
-                                {
-                                    invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
-                                    count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
-                                }
-                            }
-                            else
-                            {
-                                count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
-                            }
+                            count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
+                        }
+                        foreach (DataRow row in sourceTable.Rows.Cast<DataRow>().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
+                        {
+                            row.Delete();
                         }
 
 

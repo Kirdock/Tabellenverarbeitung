@@ -60,11 +60,6 @@ namespace DataTableConverter.Classes
 
         abstract public void renameHeaders(string oldName, string newName);
         abstract public void removeHeader(string colName);
-
-        internal virtual bool DeletesRows()
-        {
-            return true;
-        }
         abstract public void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices);
     }
 }

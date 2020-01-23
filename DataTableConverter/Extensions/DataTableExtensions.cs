@@ -458,17 +458,7 @@ namespace DataTableConverter.Extensions
             foreach (int value in sourceValues.Values.OrderByDescending(value => value))
             {
                 importIndices[value] = markDelete;
-                //sourceTable.Rows.RemoveAt(value);
-                //for (int i = 0; i < importIndices.Length; i++)
-                //{
-                //    if(importIndices[i] > value)
-                //    {
-                //        importIndices[i]--;
-                //    }
-                //}
-                //indices.RemoveAt(value);
             }
-            //importIndices = indices.ToArray();
             
             //set order of imported table
             IEnumerable<DataRow> sortedTable = sourceTable.Copy().AsEnumerable().Select((row, i) => new { row, i }).OrderBy(r => importIndices[r.i]).Select(r => r.row);

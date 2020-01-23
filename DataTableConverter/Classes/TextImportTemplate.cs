@@ -20,11 +20,7 @@ namespace DataTableConverter.Classes
         {
             get
             {
-                if(separators == null)
-                {
-                    separators = StringSeparator != null ? new List<string> { StringSeparator } : new List<string>();
-                }
-                return separators;
+                return separators ?? (StringSeparator != null ? new List<string> { StringSeparator } : new List<string>());
             }
             set
             {
