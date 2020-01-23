@@ -31,17 +31,20 @@ namespace DataTableConverter.Extensions
         {
             try
             {
-                progressBar.Invoke(new MethodInvoker(() =>
+                if (!progressBar.IsDisposed)
                 {
-                    if (progressBar.Value < progressBar.Maximum)
+                    progressBar.Invoke(new MethodInvoker(() =>
                     {
-                        progressBar.Value++;
-                    }
-                    else
-                    {
-                        progressBar.Value = progressBar.Maximum = 0;
-                    }
-                }));
+                        if (progressBar.Value < progressBar.Maximum)
+                        {
+                            progressBar.Value++;
+                        }
+                        else
+                        {
+                            progressBar.Value = progressBar.Maximum = 0;
+                        }
+                    }));
+                }
             }
             catch (Exception ex)
             {

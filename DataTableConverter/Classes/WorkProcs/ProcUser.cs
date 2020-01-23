@@ -16,7 +16,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public ProcUser(int ordinal, int id,string name) : base(ordinal, id, name) { }
@@ -57,7 +57,7 @@ namespace DataTableConverter.Classes.WorkProcs
             bool newCol = false;
 
 
-            IEnumerable<DataRow> replaces = procedure.Replace.Rows.Cast<DataRow>().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));
+            IEnumerable<DataRow> replaces = procedure.Replace.AsEnumerable().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));
             IEnumerable<DataRow> replaceWithoutEmpty = replaces.Where(replace => replace[0].ToString() != string.Empty);
             if (CopyOldColumn)
             {

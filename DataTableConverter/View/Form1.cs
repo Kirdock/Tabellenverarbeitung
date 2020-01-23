@@ -399,7 +399,7 @@ namespace DataTableConverter
         {
             ProcDuplicate procDuplicate = new ProcDuplicate(0, cas.Id, cas.Name)
             {
-                DuplicateColumns = cas.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray()
+                DuplicateColumns = cas.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray()
             };
             StartSingleWorkflow(procDuplicate);
         }
@@ -449,8 +449,8 @@ namespace DataTableConverter
                 }
                 SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), table.HeadersOfDataTable(), false);
                 if (form.ShowDialog(this) == DialogResult.OK) {
-                    string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
-                    string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
+                    string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
+                    string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
 
                     foreach (NotFoundHeaders nf in notFound)
                     {
@@ -485,16 +485,18 @@ namespace DataTableConverter
                 try
                 {
                     table.AcceptChanges();
+                    List<History> history = new List<History>();
                     foreach (WorkProc t in temp)
                     {
                         if (t.ReplacesTable)
                         {
-                            historyHelper.AddHistory(new History { State = State.ValueChange, Table = table.ChangesOfDataTable() }, GetSorting());
+                            history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting()});
+                            
                             ReplaceProcedure(table, null, t, out int[] newIndices);
-                            historyHelper.AddHistory(new History { State = State.ValueChange, Table = table.ChangesOfDataTable() }, GetSorting());
+                            history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting()});
                             table.Columns.Remove(Extensions.DataTableExtensions.TempSort);
                             table.AcceptChanges();
-                            historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
+                            history.Add(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices, Order = GetSorting() });
                         }
                         else
                         {
@@ -502,9 +504,12 @@ namespace DataTableConverter
                         }
                     }
 
+                    history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting()});
+
+                    historyHelper.AddHistory(history.ToArray());
                     dgTable.Invoke(new MethodInvoker(() =>
                     {
-                        AddDataSourceValueChange(table);
+                        AssignDataSource(table);
                     }));
                 }
                 catch (Exception ex)
@@ -691,25 +696,26 @@ namespace DataTableConverter
                         {
                             count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
                         }
-                        foreach (DataRow row in sourceTable.Rows.Cast<DataRow>().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
+                        foreach (DataRow row in sourceTable.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
                         {
                             row.Delete();
                         }
 
 
-                        List<CellMatrix> oldValues = sourceTable.ChangesOfDataTable();
-                        historyHelper.AddHistory(new History { State = State.ValueChange, Table = oldValues }, GetSorting());
+                        History[] history = new History[2];
+                        history[0] = new History { State = State.ValueChange, Table = sourceTable.ChangesOfDataTable(), Order= GetSorting() };
+
                         sourceTable.Columns.Remove(Extensions.DataTableExtensions.TempSort);
                         dgTable.Invoke(new MethodInvoker(()=> {
                             AssignDataSource(sourceTable);
                         }));
 
-                        historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
+                        history[1] = new History { State = State.OrderIndexChange, NewOrderIndices = newIndices, Order = GetSorting()};
+                        historyHelper.AddHistory(history);
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
 
                         if (count != 0)
                         {
-                            Console.WriteLine(count);
                             Invoke(new MethodInvoker(() =>
                             {
                                 ValidRows = count;
@@ -1752,6 +1758,49 @@ namespace DataTableConverter
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void aufteilenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SplitFormMain form = new SplitFormMain(sourceTable.HeadersOfDataTable());
+            if(form.ShowDialog(this) == DialogResult.OK)
+            {
+                DataTable table = GetDataSource();
+                string column = form.Column;
+                string splitText = form.SplitText;
+                string newColumn = form.NewColumn;
+                StartLoadingBar();
+                Thread thread = new Thread(() =>
+                {
+                    List<string> newColumns = new List<string>() { table.TryAddColumn(newColumn) };
+                    int counter = 1;
+                    foreach(DataRow row in table.Rows)
+                    {
+                        string[] result = row[column].ToString().Split(new string[] { splitText }, StringSplitOptions.RemoveEmptyEntries);
+                        if (result.Length > 1)
+                        {
+                            while (counter < result.Length)
+                            {
+                                newColumns.Add(table.TryAddColumn(newColumn, counter));
+                                counter++;
+                            }
+
+                            for (int i = 0; i < result.Length; i++)
+                            {
+                                row[newColumns[i]] = result[i];
+                            }
+                            
+                        }
+                    }
+                    dgTable.Invoke(new MethodInvoker(() =>
+                    {
+                        AddDataSourceValueChange(table);
+                    }));
+                    StopLoadingBar();
+                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
             }
         }
 

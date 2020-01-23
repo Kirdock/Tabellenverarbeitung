@@ -241,7 +241,7 @@ namespace DataTableConverter.Extensions
             table2.TableName = path.AppendFileName(Properties.Settings.Default.RightAddressText);
 
 
-            foreach (DataRow row in table.Rows.Cast<DataRow>().Where(row => row.RowState != DataRowState.Deleted))
+            foreach (DataRow row in table.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted))
             {
                 string value = row[invalidColumnName].ToString();
                 if (value == Properties.Settings.Default.FailAddressValue)

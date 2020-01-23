@@ -18,7 +18,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool AllColumns { get; set; }
         public override string[] GetHeaders()
         {
-            return AllColumns ? new string[0] : WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return AllColumns ? new string[0] : WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public ProcUpLowCase(int ordinal, int id,string name) : base(ordinal, id, name) {

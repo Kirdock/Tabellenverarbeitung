@@ -44,7 +44,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public override void renameHeaders(string oldName, string newName)

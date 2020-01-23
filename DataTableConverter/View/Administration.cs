@@ -929,7 +929,7 @@ namespace DataTableConverter.View
             cbNewColumnRound.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             txtNewColumnRound.Text = selectedProc.NewColumn;
             SetDataSource(dgvRound, selectedProc.Columns);
-            SetHeaderRound(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderRound(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
         }
 
         private void SetSearchControls(WorkProc selectedProc)
@@ -954,7 +954,7 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = myCase.Name;
             DataTable temp = myCase.Columns.Copy();
             DataTable table = new DataTable { TableName = "WorkDuplicates" };
-            object[] firstColumn = temp.Rows.Cast<DataRow>().Select(dc => dc.ItemArray[0]).ToArray();
+            object[] firstColumn = temp.AsEnumerable().Select(dc => dc.ItemArray[0]).ToArray();
 
             table.Columns.Add("Bezeichnung", typeof(string));
             table.Columns.Add("Zuweisung", typeof(string));
@@ -980,12 +980,12 @@ namespace DataTableConverter.View
             cmbUpLow.SelectedIndex = selectedProc.Option;
             SetDataSource(dgUpLow, selectedProc.Columns);
             SetUpLowEnabled(!selectedProc.AllColumns);
-            SetHeaderUpLowCase(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderUpLowCase(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
         }
 
         private void SetOrderControls(WorkProc selectedProc)
         {
-            SetHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderOrder(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcOrder.ClassName;
 
             if (selectedProc.Columns.Columns.Count <= 1)
@@ -1015,7 +1015,7 @@ namespace DataTableConverter.View
 
         private void SetPVMExportControls(WorkProc selectedProc)
         {
-            SetHeaderOrder(selectedProc.Columns.Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray());
+            SetHeaderOrder(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcPVMExport.ClassName;
             ProcPVMExport proc = selectedProc as ProcPVMExport;
             TxtPVMPath.Text = proc.SecondFileName;
@@ -1555,7 +1555,7 @@ namespace DataTableConverter.View
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             WorkProc selecteWorkProc = GetSelectedWorkProcedure();
-            selecteWorkProc.DuplicateColumns = GetDataSource(dgColumnDefDuplicate).Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
+            selecteWorkProc.DuplicateColumns = GetDataSource(dgColumnDefDuplicate).AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
         }
 
         private DataTable GetDataSource(DataGridView dgv)

@@ -41,13 +41,13 @@ namespace DataTableConverter.Classes.WorkProcs
         public override string[] GetHeaders()
         {
             HashSet<string> headers = new HashSet<string>(GetAffectedHeaders());
-            Conditions.Rows.Cast<DataRow>().Select(row => row[(int)ConditionColumn.Spalte].ToString()).ToList().ForEach(header => headers.Add(header));
+            Conditions.AsEnumerable().Select(row => row[(int)ConditionColumn.Spalte].ToString()).ToList().ForEach(header => headers.Add(header));
             return WorkflowHelper.RemoveEmptyHeaders(headers);
         }
 
         internal string[] GetAffectedHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.Rows.Cast<DataRow>().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)

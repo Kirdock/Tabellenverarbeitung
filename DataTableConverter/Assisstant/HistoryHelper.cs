@@ -11,13 +11,13 @@ namespace DataTableConverter.Assisstant
 {
     class HistoryHelper
     {
-        internal List<History> history;
+        internal List<History[]> history;
         internal string OrderString { get; set; }
         private int historyPointer;
 
         internal HistoryHelper()
         {
-            history = new List<History>();
+            history = new List<History[]>();
             historyPointer = -1;
             OrderString = string.Empty;
         }
@@ -28,10 +28,9 @@ namespace DataTableConverter.Assisstant
             historyPointer = -1;
         }
 
-        internal void AddHistory(History his, string order)
+        internal void AddHistory(History[] his)
         {
             historyPointer++;
-            his.Order = order;
             if (historyPointer >= history.Count)
             {
                 history.Add(his);
@@ -39,6 +38,22 @@ namespace DataTableConverter.Assisstant
             else
             {
                 history[historyPointer] = his;
+            }
+
+            AdjustHistory();
+        }
+
+        internal void AddHistory(History his, string order)
+        {
+            historyPointer++;
+            his.Order = order;
+            if (historyPointer >= history.Count)
+            {
+                history.Add(new History[] { his });
+            }
+            else
+            {
+                history[historyPointer] = new History[] { his };
             }
 
             AdjustHistory();
@@ -91,7 +106,13 @@ namespace DataTableConverter.Assisstant
             }
             else
             {
-                his = history[historyPointer];
+                History[] histories = history[historyPointer];
+                for(int i = histories.Length-1; i >= 0; i--)
+                {
+                    table = TakeOverHistory(table, orderBefore, histories[i]);
+                }
+                history[historyPointer] = history[historyPointer].Reverse().ToArray();
+                return table;
             }
             if(his.OrderType != OrderType.Windows)
             {

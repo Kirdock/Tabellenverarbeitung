@@ -23,7 +23,7 @@ namespace DataTableConverter.Classes
 
         public string[] getColumnsAsArrayToLower()
         {
-            return Columns.Rows.Cast<DataRow>().Select(dt => dt.ItemArray[0].ToString().ToLower()).ToArray();
+            return Columns.AsEnumerable().Select(dt => dt.ItemArray[0].ToString().ToLower()).ToArray();
         }
 
         public int CompareTo(Tolerance other)

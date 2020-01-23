@@ -155,6 +155,12 @@
     <Compile Include="View\ExcelSheets.Designer.cs">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\Form2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\Form2.Designer.cs">
+      <DependentUpon>Form2.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\MaxRowLengthForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +190,12 @@
     </Compile>
     <Compile Include="View\SeparatorForm.Designer.cs">
       <DependentUpon>SeparatorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\SplitFormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\SplitFormMain.Designer.cs">
+      <DependentUpon>SplitFormMain.cs</DependentUpon>
     </Compile>
     <Compile Include="View\WorkProcViews\ExportCount.cs">
       <SubType>Form</SubType>
@@ -343,6 +355,9 @@
     <EmbeddedResource Include="View\ExcelSheets.resx">
       <DependentUpon>ExcelSheets.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="View\Form2.resx">
+      <DependentUpon>Form2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="View\MaxRowLengthForm.resx">
       <DependentUpon>MaxRowLengthForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -357,6 +372,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\SeparatorForm.resx">
       <DependentUpon>SeparatorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\SplitFormMain.resx">
+      <DependentUpon>SplitFormMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\ExportCount.resx">
       <DependentUpon>ExportCount.cs</DependentUpon>

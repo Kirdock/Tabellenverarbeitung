@@ -26,17 +26,17 @@ namespace DataTableConverter.Classes
 
         public string[] getColumnsAsArray()
         {
-            return Columns.Rows.Cast<DataRow>().Select(dt => dt.ItemArray[0].ToString()).ToArray();
+            return Columns.AsEnumerable().Select(dt => dt.ItemArray[0].ToString()).ToArray();
         }
 
         public int[] getBeginSubstring()
         {
-            return Columns.Rows.Cast<DataRow>().Select(dt => dt.ItemArray[1].ToString() == string.Empty ? 0 : (int)dt.ItemArray[1]).ToArray();
+            return Columns.AsEnumerable().Select(dt => dt.ItemArray[1].ToString() == string.Empty ? 0 : (int)dt.ItemArray[1]).ToArray();
         }
 
         public int[] getEndSubstring()
         {
-            return Columns.Rows.Cast<DataRow>().Select(dt => dt.ItemArray[2].ToString() == string.Empty ? 0 : (int)dt.ItemArray[2]).ToArray();
+            return Columns.AsEnumerable().Select(dt => dt.ItemArray[2].ToString() == string.Empty ? 0 : (int)dt.ItemArray[2]).ToArray();
         }
 
         public int CompareTo(Case other)

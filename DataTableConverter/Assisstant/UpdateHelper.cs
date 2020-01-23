@@ -43,7 +43,7 @@ namespace DataTableConverter.Assisstant
                                 if (result == DialogResult.Yes)
                                 {
                                     SetUpdateShowed(false);
-                                    DownloadFile(version, progressBar);
+                                    DownloadFile(version, progressBar, mainForm);
                                 }
                                 else
                                 {
@@ -52,7 +52,7 @@ namespace DataTableConverter.Assisstant
                             }
                             else
                             {
-                                DownloadFile(version, progressBar);
+                                DownloadFile(version, progressBar, mainForm);
                             }
                         }
                         else if (!prompt)
@@ -76,7 +76,7 @@ namespace DataTableConverter.Assisstant
             Properties.Settings.Default.Save();
         }
 
-        private static void DownloadFile(string version, ProgressBar progressBar)
+        private static void DownloadFile(string version, ProgressBar progressBar, Form mainForm)
         {
             progressBar.Invoke(new MethodInvoker(() =>
             {
@@ -87,22 +87,41 @@ namespace DataTableConverter.Assisstant
                 client.DownloadFile(string.Format(Download,version), FileName);
 
                 string path = GetCurrentDirectory();
-                string ZipPath = Path.Combine(path, FileName);
-                ZipArchive archive = ZipFile.OpenRead(ZipPath);
-
-                foreach (ZipArchiveEntry file in archive.Entries)
+                string zipPath = Path.Combine(path, FileName);
+                ZipArchive archive = ZipFile.OpenRead(zipPath);
+                bool finished = true;
+                try
                 {
-                    string completeFileName = Path.Combine(path, file.FullName);
-                    if (file.Name == string.Empty)
-                    {// Assuming Empty for Directory
-                        Directory.CreateDirectory(Path.GetDirectoryName(completeFileName));
-                        continue;
+                    foreach (ZipArchiveEntry file in archive.Entries)
+                    {
+                        string completeFileName = Path.Combine(path, file.FullName);
+                        var a = Path.GetDirectoryName(completeFileName);
+                        if (!Directory.Exists(Path.GetDirectoryName(completeFileName)))
+                        {
+                            Directory.CreateDirectory(completeFileName);
+                        }
+
+                        if (file.Name != string.Empty)
+                        {
+                            file.ExtractToFile(completeFileName, true);
+                        }
                     }
-                    file.ExtractToFile(completeFileName, true);
                 }
-                archive.Dispose();
-                File.Delete(ZipPath);
-                RestartApp();
+                catch (Exception e)
+                {
+                    finished = false;
+                    ErrorHelper.LogMessage($"{e.Message}\nZipPath: {zipPath}; ApplicationPath: {path}", mainForm, false);
+                    ErrorHelper.LogMessage("Das Archiv konnte nicht enpackt werden", mainForm, true);
+                }
+                finally
+                {
+                    archive.Dispose();
+                    File.Delete(zipPath);
+                }
+                if (finished)
+                {
+                    RestartApp();
+                }
                 
             }
         }

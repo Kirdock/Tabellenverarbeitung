@@ -94,6 +94,7 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.aufteilenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -173,6 +174,7 @@
             // 
             this.funktionenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zeileToolStripMenuItem,
+            this.aufteilenToolStripMenuItem,
             this.großKleinschreibungToolStripMenuItem,
             this.längsteZeileToolStripMenuItem,
             this.nummerierenToolStripMenuItem,
@@ -591,6 +593,13 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // aufteilenToolStripMenuItem
+            // 
+            this.aufteilenToolStripMenuItem.Name = "aufteilenToolStripMenuItem";
+            this.aufteilenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.aufteilenToolStripMenuItem.Text = "Aufteilen";
+            this.aufteilenToolStripMenuItem.Click += new System.EventHandler(this.aufteilenToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AllowDrop = true;
@@ -685,6 +694,7 @@
         private System.Windows.Forms.ToolStripMenuItem suchenToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel ValidRowsText;
         private System.Windows.Forms.ToolStripStatusLabel ValidRowsLabel;
+        private System.Windows.Forms.ToolStripMenuItem aufteilenToolStripMenuItem;
     }
 }
 

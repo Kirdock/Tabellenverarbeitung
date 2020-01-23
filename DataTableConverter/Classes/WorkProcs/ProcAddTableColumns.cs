@@ -125,8 +125,8 @@ namespace DataTableConverter.Classes.WorkProcs
                             }));
                             if (result == DialogResult.OK)
                             {
-                                string[] from = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[0].ToString()).ToArray();
-                                string[] to = form.Table.Rows.Cast<DataRow>().Select(row => row.ItemArray[1].ToString()).ToArray();
+                                string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
+                                string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
 
                                 for (int i = 0; i < from.Length; i++)
                                 {
@@ -158,7 +158,7 @@ namespace DataTableConverter.Classes.WorkProcs
                                     }));
                                 }
                             }
-                            foreach (DataRow row in table.Rows.Cast<DataRow>().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
+                            foreach (DataRow row in table.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
                             {
                                 row.Delete();
                             }
