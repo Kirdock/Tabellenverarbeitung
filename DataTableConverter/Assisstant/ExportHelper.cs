@@ -237,6 +237,7 @@ namespace DataTableConverter
         internal static string ExportExcel(DataTable dt, string directory, string filename, Form mainForm)
         {
             string path = null;
+            int rowRange = 10000;
             try
             {
                 string workSheetName = "Tabelle 1";
@@ -258,39 +259,31 @@ namespace DataTableConverter
                 excel.Calculation = Microsoft.Office.Interop.Excel.XlCalculation.xlCalculationManual;
                 worksheet.Name = workSheetName;
 
-                int rows = dt.Rows.Count;
+                
                 int columns = dt.Columns.Count;
                 // Add the +1 to allow room for column headers.
-                var data = new object[rows + 1, columns];
 
-                // Insert column headers.
-                for (var column = 0; column < columns; column++)
-                {
-                    data[0, column] = dt.Columns[column].ColumnName;
-                }
 
-                // Insert the provided records.
-                for (var row = 0; row < rows; row++)
+                int rowCount = dt.Rows.Count;
+                InsertHeadersToExcel(dt, worksheet, workSheetName);
+                InsertRowsSkeleton(worksheet, rowCount, columns);
+                
+                int rowStart = 2;
+                for (int step = 0; step < rowCount; step += rowRange)
                 {
-                    for (var column = 0; column < columns; column++)
+                    int rows = Math.Min(rowRange, rowCount-step);
+                    object[,] data = new object[rows, columns];
+                    for (int srcRow = step, dstRow = 0; dstRow < rows; srcRow++, dstRow++)
                     {
-                        data[row + 1, column] = dt.Rows[row][column];
+                        for (int column = 0; column < columns; column++)
+                        {
+                            data[dstRow, column] = dt.Rows[srcRow][column];
+                        }
                     }
+                    InsertRowsToExcel(worksheet, data, rowStart, rows - 1, columns);
+                    rowStart += rows;
                 }
 
-                // Write this data to the excel worksheet.
-                Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, 1];
-                Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rows + 1, columns];
-                Microsoft.Office.Interop.Excel.Range sheetData = worksheet.Range[beginWrite, endWrite];
-                sheetData.NumberFormat = "@";
-                sheetData.Value2 = data;
-
-                worksheet.Select();
-                sheetData.Worksheet.ListObjects.Add(Microsoft.Office.Interop.Excel.XlListObjectSourceType.xlSrcRange,
-                                                   sheetData,
-                                                   System.Type.Missing,
-                                                   Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
-                                                   System.Type.Missing).Name = workSheetName;
                 string saveName = Path.GetFileNameWithoutExtension(filename)+".xls";
                 Microsoft.Office.Interop.Excel.XlFileFormat fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal;
                 if (Path.GetExtension(filename) != ".xls")
@@ -322,6 +315,47 @@ namespace DataTableConverter
                 ErrorHelper.LogMessage(ex, mainForm);
             }
             return path;
+        }
+
+        private static Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(DataTable table, Microsoft.Office.Interop.Excel.Worksheet worksheet, string worksheetName)
+        {
+            // Insert column headers.
+            object[,] data = new object[1, table.Columns.Count];
+            for (int column = 0; column < table.Columns.Count; column++)
+            {
+                data[0, column] = table.Columns[column].ColumnName;
+            }
+
+            Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, 1];
+            Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, table.Columns.Count];
+            Microsoft.Office.Interop.Excel.Range sheetData = worksheet.Range[beginWrite, endWrite];
+            sheetData.NumberFormat = "@";
+            sheetData.Value2 = data;
+
+            worksheet.Select();
+            return sheetData.Worksheet.ListObjects.Add(Microsoft.Office.Interop.Excel.XlListObjectSourceType.xlSrcRange,
+                                                   sheetData,
+                                                   System.Type.Missing,
+                                                   Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
+                                                   System.Type.Missing);
+        }
+
+        private static void InsertRowsToExcel( Microsoft.Office.Interop.Excel.Worksheet worksheet, object[,] data, int rowStart, int rowCount, int columnCount)
+        {
+            Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowStart, 1];
+            Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowStart + rowCount, columnCount];
+            Microsoft.Office.Interop.Excel.Range range = worksheet.Range[beginWrite, endWrite];
+            range.NumberFormat = "@";
+            range.Value2 = data;
+            worksheet.Select();
+        }
+
+        private static void InsertRowsSkeleton(Microsoft.Office.Interop.Excel.Worksheet worksheet, int rowCount, int columnCount)
+        {
+            Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[2, 1];
+            Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowCount, columnCount];
+            Microsoft.Office.Interop.Excel.Range addNewRows = worksheet.Range[beginWrite, endWrite];
+            addNewRows.Insert(Microsoft.Office.Interop.Excel.XlInsertShiftDirection.xlShiftDown, Microsoft.Office.Interop.Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove);
         }
 
         internal static bool ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Form mainForm, Action updateLoadingBar = null)

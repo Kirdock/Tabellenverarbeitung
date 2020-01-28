@@ -35,12 +35,19 @@ namespace DataTableConverter.View
             SetSize();
             this.path = path;
             ViewHelper.SetEncodingCmb(cmbEncoding);
-            cmbEncoding.SelectedValue = DetectTextEncoding(path).CodePage;
+            cmbEncoding.SelectedValue = DetectEncoding2(path).CodePage;
             cbTakeOver.Visible = multipleFiles;
             SetDataGridViewStyle();
         }
 
-        public Encoding DetectTextEncoding(string filename, int taster = 1000)
+        public Encoding DetectEncoding2(string filename)
+        {
+            byte[] b = File.ReadAllBytes(filename);
+            DetectTextEncoding detect = new DetectTextEncoding();
+            return detect.GetEncoding(detect.DetectEncoding(b, b.Length));
+        }
+
+        public Encoding DetectTextEncoding1(string filename, int taster = 1000)
         {
             byte[] b = File.ReadAllBytes(filename);
             if (b.Length >= 4 && b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF) 

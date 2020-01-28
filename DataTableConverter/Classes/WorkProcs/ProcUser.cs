@@ -59,6 +59,9 @@ namespace DataTableConverter.Classes.WorkProcs
 
             IEnumerable<DataRow> replaces = procedure.Replace.AsEnumerable().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));
             IEnumerable<DataRow> replaceWithoutEmpty = replaces.Where(replace => replace[0].ToString() != string.Empty);
+            IEnumerable<DataRow> replaceWithEmpty = replaces.Where(replace => replace[0].ToString() == string.Empty && replace[1].ToString().Length > 0);
+            bool containsEmpty = replaceWithEmpty.Count() > 0;
+            string replaceEmptyString = containsEmpty ? replaceWithEmpty.First()[1].ToString() : string.Empty;
             if (CopyOldColumn)
             {
                 //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
@@ -81,7 +84,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                         if (procedure.CheckTotal)
                         {
-                            DataRow foundRows = replaces.FirstOrDefault(replace => replace[0].ToString() == value);
+                            DataRow foundRows = replaceWithoutEmpty.FirstOrDefault(replace => replace[0].ToString() == value);
                             if (foundRows != null)
                             {
                                 result = foundRows[1].ToString();
@@ -101,6 +104,10 @@ namespace DataTableConverter.Classes.WorkProcs
                             {
                                 result = result.Replace(rep[0].ToString(), rep[1].ToString());
                             }
+                        }
+                        if(result == string.Empty && containsEmpty)
+                        {
+                            result = replaceEmptyString;
                         }
                         row[index] = procedure.LeaveEmpty && result == value ? string.Empty : ProcTrim.Trim(result);
                     }

@@ -79,6 +79,7 @@
     <Compile Include="Classes\CellMatrix.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
     <Compile Include="Classes\CountListboxItem.cs" />
+    <Compile Include="Classes\DetectTextEncoding.cs" />
     <Compile Include="Classes\ExportCustomItem.cs" />
     <Compile Include="Classes\ExportSeparate.cs" />
     <Compile Include="Classes\History.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Classes\WorkProcs\ProcPVMExport.cs" />
     <Compile Include="Classes\WorkProcs\ProcReplaceWhole.cs" />
     <Compile Include="Classes\WorkProcs\ProcRound.cs" />
+    <Compile Include="Classes\WorkProcs\ProcSplit.cs" />
     <Compile Include="Classes\WorkProcs\ProcSubstring.cs" />
     <Compile Include="Classes\WorkProcs\ProcTrim.cs" />
     <Compile Include="Classes\WorkProcs\ProcMerge.cs" />

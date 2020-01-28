@@ -49,6 +49,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
+            DuplicateColumns = GetHeaders();
             newOrderIndices = new int[0];
             Hashtable hTable = new Hashtable();
             Hashtable totalTable = new Hashtable();

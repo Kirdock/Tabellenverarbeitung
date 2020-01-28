@@ -88,7 +88,14 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void removeHeader(string colName)
         {
-            CompareColumn = SourceColumn = null; 
+            if(CompareColumn == colName)
+            {
+                CompareColumn = null;
+            }
+            if(SourceColumn == colName)
+            {
+                SourceColumn = null;
+            }
         }
 
     }

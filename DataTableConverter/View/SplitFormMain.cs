@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataTableConverter.Classes.WorkProcs;
+using System;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
 {
     public partial class SplitFormMain : Form
     {
-        internal string SplitText => TxTSplitText.Text;
-        internal string NewColumn => TxTNewColumn.Text;
-        internal string Column => CmBHeader.SelectedItem.ToString();
+        internal ProcSplit Procedure;
 
         internal SplitFormMain(object[] headers)
         {
@@ -39,6 +31,7 @@ namespace DataTableConverter.View
             }
             else
             {
+                Procedure = new ProcSplit(CmBHeader.SelectedItem.ToString(), TxTSplitText.Text, TxTNewColumn.Text);
                 DialogResult = DialogResult.OK;
             }
         }

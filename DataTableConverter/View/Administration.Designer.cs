@@ -62,6 +62,19 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.gbTrim = new System.Windows.Forms.GroupBox();
+            this.CLBTrimHeaders = new CheckComboBoxTest.CheckedComboBox();
+            this.label39 = new System.Windows.Forms.Label();
+            this.label38 = new System.Windows.Forms.Label();
+            this.CBTrimAllColumns = new System.Windows.Forms.CheckBox();
+            this.DGVTrimColumns = new System.Windows.Forms.DataGridView();
+            this.label10 = new System.Windows.Forms.Label();
+            this.CbTrimDeleteDouble = new System.Windows.Forms.CheckBox();
+            this.RbTrimStartEnd = new System.Windows.Forms.RadioButton();
+            this.RbTrimEnd = new System.Windows.Forms.RadioButton();
+            this.RbTrimStart = new System.Windows.Forms.RadioButton();
+            this.lblTrimCharacter = new System.Windows.Forms.Label();
+            this.TxtTrimText = new System.Windows.Forms.TextBox();
             this.gbSubstring = new System.Windows.Forms.GroupBox();
             this.CBSubstringReverse = new System.Windows.Forms.CheckBox();
             this.txtSubstringText = new System.Windows.Forms.TextBox();
@@ -184,14 +197,6 @@
             this.txtFormula = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.txtNewColumnMerge = new System.Windows.Forms.TextBox();
-            this.gbTrim = new System.Windows.Forms.GroupBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.CbTrimDeleteDouble = new System.Windows.Forms.CheckBox();
-            this.RbTrimStartEnd = new System.Windows.Forms.RadioButton();
-            this.RbTrimEnd = new System.Windows.Forms.RadioButton();
-            this.RbTrimStart = new System.Windows.Forms.RadioButton();
-            this.lblTrimCharacter = new System.Windows.Forms.Label();
-            this.TxtTrimText = new System.Windows.Forms.TextBox();
             this.gbOrder = new System.Windows.Forms.GroupBox();
             this.label8 = new System.Windows.Forms.Label();
             this.clbHeaderOrder = new CheckComboBoxTest.CheckedComboBox();
@@ -259,11 +264,7 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.DGVTrimColumns = new System.Windows.Forms.DataGridView();
-            this.CBTrimAllColumns = new System.Windows.Forms.CheckBox();
-            this.label38 = new System.Windows.Forms.Label();
-            this.CLBTrimHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.label39 = new System.Windows.Forms.Label();
+            this.CbProcedureHide = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -286,6 +287,8 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbTrim.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DGVTrimColumns)).BeginInit();
             this.gbSubstring.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringEnd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringStart)).BeginInit();
@@ -312,7 +315,6 @@
             this.gbCompare.SuspendLayout();
             this.gbMerge.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
-            this.gbTrim.SuspendLayout();
             this.gbOrder.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).BeginInit();
             this.gbDefDuplicate.SuspendLayout();
@@ -346,7 +348,6 @@
             this.gbCaseShortcuts.SuspendLayout();
             this.gbCaseColumns.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.DGVTrimColumns)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -439,6 +440,7 @@
             // 
             // gbSearchAndReplace
             // 
+            this.gbSearchAndReplace.Controls.Add(this.CbProcedureHide);
             this.gbSearchAndReplace.Controls.Add(this.CBLeaveEmpty);
             this.gbSearchAndReplace.Controls.Add(this.CbProcWordCheck);
             this.gbSearchAndReplace.Controls.Add(this.cbCheckTotal);
@@ -805,6 +807,161 @@
             this.button4.Text = "<<";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // gbTrim
+            // 
+            this.gbTrim.Controls.Add(this.CLBTrimHeaders);
+            this.gbTrim.Controls.Add(this.label39);
+            this.gbTrim.Controls.Add(this.label38);
+            this.gbTrim.Controls.Add(this.CBTrimAllColumns);
+            this.gbTrim.Controls.Add(this.DGVTrimColumns);
+            this.gbTrim.Controls.Add(this.label10);
+            this.gbTrim.Controls.Add(this.CbTrimDeleteDouble);
+            this.gbTrim.Controls.Add(this.RbTrimStartEnd);
+            this.gbTrim.Controls.Add(this.RbTrimEnd);
+            this.gbTrim.Controls.Add(this.RbTrimStart);
+            this.gbTrim.Controls.Add(this.lblTrimCharacter);
+            this.gbTrim.Controls.Add(this.TxtTrimText);
+            this.gbTrim.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbTrim.Location = new System.Drawing.Point(0, 92);
+            this.gbTrim.Name = "gbTrim";
+            this.gbTrim.Size = new System.Drawing.Size(245, 643);
+            this.gbTrim.TabIndex = 25;
+            this.gbTrim.TabStop = false;
+            this.gbTrim.Text = "Spaltenangabe";
+            // 
+            // CLBTrimHeaders
+            // 
+            this.CLBTrimHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CLBTrimHeaders.CheckOnClick = true;
+            this.CLBTrimHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.CLBTrimHeaders.DropDownHeight = 1;
+            this.CLBTrimHeaders.FormattingEnabled = true;
+            this.CLBTrimHeaders.IntegralHeight = false;
+            this.CLBTrimHeaders.Location = new System.Drawing.Point(8, 325);
+            this.CLBTrimHeaders.Name = "CLBTrimHeaders";
+            this.CLBTrimHeaders.Size = new System.Drawing.Size(233, 21);
+            this.CLBTrimHeaders.TabIndex = 19;
+            this.CLBTrimHeaders.ValueSeparator = ", ";
+            this.CLBTrimHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.CLBTrimHeaders_ItemCheck);
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(4, 309);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(209, 13);
+            this.label39.TabIndex = 18;
+            this.label39.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(7, 351);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(121, 13);
+            this.label38.TabIndex = 17;
+            this.label38.Text = "Angewendeten Spalten:";
+            // 
+            // CBTrimAllColumns
+            // 
+            this.CBTrimAllColumns.AutoSize = true;
+            this.CBTrimAllColumns.Location = new System.Drawing.Point(7, 267);
+            this.CBTrimAllColumns.Name = "CBTrimAllColumns";
+            this.CBTrimAllColumns.Size = new System.Drawing.Size(153, 17);
+            this.CBTrimAllColumns.TabIndex = 16;
+            this.CBTrimAllColumns.Text = "Auf alle Spalten anwenden";
+            this.CBTrimAllColumns.UseVisualStyleBackColor = true;
+            this.CBTrimAllColumns.CheckedChanged += new System.EventHandler(this.CBTrimAllColumns_CheckedChanged);
+            // 
+            // DGVTrimColumns
+            // 
+            this.DGVTrimColumns.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.DGVTrimColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.DGVTrimColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DGVTrimColumns.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.DGVTrimColumns.Location = new System.Drawing.Point(10, 367);
+            this.DGVTrimColumns.Name = "DGVTrimColumns";
+            this.DGVTrimColumns.Size = new System.Drawing.Size(230, 256);
+            this.DGVTrimColumns.TabIndex = 15;
+            this.DGVTrimColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            // 
+            // label10
+            // 
+            this.label10.Location = new System.Drawing.Point(25, 203);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(248, 49);
+            this.label10.TabIndex = 14;
+            this.label10.Text = "Wenn das Zeichen öfter als 1 Mal hintereinander vorkommt, wird es auf 1 gesetzt. " +
+    "Also zum Beispiel wird dann aus zwei Leerzeichen ein Leerzeichen";
+            // 
+            // CbTrimDeleteDouble
+            // 
+            this.CbTrimDeleteDouble.AutoSize = true;
+            this.CbTrimDeleteDouble.Location = new System.Drawing.Point(6, 177);
+            this.CbTrimDeleteDouble.Name = "CbTrimDeleteDouble";
+            this.CbTrimDeleteDouble.Size = new System.Drawing.Size(168, 17);
+            this.CbTrimDeleteDouble.TabIndex = 13;
+            this.CbTrimDeleteDouble.Text = "Doppelte Vorkommen löschen";
+            this.CbTrimDeleteDouble.UseVisualStyleBackColor = true;
+            this.CbTrimDeleteDouble.CheckedChanged += new System.EventHandler(this.CbTrimDeleteDouble_CheckedChanged);
+            // 
+            // RbTrimStartEnd
+            // 
+            this.RbTrimStartEnd.AutoSize = true;
+            this.RbTrimStartEnd.Location = new System.Drawing.Point(5, 138);
+            this.RbTrimStartEnd.Name = "RbTrimStartEnd";
+            this.RbTrimStartEnd.Size = new System.Drawing.Size(108, 17);
+            this.RbTrimStartEnd.TabIndex = 12;
+            this.RbTrimStartEnd.TabStop = true;
+            this.RbTrimStartEnd.Text = "Vorne und Hinten";
+            this.RbTrimStartEnd.UseVisualStyleBackColor = true;
+            this.RbTrimStartEnd.CheckedChanged += new System.EventHandler(this.RbTrimStartEnd_CheckedChanged);
+            // 
+            // RbTrimEnd
+            // 
+            this.RbTrimEnd.AutoSize = true;
+            this.RbTrimEnd.Location = new System.Drawing.Point(6, 107);
+            this.RbTrimEnd.Name = "RbTrimEnd";
+            this.RbTrimEnd.Size = new System.Drawing.Size(56, 17);
+            this.RbTrimEnd.TabIndex = 11;
+            this.RbTrimEnd.TabStop = true;
+            this.RbTrimEnd.Text = "Hinten";
+            this.RbTrimEnd.UseVisualStyleBackColor = true;
+            this.RbTrimEnd.CheckedChanged += new System.EventHandler(this.RbTrimEnd_CheckedChanged);
+            // 
+            // RbTrimStart
+            // 
+            this.RbTrimStart.AutoSize = true;
+            this.RbTrimStart.Location = new System.Drawing.Point(6, 76);
+            this.RbTrimStart.Name = "RbTrimStart";
+            this.RbTrimStart.Size = new System.Drawing.Size(53, 17);
+            this.RbTrimStart.TabIndex = 10;
+            this.RbTrimStart.TabStop = true;
+            this.RbTrimStart.Text = "Vorne";
+            this.RbTrimStart.UseVisualStyleBackColor = true;
+            this.RbTrimStart.CheckedChanged += new System.EventHandler(this.RbTrimStart_CheckedChanged);
+            // 
+            // lblTrimCharacter
+            // 
+            this.lblTrimCharacter.AutoSize = true;
+            this.lblTrimCharacter.Location = new System.Drawing.Point(2, 16);
+            this.lblTrimCharacter.Name = "lblTrimCharacter";
+            this.lblTrimCharacter.Size = new System.Drawing.Size(49, 13);
+            this.lblTrimCharacter.TabIndex = 9;
+            this.lblTrimCharacter.Text = "Zeichen:";
+            // 
+            // TxtTrimText
+            // 
+            this.TxtTrimText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtTrimText.Location = new System.Drawing.Point(5, 35);
+            this.TxtTrimText.Name = "TxtTrimText";
+            this.TxtTrimText.Size = new System.Drawing.Size(233, 20);
+            this.TxtTrimText.TabIndex = 8;
+            this.TxtTrimText.TextChanged += new System.EventHandler(this.TxtTrimText_TextChanged);
             // 
             // gbSubstring
             // 
@@ -2267,103 +2424,6 @@
             this.txtNewColumnMerge.TabIndex = 2;
             this.txtNewColumnMerge.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
             // 
-            // gbTrim
-            // 
-            this.gbTrim.Controls.Add(this.CLBTrimHeaders);
-            this.gbTrim.Controls.Add(this.label39);
-            this.gbTrim.Controls.Add(this.label38);
-            this.gbTrim.Controls.Add(this.CBTrimAllColumns);
-            this.gbTrim.Controls.Add(this.DGVTrimColumns);
-            this.gbTrim.Controls.Add(this.label10);
-            this.gbTrim.Controls.Add(this.CbTrimDeleteDouble);
-            this.gbTrim.Controls.Add(this.RbTrimStartEnd);
-            this.gbTrim.Controls.Add(this.RbTrimEnd);
-            this.gbTrim.Controls.Add(this.RbTrimStart);
-            this.gbTrim.Controls.Add(this.lblTrimCharacter);
-            this.gbTrim.Controls.Add(this.TxtTrimText);
-            this.gbTrim.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbTrim.Location = new System.Drawing.Point(0, 92);
-            this.gbTrim.Name = "gbTrim";
-            this.gbTrim.Size = new System.Drawing.Size(245, 643);
-            this.gbTrim.TabIndex = 25;
-            this.gbTrim.TabStop = false;
-            this.gbTrim.Text = "Spaltenangabe";
-            // 
-            // label10
-            // 
-            this.label10.Location = new System.Drawing.Point(25, 203);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(248, 49);
-            this.label10.TabIndex = 14;
-            this.label10.Text = "Wenn das Zeichen öfter als 1 Mal hintereinander vorkommt, wird es auf 1 gesetzt. " +
-    "Also zum Beispiel wird dann aus zwei Leerzeichen ein Leerzeichen";
-            // 
-            // CbTrimDeleteDouble
-            // 
-            this.CbTrimDeleteDouble.AutoSize = true;
-            this.CbTrimDeleteDouble.Location = new System.Drawing.Point(6, 177);
-            this.CbTrimDeleteDouble.Name = "CbTrimDeleteDouble";
-            this.CbTrimDeleteDouble.Size = new System.Drawing.Size(168, 17);
-            this.CbTrimDeleteDouble.TabIndex = 13;
-            this.CbTrimDeleteDouble.Text = "Doppelte Vorkommen löschen";
-            this.CbTrimDeleteDouble.UseVisualStyleBackColor = true;
-            this.CbTrimDeleteDouble.CheckedChanged += new System.EventHandler(this.CbTrimDeleteDouble_CheckedChanged);
-            // 
-            // RbTrimStartEnd
-            // 
-            this.RbTrimStartEnd.AutoSize = true;
-            this.RbTrimStartEnd.Location = new System.Drawing.Point(5, 138);
-            this.RbTrimStartEnd.Name = "RbTrimStartEnd";
-            this.RbTrimStartEnd.Size = new System.Drawing.Size(108, 17);
-            this.RbTrimStartEnd.TabIndex = 12;
-            this.RbTrimStartEnd.TabStop = true;
-            this.RbTrimStartEnd.Text = "Vorne und Hinten";
-            this.RbTrimStartEnd.UseVisualStyleBackColor = true;
-            this.RbTrimStartEnd.CheckedChanged += new System.EventHandler(this.RbTrimStartEnd_CheckedChanged);
-            // 
-            // RbTrimEnd
-            // 
-            this.RbTrimEnd.AutoSize = true;
-            this.RbTrimEnd.Location = new System.Drawing.Point(6, 107);
-            this.RbTrimEnd.Name = "RbTrimEnd";
-            this.RbTrimEnd.Size = new System.Drawing.Size(56, 17);
-            this.RbTrimEnd.TabIndex = 11;
-            this.RbTrimEnd.TabStop = true;
-            this.RbTrimEnd.Text = "Hinten";
-            this.RbTrimEnd.UseVisualStyleBackColor = true;
-            this.RbTrimEnd.CheckedChanged += new System.EventHandler(this.RbTrimEnd_CheckedChanged);
-            // 
-            // RbTrimStart
-            // 
-            this.RbTrimStart.AutoSize = true;
-            this.RbTrimStart.Location = new System.Drawing.Point(6, 76);
-            this.RbTrimStart.Name = "RbTrimStart";
-            this.RbTrimStart.Size = new System.Drawing.Size(53, 17);
-            this.RbTrimStart.TabIndex = 10;
-            this.RbTrimStart.TabStop = true;
-            this.RbTrimStart.Text = "Vorne";
-            this.RbTrimStart.UseVisualStyleBackColor = true;
-            this.RbTrimStart.CheckedChanged += new System.EventHandler(this.RbTrimStart_CheckedChanged);
-            // 
-            // lblTrimCharacter
-            // 
-            this.lblTrimCharacter.AutoSize = true;
-            this.lblTrimCharacter.Location = new System.Drawing.Point(2, 16);
-            this.lblTrimCharacter.Name = "lblTrimCharacter";
-            this.lblTrimCharacter.Size = new System.Drawing.Size(49, 13);
-            this.lblTrimCharacter.TabIndex = 9;
-            this.lblTrimCharacter.Text = "Zeichen:";
-            // 
-            // TxtTrimText
-            // 
-            this.TxtTrimText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtTrimText.Location = new System.Drawing.Point(5, 35);
-            this.TxtTrimText.Name = "TxtTrimText";
-            this.TxtTrimText.Size = new System.Drawing.Size(233, 20);
-            this.TxtTrimText.TabIndex = 8;
-            this.TxtTrimText.TextChanged += new System.EventHandler(this.TxtTrimText_TextChanged);
-            // 
             // gbOrder
             // 
             this.gbOrder.Controls.Add(this.label8);
@@ -3205,63 +3265,16 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // DGVTrimColumns
+            // CbProcedureHide
             // 
-            this.DGVTrimColumns.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.DGVTrimColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.DGVTrimColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DGVTrimColumns.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.DGVTrimColumns.Location = new System.Drawing.Point(10, 367);
-            this.DGVTrimColumns.Name = "DGVTrimColumns";
-            this.DGVTrimColumns.Size = new System.Drawing.Size(230, 256);
-            this.DGVTrimColumns.TabIndex = 15;
-            this.DGVTrimColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
-            // 
-            // CBTrimAllColumns
-            // 
-            this.CBTrimAllColumns.AutoSize = true;
-            this.CBTrimAllColumns.Location = new System.Drawing.Point(7, 267);
-            this.CBTrimAllColumns.Name = "CBTrimAllColumns";
-            this.CBTrimAllColumns.Size = new System.Drawing.Size(153, 17);
-            this.CBTrimAllColumns.TabIndex = 16;
-            this.CBTrimAllColumns.Text = "Auf alle Spalten anwenden";
-            this.CBTrimAllColumns.UseVisualStyleBackColor = true;
-            this.CBTrimAllColumns.CheckedChanged += new System.EventHandler(this.CBTrimAllColumns_CheckedChanged);
-            // 
-            // label38
-            // 
-            this.label38.AutoSize = true;
-            this.label38.Location = new System.Drawing.Point(7, 351);
-            this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(121, 13);
-            this.label38.TabIndex = 17;
-            this.label38.Text = "Angewendeten Spalten:";
-            // 
-            // CLBTrimHeaders
-            // 
-            this.CLBTrimHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CLBTrimHeaders.CheckOnClick = true;
-            this.CLBTrimHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.CLBTrimHeaders.DropDownHeight = 1;
-            this.CLBTrimHeaders.FormattingEnabled = true;
-            this.CLBTrimHeaders.IntegralHeight = false;
-            this.CLBTrimHeaders.Location = new System.Drawing.Point(8, 325);
-            this.CLBTrimHeaders.Name = "CLBTrimHeaders";
-            this.CLBTrimHeaders.Size = new System.Drawing.Size(233, 21);
-            this.CLBTrimHeaders.TabIndex = 19;
-            this.CLBTrimHeaders.ValueSeparator = ", ";
-            this.CLBTrimHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.CLBTrimHeaders_ItemCheck);
-            // 
-            // label39
-            // 
-            this.label39.AutoSize = true;
-            this.label39.Location = new System.Drawing.Point(4, 309);
-            this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(209, 13);
-            this.label39.TabIndex = 18;
-            this.label39.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            this.CbProcedureHide.AutoSize = true;
+            this.CbProcedureHide.Location = new System.Drawing.Point(22, 82);
+            this.CbProcedureHide.Name = "CbProcedureHide";
+            this.CbProcedureHide.Size = new System.Drawing.Size(151, 17);
+            this.CbProcedureHide.TabIndex = 13;
+            this.CbProcedureHide.Text = "Im Hauptmenü verstecken";
+            this.CbProcedureHide.UseVisualStyleBackColor = true;
+            this.CbProcedureHide.CheckedChanged += new System.EventHandler(this.CbProcedureHide_CheckedChanged);
             // 
             // Administration
             // 
@@ -3300,6 +3313,9 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbTrim.ResumeLayout(false);
+            this.gbTrim.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DGVTrimColumns)).EndInit();
             this.gbSubstring.ResumeLayout(false);
             this.gbSubstring.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbSubstringEnd)).EndInit();
@@ -3338,8 +3354,6 @@
             this.gbMerge.ResumeLayout(false);
             this.gbMerge.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).EndInit();
-            this.gbTrim.ResumeLayout(false);
-            this.gbTrim.PerformLayout();
             this.gbOrder.ResumeLayout(false);
             this.gbOrder.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).EndInit();
@@ -3382,7 +3396,6 @@
             this.gbCaseShortcuts.PerformLayout();
             this.gbCaseColumns.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.DGVTrimColumns)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -3624,5 +3637,6 @@
         private System.Windows.Forms.DataGridView DGVTrimColumns;
         private CheckComboBoxTest.CheckedComboBox CLBTrimHeaders;
         private System.Windows.Forms.Label label39;
+        private System.Windows.Forms.CheckBox CbProcedureHide;
     }
 }

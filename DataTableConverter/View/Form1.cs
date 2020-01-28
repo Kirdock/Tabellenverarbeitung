@@ -24,7 +24,6 @@ namespace DataTableConverter
     public partial class Form1 : Form
     {
         private int selectedRow = 0, selectedColumn = 0;
-        
         private List<Proc> procedures;
         private List<Work> workflows;
         private List<Tolerance> tolerances;
@@ -34,7 +33,7 @@ namespace DataTableConverter
         private DataTable sourceTable;
         private string SortingOrder;
         private Dictionary<string, SortOrder> dictSorting;
-        private int rowBefore; //Wenn eine Zelle im DataGridView geändert wird, kann ich mit dgTable[col, row] den geänderten Wert nicht holen, da die DataGridView zu diesem Zeitpunkt wieder sortiert wurde
+        private int rowBefore; //When a row in DataGridView is changed, then I'm not able to get the value through dgTable[col, row], because the DataGridView was sorted again at this moment
         private List<string> dictKeys;
         private string FilePath = string.Empty;
         private OrderType OrderType = OrderType.Windows;
@@ -340,12 +339,12 @@ namespace DataTableConverter
             ToolStripMenuItem tempProcedure = new ToolStripMenuItem("Temporäre Eingabe");
             tempProcedure.Click += TempProcedure_Click;
             ersetzenToolStripMenuItem.DropDownItems.Add(tempProcedure);
-
-            for (int i = 0; i < procedures.Count; i++)
+            List<Proc> visibleProc = procedures.Where(vproc => !vproc.HideInMainForm).ToList();
+            for (int i = 0; i < visibleProc.Count; i++)
             {
                 int index = i;
-                ToolStripMenuItem item = new ToolStripMenuItem(procedures[i].Name);
-                item.Click += (sender, e) => procedure_Click(procedures[index]);
+                ToolStripMenuItem item = new ToolStripMenuItem(visibleProc[i].Name);
+                item.Click += (sender, e) => procedure_Click(visibleProc[index]);
                 ersetzenToolStripMenuItem.DropDownItems.Add(item);
             }   
         }
@@ -552,7 +551,6 @@ namespace DataTableConverter
                     {
                         try
                         {
-
                             string filename = Path.GetFileName(file);
                             DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding);
                             if (table != null)
@@ -571,7 +569,6 @@ namespace DataTableConverter
                                     fileNameSet = true;
                                     SetFileMeta(file, fileEncoding);
                                 }
-
                             }
                         }
                         catch (Exception ex)
@@ -1766,41 +1763,7 @@ namespace DataTableConverter
             SplitFormMain form = new SplitFormMain(sourceTable.HeadersOfDataTable());
             if(form.ShowDialog(this) == DialogResult.OK)
             {
-                DataTable table = GetDataSource();
-                string column = form.Column;
-                string splitText = form.SplitText;
-                string newColumn = form.NewColumn;
-                StartLoadingBar();
-                Thread thread = new Thread(() =>
-                {
-                    List<string> newColumns = new List<string>() { table.TryAddColumn(newColumn) };
-                    int counter = 1;
-                    foreach(DataRow row in table.Rows)
-                    {
-                        string[] result = row[column].ToString().Split(new string[] { splitText }, StringSplitOptions.RemoveEmptyEntries);
-                        if (result.Length > 1)
-                        {
-                            while (counter < result.Length)
-                            {
-                                newColumns.Add(table.TryAddColumn(newColumn, counter));
-                                counter++;
-                            }
-
-                            for (int i = 0; i < result.Length; i++)
-                            {
-                                row[newColumns[i]] = result[i];
-                            }
-                            
-                        }
-                    }
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        AddDataSourceValueChange(table);
-                    }));
-                    StopLoadingBar();
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
+                StartSingleWorkflow(form.Procedure);
             }
         }
 

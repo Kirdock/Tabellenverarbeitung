@@ -17,6 +17,7 @@ namespace DataTableConverter.Classes
         public bool Locked { get; set; }
         public bool CheckWord { get; set; }
         public bool LeaveEmpty { get; set; }
+        public bool HideInMainForm { get; set; }
 
         public Proc(string name, DataTable replace, int id)
         {

@@ -34,6 +34,17 @@ namespace DataTableConverter.Extensions
             }
         }
 
+        internal static void RemoveNewLine(this DataTable table)
+        {
+            foreach(DataRow row in table.AsEnumerable())
+            {
+                for (int i = 0; i < row.ItemArray.Length; i++)
+                {
+                    row[i] = row[i].ToString().Replace("\n", string.Empty);
+                }
+            }
+        }
+
         internal static List<string> HeadersToLower(this DataTable table)
         {
             return table.Columns.Cast<DataColumn>().Select(dt => dt.ColumnName.ToLower()).ToList();

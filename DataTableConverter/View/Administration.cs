@@ -527,6 +527,7 @@ namespace DataTableConverter.View
                 cbCheckTotal.Checked = selectedProc.CheckTotal;
                 CBLeaveEmpty.Checked = selectedProc.LeaveEmpty;
                 CbProcWordCheck.Checked = selectedProc.CheckWord;
+                CbProcedureHide.Checked = selectedProc.HideInMainForm;
                 SetProcedureLock(selectedProc);
             }
         }
@@ -2450,6 +2451,14 @@ namespace DataTableConverter.View
         private void CLBTrimHeaders_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             ViewHelper.AddRemoveHeaderThroughCheckedListBox(DGVTrimColumns, e, (CheckedListBox)sender);
+        }
+
+        private void CbProcedureHide_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lbProcedures.SelectedIndex != -1)
+            {
+                selectedProc.HideInMainForm = CbProcedureHide.Checked;
+            }
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

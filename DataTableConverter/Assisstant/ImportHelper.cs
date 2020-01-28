@@ -370,6 +370,7 @@ namespace DataTableConverter.Assisstant
             OleDbDataAdapter da = new OleDbDataAdapter(new OleDbCommand(sql, con));
             da.Fill(data);
             da.Dispose();
+            data.RemoveNewLine();
             return data.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? data : data.SetColumnsTypeStringWithContainingData();
         }
 
