@@ -858,7 +858,7 @@ namespace DataTableConverter.Assisstant
             return dt;
         }
 
-        internal static List<Proc> LoadProcedures()
+        internal static List<Proc> LoadProcedures(Form mainForm)
         {
             List<Proc> data = new List<Proc>();
             if (File.Exists(ProjectProcedures))
@@ -874,6 +874,38 @@ namespace DataTableConverter.Assisstant
                 }
                 catch (IOException)
                 {
+                }
+                if (!ExportHelper.SaveProcedures(data, mainForm))
+                {
+                    File.Delete(ProjectWorkflows);
+                }
+            }
+            else
+            {
+                string[] files = ExportHelper.GetProcedures();
+                bool error = false;
+                foreach (string file in files)
+                {
+                    try
+                    {
+                        using (Stream stream = File.Open(file, FileMode.Open))
+                        {
+                            BinaryFormatter bin = new BinaryFormatter();
+                            if (bin.Deserialize(stream) is Proc proc)
+                            {
+                                data.Add(proc);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        error = true;
+                        ErrorHelper.LogMessage(ex, mainForm, false);
+                    }
+                }
+                if (error)
+                {
+                    mainForm.MessagesOK(MessageBoxIcon.Error, "Es konnten nicht alle Arbeitsabläufe geladen werden");
                 }
             }
             return data;
@@ -939,6 +971,17 @@ namespace DataTableConverter.Assisstant
             {
                 BinaryFormatter bin = new BinaryFormatter();
                 result = bin.Deserialize(stream) as Work;
+            }
+            return result;
+        }
+
+        internal static Proc LoadProcedure(string path)
+        {
+            Proc result = null;
+            using(Stream stream = File.Open(path, FileMode.Open))
+            {
+                BinaryFormatter bin = new BinaryFormatter();
+                result = bin.Deserialize(stream) as Proc;
             }
             return result;
         }

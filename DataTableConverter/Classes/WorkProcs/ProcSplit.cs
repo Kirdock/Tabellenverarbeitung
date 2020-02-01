@@ -12,6 +12,7 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     class ProcSplit : WorkProc
     {
+        internal static readonly string ClassName = "Aufteilen";
         public string Column;
         public string SplitText;
 

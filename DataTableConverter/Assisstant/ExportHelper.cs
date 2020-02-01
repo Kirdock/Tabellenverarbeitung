@@ -36,6 +36,7 @@ namespace DataTableConverter
         internal static string ProjectCases => Path.Combine(ProjectPath,"Fälle.bin");
         internal static string ProjectWorkflows => Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
         internal static string WorkflowPath => Path.Combine(ProjectPath, "Arbeitsabläufe");
+        internal static string ProcedurePath => Path.Combine(ProjectPath, "Suchen & Ersetzen");
         internal static string ProjectHeaderPresets => Path.Combine(ProjectPath, "Vorlagen Überschriften");
         private static readonly string CSVSeparator = ";";
         private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
@@ -67,6 +68,10 @@ namespace DataTableConverter
             {
                 Directory.CreateDirectory(WorkflowPath);
             }
+            if (!Directory.Exists(ProcedurePath))
+            {
+                Directory.CreateDirectory(ProcedurePath);
+            }
         }
 
         private static void CheckFont()
@@ -91,20 +96,34 @@ namespace DataTableConverter
             }
         }
         
-        internal static bool SaveProcedures(List<Proc> procedures)
+        internal static bool SaveProcedures(List<Proc> procedures, Form mainForm)
         {
             bool error = false;
-            try
+            List<string> files = new List<string>(GetProcedures());
+            foreach (Proc proc in procedures.Where(proc => proc.Name != null))
             {
-                using (Stream stream = File.Open(ProjectProcedures, FileMode.Create))
+                try
                 {
-                    BinaryFormatter bin = new BinaryFormatter();
-                    bin.Serialize(stream, procedures);
+                    string path = Path.Combine(ProcedurePath, proc.Name + ".bin");
+                    using (Stream stream = File.Open(path, FileMode.Create))
+                    {
+                        BinaryFormatter bin = new BinaryFormatter();
+                        bin.Serialize(stream, proc);
+                        files.Remove(path);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    error = true;
+                    ErrorHelper.LogMessage(ex, mainForm, false);
                 }
             }
-            catch (IOException)
+            if (!error)
             {
-                error = true;
+                foreach (string file in files)
+                {
+                    File.Delete(file);
+                }
             }
             return error;
         }
@@ -143,7 +162,12 @@ namespace DataTableConverter
 
         internal static string[] GetWorkflows()
         {
-            return Directory.GetFiles(WorkflowPath, "*.bin"); ;
+            return Directory.GetFiles(WorkflowPath, "*.bin");
+        }
+
+        internal static string[] GetProcedures()
+        {
+            return Directory.GetFiles(ProcedurePath, "*.bin");
         }
 
         internal static bool SaveTextImportTemplate(TextImportTemplate template, string path)
@@ -265,7 +289,7 @@ namespace DataTableConverter
 
 
                 int rowCount = dt.Rows.Count;
-                InsertHeadersToExcel(dt, worksheet, workSheetName);
+                InsertHeadersToExcel(dt, worksheet);
                 InsertRowsSkeleton(worksheet, rowCount, columns);
                 
                 int rowStart = 2;
@@ -317,7 +341,7 @@ namespace DataTableConverter
             return path;
         }
 
-        private static Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(DataTable table, Microsoft.Office.Interop.Excel.Worksheet worksheet, string worksheetName)
+        private static Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(DataTable table, Microsoft.Office.Interop.Excel.Worksheet worksheet)
         {
             // Insert column headers.
             object[,] data = new object[1, table.Columns.Count];

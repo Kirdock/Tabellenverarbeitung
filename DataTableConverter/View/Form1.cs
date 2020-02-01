@@ -334,7 +334,7 @@ namespace DataTableConverter
         {
             ersetzenToolStripMenuItem.DropDownItems.Clear();
             
-            procedures = proc ?? ImportHelper.LoadProcedures();
+            procedures = proc ?? ImportHelper.LoadProcedures(this);
 
             ToolStripMenuItem tempProcedure = new ToolStripMenuItem("Temporäre Eingabe");
             tempProcedure.Click += TempProcedure_Click;

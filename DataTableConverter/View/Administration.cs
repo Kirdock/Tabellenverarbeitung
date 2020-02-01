@@ -98,7 +98,8 @@ namespace DataTableConverter.View
                 { gbCount, typeof(ProcCount) },
                 { gbTrim, typeof(ProcTrim) },
                 { gbSeparate, typeof(ProcSeparate) },
-                { GbSearch, typeof(ProcSearch) }
+                { GbSearch, typeof(ProcSearch) },
+                { GbSplit, typeof(ProcSplit) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -118,7 +119,8 @@ namespace DataTableConverter.View
                 { typeof(ProcPVMExport), SetPVMExportControls },
                 { typeof(ProcCount), SetCountControls },
                 { typeof(ProcSeparate), SetSeparateControls },
-                { typeof(ProcSearch), SetSearchControls }
+                { typeof(ProcSearch), SetSearchControls },
+                { typeof(ProcSplit), SetSplitControls }
             };
         }
 
@@ -140,7 +142,8 @@ namespace DataTableConverter.View
                 new Proc(ProcPVMExport.ClassName, null, 12),
                 new Proc(ProcCount.ClassName, null, 13),
                 new Proc(ProcSeparate.ClassName, null, 14),
-                new Proc(ProcSearch.ClassName, null, 15)
+                new Proc(ProcSearch.ClassName, null, 15),
+                new Proc(ProcSplit.ClassName, null, 16)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -174,7 +177,10 @@ namespace DataTableConverter.View
                 lblCompareNewColumn,
                 lblCountColumn,
                 lblTrimCharacter,
-                LblSeparateColumn
+                LblSeparateColumn,
+                LblSplitColumn,
+                LblSplitNewColumn,
+                LblSplitText
             };
             foreach (Label label in labels)
             {
@@ -364,7 +370,7 @@ namespace DataTableConverter.View
             SaveSize();
             Properties.Settings.Default.Save();
 
-            if ((ExportHelper.SaveWorkflows(Workflows, this) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases)))
+            if ((ExportHelper.SaveWorkflows(Workflows, this) || ExportHelper.SaveProcedures(Procedures, this) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases)))
             {
                 DialogResult result = this.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!\nMöchten Sie das Fenster trotzdem schließen?");
                 e.Cancel = result == DialogResult.No;
@@ -947,6 +953,15 @@ namespace DataTableConverter.View
             TxtSearchShortcut.Text = proc.Shortcut;
             NbSearchFrom.Value = proc.From;
             NbSearchTo.Value = proc.To;
+        }
+
+        private void SetSplitControls(WorkProc selectedProc)
+        {
+            ProcSplit proc = selectedProc as ProcSplit;
+            lblOriginalNameText.Text = ProcSearch.ClassName;
+            TxtSplitColumn.Text = proc.Column;
+            TxtSplitText.Text = proc.SplitText;
+            TxtSplitNewColumn.Text = proc.NewColumn;
         }
 
         private void SetDuplicateControls(WorkProc selectedProc)
@@ -1947,7 +1962,7 @@ namespace DataTableConverter.View
 
         private void BtnSave_Click(object sender, EventArgs e)
         {
-            if (ExportHelper.SaveWorkflows(Workflows, this) || ExportHelper.SaveProcedures(Procedures) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
+            if (ExportHelper.SaveWorkflows(Workflows, this) || ExportHelper.SaveProcedures(Procedures, this) || ExportHelper.SaveTolerances(Tolerances) || ExportHelper.SaveCases(Cases))
             {
                 this.MessagesYesNo(MessageBoxIcon.Warning, "Es ist ein Fehler beim Speichern aufgetreten!");
             }
@@ -2309,6 +2324,29 @@ namespace DataTableConverter.View
             return valid;
         }
 
+        private bool CheckProcedure(Proc proc)
+        {
+            Proc foundProc = bindingProcedure.FirstOrDefault(item => item.Name == proc.Name);
+            bool valid = foundProc == null;
+            if (!valid)
+            {
+                CustomMessageBox box = new CustomMessageBox(MessageBoxIcon.Warning, $"Es gibt bereits eine \"Suchen & Ersetzen\"-Funktion mit dem Namen\n\"{proc.Name}\"", "Überschreiben", "Umbenennen", "Abbrechen");
+                DialogResult res = box.ShowDialog(this);
+                box.Dispose();
+                if (res == DialogResult.OK)
+                {
+                    bindingProcedure.Remove(foundProc);
+                    valid = true;
+                }
+                else if (res == DialogResult.Yes)
+                {
+                    proc.Name = Microsoft.VisualBasic.Interaction.InputBox("Umbenennen der zu importierenden \"Suchen & Ersetzen\"-Funktion", "Name der  \"Suchen & Ersetzen\"-Funktion", proc.Name);
+                    return CheckProcedure(proc);
+                }
+            }
+            return valid;
+        }
+
         private void BtnSeparateLoadEntries_Click(object sender, EventArgs e)
         {
             if (Table != null)
@@ -2459,6 +2497,57 @@ namespace DataTableConverter.View
             {
                 selectedProc.HideInMainForm = CbProcedureHide.Checked;
             }
+        }
+
+        private void BtnImportProcedure_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Bin-Dateien (*.bin*)|*.bin",
+                RestoreDirectory = true,
+                Multiselect = true
+            };
+            if (dialog.ShowDialog(this) == DialogResult.OK)
+            {
+                int lastId = -1;
+                foreach (string file in dialog.FileNames)
+                {
+                    Proc proc = ImportHelper.LoadProcedure(file);
+                    if (proc != null)
+                    {
+                        proc.Name = Path.GetFileNameWithoutExtension(file);
+                        proc.Id = MaxIdProcedure() + 1;
+                        proc.HideInMainForm = proc.Locked = false;
+
+                        if (CheckProcedure(proc))
+                        {
+                            bindingProcedure.Add(proc);
+                            lastId = proc.Id;
+                        }
+                    }
+                }
+                if (lastId != -1)
+                {
+                    SortProcedureList(lastId);
+                }
+                ltbProcedures_SelectedIndexChanged(null, null);
+            }
+            dialog.Dispose();
+        }
+
+        private void TxtSplitColumn_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSplit).Column = TxtSplitColumn.Text;
+        }
+
+        private void TxtSplitText_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSplit).SplitText = TxtSplitText.Text;
+        }
+
+        private void TxtSplitNewColumn_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSplit).NewColumn = TxtSplitNewColumn.Text;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)
