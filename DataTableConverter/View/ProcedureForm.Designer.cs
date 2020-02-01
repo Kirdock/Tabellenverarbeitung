@@ -33,6 +33,7 @@
             this.DGVProcedure = new System.Windows.Forms.DataGridView();
             this.CBLeaveEmpty = new System.Windows.Forms.CheckBox();
             this.BtnConfirm = new System.Windows.Forms.Button();
+            this.label40 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.DGVProcedure)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,10 +64,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DGVProcedure.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.DGVProcedure.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DGVProcedure.Location = new System.Drawing.Point(1, 27);
+            this.DGVProcedure.Location = new System.Drawing.Point(1, 52);
             this.DGVProcedure.Name = "DGVProcedure";
             this.DGVProcedure.RowHeadersVisible = false;
-            this.DGVProcedure.Size = new System.Drawing.Size(536, 389);
+            this.DGVProcedure.Size = new System.Drawing.Size(536, 364);
             this.DGVProcedure.TabIndex = 12;
             // 
             // CBLeaveEmpty
@@ -91,11 +92,21 @@
             this.BtnConfirm.UseVisualStyleBackColor = true;
             this.BtnConfirm.Click += new System.EventHandler(this.BtnConfirm_Click);
             // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(11, 30);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(204, 13);
+            this.label40.TabIndex = 18;
+            this.label40.Text = "[befüllt] ... Falls befüllt, ersetze durch Wert";
+            // 
             // ProcedureForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(536, 451);
+            this.Controls.Add(this.label40);
             this.Controls.Add(this.BtnConfirm);
             this.Controls.Add(this.CBLeaveEmpty);
             this.Controls.Add(this.CbCheckWord);
@@ -118,5 +129,6 @@
         private System.Windows.Forms.DataGridView DGVProcedure;
         private System.Windows.Forms.CheckBox CBLeaveEmpty;
         private System.Windows.Forms.Button BtnConfirm;
+        private System.Windows.Forms.Label label40;
     }
 }

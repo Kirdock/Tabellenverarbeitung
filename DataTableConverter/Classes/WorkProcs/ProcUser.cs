@@ -14,6 +14,7 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     internal class ProcUser : WorkProc
     {
+        internal static readonly string ContainsDataFormat = "[befüllt]";
         public override string[] GetHeaders()
         {
             return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
@@ -60,6 +61,9 @@ namespace DataTableConverter.Classes.WorkProcs
             IEnumerable<DataRow> replaces = procedure.Replace.AsEnumerable().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));
             IEnumerable<DataRow> replaceWithoutEmpty = replaces.Where(replace => replace[0].ToString() != string.Empty);
             IEnumerable<DataRow> replaceWithEmpty = replaces.Where(replace => replace[0].ToString() == string.Empty && replace[1].ToString().Length > 0);
+            DataRow replaceWhole = replaces.FirstOrDefault(replace => replace[0].ToString() == ContainsDataFormat);
+            string replaceWholeText = replaceWhole?[1].ToString() ?? string.Empty;
+            bool containsReplaceWhole = replaceWhole != null;
             bool containsEmpty = replaceWithEmpty.Count() > 0;
             string replaceEmptyString = containsEmpty ? replaceWithEmpty.First()[1].ToString() : string.Empty;
             if (CopyOldColumn)
@@ -81,8 +85,11 @@ namespace DataTableConverter.Classes.WorkProcs
                         string index = newColumn ?? column;
                         string value = row[column].ToString();
                         string result = value;
-
-                        if (procedure.CheckTotal)
+                        if (containsReplaceWhole && result != string.Empty)
+                        {
+                            result = replaceWholeText;
+                        }
+                        else if (procedure.CheckTotal)
                         {
                             DataRow foundRows = replaceWithoutEmpty.FirstOrDefault(replace => replace[0].ToString() == value);
                             if (foundRows != null)

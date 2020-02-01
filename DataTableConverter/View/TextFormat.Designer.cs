@@ -510,7 +510,7 @@
             this.dgvPreview.Location = new System.Drawing.Point(3, 16);
             this.dgvPreview.Name = "dgvPreview";
             this.dgvPreview.ReadOnly = true;
-            this.dgvPreview.Size = new System.Drawing.Size(794, 159);
+            this.dgvPreview.Size = new System.Drawing.Size(794, 137);
             this.dgvPreview.TabIndex = 0;
             this.dgvPreview.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgvSetting_RowPostPaint);
             // 

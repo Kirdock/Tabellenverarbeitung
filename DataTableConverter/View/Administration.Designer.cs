@@ -273,6 +273,7 @@
             this.clbHeaderProcedure = new CheckComboBoxTest.CheckedComboBox();
             this.clbUpLowHeader = new CheckComboBoxTest.CheckedComboBox();
             this.cbHeadersReplaceWhole = new CheckComboBoxTest.CheckedComboBox();
+            this.label40 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -450,6 +451,7 @@
             // 
             // gbSearchAndReplace
             // 
+            this.gbSearchAndReplace.Controls.Add(this.label40);
             this.gbSearchAndReplace.Controls.Add(this.CbProcedureHide);
             this.gbSearchAndReplace.Controls.Add(this.CBLeaveEmpty);
             this.gbSearchAndReplace.Controls.Add(this.CbProcWordCheck);
@@ -469,7 +471,7 @@
             // CbProcedureHide
             // 
             this.CbProcedureHide.AutoSize = true;
-            this.CbProcedureHide.Location = new System.Drawing.Point(22, 82);
+            this.CbProcedureHide.Location = new System.Drawing.Point(22, 81);
             this.CbProcedureHide.Name = "CbProcedureHide";
             this.CbProcedureHide.Size = new System.Drawing.Size(151, 17);
             this.CbProcedureHide.TabIndex = 13;
@@ -481,7 +483,7 @@
             // 
             this.CBLeaveEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.CBLeaveEmpty.AutoSize = true;
-            this.CBLeaveEmpty.Location = new System.Drawing.Point(525, 82);
+            this.CBLeaveEmpty.Location = new System.Drawing.Point(525, 81);
             this.CBLeaveEmpty.Name = "CBLeaveEmpty";
             this.CBLeaveEmpty.Size = new System.Drawing.Size(201, 17);
             this.CBLeaveEmpty.TabIndex = 12;
@@ -493,7 +495,7 @@
             // 
             this.CbProcWordCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.CbProcWordCheck.AutoSize = true;
-            this.CbProcWordCheck.Location = new System.Drawing.Point(525, 56);
+            this.CbProcWordCheck.Location = new System.Drawing.Point(525, 55);
             this.CbProcWordCheck.Name = "CbProcWordCheck";
             this.CbProcWordCheck.Size = new System.Drawing.Size(128, 17);
             this.CbProcWordCheck.TabIndex = 11;
@@ -505,7 +507,7 @@
             // 
             this.cbCheckTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbCheckTotal.AutoSize = true;
-            this.cbCheckTotal.Location = new System.Drawing.Point(525, 28);
+            this.cbCheckTotal.Location = new System.Drawing.Point(525, 27);
             this.cbCheckTotal.Name = "cbCheckTotal";
             this.cbCheckTotal.Size = new System.Drawing.Size(148, 17);
             this.cbCheckTotal.TabIndex = 10;
@@ -520,16 +522,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvReplaces.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvReplaces.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvReplaces.Location = new System.Drawing.Point(22, 105);
+            this.dgvReplaces.Location = new System.Drawing.Point(22, 143);
             this.dgvReplaces.Name = "dgvReplaces";
             this.dgvReplaces.RowHeadersVisible = false;
-            this.dgvReplaces.Size = new System.Drawing.Size(704, 610);
+            this.dgvReplaces.Size = new System.Drawing.Size(704, 572);
             this.dgvReplaces.TabIndex = 9;
             // 
             // lblProcName
             // 
             this.lblProcName.AutoSize = true;
-            this.lblProcName.Location = new System.Drawing.Point(19, 26);
+            this.lblProcName.Location = new System.Drawing.Point(19, 25);
             this.lblProcName.Name = "lblProcName";
             this.lblProcName.Size = new System.Drawing.Size(69, 13);
             this.lblProcName.TabIndex = 6;
@@ -539,7 +541,7 @@
             // 
             this.txtName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtName.Location = new System.Drawing.Point(22, 53);
+            this.txtName.Location = new System.Drawing.Point(22, 52);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(472, 20);
             this.txtName.TabIndex = 1;
@@ -3370,6 +3372,15 @@
             this.cbHeadersReplaceWhole.ValueSeparator = ", ";
             this.cbHeadersReplaceWhole.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeadersReplaceWhole_ItemCheck);
             // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(19, 117);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(204, 13);
+            this.label40.TabIndex = 14;
+            this.label40.Text = "[befüllt] ... Falls befüllt, ersetze durch Wert";
+            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -3742,5 +3753,6 @@
         private System.Windows.Forms.Label LblSplitColumn;
         private System.Windows.Forms.TextBox TxtSplitNewColumn;
         private System.Windows.Forms.Label LblSplitNewColumn;
+        private System.Windows.Forms.Label label40;
     }
 }
