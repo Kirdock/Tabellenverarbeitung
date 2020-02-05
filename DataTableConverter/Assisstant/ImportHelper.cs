@@ -792,13 +792,17 @@ namespace DataTableConverter.Assisstant
 
         private static void AddMultiCellColumn(string header, int count, DataTable table, DataRow row, StringBuilder text)
         {
-            string multiHeader = count == 0 ? header : header + count;
-            if (!table.Columns.Contains(multiHeader))
-            {
-                table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(table.Columns.IndexOf(header) + count);
-            }
-            row[multiHeader] = text.ToString();
+            string result = text.ToString();
             text.Clear();
+            if (result != string.Empty)
+            {
+                string multiHeader = count == 0 ? header : header + count;
+                if (!table.Columns.Contains(multiHeader))
+                {
+                    table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(table.Columns.IndexOf(header) + count);
+                }
+                row[multiHeader] = result;
+            }
         }
 
         private static bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)

@@ -119,6 +119,7 @@
     <Compile Include="Extensions\DataTableExtensions.cs" />
     <Compile Include="Extensions\ProgressBarExtension.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\TextBoxExtension.cs" />
     <Compile Include="View\Administration.cs">
       <SubType>Form</SubType>
     </Compile>

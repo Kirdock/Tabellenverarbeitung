@@ -528,7 +528,7 @@ namespace DataTableConverter.View
             else
             {
                 selectedProc = (Proc)ltbProcedures.SelectedItem;
-                txtName.Text = selectedProc.Name;
+                txtName.SetText(selectedProc.Name);
                 SetDataSource(dgvReplaces, selectedProc.Replace);
                 cbCheckTotal.Checked = selectedProc.CheckTotal;
                 CBLeaveEmpty.Checked = selectedProc.LeaveEmpty;
@@ -540,9 +540,7 @@ namespace DataTableConverter.View
 
         private void ResetForm()
         {
-            txtName.TextChanged -= txtName_TextChanged;
-            txtName.Text = string.Empty;
-            txtName.TextChanged += txtName_TextChanged;
+            txtName.SetText(string.Empty);
             dgvReplaces.DataSource = null;
             cbCheckTotal.CheckedChanged -= cbCheckTotal_CheckedChanged;
             cbCheckTotal.Checked = false;
@@ -664,13 +662,13 @@ namespace DataTableConverter.View
                 Work workflow = GetSelectedWorkflow();
                 SetWorkflowProcedures(workflow.Procedures);
                 
-                txtWorkflow.Text = workflow.Name;
+                txtWorkflow.SetText(workflow.Name);
                 lbUsedProcedures_SelectedIndexChanged(null, null);
                 SetWorkflowLock(workflow);
             }
             else
             {
-                txtWorkflow.Text = string.Empty;
+                txtWorkflow.SetText(string.Empty);
             }
         }
 
@@ -753,8 +751,8 @@ namespace DataTableConverter.View
         private void SetMergeControls( WorkProc proc)
         {
             ProcMerge selectedProc = proc as ProcMerge;
-            txtNewColumnMerge.Text = selectedProc.NewColumn;
-            txtFormula.Text = selectedProc?.Format?.ToString() ?? string.Empty;
+            txtNewColumnMerge.SetText(selectedProc.NewColumn);
+            txtFormula.SetText(selectedProc?.Format?.ToString() ?? string.Empty);
             lblOriginalNameText.Text = ProcMerge.ClassName;
 
             SetMergeDataGridView(selectedProc.Conditions);
@@ -814,12 +812,12 @@ namespace DataTableConverter.View
             ProcPadding proc = selectedProc as ProcPadding;
             lblOriginalNameText.Text = ProcPadding.ClassName;
             nbPadCount.Value = proc.Counter;
-            txtNewColumnPad.Text = proc.NewColumn;
+            txtNewColumnPad.SetText(proc.NewColumn);
             
             bool status = proc.OperationSide == ProcPadding.Side.Left;
             RbLeft.Checked = status;
             RbRight.Checked = !status;
-            TxtCharacter.Text = proc.Character?.ToString() ?? string.Empty;
+            TxtCharacter.SetText(proc.Character?.ToString() ?? string.Empty);
             cbPadNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
             cbPadOldColumn.Checked = proc.CopyOldColumn;
             SetHeaderPadding(proc.GetAffectedHeaders());
@@ -833,10 +831,10 @@ namespace DataTableConverter.View
             SetHeaderSubstring(selectedProc.GetHeaders());
             lblOriginalNameText.Text = ProcSubstring.ClassName;
             cbSubstringNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
-            txtSubstringNewColumn.Text = proc.NewColumn;
+            txtSubstringNewColumn.SetText(proc.NewColumn);
             nbSubstringStart.Value = proc.Start;
             nbSubstringEnd.Value = proc.End;
-            txtSubstringText.Text = proc.ReplaceText;
+            txtSubstringText.SetText(proc.ReplaceText);
             txtSubstringText.Visible = cbSubstringText.Checked = proc.ReplaceChecked;
             cbSubstringOldColumn.Checked = proc.CopyOldColumn;
             CBSubstringReverse.Checked = proc.ReverseCheck;
@@ -856,8 +854,8 @@ namespace DataTableConverter.View
         {
             ProcAddTableColumns proc = selectedProc as ProcAddTableColumns;
             lblOriginalNameText.Text = ProcAddTableColumns.ClassName;
-            txtIdentifierSource.Text = proc.IdentifySource;
-            txtIdentifierAppend.Text = proc.IdentifyAppend;
+            txtIdentifierSource.SetText(proc.IdentifySource);
+            txtIdentifierAppend.SetText(proc.IdentifyAppend);
 
             int index = 0;
             for(int i = 0; i < CmBPresetPVMImport.Items.Count; i++)
@@ -877,9 +875,9 @@ namespace DataTableConverter.View
         {
             ProcCompare proc = selectedProc as ProcCompare;
             lblOriginalNameText.Text = ProcCompare.ClassName;
-            txtCompareSourceColumn.Text = proc.SourceColumn;
-            txtCompareSecondColumn.Text = proc.CompareColumn;
-            txtNewColumn.Text = proc.NewColumn;
+            txtCompareSourceColumn.SetText(proc.SourceColumn);
+            txtCompareSecondColumn.SetText(proc.CompareColumn);
+            txtNewColumn.SetText(proc.NewColumn);
             cbCompareNewColumn.Checked = !string.IsNullOrWhiteSpace(proc.NewColumn);
             cbCompareOldColumn.Checked = proc.CopyOldColumn;
         }
@@ -888,7 +886,7 @@ namespace DataTableConverter.View
         {
             ProcNumber proc = selectedProc as ProcNumber;
             lblOriginalNameText.Text = ProcNumber.ClassName;
-            txtNumberNewColumn.Text = proc.NewColumn;
+            txtNumberNewColumn.SetText(proc.NewColumn);
             nbNumberStart.Value = proc.Start;
             nbNumberEnd.Value = proc.End;
             cbNumberRepeat.Checked = proc.Repeat;
@@ -898,7 +896,7 @@ namespace DataTableConverter.View
         {
             ProcTrim proc = selectedProc as ProcTrim;
             lblOriginalNameText.Text = ProcTrim.ClassName;
-            TxtTrimText.Text = proc.Characters;
+            TxtTrimText.SetText(proc.Characters);
             switch (proc.Type)
             {
                 case ProcTrim.TrimType.Start:
@@ -934,7 +932,7 @@ namespace DataTableConverter.View
         {
             lblOriginalNameText.Text = ProcRound.ClassName;
             cbNewColumnRound.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
-            txtNewColumnRound.Text = selectedProc.NewColumn;
+            txtNewColumnRound.SetText(selectedProc.NewColumn);
             SetDataSource(dgvRound, selectedProc.Columns);
             SetHeaderRound(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
         }
@@ -943,14 +941,14 @@ namespace DataTableConverter.View
         {
             ProcSearch proc = selectedProc as ProcSearch;
             lblOriginalNameText.Text = ProcSearch.ClassName;
-            TxtSearchText.Text = proc.SearchText;
-            TxtSearchNewColumn.Text = selectedProc.NewColumn;
-            TxtSearchHeader.Text = proc.Header;
+            TxtSearchText.SetText(proc.SearchText);
+            TxtSearchNewColumn.SetText(selectedProc.NewColumn);
+            TxtSearchHeader.SetText(proc.Header);
             CBSearchTotal.Checked = proc.TotalSearch;
             bool isFromTo = string.IsNullOrWhiteSpace(proc.Shortcut);
             RBSearchFromTo.Checked = isFromTo;
             RBSearchShortcut.Checked = !isFromTo;
-            TxtSearchShortcut.Text = proc.Shortcut;
+            TxtSearchShortcut.SetText(proc.Shortcut);
             NbSearchFrom.Value = proc.From;
             NbSearchTo.Value = proc.To;
         }
@@ -959,9 +957,9 @@ namespace DataTableConverter.View
         {
             ProcSplit proc = selectedProc as ProcSplit;
             lblOriginalNameText.Text = ProcSearch.ClassName;
-            TxtSplitColumn.Text = proc.Column;
-            TxtSplitText.Text = proc.SplitText;
-            TxtSplitNewColumn.Text = proc.NewColumn;
+            TxtSplitColumn.SetText(proc.Column);
+            TxtSplitText.SetText(proc.SplitText);
+            TxtSplitNewColumn.SetText(proc.NewColumn);
         }
 
         private void SetDuplicateControls(WorkProc selectedProc)
@@ -1034,7 +1032,7 @@ namespace DataTableConverter.View
             SetHeaderOrder(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcPVMExport.ClassName;
             ProcPVMExport proc = selectedProc as ProcPVMExport;
-            TxtPVMPath.Text = proc.SecondFileName;
+            TxtPVMPath.SetText(proc.SecondFileName);
             CmBPVMExportEncodings.SelectedValue = proc.FileEncoding;
             SetDataSource(dgvPVMExport, selectedProc.Columns);
         }
@@ -1043,7 +1041,7 @@ namespace DataTableConverter.View
         {
             ProcCount proc = selectedProc as ProcCount;
             lblOriginalNameText.Text = ProcCount.ClassName;
-            TxtCountColumn.Text = proc.Column;
+            TxtCountColumn.SetText(proc.Column);
             cbShowFromTo.Checked = proc.ShowFromTo;
             cbCount.Checked = proc.CountChecked;
             nbCount.Value = proc.Count == 0 ? 1 : proc.Count;
@@ -1056,9 +1054,7 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = ProcSeparate.ClassName;
             DgvSeparate.DataSource = null;
 
-            TxtSeparateColumn.TextChanged -= TxtSeparateColumn_TextChanged;
-            TxtSeparateColumn.Text = string.Empty;
-            TxtSeparateColumn.TextChanged += TxtSeparateColumn_TextChanged;
+            TxtSeparateColumn.SetText(string.Empty);
 
             CmBSeparateFormat.SelectedIndexChanged -= CmBSeparateFormat_SelectedIndexChanged;
             CmBSeparateFormat.SelectedIndex = 0;
@@ -1104,7 +1100,7 @@ namespace DataTableConverter.View
 
         private void SetProcValues(WorkProc selectedProc)
         {
-            txtWorkProcName.Text = selectedProc.Name;
+            txtWorkProcName.SetText(selectedProc.Name);
             SetNewColumnText(selectedProc.NewColumn);
             SetGroupBoxVisibility(selectedProc.GetType());
         }
@@ -1121,9 +1117,8 @@ namespace DataTableConverter.View
             else
             {
                 SetGroupBoxVisibility(null);
-                txtWorkProcName.TextChanged -= txtWorkProcName_TextChanged;
-                txtWorkProcName.Text = lblOriginalNameText.Text = string.Empty;
-                txtWorkProcName.TextChanged += txtWorkProcName_TextChanged;
+                txtWorkProcName.SetText(string.Empty);
+                lblOriginalNameText.Text = string.Empty;
             }
             gbMain.Enabled = lbUsedProcedures.SelectedIndex != -1;
         }
@@ -1142,7 +1137,7 @@ namespace DataTableConverter.View
 
         private void SetNewColumnText(string text)
         {
-            txtNewColumn.Text = text;
+            txtNewColumn.SetText(text);
         }
 
         private string GetProcedureName(int id)
@@ -1286,20 +1281,6 @@ namespace DataTableConverter.View
             GetSelectedWorkProcedure().NewColumn = (sender as TextBox)?.Text;
         }
 
-        private void addColumnToFormula(string column)
-        {
-            if (!txtFormula.Text.Contains(column))
-            {
-                string separator = txtFormula.Text.Length > 0 ? " " : string.Empty;
-                txtFormula.Text = $"{txtFormula.Text}{separator}[{column}]";
-            }
-        }
-
-        private void RemoveColumnOfFormula(string column)
-        {
-            txtFormula.Text = txtFormula.Text.Replace($" [{column}]", "");
-        }
-
         private void txtWorkflow_TextChanged(object sender, EventArgs e)
         {
             if (lbWorkflows.SelectedIndex != -1)
@@ -1379,13 +1360,13 @@ namespace DataTableConverter.View
         {
             if (lbTolerances.SelectedIndex == -1)
             {
-                txtToleranceName.Text = string.Empty;
+                txtToleranceName.SetText(string.Empty);
                 dgTolerance.DataSource = null;
             }
             else
             {
                 Tolerance selectedTolerance = (Tolerance)lbTolerances.SelectedItem;
-                txtToleranceName.Text = selectedTolerance.Name;
+                txtToleranceName.SetText(selectedTolerance.Name);
                 SetDataSource(dgTolerance, selectedTolerance.Columns);
                 SetToleranceLock();
             }
@@ -1476,17 +1457,17 @@ namespace DataTableConverter.View
         {
             if (lbCases.SelectedIndex == -1)
             {
-                txtCaseName.Text = string.Empty;
-                txtShortcut.Text = string.Empty;
-                txtShortcutTotal.Text = string.Empty;
+                txtCaseName.SetText(string.Empty);
+                txtShortcut.SetText(string.Empty);
+                txtShortcutTotal.SetText(string.Empty);
                 dgCaseColumns.DataSource = null;
             }
             else
             {
                 Case selectedCase = (Case)lbCases.SelectedItem;
-                txtCaseName.Text = selectedCase.Name;
-                txtShortcut.Text = selectedCase.Shortcut;
-                txtShortcutTotal.Text = selectedCase.ShortcutTotal;
+                txtCaseName.SetText(selectedCase.Name);
+                txtShortcut.SetText(selectedCase.Shortcut);
+                txtShortcutTotal.SetText(selectedCase.ShortcutTotal);
                 SetDataSource(dgCaseColumns, selectedCase.Columns);
                 if (ViewHelper != null)
                 {
@@ -1686,7 +1667,7 @@ namespace DataTableConverter.View
             newColumnLabel.Visible = newColumnTextbox.Visible = newColumn.Checked;
             if (oldColumn.Visible = !newColumn.Checked)
             {
-                newColumnTextbox.Text = string.Empty;
+                newColumnTextbox.SetText(string.Empty);
             }
             else
             {
@@ -1956,7 +1937,7 @@ namespace DataTableConverter.View
             txtSubstringText.Visible = (GetSelectedWorkProcedure() as ProcSubstring).ReplaceChecked = sender.Checked;
             if (!sender.Checked)
             {
-                txtSubstringText.Text = string.Empty;
+                txtSubstringText.SetText(string.Empty);
             }
         }
 
@@ -2074,7 +2055,7 @@ namespace DataTableConverter.View
             };
             if (folderBrowser.ShowDialog(this) == DialogResult.OK)
             {
-                TxtPVMPath.Text = (GetSelectedWorkProcedure() as ProcPVMExport).SecondFileName = Path.GetDirectoryName(folderBrowser.FileName);
+                TxtPVMPath.SetText((GetSelectedWorkProcedure() as ProcPVMExport).SecondFileName = Path.GetDirectoryName(folderBrowser.FileName));
             }
             folderBrowser.Dispose();
         }
@@ -2148,7 +2129,7 @@ namespace DataTableConverter.View
         private void CmBSeparate_SelectedIndexChanged(object sender, EventArgs e)
         {
             ExportSeparate selectedItem = GetSeparateSelectedItem();
-            TxtSeparateColumn.Text = selectedItem.Column;
+            TxtSeparateColumn.SetText(selectedItem.Column);
             CmBSeparateFormat.SelectedIndex = selectedItem.Format;
             CbSeparateSaveAll.Checked = selectedItem.CheckedAllValues;
             CbSeparateSaveRemaining.Checked = selectedItem.SaveRemaining;
@@ -2355,7 +2336,8 @@ namespace DataTableConverter.View
                 SeparateLoadEntries form = new SeparateLoadEntries(selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, Table);
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
-                    selectedItem.Column = TxtSeparateColumn.Text = form.SelectedItem.Column;
+                    selectedItem.Column = form.SelectedItem.Column;
+                    TxtSeparateColumn.SetText(form.SelectedItem.Column);
                     selectedItem.Table.BeginLoadData();
                     selectedItem.Table.Rows.Clear();
                     foreach(string item in form.SelectedItem.SelectedValues)
@@ -2561,7 +2543,7 @@ namespace DataTableConverter.View
             MergeFormatView view = new MergeFormatView(format);
             if(view.ShowDialog(this) == DialogResult.OK)
             {
-                txtFormula.Text = format.ToString();
+                txtFormula.SetText(format.ToString());
             }
         }
 
