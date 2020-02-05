@@ -877,7 +877,7 @@ namespace DataTableConverter.Assisstant
                 }
                 if (!ExportHelper.SaveProcedures(data, mainForm))
                 {
-                    File.Delete(ProjectWorkflows);
+                    File.Delete(ProjectProcedures);
                 }
             }
             else
