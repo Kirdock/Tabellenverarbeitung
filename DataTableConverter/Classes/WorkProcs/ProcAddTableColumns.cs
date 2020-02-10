@@ -150,7 +150,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             if (Properties.Settings.Default.SplitPVM)
                             {
                                 int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
-                                if(count != 0)
+                                if(count != 0 && !invokeForm.IsDisposed)
                                 {
                                     invokeForm.Invoke(new MethodInvoker(() =>
                                     {

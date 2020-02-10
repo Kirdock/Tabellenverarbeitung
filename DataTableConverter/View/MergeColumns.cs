@@ -33,7 +33,6 @@ namespace DataTableConverter.View
             }
             ClBHeaders.Items.AddRange(list.ToArray());
             CmBHeaders.SelectedIndex = 0;
-            SetChecked(true);
             ViewHelper.ResizePlusListBox(ClBHeaders);
         }
 

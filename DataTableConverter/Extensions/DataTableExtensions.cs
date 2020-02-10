@@ -665,15 +665,23 @@ namespace DataTableConverter.Extensions
                         }
                         else if(column.State == PlusListboxItem.RowMergeState.Sum)
                         {
-                            if (float.TryParse(table.Rows[i][column.Value].ToString(), out float result))
+                            if (decimal.TryParse(table.Rows[i][column.Value].ToString(), out decimal result))
                             {
                                 firstRow.CountDict[column.Value] += result;
                             }
                         }
                         else
                         {
-                            string header = table.TryAddColumn(column.Value, firstRow.RowsMerged);
-                            firstRow.Row[header] = table.Rows[i][column.Value].ToString();
+                            string value = table.Rows[i][column.Value].ToString();
+                            if (value != string.Empty)
+                            {
+                                string header = column.Value + firstRow.RowsMerged;
+                                if (!table.Columns.Contains(header))
+                                {
+                                    header = table.TryAddColumn(column.Value, firstRow.RowsMerged);
+                                }
+                                firstRow.Row[header] = value;
+                            }
                             //table.Columns[header].SetOrdinal(table.Columns.IndexOf(column.Value) + firstRow.RowsMerged);
                             //ordinal destroys my history atm
                         }
@@ -692,7 +700,7 @@ namespace DataTableConverter.Extensions
                         }
                         if (column.State == PlusListboxItem.RowMergeState.Sum)
                         {
-                            float.TryParse(info.Row[column.Value].ToString(), out float result);
+                            decimal.TryParse(info.Row[column.Value].ToString(), out decimal result);
                             info.CountDict.Add(column.Value.ToString(), result);
                         }
                     }

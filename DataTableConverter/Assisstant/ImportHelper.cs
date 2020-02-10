@@ -589,7 +589,10 @@ namespace DataTableConverter.Assisstant
                 range.Copy();
                 IDataObject data = Clipboard.GetDataObject();
                 string content = (string)data.GetData(DataFormats.UnicodeText);
-                GetDataOfString(content, table, fileName, headers,progressBar, mainForm);
+                if(content != null)
+                {
+                    GetDataOfString(content, table, fileName, headers, progressBar, mainForm);
+                }
                 i = rowCount;
             }
         }

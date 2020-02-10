@@ -371,7 +371,6 @@ namespace DataTableConverter
             Microsoft.Office.Interop.Excel.Range range = worksheet.Range[beginWrite, endWrite];
             range.NumberFormat = "@";
             range.Value2 = data;
-            worksheet.Select();
         }
 
         private static void InsertRowsSkeleton(Microsoft.Office.Interop.Excel.Worksheet worksheet, int rowCount, int columnCount)

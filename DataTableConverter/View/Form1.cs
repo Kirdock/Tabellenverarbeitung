@@ -493,7 +493,10 @@ namespace DataTableConverter
                             
                             ReplaceProcedure(table, null, t, out int[] newIndices);
                             history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting()});
-                            table.Columns.Remove(Extensions.DataTableExtensions.TempSort);
+                            if (table.Columns.Contains(Extensions.DataTableExtensions.TempSort))
+                            {
+                                table.Columns.Remove(Extensions.DataTableExtensions.TempSort);
+                            }
                             table.AcceptChanges();
                             history.Add(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices, Order = GetSorting() });
                         }
