@@ -63,7 +63,7 @@ namespace DataTableConverter.Classes.WorkProcs
                         }
                     }
                 }
-                foreach (DataRow row in table.Rows)
+                foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
                 {
                     if (Dict.TryGetValue(row[item.Column].ToString(), out DataTable dictTable))
                     {

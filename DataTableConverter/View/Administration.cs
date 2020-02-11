@@ -1145,16 +1145,6 @@ namespace DataTableConverter.View
             return Procedures[GetProcedureIndexThroughId(id)].Name;
         }
 
-        private void ResetHeader(CheckedComboBox box, ItemCheckEventHandler handler)
-        {
-            box.ItemCheck -= handler;
-            for(int i = 0; i < box.Items.Count; i++)
-            {
-                box.SetItemChecked(i, false);
-            }
-            box.ItemCheck += handler;
-        }
-
         private void SetHeaderProcedure(string[] headers)
         {
             SetChecked(clbHeaderProcedure, headers, clbHeaderProcedure_ItemCheck);
@@ -2244,7 +2234,7 @@ namespace DataTableConverter.View
                             {
                                 if (form.Table.Rows[i][1].ToString() == SelectDuplicateColumns.IgnoreColumn)
                                 {
-                                    work.Procedures.RemoveAll(proc => proc is ProcUser && proc.ProcedureId == Procedures[i].Id);
+                                    work.Procedures.RemoveAll(proc => proc is ProcUser && proc.ProcedureId == procs[i].ProcedureId);
                                 }
                                 else
                                 {
