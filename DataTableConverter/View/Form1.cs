@@ -343,7 +343,8 @@ namespace DataTableConverter
             for (int i = 0; i < visibleProc.Count; i++)
             {
                 int index = i;
-                ToolStripMenuItem item = new ToolStripMenuItem(visibleProc[i].Name);
+                string name = visibleProc[i].Name.Replace("&", "&&");
+                ToolStripMenuItem item = new ToolStripMenuItem(name);
                 item.Click += (sender, e) => procedure_Click(visibleProc[index]);
                 ersetzenToolStripMenuItem.DropDownItems.Add(item);
             }   
@@ -360,7 +361,8 @@ namespace DataTableConverter
             for (int i = 0; i < workflowsCopy.Count; i++)
             {
                 int index = i;
-                ToolStripMenuItem item = new ToolStripMenuItem(workflowsCopy[i].Name);
+                string name = workflowsCopy[i].Name.Replace("&","&&");
+                ToolStripMenuItem item = new ToolStripMenuItem(name);
                 item.Click += (sender, e) => workflow_Click(workflowsCopy[index]);
                 arbeitsablaufToolStripMenuItem.DropDownItems.Add(item);
             }
@@ -460,11 +462,11 @@ namespace DataTableConverter
                             {
                                 if(to[i] == SelectDuplicateColumns.IgnoreColumn)
                                 {
-                                    nf.Wp.removeHeader(from[i]);
+                                    nf.Wp.RemoveHeader(from[i]);
                                 }
                                 else if (wpHeaders[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
                                 {
-                                    nf.Wp.renameHeaders(from[i], to[i]);
+                                    nf.Wp.RenameHeaders(from[i], to[i]);
                                 }
                             }
                         }
@@ -776,7 +778,7 @@ namespace DataTableConverter
                         {
                             Thread.CurrentThread.IsBackground = true;
                             string order = GetSorting();
-                            form.Proc.doWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this, out int[] newIndices);
+                            form.Proc.DoWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this, out int[] newIndices);
                             dgTable.Invoke(new MethodInvoker(() =>
                             {
                                 AddDataSourceValueChange(table);
@@ -847,7 +849,7 @@ namespace DataTableConverter
         private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp, out int[] newOrderIndices)
         {
             string newOrder = GetSorting();
-            wp.doWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this, out int[] newIndices);
+            wp.DoWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this, out int[] newIndices);
             newOrderIndices = newIndices;
             SetSorting(newOrder);
         }
@@ -1195,7 +1197,7 @@ namespace DataTableConverter
             if(formula.ShowDialog(this) == DialogResult.OK)
             {
                 StartLoadingBarCount(Properties.Settings.Default.PVMSaveTwice ? sourceTable.Rows.Count * 2 : sourceTable.Rows.Count);
-                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).doWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType, this, out int[] newIndices);
+                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).DoWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType, this, out int[] newIndices);
                 StopLoadingBar();
                 SaveFinished();
             }

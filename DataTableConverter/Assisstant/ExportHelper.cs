@@ -104,7 +104,8 @@ namespace DataTableConverter
             {
                 try
                 {
-                    string path = Path.Combine(ProcedurePath, proc.Name + ".bin");
+                    string filename = RemoveSpecialCharacters(proc.Name);
+                    string path = Path.Combine(ProcedurePath, filename + ".bin");
                     using (Stream stream = File.Open(path, FileMode.Create))
                     {
                         BinaryFormatter bin = new BinaryFormatter();
@@ -128,6 +129,19 @@ namespace DataTableConverter
             return error;
         }
 
+        internal static string RemoveSpecialCharacters(string text)
+        {
+            return text.Replace("?", "？")
+                       .Replace(" : ", "：")
+                       .Replace(":", "：")
+                       .Replace("/", " ∕ ")
+                       .Replace("\\", "＼")
+                       .Replace("\"", "''")
+                       .Replace(">", "＞")
+                       .Replace("<", "＜")
+                       .Replace("*", "＊");
+        }
+
         internal static bool SaveWorkflows(List<Work> workflows, Form mainForm)
         {
             bool error = false;
@@ -136,7 +150,8 @@ namespace DataTableConverter
             {
                 try
                 {
-                    string path = Path.Combine(WorkflowPath, work.Name+".bin");
+                    string filename = RemoveSpecialCharacters(work.Name);
+                    string path = Path.Combine(WorkflowPath, filename+".bin");
                     using (Stream stream = File.Open(path, FileMode.Create))
                     {
                         BinaryFormatter bin = new BinaryFormatter();

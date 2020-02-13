@@ -57,7 +57,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return AllColumns ? new string[0] : WorkflowHelper.RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
         }
 
-        public override void renameHeaders(string oldName, string newName)
+        public override void RenameHeaders(string oldName, string newName)
         {
             if (!AllColumns)
             {
@@ -71,7 +71,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void removeHeader(string colName)
+        public override void RemoveHeader(string colName)
         {
             if (!AllColumns)
             {
@@ -79,7 +79,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
             if (Characters.Contains(" "))

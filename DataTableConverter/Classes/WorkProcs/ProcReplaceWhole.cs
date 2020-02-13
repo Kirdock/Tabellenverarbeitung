@@ -52,7 +52,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr.ItemArray[0].ToString()));
         }
 
-        public override void renameHeaders(string oldName, string newName)
+        public override void RenameHeaders(string oldName, string newName)
         {
             foreach (DataRow row in Columns.Rows)
             {
@@ -63,12 +63,12 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void removeHeader(string colName)
+        public override void RemoveHeader(string colName)
         {
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
             IEnumerable<DataRow> distinctDataTale = GetFoundRows(table.Columns);

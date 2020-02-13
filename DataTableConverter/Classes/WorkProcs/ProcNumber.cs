@@ -28,7 +28,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Repeat = repeat;
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
             string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
@@ -60,12 +60,12 @@ namespace DataTableConverter.Classes.WorkProcs
             return new string[0];
         }
 
-        public override void renameHeaders(string oldName, string newName)
+        public override void RenameHeaders(string oldName, string newName)
         {
             return;
         }
 
-        public override void removeHeader(string colName)
+        public override void RemoveHeader(string colName)
         {
             return;
         }

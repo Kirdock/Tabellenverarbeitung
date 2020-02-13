@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataTableConverter.Classes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,17 +19,26 @@ namespace DataTableConverter.View
         internal bool LeaveEmpty => CBLeaveEmpty.Checked;
         private ViewHelper Helper;
 
-        public ProcedureForm(ContextMenuStrip ctxRow)
+        internal ProcedureForm(ContextMenuStrip ctxRow, Proc procedure = null)
         {
             InitializeComponent();
-            Table = new DataTable();
-            Table.Columns.Add("Ersetze");
-            Table.Columns.Add("Durch");
+            if (procedure == null)
+            {
+                Table = new DataTable();
+                Table.Columns.Add("Ersetze");
+                Table.Columns.Add("Durch");
+            }
+            else
+            {
+                Table = procedure.Replace.Copy();
+                cbCheckTotal.Checked = procedure.CheckTotal;
+                CbCheckWord.Checked = procedure.CheckWord;
+                CBLeaveEmpty.Checked = procedure.LeaveEmpty;
+            }
             DGVProcedure.DataSource = Table;
             Helper = new ViewHelper(ctxRow, null, null);
             ViewHelper.SetDataGridViewStyle(DGVProcedure);
             Helper.AddContextMenuToDataGridView(DGVProcedure, this, true);
-
         }
 
         private void BtnConfirm_Click(object sender, EventArgs e)

@@ -42,11 +42,12 @@ namespace DataTableConverter.View
         private MemoryStream ProceduresBefore, WorkflowsBefore, TolerancesBefore, CasesBefore;
         private object[] Headers;
         private DataTable Table;
+        private ContextMenuStrip ContextGlobal;
 
         internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
         {
             InitializeComponent();
-            
+            ContextGlobal = ctxRow;
             SetEncodingCmBs();
             Table = table;
             SetSize();
@@ -143,7 +144,8 @@ namespace DataTableConverter.View
                 new Proc(ProcCount.ClassName, null, 13),
                 new Proc(ProcSeparate.ClassName, null, 14),
                 new Proc(ProcSearch.ClassName, null, 15),
-                new Proc(ProcSplit.ClassName, null, 16)
+                new Proc(ProcSplit.ClassName, null, 16),
+                new Proc(ProcUser.ClassName, null, 17)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -921,8 +923,10 @@ namespace DataTableConverter.View
 
         private void SetUserControls(WorkProc selectedProc)
         {
-            lblOriginalNameText.Text = GetProcedureName(selectedProc.ProcedureId);
+            ProcUser proc = selectedProc as ProcUser;
+            lblOriginalNameText.Text = proc.IsSystem ? proc.Procedure.Name : GetProcedureName(selectedProc.ProcedureId);
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
+            BtnProcUserOpen.Visible = proc.IsSystem;
             SetDataSource(dgvColumns, selectedProc.Columns);
 
             SetHeaderProcedure(selectedProc.Columns.ColumnValuesAsString(0));
@@ -2520,6 +2524,19 @@ namespace DataTableConverter.View
         private void TxtSplitNewColumn_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSplit).NewColumn = TxtSplitNewColumn.Text;
+        }
+
+        private void BtnProcUserOpen_Click(object sender, EventArgs e)
+        {
+            ProcUser proc = (GetSelectedWorkProcedure() as ProcUser);
+            ProcedureForm form = new ProcedureForm(ContextGlobal, proc.Procedure);
+            if (form.ShowDialog(this) == DialogResult.OK)
+            {
+                proc.Procedure.Replace = form.Table;
+                proc.Procedure.CheckTotal = form.CheckTotal;
+                proc.Procedure.CheckWord = form.CheckWord;
+                proc.Procedure.LeaveEmpty = form.LeaveEmpty;
+            }
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

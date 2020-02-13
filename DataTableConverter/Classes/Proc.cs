@@ -19,6 +19,12 @@ namespace DataTableConverter.Classes
         public bool LeaveEmpty { get; set; }
         public bool HideInMainForm { get; set; }
 
+        public Proc()
+        {
+            Replace = new DataTable();
+            Replace.Columns.Add("Ersetze");
+            Replace.Columns.Add("Durch");
+        }
         public Proc(string name, DataTable replace, int id)
         {
             Name = name;

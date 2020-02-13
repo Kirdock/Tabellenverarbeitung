@@ -146,6 +146,14 @@ namespace DataTableConverter.Assisstant
                             newProc = new ProcSplit(ordinal, id, name);
                             break;
 
+                        case 17:
+                            newProc = new ProcUser(ordinal, id, name)
+                            {
+                                IsSystem = true,
+                                Procedure = new Proc()
+                            };
+                            break;
+
                         case 1:
                         default:
                             newProc = new ProcTrim(ordinal, id, name);

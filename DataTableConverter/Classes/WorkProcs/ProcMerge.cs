@@ -63,7 +63,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return re.Matches(formula ?? string.Empty).Cast<Match>().Select(col => col.Groups[1].Value);
         }
 
-        public override void renameHeaders(string oldName, string newName)
+        public override void RenameHeaders(string oldName, string newName)
         {
             Format.RenameHeaders(oldName, newName);
             foreach (DataRow row in Conditions.Rows)
@@ -98,12 +98,12 @@ namespace DataTableConverter.Classes.WorkProcs
 
         //we only remove Conditions
         //for Format: a non existing column is seen as an empty column
-        public override void removeHeader(string colName)
+        public override void RemoveHeader(string colName)
         {
             Conditions = Conditions.AsEnumerable().Where(condition => condition[(int)ConditionColumn.Spalte].ToString() != colName).ToTable(Conditions);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
             if (!string.IsNullOrWhiteSpace(NewColumn))

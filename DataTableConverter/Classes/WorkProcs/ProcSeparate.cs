@@ -23,7 +23,7 @@ namespace DataTableConverter.Classes.WorkProcs
         }
 
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
             foreach (ExportSeparate item in Files)
@@ -107,7 +107,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.RemoveEmptyHeaders(Files.Select(file => file.Column));
         }
 
-        public override void renameHeaders(string oldName, string newName)
+        public override void RenameHeaders(string oldName, string newName)
         {
             foreach (ExportSeparate file in Files)
             {
@@ -118,7 +118,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void removeHeader(string colName)
+        public override void RemoveHeader(string colName)
         {
             Files = new BindingList<ExportSeparate>(Files.Where(file => file.Column != colName).ToList());
         }

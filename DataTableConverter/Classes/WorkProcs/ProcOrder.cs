@@ -22,7 +22,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return WorkflowHelper.RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
         }
 
-        public override void renameHeaders(string oldName, string newName)
+        public override void RenameHeaders(string oldName, string newName)
         {
             foreach (DataRow row in Columns.Rows)
             {
@@ -33,12 +33,12 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void removeHeader(string colName)
+        public override void RemoveHeader(string colName)
         {
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void doWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
             StringBuilder builder = new StringBuilder();
