@@ -152,8 +152,10 @@ namespace DataTableConverter
             dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
             sourceTable = table ?? sourceTable;
             int rowCount = sourceTable.Rows.Count;
+
+            dgTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
-            
+            dgTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
             RestoreDataGridSortMode();
             SetWidth();
 
