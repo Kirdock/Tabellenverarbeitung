@@ -67,6 +67,7 @@ namespace DataTableConverter.View
             TxTPVMIdentifier.Text = Properties.Settings.Default.PVMIdentifier;
             CbImportWorkflowAuto.Checked = Properties.Settings.Default.ImportWorkflowAuto;
             CbSeparateSelectable.Checked = Properties.Settings.Default.SeparateSelectable;
+            CbAdjustColumnOver100.Checked = Properties.Settings.Default.NotAdjustColumnOver100;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -95,6 +96,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.SeparateColor = PSeparateColor.BackColor;
                 Properties.Settings.Default.ImportWorkflowAuto = CbImportWorkflowAuto.Checked;
                 Properties.Settings.Default.SeparateSelectable = CbSeparateSelectable.Checked;
+                Properties.Settings.Default.NotAdjustColumnOver100 = CbAdjustColumnOver100.Checked;
                 Properties.Settings.Default.Save();
             }
             else

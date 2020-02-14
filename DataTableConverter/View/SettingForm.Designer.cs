@@ -115,6 +115,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.CbAdjustColumnOver100 = new System.Windows.Forms.CheckBox();
+            this.label38 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -470,6 +472,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label38);
+            this.tabPage2.Controls.Add(this.CbAdjustColumnOver100);
             this.tabPage2.Controls.Add(this.CbSeparateSelectable);
             this.tabPage2.Controls.Add(this.label37);
             this.tabPage2.Controls.Add(this.CbImportWorkflowAuto);
@@ -1015,6 +1019,26 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
+            // CbAdjustColumnOver100
+            // 
+            this.CbAdjustColumnOver100.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CbAdjustColumnOver100.Location = new System.Drawing.Point(8, 471);
+            this.CbAdjustColumnOver100.Name = "CbAdjustColumnOver100";
+            this.CbAdjustColumnOver100.Size = new System.Drawing.Size(254, 34);
+            this.CbAdjustColumnOver100.TabIndex = 22;
+            this.CbAdjustColumnOver100.Text = "Spaltenbreite bei über 100 Spalten nicht anpassen";
+            this.CbAdjustColumnOver100.UseVisualStyleBackColor = true;
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label38.Location = new System.Drawing.Point(10, 443);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(55, 16);
+            this.label38.TabIndex = 23;
+            this.label38.Text = "Import:";
+            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1139,5 +1163,7 @@
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.CheckBox CbSeparateSelectable;
         private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.CheckBox CbAdjustColumnOver100;
     }
 }

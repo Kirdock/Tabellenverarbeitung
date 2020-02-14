@@ -42,6 +42,7 @@
             this.verwaltungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.funktionenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aufteilenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.längsteZeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nummerierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -94,7 +95,6 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.aufteilenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -201,6 +201,13 @@
             this.zeileToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.zeileToolStripMenuItem.Text = "1 Zeile";
             this.zeileToolStripMenuItem.Click += new System.EventHandler(this.überschriftenEinlesenToolStripMenuItem_Click);
+            // 
+            // aufteilenToolStripMenuItem
+            // 
+            this.aufteilenToolStripMenuItem.Name = "aufteilenToolStripMenuItem";
+            this.aufteilenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.aufteilenToolStripMenuItem.Text = "Aufteilen";
+            this.aufteilenToolStripMenuItem.Click += new System.EventHandler(this.aufteilenToolStripMenuItem_Click);
             // 
             // großKleinschreibungToolStripMenuItem
             // 
@@ -589,16 +596,10 @@
             this.dgTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgTable_CellPainting);
             this.dgTable.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgTable_CellValidating);
             this.dgTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellValueChanged);
+            this.dgTable.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgTable_ColumnAdded);
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
-            // 
-            // aufteilenToolStripMenuItem
-            // 
-            this.aufteilenToolStripMenuItem.Name = "aufteilenToolStripMenuItem";
-            this.aufteilenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.aufteilenToolStripMenuItem.Text = "Aufteilen";
-            this.aufteilenToolStripMenuItem.Click += new System.EventHandler(this.aufteilenToolStripMenuItem_Click);
             // 
             // Form1
             // 
