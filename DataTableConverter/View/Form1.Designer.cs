@@ -585,7 +585,6 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
-            this.dgTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dgTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgTable.Location = new System.Drawing.Point(0, 27);
             this.dgTable.Name = "dgTable";

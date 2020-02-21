@@ -62,7 +62,7 @@ namespace DataTableConverter.Classes.WorkProcs
             procedure = Procedure ?? procedure;
 
             IEnumerable<DataRow> replaces = procedure.Replace.AsEnumerable().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));
-            IEnumerable<DataRow> replaceWithoutEmpty = replaces.Where(replace => replace[0].ToString() != string.Empty);
+            IEnumerable<DataRow> replaceWithoutEmpty = replaces.Where(replace => replace[0].ToString() != string.Empty && replace[0].ToString() != ContainsDataFormat);
             IEnumerable<DataRow> replaceWithEmpty = replaces.Where(replace => replace[0].ToString() == string.Empty && replace[1].ToString().Length > 0);
             DataRow replaceWhole = replaces.FirstOrDefault(replace => replace[0].ToString() == ContainsDataFormat);
             string replaceWholeText = replaceWhole?[1].ToString() ?? string.Empty;
@@ -88,11 +88,9 @@ namespace DataTableConverter.Classes.WorkProcs
                         string index = newColumn ?? column;
                         string value = row[column].ToString();
                         string result = value;
-                        if (containsReplaceWhole && result != string.Empty)
-                        {
-                            result = replaceWholeText;
-                        }
-                        else if (procedure.CheckTotal)
+                        bool changed = false;
+                        
+                        if (procedure.CheckTotal)
                         {
                             DataRow foundRows = replaceWithoutEmpty.FirstOrDefault(replace => replace[0].ToString() == value);
                             if (foundRows != null)
@@ -119,7 +117,12 @@ namespace DataTableConverter.Classes.WorkProcs
                         {
                             result = replaceEmptyString;
                         }
-                        row[index] = procedure.LeaveEmpty && result == value ? string.Empty : ProcTrim.Trim(result);
+                        if (containsReplaceWhole && result != string.Empty && result == value)
+                        {
+                            result = replaceWholeText;
+                            changed = true;
+                        }
+                        row[index] = !changed && procedure.LeaveEmpty && result == value ? string.Empty : ProcTrim.Trim(result);
                     }
                 }
             }

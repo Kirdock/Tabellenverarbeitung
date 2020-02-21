@@ -506,12 +506,12 @@
             this.dgvPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvPreview.Location = new System.Drawing.Point(3, 16);
             this.dgvPreview.Name = "dgvPreview";
             this.dgvPreview.ReadOnly = true;
             this.dgvPreview.Size = new System.Drawing.Size(794, 137);
             this.dgvPreview.TabIndex = 0;
+            this.dgvPreview.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgvPreview_ColumnAdded);
             this.dgvPreview.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgvSetting_RowPostPaint);
             // 
             // ctxRow

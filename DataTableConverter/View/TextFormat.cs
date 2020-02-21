@@ -799,6 +799,11 @@ namespace DataTableConverter.View
                 form.Dispose();
             }
         }
+
+        private void dgvPreview_ColumnAdded(object sender, DataGridViewColumnEventArgs e)
+        {
+            e.Column.FillWeight = 10;
+        }
     }
 
 }
