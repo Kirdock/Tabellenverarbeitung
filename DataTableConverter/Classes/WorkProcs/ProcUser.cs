@@ -96,6 +96,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             if (foundRows != null)
                             {
                                 result = foundRows[1].ToString();
+                                changed = true;
                             }
                         }
                         else if (procedure.CheckWord)
@@ -103,26 +104,37 @@ namespace DataTableConverter.Classes.WorkProcs
                             foreach (DataRow rep in replaceWithoutEmpty)
                             {
                                 string pattern = @"(?<=^|[\s>])" + Regex.Escape(rep[0].ToString()) + @"(?!\w)";
-                                result = Regex.Replace(result, pattern, rep[1].ToString());
+                                if (Regex.IsMatch(result, pattern))
+                                {
+                                    result = Regex.Replace(result, pattern, rep[1].ToString());
+                                    changed = true;
+                                }
                             }
                         }
                         else
                         {
                             foreach (DataRow rep in replaceWithoutEmpty)
                             {
-                                result = result.Replace(rep[0].ToString(), rep[1].ToString());
+                                string pattern = rep[0].ToString();
+                                if (result.Contains(pattern))
+                                {
+                                    result = result.Replace(pattern, rep[1].ToString());
+                                    changed = true;
+                                }
                             }
                         }
-                        if(result == string.Empty && containsEmpty)
+                        
+                        if(containsEmpty && !changed && result == string.Empty)
                         {
                             result = replaceEmptyString;
+                            changed = true;
                         }
-                        if (containsReplaceWhole && result != string.Empty && result == value)
+                        if (containsReplaceWhole && !changed && result != string.Empty)
                         {
                             result = replaceWholeText;
                             changed = true;
                         }
-                        row[index] = !changed && procedure.LeaveEmpty && result == value ? string.Empty : ProcTrim.Trim(result);
+                        row[index] = !changed && procedure.LeaveEmpty ? string.Empty : ProcTrim.Trim(result);
                     }
                 }
             }
