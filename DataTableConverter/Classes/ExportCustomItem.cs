@@ -33,6 +33,7 @@ namespace DataTableConverter.Classes
             Name = name;
             Column = column;
             Values = new Dictionary<string, bool>();
+            Format = 1;
         }
 
         internal void SetValues(IEnumerable<string> allValues, bool status, IEnumerable<ExportCustomItem> dict)

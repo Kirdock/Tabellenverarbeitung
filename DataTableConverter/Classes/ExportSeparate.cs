@@ -21,7 +21,7 @@ namespace DataTableConverter.Classes
 
         internal ExportSeparate(string name, string column)
         {
-            Format = 0;
+            Format = 1;
             Name = name;
             Column = column;
             Table = new DataTable { TableName = "ExportSeparate" };

@@ -238,7 +238,7 @@
             this.MinimumSize = new System.Drawing.Size(457, 500);
             this.Name = "ExportCustom";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Benutzerdefiniertes Exportieren";
+            this.Text = "Trennen";
             this.ResumeLayout(false);
             this.PerformLayout();
 

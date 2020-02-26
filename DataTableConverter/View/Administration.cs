@@ -1061,7 +1061,7 @@ namespace DataTableConverter.View
             TxtSeparateColumn.SetText(string.Empty);
 
             CmBSeparateFormat.SelectedIndexChanged -= CmBSeparateFormat_SelectedIndexChanged;
-            CmBSeparateFormat.SelectedIndex = 0;
+            CmBSeparateFormat.SelectedIndex = 1;
             CmBSeparateFormat.SelectedIndexChanged += CmBSeparateFormat_SelectedIndexChanged;
 
             CbSeparateSaveAll.CheckedChanged -= CbSeparateSaveAll_CheckedChanged;
@@ -2068,9 +2068,16 @@ namespace DataTableConverter.View
                 else
                 {
                     int index = selectedProc.Files.Count;
-                    selectedProc.Files.Add(new ExportSeparate(newText, string.Empty));
+                    ExportSeparate item = new ExportSeparate(newText, string.Empty);
+                    ExportSeparate lastItem = selectedProc.Files.LastOrDefault();
+                    if(lastItem != null)
+                    {
+                        item.Format = lastItem.Format;
+                        item.Column = lastItem.Column;
+                    }
+                    selectedProc.Files.Add(item);
                     CmBSeparate.SelectedIndex = index;
-                    CmBSeparateFormat.SelectedIndex = 0;
+                    CmBSeparateFormat.SelectedIndex = item.Format;
                     SetSeparateEnabled();
                     CmBSeparate_SelectedIndexChanged(null, null);
                 }

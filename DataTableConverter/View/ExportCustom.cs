@@ -78,10 +78,19 @@ namespace DataTableConverter.View
         {
             if (CmBFileNames.SelectedIndex > -1)
             {
-                SelectedItem.Column = cmbColumn.SelectedItem.ToString();
-                SetListValues();
-                SetValues(false);
-                SetSumCount();
+                if(CmBFileNames.Items.Count > 1 && this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie wirklich eine andere Spalte verwenden?") == DialogResult.Yes || CmBFileNames.Items.Count == 1)
+                {
+                    SelectedItem.Column = cmbColumn.SelectedItem.ToString();
+                    SetListValues();
+                    SetValues(false);
+                    SetSumCount();
+                }
+                else
+                {
+                    cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
+                    cmbColumn.SelectedIndex = cmbColumn.Items.Cast<string>().Select((value, index) => new { value, index }).Where(pair => pair.value == SelectedItem.Column).FirstOrDefault()?.index ?? 0;
+                    cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
+                }
             }
         }
 
@@ -190,16 +199,27 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    var item = new ExportCustomItem(newText, cmbColumn.Items[0].ToString());
-                    cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
-                    cmbColumn.SelectedIndex = 0;
-                    cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
-                    SetListValues();
-                    SetValues(false, item);
+                    ExportCustomItem item = new ExportCustomItem(newText, cmbColumn.Items[0].ToString());
                     int index = CmBFileNames.Items.Count;
+                    ExportCustomItem lastItem = CmBFileNames.Items.Cast<ExportCustomItem>().LastOrDefault();
+                    if (lastItem != null)
+                    {
+                        item.Column = lastItem.Column;
+                        item.Format = lastItem.Format;
+                    }
+                    else
+                    {
+                        cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
+                        cmbColumn.SelectedIndex = 0;
+                        cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
+                        SetListValues();
+                    }
+
+                    
+                    SetValues(false, item);
                     CmBFileNames.Items.Add(item);
                     CmBFileNames.SelectedIndex = index;
-                    CmBFormat.SelectedIndex = cmbColumn.SelectedIndex = 0;
+                    CmBFormat.SelectedIndex = item.Format;
                     SetEnabled();
                 }
             }
