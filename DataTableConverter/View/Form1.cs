@@ -1456,16 +1456,16 @@ namespace DataTableConverter
 
         private void textErsetzenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte Text eingeben", "Spalte mit Text befüllen", string.Empty);
-            if (!string.IsNullOrWhiteSpace(newText))
+            InsertText form = new InsertText();
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
                 DataTable newTable = GetDataSource();
+                string newText = form.NewText;
 
                 foreach (DataRow row in newTable.Rows)
                 {
                     row[selectedColumn] = newText;
                 }
-
 
                 AddDataSourceValueChange(newTable);
             }
