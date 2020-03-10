@@ -20,9 +20,12 @@ namespace DataTableConverter.View.WorkProcViews
         internal bool CheckTotal => CBTotal.Checked;
         internal string Shortcut => TxtShortcut.Text;
         internal bool FromToSelected => RbFromTo.Checked;
+        private string[] Headers;
+
         internal SearchForm(string[] headers)
         {
             InitializeComponent();
+            Headers = headers;
             CmBHeader.Items.AddRange(headers);
             CmBHeader.SelectedIndex = 0;
             RbFromTo.Checked = true;
@@ -39,6 +42,14 @@ namespace DataTableConverter.View.WorkProcViews
                 else if(RbShortcut.Checked && string.IsNullOrWhiteSpace(TxtShortcut.Text))
                 {
                     MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Bitte geben Sie eine Kennung ein.");
+                }
+                else if (Headers.Contains(TxtSearchNewColumn.Text))
+                {
+                    DialogResult res = MessageHandler.MessagesYesNoCancel(this, MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit derselben Bezeichnung.\nTrotzdem ausführen?");
+                    if (res == DialogResult.Yes)
+                    {
+                        DialogResult = DialogResult.OK;
+                    }
                 }
                 else
                 {

@@ -28,20 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
+            this.LblDescription = new System.Windows.Forms.Label();
             this.TxTName = new System.Windows.Forms.TextBox();
             this.BtnConfirm = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // label1
+            // LblDescription
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 12);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(99, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Bitte Text eingeben";
+            this.LblDescription.AutoSize = true;
+            this.LblDescription.Location = new System.Drawing.Point(12, 12);
+            this.LblDescription.Name = "LblDescription";
+            this.LblDescription.Size = new System.Drawing.Size(99, 13);
+            this.LblDescription.TabIndex = 0;
+            this.LblDescription.Text = "Bitte Text eingeben";
             // 
             // TxTName
             // 
@@ -79,7 +79,7 @@
             this.Controls.Add(this.BtnCancel);
             this.Controls.Add(this.BtnConfirm);
             this.Controls.Add(this.TxTName);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.LblDescription);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -94,7 +94,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label LblDescription;
         private System.Windows.Forms.TextBox TxTName;
         private System.Windows.Forms.Button BtnConfirm;
         private System.Windows.Forms.Button BtnCancel;

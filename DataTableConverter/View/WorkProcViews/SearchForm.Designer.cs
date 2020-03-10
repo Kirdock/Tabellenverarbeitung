@@ -45,8 +45,8 @@
             this.RbShortcut = new System.Windows.Forms.RadioButton();
             this.GBFromTo = new System.Windows.Forms.GroupBox();
             this.GBShortcut = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.TxtShortcut = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.NbSearchTo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbSearchFrom)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -235,6 +235,13 @@
             this.GBShortcut.TabStop = false;
             this.GBShortcut.Text = "Kennung";
             // 
+            // TxtShortcut
+            // 
+            this.TxtShortcut.Location = new System.Drawing.Point(6, 37);
+            this.TxtShortcut.Name = "TxtShortcut";
+            this.TxtShortcut.Size = new System.Drawing.Size(233, 20);
+            this.TxtShortcut.TabIndex = 32;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -244,20 +251,13 @@
             this.label1.TabIndex = 31;
             this.label1.Text = "Bezeichnung:";
             // 
-            // TxtShortcut
-            // 
-            this.TxtShortcut.Location = new System.Drawing.Point(6, 37);
-            this.TxtShortcut.Name = "TxtShortcut";
-            this.TxtShortcut.Size = new System.Drawing.Size(233, 20);
-            this.TxtShortcut.TabIndex = 32;
-            // 
             // SearchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(245, 310);
-            this.Controls.Add(this.GBShortcut);
             this.Controls.Add(this.GBFromTo);
+            this.Controls.Add(this.GBShortcut);
             this.Controls.Add(this.RbShortcut);
             this.Controls.Add(this.RbFromTo);
             this.Controls.Add(this.CBTotal);

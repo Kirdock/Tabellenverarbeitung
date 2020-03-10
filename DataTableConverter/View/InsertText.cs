@@ -14,9 +14,11 @@ namespace DataTableConverter.View
     {
         internal string NewText => TxTName.Text;
 
-        internal InsertText(string oldName = "")
+        internal InsertText(string header, string description, string oldName = "")
         {
             InitializeComponent();
+            Text = header;
+            LblDescription.Text = description;
             TxTName.Text = oldName;
         }
 

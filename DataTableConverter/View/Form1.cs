@@ -1456,7 +1456,7 @@ namespace DataTableConverter
 
         private void textErsetzenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InsertText form = new InsertText();
+            InsertText form = new InsertText("Spalte mit Text befüllen", "Bitte Text eingeben");
             if (form.ShowDialog(this) == DialogResult.OK)
             {
                 DataTable newTable = GetDataSource();

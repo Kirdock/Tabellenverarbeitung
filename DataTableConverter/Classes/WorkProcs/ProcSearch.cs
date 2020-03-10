@@ -48,7 +48,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 if (!string.IsNullOrWhiteSpace(NewColumn))
                 {
-                    string col = table.TryAddColumn(NewColumn);
+                    string col = table.Columns.Contains(NewColumn) ? NewColumn : table.TryAddColumn(NewColumn);
                     
                     Func<string, string, bool> search;
                     if (TotalSearch)
