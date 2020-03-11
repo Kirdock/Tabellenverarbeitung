@@ -174,30 +174,33 @@ namespace DataTableConverter.Extensions
             {
                 tableNew.Columns[tempIndex].SetOrdinal(tableNew.Columns.Count - 1);
             }
-            DataTable changes = tableNew.GetChanges(DataRowState.Modified);
-            HashSet<int> newColumns = new HashSet<int>();
-            for (int rowIndex = 0; changes != null && rowIndex < changes.Rows.Count; rowIndex++)
-            {
 
-                for (int colIndex = 0; colIndex < changes.Rows[rowIndex].ItemArray.Length; colIndex++)
+            HashSet<int> newColumns = new HashSet<int>();
+            //Get changed values. Don't use GetChanges(DataRowState.Modified) because then we don't know the original rowIndex (changes.RowCount != table.RowCount)
+            for (int rowIndex = 0; rowIndex < tableNew.Rows.Count; rowIndex++)
+            {
+                if (tableNew.Rows[rowIndex].RowState == DataRowState.Modified)
                 {
-                    object value;
-                    if ((value = changes.Rows[rowIndex][colIndex, DataRowVersion.Original]) != changes.Rows[rowIndex][colIndex, DataRowVersion.Current])
+                    for (int colIndex = 0; colIndex < tableNew.Rows[rowIndex].ItemArray.Length; colIndex++)
                     {
-                        if (value == DBNull.Value)
+                        object value = tableNew.Rows[rowIndex][colIndex, DataRowVersion.Original];
+                        if (value != tableNew.Rows[rowIndex][colIndex, DataRowVersion.Current])
                         {
-                            newColumns.Add(colIndex);
-                        }
-                        else
-                        {
-                            result.Add(new CellMatrix(rowIndex, colIndex, value.ToString()));
+                            if (value == DBNull.Value)
+                            {
+                                newColumns.Add(colIndex);
+                            }
+                            else
+                            {
+                                result.Add(new CellMatrix(rowIndex, colIndex, value.ToString()));
+                            }
                         }
                     }
                 }
             }
 
             //deleted rows
-            changes = tableNew.GetChanges(DataRowState.Deleted);
+            DataTable changes = tableNew.GetChanges(DataRowState.Deleted);
             if (changes != null && tempIndex != -1) //without tempSort I don't know where the DataRow was
             {
                 foreach (DataRow row in changes.Rows)
@@ -222,7 +225,6 @@ namespace DataTableConverter.Extensions
             {
                 result.Add(new CellMatrix(new History { State = State.InsertColumn, ColumnIndex = index }));
             }
-
             return result;
         }
 
