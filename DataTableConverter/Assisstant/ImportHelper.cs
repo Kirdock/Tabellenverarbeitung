@@ -356,7 +356,7 @@ namespace DataTableConverter.Assisstant
         internal static DataTable OpenDBF(string path, ProgressBar progressBar, Form mainForm)
         {
             DataTable data = new DataTable();
-            string directory = Path.GetDirectoryName(path);
+            string directory = ToShortPathName(Path.GetDirectoryName(path));
             string shortPath = GetShortFileName(path);
             string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={directory};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
             OleDbConnection con = new OleDbConnection(constr);
@@ -1116,13 +1116,22 @@ namespace DataTableConverter.Assisstant
             return setting;
         }
 
+        public static string ToShortPathName(string longName)
+        {
+            int bufferSize = 256;
+            // don´t allocate stringbuilder here but outside of the function for fast access
+            StringBuilder shortNameBuffer = new StringBuilder(bufferSize);
+            GetShortPathName(longName, shortNameBuffer, bufferSize);
+            return shortNameBuffer.ToString();
+        }
+
         internal static string GetShortFileName(string path)
         {
             StringBuilder temp = new StringBuilder(255);
 
             GetShortPathName(path, temp, 255);
 
-            return ((temp.ToString().Split('\\')).Last()).ToLower();
+            return temp.ToString().Split('\\').Last().ToLower();
         }
         private string LongFileName(string shortName)
         {
