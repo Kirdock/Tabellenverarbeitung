@@ -238,7 +238,7 @@ namespace DataTableConverter
         private DataView GetDataView()
         {
             EndEdit();
-            return (DataView)dgTable.DataSource;
+            return sourceTable.GetSortedView(SortingOrder,OrderType,-1);
         }
 
         #region Add History Entry

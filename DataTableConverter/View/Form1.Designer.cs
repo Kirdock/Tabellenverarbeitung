@@ -377,19 +377,19 @@
             // cSVToolStripMenuItem
             // 
             this.cSVToolStripMenuItem.Name = "cSVToolStripMenuItem";
-            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cSVToolStripMenuItem.Text = "CSV";
             // 
             // dBASEToolStripMenuItem1
             // 
             this.dBASEToolStripMenuItem1.Name = "dBASEToolStripMenuItem1";
-            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
+            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.dBASEToolStripMenuItem1.Text = "DBASE";
             // 
             // excelToolStripMenuItem1
             // 
             this.excelToolStripMenuItem1.Name = "excelToolStripMenuItem1";
-            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
+            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.excelToolStripMenuItem1.Text = "Excel";
             // 
             // benutzerdefiniertesSpeichernToolStripMenuItem1
