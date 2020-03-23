@@ -657,5 +657,17 @@ namespace DataTableConverter.Properties {
                 this["NotAdjustColumnOver100"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15000")]
+        public decimal MaxRows {
+            get {
+                return ((decimal)(this["MaxRows"]));
+            }
+            set {
+                this["MaxRows"] = value;
+            }
+        }
     }
 }

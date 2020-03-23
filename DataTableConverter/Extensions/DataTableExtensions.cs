@@ -539,7 +539,36 @@ namespace DataTableConverter.Extensions
             return result;
         }
 
-        internal static DataView GetSortedView(this DataTable table, string order, OrderType orderType, Action addHistory = null)
+        internal static EnumerableRowCollection<DataRow> SkipTakeRows(this DataTable table, decimal range, int page, out string tempColumn, OrderedEnumerableRowCollection<DataRow> enumerable = null)
+        {
+            string temp = tempColumn = table.TryAddColumn(TempSort);
+            EnumerableRowCollection<DataRow> result;
+            if (page == -1)
+            {
+                result = table.AsEnumerable();
+            }
+            else
+            {
+                int count = 0;
+                
+                foreach (DataRow row in (enumerable ?? table.AsEnumerable()).ToList())//lazy loading. this does not always run before the next (enumerable.OrderBy...) statement
+                {
+                    row[temp] = count++;
+                }
+                result = (enumerable ?? table.AsEnumerable()).Where(row => {
+                    bool status = table.Columns.Contains(temp);
+                    if (status)
+                    {
+                        int.TryParse(row[temp]?.ToString(), out int res);
+                        status = res >= (page - 1) * range && res < page * range;
+                    }
+                    return status;
+                });
+            }
+            return result;
+        }
+
+        internal static DataView GetSortedView(this DataTable table, string order, OrderType orderType, int page, Action addHistory = null)
         {
             DataView view;
             table.Dispose(); //in hope to remove all remaining lazy loading
@@ -548,7 +577,9 @@ namespace DataTableConverter.Extensions
             Dictionary<string, SortOrder> dict = ViewHelper.GenerateSortingList(order);
             if (dict.Count == 0)
             {
-                view = table.AsEnumerable().AsDataView(); //create new view. Default view throws exception "is not opened"
+                view = table.SkipTakeRows(Properties.Settings.Default.MaxRows, page, out string tempColumn).AsDataView();
+                table.Columns.Remove(tempColumn);
+                //view = table.AsEnumerable().Where(row => int.TryParse(row[temp]?.ToString(), out int res) && res > (page-1)*range && res < (page-1)*(range+1) ).AsDataView(); //create new view. Default view throws exception "is not opened"
             }
             else
             {
@@ -606,7 +637,9 @@ namespace DataTableConverter.Extensions
                     }, new CustomSort(firstElement.Value == SortOrder.Ascending));
 
                 }
-                view = enumerable.AsDataView();
+                view = table.SkipTakeRows(Properties.Settings.Default.MaxRows, page, out string tempColumn, enumerable).AsDataView();
+                table.Columns.Remove(tempColumn);
+                //view = enumerable.AsDataView();
 
                 if (tempSortName != string.Empty)
                 {
@@ -614,6 +647,7 @@ namespace DataTableConverter.Extensions
                 }
 
             }
+            
             table.EndLoadData();
             return view;
         }

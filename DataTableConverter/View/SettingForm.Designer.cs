@@ -61,6 +61,8 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label38 = new System.Windows.Forms.Label();
+            this.CbAdjustColumnOver100 = new System.Windows.Forms.CheckBox();
             this.CbSeparateSelectable = new System.Windows.Forms.CheckBox();
             this.label37 = new System.Windows.Forms.Label();
             this.CbImportWorkflowAuto = new System.Windows.Forms.CheckBox();
@@ -115,8 +117,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.CbAdjustColumnOver100 = new System.Windows.Forms.CheckBox();
-            this.label38 = new System.Windows.Forms.Label();
+            this.label39 = new System.Windows.Forms.Label();
+            this.NumMaxRows = new System.Windows.Forms.NumericUpDown();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -132,6 +134,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).BeginInit();
             this.tabPage6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DgVSecondExample)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumMaxRows)).BeginInit();
             this.SuspendLayout();
             // 
             // tabSettings
@@ -472,6 +475,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.NumMaxRows);
+            this.tabPage2.Controls.Add(this.label39);
             this.tabPage2.Controls.Add(this.label38);
             this.tabPage2.Controls.Add(this.CbAdjustColumnOver100);
             this.tabPage2.Controls.Add(this.CbSeparateSelectable);
@@ -499,6 +504,26 @@
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label38.Location = new System.Drawing.Point(10, 443);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(55, 16);
+            this.label38.TabIndex = 23;
+            this.label38.Text = "Import:";
+            // 
+            // CbAdjustColumnOver100
+            // 
+            this.CbAdjustColumnOver100.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CbAdjustColumnOver100.Location = new System.Drawing.Point(8, 471);
+            this.CbAdjustColumnOver100.Name = "CbAdjustColumnOver100";
+            this.CbAdjustColumnOver100.Size = new System.Drawing.Size(254, 34);
+            this.CbAdjustColumnOver100.TabIndex = 22;
+            this.CbAdjustColumnOver100.Text = "Spaltenbreite bei über 100 Spalten nicht anpassen";
+            this.CbAdjustColumnOver100.UseVisualStyleBackColor = true;
             // 
             // CbSeparateSelectable
             // 
@@ -1019,25 +1044,35 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // CbAdjustColumnOver100
+            // label39
             // 
-            this.CbAdjustColumnOver100.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbAdjustColumnOver100.Location = new System.Drawing.Point(8, 471);
-            this.CbAdjustColumnOver100.Name = "CbAdjustColumnOver100";
-            this.CbAdjustColumnOver100.Size = new System.Drawing.Size(254, 34);
-            this.CbAdjustColumnOver100.TabIndex = 22;
-            this.CbAdjustColumnOver100.Text = "Spaltenbreite bei über 100 Spalten nicht anpassen";
-            this.CbAdjustColumnOver100.UseVisualStyleBackColor = true;
+            this.label39.Location = new System.Drawing.Point(10, 527);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(207, 28);
+            this.label39.TabIndex = 24;
+            this.label39.Text = "Zeilen auf mehrere Seiten aufteilen ab einer Anzal von:";
             // 
-            // label38
+            // NumMaxRows
             // 
-            this.label38.AutoSize = true;
-            this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label38.Location = new System.Drawing.Point(10, 443);
-            this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(55, 16);
-            this.label38.TabIndex = 23;
-            this.label38.Text = "Import:";
+            this.NumMaxRows.Location = new System.Drawing.Point(247, 525);
+            this.NumMaxRows.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.NumMaxRows.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.NumMaxRows.Name = "NumMaxRows";
+            this.NumMaxRows.Size = new System.Drawing.Size(120, 20);
+            this.NumMaxRows.TabIndex = 25;
+            this.NumMaxRows.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // SettingForm
             // 
@@ -1071,6 +1106,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).EndInit();
             this.tabPage6.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.DgVSecondExample)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumMaxRows)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1165,5 +1201,7 @@
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.CheckBox CbAdjustColumnOver100;
+        private System.Windows.Forms.NumericUpDown NumMaxRows;
+        private System.Windows.Forms.Label label39;
     }
 }

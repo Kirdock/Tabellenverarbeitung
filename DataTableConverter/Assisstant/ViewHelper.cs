@@ -66,10 +66,10 @@ namespace DataTableConverter
             Workflows = workflows;
         }
 
-        internal static void AddNumerationToDataGridView(object sender, DataGridViewRowPostPaintEventArgs e, Font font)
+        internal static void AddNumerationToDataGridView(object sender, DataGridViewRowPostPaintEventArgs e, Font font, decimal pages = 1)
         {
             var grid = sender as DataGridView;
-            var rowIdx = (e.RowIndex + 1).ToString();
+            var rowIdx = (e.RowIndex + 1 + (pages - 1) * Properties.Settings.Default.MaxRows).ToString();
 
             Font f = new Font(font.Name, font.Size, FontStyle.Bold);
 

@@ -94,13 +94,17 @@
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lblPage = new System.Windows.Forms.Label();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.label1 = new System.Windows.Forms.Label();
+            this.NumPage = new System.Windows.Forms.NumericUpDown();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.contextGlobal.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgTable)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumPage)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -415,7 +419,7 @@
             // 
             this.pgbLoading.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pgbLoading.Location = new System.Drawing.Point(0, 402);
+            this.pgbLoading.Location = new System.Drawing.Point(0, 421);
             this.pgbLoading.MarqueeAnimationSpeed = 10;
             this.pgbLoading.Name = "pgbLoading";
             this.pgbLoading.Size = new System.Drawing.Size(1056, 23);
@@ -499,7 +503,7 @@
             this.StatusLabel,
             this.ValidRowsText,
             this.ValidRowsLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 426);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 445);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1056, 24);
             this.statusStrip1.TabIndex = 3;
@@ -579,6 +583,16 @@
             this.clipboardItem.Size = new System.Drawing.Size(209, 22);
             this.clipboardItem.Text = "Zwischenablage einfügen";
             // 
+            // lblPage
+            // 
+            this.lblPage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPage.AutoSize = true;
+            this.lblPage.Location = new System.Drawing.Point(135, 398);
+            this.lblPage.Name = "lblPage";
+            this.lblPage.Size = new System.Drawing.Size(34, 13);
+            this.lblPage.TabIndex = 4;
+            this.lblPage.Text = "von 0";
+            // 
             // dgTable
             // 
             this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -589,7 +603,7 @@
             this.dgTable.Location = new System.Drawing.Point(0, 27);
             this.dgTable.Name = "dgTable";
             this.dgTable.RowHeadersWidth = 60;
-            this.dgTable.Size = new System.Drawing.Size(1056, 369);
+            this.dgTable.Size = new System.Drawing.Size(1056, 361);
             this.dgTable.TabIndex = 0;
             this.dgTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellClick);
             this.dgTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgTable_CellPainting);
@@ -600,12 +614,50 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(4, 398);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(31, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Seite";
+            // 
+            // NumPage
+            // 
+            this.NumPage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.NumPage.Location = new System.Drawing.Point(41, 396);
+            this.NumPage.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.NumPage.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.NumPage.Name = "NumPage";
+            this.NumPage.Size = new System.Drawing.Size(88, 20);
+            this.NumPage.TabIndex = 8;
+            this.NumPage.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.NumPage.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.NumPage.ValueChanged += new System.EventHandler(this.NumPage_ValueChanged);
+            // 
             // Form1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1056, 450);
+            this.ClientSize = new System.Drawing.Size(1056, 469);
+            this.Controls.Add(this.NumPage);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblPage);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.pgbLoading);
             this.Controls.Add(this.dgTable);
@@ -625,6 +677,7 @@
             this.statusStrip1.PerformLayout();
             this.contextGlobal.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgTable)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumPage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -695,6 +748,9 @@
         private System.Windows.Forms.ToolStripStatusLabel ValidRowsText;
         private System.Windows.Forms.ToolStripStatusLabel ValidRowsLabel;
         private System.Windows.Forms.ToolStripMenuItem aufteilenToolStripMenuItem;
+        private System.Windows.Forms.Label lblPage;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown NumPage;
     }
 }
 

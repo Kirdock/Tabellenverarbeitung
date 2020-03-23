@@ -40,6 +40,20 @@ namespace DataTableConverter
         private readonly Dictionary<string, int> ColumnWidths;
         private readonly int ColumnWidthTolerance = 10;
         internal int FileEncoding = 0;
+        private decimal MaxPages => Math.Ceiling(((decimal)(sourceTable?.Rows.Count ?? 1) / Properties.Settings.Default.MaxRows));
+        private decimal Page {
+            get {
+                return NumPage.Value;
+            }
+            set
+            {
+                dgTable.RowsAdded -= dgTable_RowsAdded;
+                dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
+                dgTable.RowsAdded += dgTable_RowsAdded;
+                SetPage();
+                AssignDataSource();
+            }
+        }
         internal int ValidRows
         {
             get
@@ -86,6 +100,12 @@ namespace DataTableConverter
             }
         }
 
+        private void SetPage()
+        {
+            lblPage.Text = $"von {MaxPages}";
+            NumPage.Maximum = MaxPages;
+        }
+
         private void ResetValidRowLabel()
         {
             statusStrip1.Invoke(new MethodInvoker(() =>
@@ -106,6 +126,10 @@ namespace DataTableConverter
                 item.Enabled = status;
             }
 
+            foreach (Control item in new Control[] { NumPage })
+            {
+                item.Enabled = status;
+            }
         }
 
         private void SetSubItemEnabled(bool status, ToolStripMenuItem menuItem)
@@ -152,9 +176,7 @@ namespace DataTableConverter
             dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
             sourceTable = table ?? sourceTable;
             int rowCount = sourceTable.Rows.Count;
-
-            dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, delegate { AddDataSourceAddRow(rowCount, orderType); });
-            
+            dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, (int) Page, delegate { AddDataSourceAddRow(rowCount, orderType); });
             RestoreDataGridSortMode();
             SetWidth();
 
@@ -232,9 +254,18 @@ namespace DataTableConverter
         {
             historyHelper.ResetHistory();
             SetSorting(string.Empty);
-            
             AssignDataSource(table, true);
             SetMenuEnabled(true);
+            ResetPage();
+        }
+
+        private void ResetPage()
+        {
+            NumPage.ValueChanged -= NumPage_ValueChanged;
+            NumPage.Value = 1;
+            NumPage.ValueChanged += NumPage_ValueChanged;
+            SetPage();
+            dgTable.AllowUserToAddRows = Page == MaxPages;
         }
 
         private void SetWidth()
@@ -629,7 +660,7 @@ namespace DataTableConverter
                     default:
                         ResetValidRowLabel();
                         dgTable.BeginInvoke(new MethodInvoker(() => { AddDataSourceNewTable(table); }));
-                        lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { SetRowCount(table.Rows.Count); }));
+                        lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { SetRowCount(); }));
                         break;
                 }
             }
@@ -756,7 +787,7 @@ namespace DataTableConverter
 
         private void SetRowCount()
         {
-            SetRowCount(dgTable.Rows.Count - 1);
+            SetRowCount(sourceTable?.Rows.Count ?? 0);
         }
 
         private void SetRowCount(int count)
@@ -922,8 +953,7 @@ namespace DataTableConverter
         {
             if (e.Button == MouseButtons.Right)
             {
-                
-                selectedRow = dgTable.HitTest(e.X, e.Y).RowIndex;
+                selectedRow =  dgTable.HitTest(e.X, e.Y).RowIndex;
                 selectedColumn = dgTable.HitTest(e.X, e.Y).ColumnIndex;
                 if(selectedColumn > -1 && selectedRow > -1 && !dgTable[selectedColumn, selectedRow].Selected)
                 {
@@ -1022,7 +1052,7 @@ namespace DataTableConverter
 
         private void dgTable_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
-            ViewHelper.AddNumerationToDataGridView(sender, e, Font);
+            ViewHelper.AddNumerationToDataGridView(sender, e, Font, NumPage.Value);
         }
 
         private void rückgängigToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1087,20 +1117,41 @@ namespace DataTableConverter
             {
                 ColumnWidths[col.Name] = col.Width = width;
             }
+            AssignDataSource();
             AddDataSourceCellChanged(tableValueBefore, e.ColumnIndex, rowBefore);
         }
 
         private void dgTable_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             tableValueBefore = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
-            rowBefore = e.RowIndex >= 0 && e.RowIndex < sourceTable.Rows.Count ? GetDataTableRowIndexOfDataGridView(e.RowIndex) : e.RowIndex >= 0 ? e.RowIndex : 0;
+            rowBefore = e.RowIndex >= 0 && (RealRowCount()-1) < sourceTable.Rows.Count ? GetDataTableRowIndexOfDataGridView(e.RowIndex) : e.RowIndex >= 0 ? e.RowIndex : 0;
+        }
+
+        private decimal RealRowCount()
+        {
+            return dgTable.Rows.Count + (NumPage.Value - 1) * Properties.Settings.Default.MaxRows;
         }
 
         private void dgTable_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
-            if(dgTable.Rows.Count-1 > sourceTable.Rows.Count)
+            if (RealRowCount() -1 > sourceTable.Rows.Count)
             {
+                var cell = dgTable.SelectedCells[0];
+                var rowIndex = cell.RowIndex;
+                var columnIndex = cell.ColumnIndex;
                 AddDataSourceAddRow(sourceTable.Rows.Count, OrderType);
+                //EndEdit();
+
+                dgTable.BeginInvoke(new MethodInvoker(() =>
+                {
+                    EndEdit();
+                    AssignDataSource();
+                    cell = dgTable[columnIndex, rowIndex];
+                    cell.Selected = true;
+                    dgTable.CurrentCell = dgTable[columnIndex, rowIndex];
+                    dgTable.BeginEdit(false);
+                }));
+
             }
             SetRowCount();
         }
@@ -1776,6 +1827,15 @@ namespace DataTableConverter
         private void dgTable_ColumnAdded(object sender, DataGridViewColumnEventArgs e)
         {
             e.Column.FillWeight = 10;
+        }
+
+        private void NumPage_ValueChanged(object sender, EventArgs e)
+        {
+            int page = (int)NumPage.Value;
+            if(page > 0 && page <= MaxPages)
+            {
+                Page = page;
+            }
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
