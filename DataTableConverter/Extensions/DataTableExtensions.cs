@@ -545,7 +545,7 @@ namespace DataTableConverter.Extensions
             EnumerableRowCollection<DataRow> result;
             if (page == -1)
             {
-                result = table.AsEnumerable();
+                result = enumerable ?? table.AsEnumerable();
             }
             else
             {

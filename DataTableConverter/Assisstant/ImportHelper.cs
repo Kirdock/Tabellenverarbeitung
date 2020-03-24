@@ -470,7 +470,15 @@ namespace DataTableConverter.Assisstant
             
             Microsoft.Office.Interop.Excel.Application objXL = null;
             Microsoft.Office.Interop.Excel.Workbook objWB = null;
-            string clipboardBefore = Clipboard.GetText();
+            string clipboardBefore = string.Empty;
+            try
+            {
+                clipboardBefore = Clipboard.GetText();
+            }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage(ex, mainForm, false);
+            }
             Clipboard.Clear();
 
             try

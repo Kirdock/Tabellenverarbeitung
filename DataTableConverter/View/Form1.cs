@@ -215,7 +215,7 @@ namespace DataTableConverter
                 EndEdit();
                 if (withSort)
                 {
-                    table = GetDataView().ToTable();
+                    table = table.GetSortedView(SortingOrder,OrderType,-1).ToTable();
                 }
                 else
                 {
@@ -233,12 +233,6 @@ namespace DataTableConverter
         private void EndEdit()
         {
             ViewHelper.EndDataGridViewEdit(dgTable);
-        }
-
-        private DataView GetDataView()
-        {
-            EndEdit();
-            return sourceTable.GetSortedView(SortingOrder,OrderType,-1);
         }
 
         #region Add History Entry
@@ -629,7 +623,7 @@ namespace DataTableConverter
 
         private void SetFileName(string path)
         {
-            lblFilename.GetCurrentParent().BeginInvoke(new MethodInvoker(() =>
+            (lblFilename?.GetCurrentParent() ?? statusStrip1)?.BeginInvoke(new MethodInvoker(() =>
             {
                 lblFilename.Text = Path.GetFileName(path);
             }));
@@ -1340,7 +1334,7 @@ namespace DataTableConverter
         {
             int[] rows = ViewHelper.SelectedRowsOfDataGridView(dgTable);
             List<CellMatrix> newHistoryEntry = new List<CellMatrix>();
-            DataTable table = ((DataView)dgTable.DataSource).Table;
+            DataTable table = sourceTable;
             foreach (int row in rows)
             {
                 DataRow oldRow = ((DataRowView)dgTable.Rows[row].DataBoundItem).Row;
