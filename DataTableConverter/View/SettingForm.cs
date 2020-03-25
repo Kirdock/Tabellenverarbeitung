@@ -69,6 +69,7 @@ namespace DataTableConverter.View
             CbSeparateSelectable.Checked = Properties.Settings.Default.SeparateSelectable;
             CbAdjustColumnOver100.Checked = Properties.Settings.Default.NotAdjustColumnOver100;
             NumMaxRows.Value = Properties.Settings.Default.MaxRows;
+            CBTrimImport.Checked = Properties.Settings.Default.TrimImport;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -99,6 +100,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.SeparateSelectable = CbSeparateSelectable.Checked;
                 Properties.Settings.Default.NotAdjustColumnOver100 = CbAdjustColumnOver100.Checked;
                 Properties.Settings.Default.MaxRows = NumMaxRows.Value;
+                Properties.Settings.Default.TrimImport = CBTrimImport.Checked;
                 Properties.Settings.Default.Save();
             }
             else

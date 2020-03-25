@@ -122,8 +122,11 @@ namespace DataTableConverter.Assisstant
             {
                 CheckDataTableColumnHeader(table);
                 table.RemoveEmptyRows();
-                table.RemoveNull();
-                table.Trim();
+                
+                if (Properties.Settings.Default.TrimImport)
+                {
+                    table.Trim();
+                }
             }
             return table;
         }
@@ -371,6 +374,7 @@ namespace DataTableConverter.Assisstant
             da.Fill(data);
             da.Dispose();
             data.RemoveNewLine();
+            data.RemoveNull();
             return data.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? data : data.SetColumnsTypeStringWithContainingData();
         }
 

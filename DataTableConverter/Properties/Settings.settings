@@ -164,5 +164,8 @@
     <Setting Name="MaxRows" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">15000</Value>
     </Setting>
+    <Setting Name="TrimImport" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

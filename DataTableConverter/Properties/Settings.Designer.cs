@@ -669,5 +669,17 @@ namespace DataTableConverter.Properties {
                 this["MaxRows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TrimImport {
+            get {
+                return ((bool)(this["TrimImport"]));
+            }
+            set {
+                this["TrimImport"] = value;
+            }
+        }
     }
 }
