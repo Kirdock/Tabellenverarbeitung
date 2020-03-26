@@ -213,14 +213,12 @@ namespace DataTableConverter
             {
                 int rowCountBefore = table.Rows.Count;
                 EndEdit();
+                table = sourceTable.Copy();
                 if (withSort)
                 {
                     table = table.GetSortedView(SortingOrder,OrderType,-1).ToTable();
                 }
-                else
-                {
-                    table = sourceTable.Copy();
-                }
+
                 while(rowCountBefore < table.Rows.Count)
                 {
                     table.Rows.RemoveAt(table.Rows.Count - 1);
