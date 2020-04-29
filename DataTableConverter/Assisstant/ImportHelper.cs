@@ -368,14 +368,15 @@ namespace DataTableConverter.Assisstant
             con.Open();
             progressBar?.StartLoadingBar(GetDataReaderRowCount(con,shortPath, mainForm), mainForm);
 
-
-            data.RowChanged += (sender, e) => FillDataTableNewRow(e, progressBar, mainForm);
+            DataRowChangeEventHandler handler = (sender, e) => FillDataTableNewRow(e, progressBar, mainForm);
+            data.RowChanged += handler;
             OleDbDataAdapter da = new OleDbDataAdapter(new OleDbCommand(sql, con));
             da.Fill(data);
             da.Dispose();
-            data.RemoveNewLine();
-            data.RemoveNull();
-            return data.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? data : data.SetColumnsTypeStringWithContainingData();
+            data.RowChanged -= handler;
+            data = data.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? data : data.SetColumnsTypeStringWithContainingData();
+            data.AdjustDBASEImport();
+            return data;
         }
 
         private static void FillDataTableNewRow(DataRowChangeEventArgs e, ProgressBar progressBar, Form mainForm)

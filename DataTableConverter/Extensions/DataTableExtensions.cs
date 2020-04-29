@@ -34,12 +34,17 @@ namespace DataTableConverter.Extensions
             }
         }
 
-        internal static void RemoveNewLine(this DataTable table)
+        internal static void AdjustDBASEImport(this DataTable table)
         {
-            foreach(DataRow row in table.AsEnumerable())
+            //remove Null-Value and newLine
+            foreach (DataRow row in table.AsEnumerable())
             {
                 for (int i = 0; i < row.ItemArray.Length; i++)
                 {
+                    if (row[i] == DBNull.Value)
+                    {
+                        row[i] = string.Empty;
+                    }
                     row[i] = row[i].ToString().Replace("\n", string.Empty);
                 }
             }
@@ -300,19 +305,6 @@ namespace DataTableConverter.Extensions
                 }
             }
             return table2.Rows.Count;
-        }
-        internal static void RemoveNull(this DataTable table)
-        {
-            foreach (DataRow row in table.Rows)
-            {
-                for (int i = 0; i < row.ItemArray.Length; i++)
-                {
-                    if (row[i] == DBNull.Value)
-                    {
-                        row[i] = string.Empty;
-                    }
-                }
-            }
         }
 
         internal static object[] HeadersOfDataTable(this DataTable table)
