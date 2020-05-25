@@ -815,7 +815,8 @@ namespace DataTableConverter.Assisstant
                 string multiHeader = count == 0 ? header : header + count;
                 if (!table.Columns.Contains(multiHeader))
                 {
-                    table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(table.Columns.IndexOf(header) + count);
+                    int ordinal = table.Columns.IndexOf(header) + count;
+                    table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(ordinal >= table.Columns.Count ? table.Columns.Count-1 : ordinal);
                 }
                 row[multiHeader] = result;
             }
