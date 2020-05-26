@@ -669,7 +669,7 @@ namespace DataTableConverter.Assisstant
                 }
                 else if (content[i] == '\t') // new column
                 {
-                    if (!generatedMulti)
+                    if (!generatedMulti && cellBuilder.Length > 0)
                     {
                         SetContentRowValue(row, headers[headerCounter], cellBuilder);
                     }
@@ -782,7 +782,7 @@ namespace DataTableConverter.Assisstant
                         i--;
                         cell = new StringBuilder("\"").Append(cell);
                     }
-                    else if(multiCellCount == 0)
+                    else if(multiCellCount == 0 && cell.Length > 0)
                     {
                         cell = new StringBuilder("\"").Append(cell).Append('\"');
                     }
@@ -791,13 +791,16 @@ namespace DataTableConverter.Assisstant
                 }
                 else if((newLine = (content[i] == '\r')) || content[i] == '\n')
                 {
-                    AddMultiCellColumn(header, multiCellCount, table, row,cell);
-
-                    if (newLine)
+                    if (cell.Length != 0)
                     {
-                        ++i;
+                        AddMultiCellColumn(header, multiCellCount, table, row, cell);
+
+                        if (newLine)
+                        {
+                            ++i;
+                        }
+                        multiCellCount++;
                     }
-                    multiCellCount++;
                 }
                 else if (content[i] != '\"' || content[i-1] != '\"' || content[i + 1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
                 {
@@ -815,8 +818,7 @@ namespace DataTableConverter.Assisstant
                 string multiHeader = count == 0 ? header : header + count;
                 if (!table.Columns.Contains(multiHeader))
                 {
-                    int ordinal = table.Columns.IndexOf(header) + count;
-                    table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(ordinal >= table.Columns.Count ? table.Columns.Count-1 : ordinal);
+                    table.Columns.Add(multiHeader, typeof(string)).SetOrdinal(table.Columns.IndexOf(header) + count);
                 }
                 row[multiHeader] = result;
             }
