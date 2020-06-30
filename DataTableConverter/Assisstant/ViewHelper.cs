@@ -336,7 +336,7 @@ namespace DataTableConverter
                 bool found = false;
                 for (int i = Table.Rows.Count - 1; i >= 0 && !found; i--)
                 {
-                    if (Table.Rows[i][0] == headers.Items[e.Index])
+                    if (Table.Rows[i][0].ToString() == headers.Items[e.Index].ToString())
                     {
                         Table.Rows.RemoveAt(i);
                         found = true;

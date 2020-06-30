@@ -13,6 +13,7 @@ namespace DataTableConverter.Classes
     {
         public int ProcedureId { get; set; }
         public bool ReplacesTable = false;
+        internal bool CommitDelete = false;
         internal DataTable Columns { get; set; }
         internal string[] DuplicateColumns { get; set; }
         internal int Ordinal { get; set; }

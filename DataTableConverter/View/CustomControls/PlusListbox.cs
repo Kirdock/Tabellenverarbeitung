@@ -23,11 +23,11 @@ namespace DataTableConverter.View.CustomControls
                 {
                     switch((Items[e.Index] as PlusListboxItem).State)
                     {
-                        case RowMergeState.Sum:
+                        case RowMergeState.Summe:
                             text += " (Summe)";
                             break;
 
-                        case RowMergeState.Count:
+                        case RowMergeState.Anzahl:
                             text += " (Anzahl)";
                             break;
 

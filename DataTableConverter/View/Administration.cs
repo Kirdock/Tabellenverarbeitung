@@ -43,10 +43,12 @@ namespace DataTableConverter.View
         private object[] Headers;
         private DataTable Table;
         private ContextMenuStrip ContextGlobal;
+        private List<KeyValuePair<string, int>> RowMergeStateList;
 
         internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
         {
             InitializeComponent();
+            InitRowMergeStateList();
             ContextGlobal = ctxRow;
             SetEncodingCmBs();
             Table = table;
@@ -78,6 +80,16 @@ namespace DataTableConverter.View
             SetColors();
         }
 
+        private void InitRowMergeStateList()
+        {
+            RowMergeStateList = new List<KeyValuePair<string, int>>();
+            Array array = Enum.GetValues(typeof(PlusListboxItem.RowMergeState));
+            for (int i = 0; i < array.Length; ++i)
+            {
+                RowMergeStateList.Add(new KeyValuePair<string, int>(array.GetValue(i).ToString(), i));
+            }
+        }
+
         #region Adjust all custom GroupBoxes
         private void AssignGroupBoxToEnum()
         {
@@ -100,7 +112,8 @@ namespace DataTableConverter.View
                 { gbTrim, typeof(ProcTrim) },
                 { gbSeparate, typeof(ProcSeparate) },
                 { GbSearch, typeof(ProcSearch) },
-                { GbSplit, typeof(ProcSplit) }
+                { GbSplit, typeof(ProcSplit) },
+                { GbMergeRows, typeof(ProcMergeRows) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -121,7 +134,8 @@ namespace DataTableConverter.View
                 { typeof(ProcCount), SetCountControls },
                 { typeof(ProcSeparate), SetSeparateControls },
                 { typeof(ProcSearch), SetSearchControls },
-                { typeof(ProcSplit), SetSplitControls }
+                { typeof(ProcSplit), SetSplitControls },
+                { typeof(ProcMergeRows), SetMergeRowsControls }
             };
         }
 
@@ -145,7 +159,8 @@ namespace DataTableConverter.View
                 new Proc(ProcSeparate.ClassName, null, 14),
                 new Proc(ProcSearch.ClassName, null, 15),
                 new Proc(ProcSplit.ClassName, null, 16),
-                new Proc(ProcUser.ClassName, null, 17)
+                new Proc(ProcUser.ClassName, null, 17),
+                new Proc(ProcMergeRows.ClassName, null, 18)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -182,7 +197,8 @@ namespace DataTableConverter.View
                 LblSeparateColumn,
                 LblSplitColumn,
                 LblSplitNewColumn,
-                LblSplitText
+                LblSplitText,
+                lblMergeRowsIdentifier
             };
             foreach (Label label in labels)
             {
@@ -212,7 +228,8 @@ namespace DataTableConverter.View
 
             DataGridView[] dataGridViews = new DataGridView[]
             {
-                dgOrderColumns
+                dgOrderColumns,
+                dgMergeRowsColumns
             };
 
             foreach (DataGridView dataGridView in dataGridViewsClipboard)
@@ -238,7 +255,8 @@ namespace DataTableConverter.View
                 cbSubstringHeaders,
                 cbHeadersReplaceWhole,
                 cbHeadersPVMExport,
-                CLBTrimHeaders
+                CLBTrimHeaders,
+                CLBMergeRowsHeaders
             };
             foreach (CheckedComboBox checkedComboBox in checkedComboBoxes)
             {
@@ -1031,9 +1049,34 @@ namespace DataTableConverter.View
             dgOrderColumns.Columns.Add(cmb);
         }
 
+        private void SetMergeRowsControls(WorkProc proc)
+        {
+            ProcMergeRows selectedProc = proc as ProcMergeRows;
+            SetHeaderMergeRows(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
+            lblOriginalNameText.Text = ProcMergeRows.ClassName;
+            TxtMergeRowsIdentifier.Text = selectedProc.Identifier;
+            CBMergeRowsSeparator.Checked = selectedProc.Separator;
+            SetDataSource(dgMergeRowsColumns, selectedProc.Columns);
+
+            dgMergeRowsColumns.Columns[1].Visible = false;
+
+            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
+            {
+                DataSource = RowMergeStateList,
+                HeaderText = "Aktion",
+                DataPropertyName = "Aktion",
+                ValueMember = "value",
+                DisplayMember = "key",
+                ValueType = typeof(int)
+            };
+
+
+            dgMergeRowsColumns.Columns.Add(cmb);
+        }
+
         private void SetPVMExportControls(WorkProc selectedProc)
         {
-            SetHeaderOrder(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
+            SetHeaderPVMExport(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcPVMExport.ClassName;
             ProcPVMExport proc = selectedProc as ProcPVMExport;
             TxtPVMPath.SetText(proc.SecondFileName);
@@ -1197,6 +1240,16 @@ namespace DataTableConverter.View
         private void SetHeaderOrder(string[] headers)
         {
             SetChecked(clbHeaderOrder, headers, clbHeaderOrder_ItemCheck);
+        }
+
+        private void SetHeaderPVMExport(string[] headers)
+        {
+            SetChecked(cbHeadersPVMExport, headers, cbHeadersPVMExport_ItemCheck);
+        }
+
+        private void SetHeaderMergeRows(string[] headers)
+        {
+            SetChecked(CLBMergeRowsHeaders, headers, CLBMergeRowsHeaders_ItemCheck);
         }
 
         private WorkProc GetSelectedWorkProcedure()
@@ -2543,6 +2596,39 @@ namespace DataTableConverter.View
                 proc.Procedure.CheckTotal = form.CheckTotal;
                 proc.Procedure.CheckWord = form.CheckWord;
                 proc.Procedure.LeaveEmpty = form.LeaveEmpty;
+            }
+        }
+
+        private void TxtMergeRowsIdentifier_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcMergeRows).Identifier = (sender as TextBox).Text;
+        }
+
+        private void CLBMergeRowsHeaders_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgMergeRowsColumns, e, (CheckedListBox)sender);
+        }
+
+        private void CBMergeRowsSeparator_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcMergeRows).Separator = (sender as CheckBox).Checked;
+        }
+
+        private void dgMergeRowsColumns_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.ColumnIndex == 2 && e.Value?.ToString() == string.Empty)
+            {
+                e.Value = RowMergeStateList.Last().Key;
+            }
+        }
+
+        private void dgMergeRowsColumns_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (e.Control is ComboBox)
+            {
+                ComboBox ctl = e.Control as ComboBox;
+                ctl.Enter -= new EventHandler(ctl_Enter);
+                ctl.Enter += new EventHandler(ctl_Enter);
             }
         }
 

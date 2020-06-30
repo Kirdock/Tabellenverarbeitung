@@ -178,16 +178,18 @@ namespace DataTableConverter.Extensions
             if ((tempIndex = tableNew.Columns.IndexOf(TempSort)) != -1)
             {
                 tableNew.Columns[tempIndex].SetOrdinal(tableNew.Columns.Count - 1);
+                tempIndex = tableNew.Columns.Count - 1;
             }
-
             HashSet<int> newColumns = new HashSet<int>();
             //Get changed values. Don't use GetChanges(DataRowState.Modified) because then we don't know the original rowIndex (changes.RowCount != table.RowCount)
             for (int rowIndex = 0; rowIndex < tableNew.Rows.Count; rowIndex++)
             {
                 if (tableNew.Rows[rowIndex].RowState == DataRowState.Modified)
                 {
-                    for (int colIndex = 0; colIndex < tableNew.Rows[rowIndex].ItemArray.Length; colIndex++)
+                    for (int colIndex = 0; colIndex < tableNew.Rows[rowIndex].ItemArray.Length; ++colIndex)
                     {
+                        if (colIndex == tempIndex) continue;
+
                         object value = tableNew.Rows[rowIndex][colIndex, DataRowVersion.Original];
                         if (value != tableNew.Rows[rowIndex][colIndex, DataRowVersion.Current])
                         {
@@ -665,11 +667,12 @@ namespace DataTableConverter.Extensions
         /// <param name="additionalColumns"></param>
         /// <param name="progressBar"></param>
         /// <returns>The temporary sort-column that is created for the history</returns>
-        internal static string MergeRows(this DataTable table, string identifier, List<PlusListboxItem> additionalColumns, ProgressBar progressBar, Form mainForm)
+        internal static string MergeRows(this DataTable table, string identifier, List<PlusListboxItem> additionalColumns, bool separator, ProgressBar progressBar, Form mainForm)
         {
-            progressBar.StartLoadingBar(table.Rows.Count, mainForm);
-
+            progressBar?.StartLoadingBar(table.Rows.Count, mainForm);
+            string separatorText = separator ? "#,0.###" : string.Empty;
             int lastIndex = table.Columns.Count;
+            //we have to add tempSort column in order to manage row deletion/insertion (history)
             string name = table.TryAddColumn(TempSort);
 
             for (int i = 0; i < table.Rows.Count; i++)
@@ -687,11 +690,11 @@ namespace DataTableConverter.Extensions
                     firstRow.RowsMerged++;
                     foreach (PlusListboxItem column in additionalColumns)
                     {
-                        if (column.State == PlusListboxItem.RowMergeState.Count)
+                        if (column.State == PlusListboxItem.RowMergeState.Anzahl)
                         {
                             firstRow.CountDict[column.Value]++;
                         }
-                        else if(column.State == PlusListboxItem.RowMergeState.Sum)
+                        else if(column.State == PlusListboxItem.RowMergeState.Summe)
                         {
                             if (decimal.TryParse(table.Rows[i][column.Value].ToString(), out decimal result))
                             {
@@ -722,11 +725,11 @@ namespace DataTableConverter.Extensions
                     MergeRowsInfo info = new MergeRowsInfo(table.Rows[i]);
                     foreach(PlusListboxItem column in additionalColumns)
                     {
-                        if(column.State == PlusListboxItem.RowMergeState.Count)
+                        if(column.State == PlusListboxItem.RowMergeState.Anzahl)
                         {
                             info.CountDict.Add(column.Value.ToString(), 1);
                         }
-                        if (column.State == PlusListboxItem.RowMergeState.Sum)
+                        if (column.State == PlusListboxItem.RowMergeState.Summe)
                         {
                             decimal.TryParse(info.Row[column.Value].ToString(), out decimal result);
                             info.CountDict.Add(column.Value.ToString(), result);
@@ -734,14 +737,14 @@ namespace DataTableConverter.Extensions
                     }
                     dict.Add(key, info);
                 }
-                progressBar.UpdateLoadingBar(mainForm);
+                progressBar?.UpdateLoadingBar(mainForm);
             }
 
             foreach(MergeRowsInfo info in dict.Values)
             {
                 foreach(string column in info.CountDict.Keys)
                 {
-                    info.Row[column] = info.CountDict[column].ToString();
+                    info.Row[column] = info.CountDict[column].ToString(separatorText);
                 }
             }
             return name;

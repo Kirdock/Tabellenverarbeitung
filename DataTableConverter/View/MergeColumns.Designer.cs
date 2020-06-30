@@ -35,6 +35,7 @@
             this.BtnUncheckAll = new System.Windows.Forms.Button();
             this.ClBHeaders = new DataTableConverter.View.CustomControls.PlusListbox();
             this.label2 = new System.Windows.Forms.Label();
+            this.CBSeparator = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // CmBHeaders
@@ -67,7 +68,7 @@
             // 
             // BtnCheckAll
             // 
-            this.BtnCheckAll.Location = new System.Drawing.Point(154, 25);
+            this.BtnCheckAll.Location = new System.Drawing.Point(173, 25);
             this.BtnCheckAll.Name = "BtnCheckAll";
             this.BtnCheckAll.Size = new System.Drawing.Size(91, 23);
             this.BtnCheckAll.TabIndex = 4;
@@ -77,7 +78,7 @@
             // 
             // BtnUncheckAll
             // 
-            this.BtnUncheckAll.Location = new System.Drawing.Point(338, 25);
+            this.BtnUncheckAll.Location = new System.Drawing.Point(357, 25);
             this.BtnUncheckAll.Name = "BtnUncheckAll";
             this.BtnUncheckAll.Size = new System.Drawing.Size(91, 23);
             this.BtnUncheckAll.TabIndex = 5;
@@ -90,7 +91,7 @@
             this.ClBHeaders.CheckOnClick = true;
             this.ClBHeaders.FormattingEnabled = true;
             this.ClBHeaders.HorizontalScrollbar = true;
-            this.ClBHeaders.Location = new System.Drawing.Point(154, 57);
+            this.ClBHeaders.Location = new System.Drawing.Point(173, 57);
             this.ClBHeaders.Name = "ClBHeaders";
             this.ClBHeaders.Size = new System.Drawing.Size(275, 274);
             this.ClBHeaders.TabIndex = 6;
@@ -98,18 +99,29 @@
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(450, 57);
+            this.label2.Location = new System.Drawing.Point(469, 57);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(193, 48);
             this.label2.TabIndex = 7;
             this.label2.Text = "Per Rechtsklick legt man bei einer Spalte fest, ob sie gezählt oder addiert werde" +
     "n soll";
             // 
+            // CBSeparator
+            // 
+            this.CBSeparator.AutoSize = true;
+            this.CBSeparator.Location = new System.Drawing.Point(12, 57);
+            this.CBSeparator.Name = "CBSeparator";
+            this.CBSeparator.Size = new System.Drawing.Size(145, 17);
+            this.CBSeparator.TabIndex = 8;
+            this.CBSeparator.Text = "Tausender-Trennzeichen";
+            this.CBSeparator.UseVisualStyleBackColor = true;
+            // 
             // MergeColumns
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.CBSeparator);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.ClBHeaders);
             this.Controls.Add(this.BtnUncheckAll);
@@ -134,5 +146,6 @@
         private System.Windows.Forms.Button BtnUncheckAll;
         private CustomControls.PlusListbox ClBHeaders;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox CBSeparator;
     }
 }

@@ -146,13 +146,17 @@ namespace DataTableConverter.Assisstant
 
                 case State.ValueChange:
                     List<CellMatrix> oldValues = his.Table;
-                    foreach (CellMatrix matrix in oldValues.Where(cm => cm.bigChange == null))
-                    {
-                        string temp = matrix.Value;
-                        matrix.Value = table.Rows[matrix.RowIndex].ItemArray[matrix.ColumnIndex]?.ToString();
-                        table.Rows[matrix.RowIndex].SetField(matrix.ColumnIndex, temp);
-                    }
+                    
                     oldValues = oldValues.Where(cm => cm.bigChange != null).ToList();
+                    if(oldValues.Count == 0)
+                    {
+                        foreach (CellMatrix matrix in his.Table.Where(cm => cm.bigChange == null))
+                        {
+                            string temp = matrix.Value;
+                            matrix.Value = table.Rows[matrix.RowIndex].ItemArray[matrix.ColumnIndex]?.ToString();
+                            table.Rows[matrix.RowIndex].SetField(matrix.ColumnIndex, temp);
+                        }
+                    }
                     if(oldValues.Count > 0)
                     {
                         List<CellMatrix> rowDelete = oldValues.Where(matrix => matrix.bigChange.State == State.DeleteRow).OrderBy(cm => cm.bigChange.RowIndex).ToList();
@@ -160,12 +164,23 @@ namespace DataTableConverter.Assisstant
                         List<CellMatrix> columnDelete = oldValues.Where(matrix => matrix.bigChange.State == State.DeleteColumn).OrderBy(cm => cm.bigChange.ColumnIndex).ToList();
                         List<CellMatrix> rowInsert = oldValues.Where(matrix => matrix.bigChange.State == State.InsertRow).OrderByDescending(cm => cm.bigChange.RowIndex).ToList();
 
-                        foreach (CellMatrix matrix in rowDelete.Concat(columnInsert).Concat(columnDelete).Concat(rowInsert))
+
+                        foreach (CellMatrix matrix in rowDelete.Concat(columnInsert).Concat(columnDelete))
                         {
                             table = TakeOverHistory(table, orderBefore, matrix.bigChange);
                         }
+                        foreach (CellMatrix matrix in his.Table.Where(cm => cm.bigChange == null))
+                        {
+                            string temp = matrix.Value;
+                            matrix.Value = table.Rows[matrix.RowIndex].ItemArray[matrix.ColumnIndex]?.ToString();
+                            table.Rows[matrix.RowIndex].SetField(matrix.ColumnIndex, temp);
+                        }
+                        foreach (CellMatrix matrix in rowInsert)
+                        {
+                            table = TakeOverHistory(table, orderBefore, matrix.bigChange);
+                        }
+                        
                     }
-                    
                     break;
 
                 case State.DeleteColumn:

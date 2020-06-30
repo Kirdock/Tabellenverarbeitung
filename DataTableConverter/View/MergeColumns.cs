@@ -15,6 +15,7 @@ namespace DataTableConverter.View
     {
         internal string Identifier => CmBHeaders.SelectedItem.ToString();
         internal int IdentifierIndex => CmBHeaders.SelectedIndex;
+        internal bool Separator => CBSeparator.Checked;
         internal List<PlusListboxItem> AdditionalColumns { get
             {
                 return ClBHeaders.CheckedItems.Cast<PlusListboxItem>().Where(item => item.ToString() != Identifier).ToList();

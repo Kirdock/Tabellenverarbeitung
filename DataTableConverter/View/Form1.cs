@@ -530,9 +530,17 @@ namespace DataTableConverter
                         {
                             ReplaceProcedure(table, null, t, out _);
                         }
+                        if (t.CommitDelete)
+                        {
+                            history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting() });
+                            if (table.Columns.Contains(Extensions.DataTableExtensions.TempSort))
+                            {
+                                table.Columns.Remove(Extensions.DataTableExtensions.TempSort);
+                            }
+                            table.AcceptChanges();
+                        }
                     }
-
-                    history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting()});
+                    history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting() });
 
                     historyHelper.AddHistory(history.ToArray());
                     dgTable.Invoke(new MethodInvoker(() =>
@@ -1461,13 +1469,14 @@ namespace DataTableConverter
             {
                 string identifier = form.Identifier;
                 int identifierIndex = form.IdentifierIndex;
+                bool separator = form.Separator;
                 List<PlusListboxItem> additionalColumns = form.AdditionalColumns;
 
                 new Thread(() =>
                 {
                     try
                     {
-                        string tempSortName = table.MergeRows(identifier, additionalColumns, pgbLoading, this);
+                        string tempSortName = table.MergeRows(identifier, additionalColumns, separator, pgbLoading, this);
 
                         dgTable.Invoke(new MethodInvoker(() =>
                         {
