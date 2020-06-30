@@ -43,12 +43,10 @@ namespace DataTableConverter.View
         private object[] Headers;
         private DataTable Table;
         private ContextMenuStrip ContextGlobal;
-        private List<KeyValuePair<string, int>> RowMergeStateList;
 
         internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
         {
             InitializeComponent();
-            InitRowMergeStateList();
             ContextGlobal = ctxRow;
             SetEncodingCmBs();
             Table = table;
@@ -78,16 +76,6 @@ namespace DataTableConverter.View
             AddContextMenuAndDataGridViewStyle();
             RestoreSplitterDistance();
             SetColors();
-        }
-
-        private void InitRowMergeStateList()
-        {
-            RowMergeStateList = new List<KeyValuePair<string, int>>();
-            Array array = Enum.GetValues(typeof(PlusListboxItem.RowMergeState));
-            for (int i = 0; i < array.Length; ++i)
-            {
-                RowMergeStateList.Add(new KeyValuePair<string, int>(array.GetValue(i).ToString(), i));
-            }
         }
 
         #region Adjust all custom GroupBoxes
@@ -1062,7 +1050,7 @@ namespace DataTableConverter.View
 
             DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
             {
-                DataSource = RowMergeStateList,
+                DataSource = PlusListboxItem.RowMergeStateList,
                 HeaderText = "Aktion",
                 DataPropertyName = "Aktion",
                 ValueMember = "value",
@@ -2618,7 +2606,7 @@ namespace DataTableConverter.View
         {
             if (e.ColumnIndex == 2 && e.Value?.ToString() == string.Empty)
             {
-                e.Value = RowMergeStateList.Last().Key;
+                e.Value = PlusListboxItem.RowMergeStateList.Last().Key;
             }
         }
 

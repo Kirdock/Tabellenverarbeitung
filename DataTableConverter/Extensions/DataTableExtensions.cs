@@ -690,11 +690,11 @@ namespace DataTableConverter.Extensions
                     firstRow.RowsMerged++;
                     foreach (PlusListboxItem column in additionalColumns)
                     {
-                        if (column.State == PlusListboxItem.RowMergeState.Anzahl)
+                        if (column.State == PlusListboxItem.RowMergeState.Count)
                         {
                             firstRow.CountDict[column.Value]++;
                         }
-                        else if(column.State == PlusListboxItem.RowMergeState.Summe)
+                        else if(column.State == PlusListboxItem.RowMergeState.Sum)
                         {
                             if (decimal.TryParse(table.Rows[i][column.Value].ToString(), out decimal result))
                             {
@@ -725,11 +725,11 @@ namespace DataTableConverter.Extensions
                     MergeRowsInfo info = new MergeRowsInfo(table.Rows[i]);
                     foreach(PlusListboxItem column in additionalColumns)
                     {
-                        if(column.State == PlusListboxItem.RowMergeState.Anzahl)
+                        if(column.State == PlusListboxItem.RowMergeState.Count)
                         {
                             info.CountDict.Add(column.Value.ToString(), 1);
                         }
-                        if (column.State == PlusListboxItem.RowMergeState.Summe)
+                        if (column.State == PlusListboxItem.RowMergeState.Sum)
                         {
                             decimal.TryParse(info.Row[column.Value].ToString(), out decimal result);
                             info.CountDict.Add(column.Value.ToString(), result);
