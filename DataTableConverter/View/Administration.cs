@@ -244,7 +244,8 @@ namespace DataTableConverter.View
                 cbHeadersReplaceWhole,
                 cbHeadersPVMExport,
                 CLBTrimHeaders,
-                CLBMergeRowsHeaders
+                CLBMergeRowsHeaders,
+                cbHeadersPad
             };
             foreach (CheckedComboBox checkedComboBox in checkedComboBoxes)
             {
