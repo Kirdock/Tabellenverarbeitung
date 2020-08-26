@@ -16,6 +16,7 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcSeparate : WorkProc
     {
         internal static readonly string ClassName = "Trennen";
+        public bool ContinuedColumn;
         public BindingList<ExportSeparate> Files;
         
         public ProcSeparate(int ordinal, int id, string name) : base(ordinal, id, name) {
@@ -26,6 +27,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
         {
             newOrderIndices = new int[0];
+            NewColumn = string.IsNullOrEmpty(NewColumn) ? "FTNR" : NewColumn;
             foreach (ExportSeparate item in Files)
             {
                 Dictionary<string, DataTable> Dict = new Dictionary<string, DataTable>();
@@ -73,6 +75,15 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 foreach (DataTable dictTable in Dict.Values.Distinct())
                 {
+                    if (ContinuedColumn)
+                    {
+                        string col = dictTable.TryAddColumn(NewColumn);
+                        dictTable.Columns[col].SetOrdinal(0);
+                        for (int i = 0; i < dictTable.Rows.Count; i++)
+                        {
+                            dictTable.Rows[i][col] = (i + 1).ToString();
+                        }
+                    }
                     string FileName = dictTable.TableName;
                     string path = Path.GetDirectoryName(filePath);
                     switch (item.Format)

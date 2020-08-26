@@ -1262,7 +1262,7 @@ namespace DataTableConverter
             if(export.ShowDialog(this) == DialogResult.OK)
             {
                 StartLoadingBar();
-                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, this);
+                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, this, export.ContinuedNumberName);
             }
             export.Dispose();
         }
@@ -1309,7 +1309,7 @@ namespace DataTableConverter
 
         private void dgTable_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if ((ModifierKeys & Keys.Control) != 0 && (ModifierKeys & Keys.Alt) != 0)
+            if (Properties.Settings.Default.EditShortcut == (ModifierKeys | Keys.LButton))
             {
                 dgTable.BeginEdit(true);
             }
@@ -1330,6 +1330,15 @@ namespace DataTableConverter
             }
         }
 
+        private void dgTable_KeyDown(object sender, KeyEventArgs e)
+        {
+
+            if (Properties.Settings.Default.EditShortcut == e.KeyData)
+            {
+                dgTable.BeginEdit(true);
+            }
+        }
+
         private void ResetSort()
         {
             SetSorting(string.Empty);
@@ -1338,10 +1347,14 @@ namespace DataTableConverter
 
         private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int[] rows = ViewHelper.SelectedRowsOfDataGridView(dgTable);
+            DeleteRows(ViewHelper.SelectedRowsOfDataGridView(dgTable));
+        }
+
+        private void DeleteRows(int[] rows)
+        {
             List<CellMatrix> newHistoryEntry = new List<CellMatrix>();
             DataTable table = sourceTable;
-            foreach (int row in rows)
+            foreach (int row in rows.OrderByDescending(index => index))
             {
                 DataRow oldRow = ((DataRowView)dgTable.Rows[row].DataBoundItem).Row;
                 int tableIndex = table.Rows.IndexOf(oldRow);
@@ -1355,7 +1368,6 @@ namespace DataTableConverter
                 table.Rows.RemoveAt(tableIndex);
             }
             AddDataSourceAddHistory(newHistoryEntry);
-
             SetRowCount();
         }
 
@@ -1836,6 +1848,16 @@ namespace DataTableConverter
             if(page > 0 && page <= MaxPages)
             {
                 Page = page;
+            }
+        }
+
+        private void zeilenLöschenToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            DeleteRows form = new DeleteRows(sourceTable.Rows.Count);
+            form.ShowDialog();
+            if (form.DialogResult == DialogResult.OK)
+            {
+                DeleteRows(form.Range);
             }
         }
 

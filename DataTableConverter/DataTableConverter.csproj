@@ -163,6 +163,12 @@
     <Compile Include="View\CustomMessageBox.Designer.cs">
       <DependentUpon>CustomMessageBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\DeleteRows.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\DeleteRows.Designer.cs">
+      <DependentUpon>DeleteRows.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\ExcelSheets.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -371,6 +377,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\CustomMessageBox.resx">
       <DependentUpon>CustomMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\DeleteRows.resx">
+      <DependentUpon>DeleteRows.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\ExcelSheets.resx">
       <DependentUpon>ExcelSheets.cs</DependentUpon>

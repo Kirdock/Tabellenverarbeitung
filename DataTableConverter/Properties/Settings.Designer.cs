@@ -681,5 +681,17 @@ namespace DataTableConverter.Properties {
                 this["TrimImport"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Strg+Alt+LButton")]
+        public global::System.Windows.Forms.Keys EditShortcut {
+            get {
+                return ((global::System.Windows.Forms.Keys)(this["EditShortcut"]));
+            }
+            set {
+                this["EditShortcut"] = value;
+            }
+        }
     }
 }

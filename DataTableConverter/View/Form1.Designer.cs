@@ -95,16 +95,17 @@
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblPage = new System.Windows.Forms.Label();
-            this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
+            this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.zeilenLöschenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.contextGlobal.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumPage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgTable)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -194,6 +195,7 @@
             this.zählenToolStripMenuItem1,
             this.zeichenAuffüllenToolStripMenuItem,
             this.zeilenAusTabelleHinzufügenToolStripMenuItem,
+            this.zeilenLöschenToolStripMenuItem1,
             this.zeilenZusammenfassenToolStripMenuItem});
             this.funktionenToolStripMenuItem.Name = "funktionenToolStripMenuItem";
             this.funktionenToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
@@ -377,19 +379,19 @@
             // cSVToolStripMenuItem
             // 
             this.cSVToolStripMenuItem.Name = "cSVToolStripMenuItem";
-            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.cSVToolStripMenuItem.Text = "CSV";
             // 
             // dBASEToolStripMenuItem1
             // 
             this.dBASEToolStripMenuItem1.Name = "dBASEToolStripMenuItem1";
-            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
             this.dBASEToolStripMenuItem1.Text = "DBASE";
             // 
             // excelToolStripMenuItem1
             // 
             this.excelToolStripMenuItem1.Name = "excelToolStripMenuItem1";
-            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
             this.excelToolStripMenuItem1.Text = "Excel";
             // 
             // benutzerdefiniertesSpeichernToolStripMenuItem1
@@ -593,27 +595,6 @@
             this.lblPage.TabIndex = 4;
             this.lblPage.Text = "von 0";
             // 
-            // dgTable
-            // 
-            this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
-            this.dgTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dgTable.Location = new System.Drawing.Point(0, 27);
-            this.dgTable.Name = "dgTable";
-            this.dgTable.RowHeadersWidth = 60;
-            this.dgTable.Size = new System.Drawing.Size(1056, 361);
-            this.dgTable.TabIndex = 0;
-            this.dgTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellClick);
-            this.dgTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgTable_CellPainting);
-            this.dgTable.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgTable_CellValidating);
-            this.dgTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellValueChanged);
-            this.dgTable.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgTable_ColumnAdded);
-            this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
-            this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
-            this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
-            // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -649,6 +630,35 @@
             0});
             this.NumPage.ValueChanged += new System.EventHandler(this.NumPage_ValueChanged);
             // 
+            // dgTable
+            // 
+            this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
+            this.dgTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.dgTable.Location = new System.Drawing.Point(0, 27);
+            this.dgTable.Name = "dgTable";
+            this.dgTable.RowHeadersWidth = 60;
+            this.dgTable.Size = new System.Drawing.Size(1056, 361);
+            this.dgTable.TabIndex = 0;
+            this.dgTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellClick);
+            this.dgTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgTable_CellPainting);
+            this.dgTable.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgTable_CellValidating);
+            this.dgTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellValueChanged);
+            this.dgTable.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgTable_ColumnAdded);
+            this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);
+            this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
+            this.dgTable.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgTable_KeyDown);
+            this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
+            // 
+            // zeilenLöschenToolStripMenuItem1
+            // 
+            this.zeilenLöschenToolStripMenuItem1.Name = "zeilenLöschenToolStripMenuItem1";
+            this.zeilenLöschenToolStripMenuItem1.Size = new System.Drawing.Size(229, 22);
+            this.zeilenLöschenToolStripMenuItem1.Text = "Zeilen löschen";
+            this.zeilenLöschenToolStripMenuItem1.Click += new System.EventHandler(this.zeilenLöschenToolStripMenuItem1_Click);
+            // 
             // Form1
             // 
             this.AllowDrop = true;
@@ -676,8 +686,8 @@
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.contextGlobal.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumPage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -751,6 +761,7 @@
         private System.Windows.Forms.Label lblPage;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown NumPage;
+        private System.Windows.Forms.ToolStripMenuItem zeilenLöschenToolStripMenuItem1;
     }
 }
 

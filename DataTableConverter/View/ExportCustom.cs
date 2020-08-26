@@ -20,6 +20,7 @@ namespace DataTableConverter.View
         private readonly DataTable Table;
         private Dictionary<string, Dictionary<string, int>> CacheDataTableGroupCount;
         private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
+        internal string ContinuedNumberName => CbContinuedNumber.Checked ? TxtContinuedNumber.Text : string.Empty;
         internal ExportCustom(object[] headers, DataTable table)
         {
             InitializeComponent();
@@ -65,7 +66,14 @@ namespace DataTableConverter.View
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            CloseConfirmed();
+            if(CbContinuedNumber.Checked && string.IsNullOrWhiteSpace(TxtContinuedNumber.Text))
+            {
+                MessageHandler.MessagesOK(this, MessageBoxIcon.Error, "Bitte geben Sie eine Spaltenbezeichnung für die fortlaufende Nummer ein");
+            }
+            else
+            {
+                CloseConfirmed();
+            }
         }
 
         private void CbSaveAll_CheckedChanged(object sender, EventArgs e)
@@ -267,6 +275,11 @@ namespace DataTableConverter.View
         {
             SetValues(false);
             CmBFileNames_SelectedIndexChanged(null, null);
+        }
+
+        private void CbContinuedNumber_CheckedChanged(object sender, EventArgs e)
+        {
+            LblContinuedNumber.Visible = TxtContinuedNumber.Visible = CbContinuedNumber.Checked;
         }
     }
 }

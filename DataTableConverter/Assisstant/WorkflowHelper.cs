@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -220,6 +221,19 @@ namespace DataTableConverter.Assisstant
                         caseProc.DuplicateColumns = temp.ToArray();
                     }
                 });
+            }
+        }
+
+        internal static List<WorkProc> CopyProcedures(List<WorkProc> proc)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                formatter.Serialize(memoryStream, proc);
+
+                memoryStream.Position = 0;
+
+                return (List<WorkProc>)formatter.Deserialize(memoryStream);
             }
         }
     }

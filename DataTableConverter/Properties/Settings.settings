@@ -167,5 +167,8 @@
     <Setting Name="TrimImport" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="EditShortcut" Type="System.Windows.Forms.Keys" Scope="User">
+      <Value Profile="(Default)">Strg+Alt+LButton</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

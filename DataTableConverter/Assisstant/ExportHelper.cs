@@ -597,7 +597,7 @@ namespace DataTableConverter
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
-        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished, int codePage, Form mainForm)
+        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished, int codePage, Form mainForm, string continuedNumberColumn)
         {
             new Thread(() =>
             {
@@ -638,6 +638,15 @@ namespace DataTableConverter
 
                     foreach (DataTable table in Dict.Values.Distinct())
                     {
+                        if(continuedNumberColumn != string.Empty)
+                        {
+                            string col = table.TryAddColumn(continuedNumberColumn);
+                            table.Columns[col].SetOrdinal(0);
+                            for(int i = 0; i < table.Rows.Count; i++)
+                            {
+                                table.Rows[i][col] = (i + 1).ToString();
+                            }
+                        }
                         string FileName = table.TableName;
                         string path = Path.GetDirectoryName(filePath);
                         switch (item.Format)

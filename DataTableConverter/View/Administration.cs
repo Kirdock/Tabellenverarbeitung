@@ -593,7 +593,13 @@ namespace DataTableConverter.View
         private void LoadProceduresWorkflow(bool status = true)
         {
             lbProcedures.DataSource = null;
-            lbProcedures.DataSource = GetSelectedProcedureType();
+            if (cmbProcedureType.SelectedIndex == 3)
+            {
+                lbProcedures.DataSource = Workflows;
+            }
+            else {
+                lbProcedures.DataSource = cmbProcedureType.SelectedIndex == 1 ? SystemProc : cmbProcedureType.SelectedIndex == 2 ? DuplicateProc : Procedures;
+            }
             lbProcedures.DisplayMember = "Name";
             lbProcedures.ValueMember = "Id";
             if (status)
@@ -609,11 +615,6 @@ namespace DataTableConverter.View
             {
                 DuplicateProc.Add(new Proc(cas.Name, null, cas.Id));
             }
-        }
-
-        private List<Proc> GetSelectedProcedureType()
-        {
-            return cmbProcedureType.SelectedIndex == 1 ? SystemProc : cmbProcedureType.SelectedIndex == 2 ? DuplicateProc : Procedures;
         }
 
         private void btnNewWorkflow_Click(object sender, EventArgs e)
@@ -1088,6 +1089,8 @@ namespace DataTableConverter.View
         {
             ProcSeparate proc = selectedProc as ProcSeparate;
             lblOriginalNameText.Text = ProcSeparate.ClassName;
+            TxtSeparateContinuedNumber.Text = string.IsNullOrEmpty(proc.NewColumn) ? "FTNR" : proc.NewColumn;
+            CbSeparateContinuedNumber.Checked = proc.ContinuedColumn;
             DgvSeparate.DataSource = null;
 
             TxtSeparateColumn.SetText(string.Empty);
@@ -1257,7 +1260,15 @@ namespace DataTableConverter.View
             if (lbProcedures.SelectedIndex != -1)
             {
                 Work workflow = GetSelectedWorkflow();
-                workflow.Procedures.Add(WorkflowHelper.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
+                if (cmbProcedureType.SelectedIndex == 3)
+                {
+                    int index = GetWorkflowIndexThroughId((int)lbProcedures.SelectedValue);
+                    workflow.Procedures.AddRange(WorkflowHelper.CopyProcedures(Workflows[index].Procedures));
+                }
+                else
+                {
+                    workflow.Procedures.Add(WorkflowHelper.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
+                }
 
                 SetWorkflowProcedures(workflow.Procedures);
             }
@@ -2619,6 +2630,16 @@ namespace DataTableConverter.View
                 ctl.Enter -= new EventHandler(ctl_Enter);
                 ctl.Enter += new EventHandler(ctl_Enter);
             }
+        }
+
+        private void CbSeparateContinuedNumber_Click(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSeparate).ContinuedColumn = TxtSeparateContinuedNumber.Visible = LblSeparateContinuedNumber.Visible = CbSeparateContinuedNumber.Checked;
+        }
+
+        private void TxtSeparateContinuedNumber_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcSeparate).NewColumn = TxtSeparateContinuedNumber.Text;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

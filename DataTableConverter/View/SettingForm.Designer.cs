@@ -61,6 +61,7 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.CBTrimImport = new System.Windows.Forms.CheckBox();
             this.NumMaxRows = new System.Windows.Forms.NumericUpDown();
             this.label39 = new System.Windows.Forms.Label();
             this.label38 = new System.Windows.Forms.Label();
@@ -119,7 +120,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.CBTrimImport = new System.Windows.Forms.CheckBox();
+            this.label40 = new System.Windows.Forms.Label();
+            this.TxTShortcut = new System.Windows.Forms.TextBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -476,6 +478,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.TxTShortcut);
+            this.tabPage2.Controls.Add(this.label40);
             this.tabPage2.Controls.Add(this.CBTrimImport);
             this.tabPage2.Controls.Add(this.NumMaxRows);
             this.tabPage2.Controls.Add(this.label39);
@@ -507,9 +511,19 @@
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // CBTrimImport
+            // 
+            this.CBTrimImport.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBTrimImport.Location = new System.Drawing.Point(11, 630);
+            this.CBTrimImport.Name = "CBTrimImport";
+            this.CBTrimImport.Size = new System.Drawing.Size(254, 34);
+            this.CBTrimImport.TabIndex = 26;
+            this.CBTrimImport.Text = "Bei Import \"Trim\" ausführen";
+            this.CBTrimImport.UseVisualStyleBackColor = true;
+            // 
             // NumMaxRows
             // 
-            this.NumMaxRows.Location = new System.Drawing.Point(247, 525);
+            this.NumMaxRows.Location = new System.Drawing.Point(247, 586);
             this.NumMaxRows.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -531,7 +545,7 @@
             // 
             // label39
             // 
-            this.label39.Location = new System.Drawing.Point(10, 527);
+            this.label39.Location = new System.Drawing.Point(10, 588);
             this.label39.Name = "label39";
             this.label39.Size = new System.Drawing.Size(207, 28);
             this.label39.TabIndex = 24;
@@ -541,7 +555,7 @@
             // 
             this.label38.AutoSize = true;
             this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label38.Location = new System.Drawing.Point(10, 443);
+            this.label38.Location = new System.Drawing.Point(10, 504);
             this.label38.Name = "label38";
             this.label38.Size = new System.Drawing.Size(55, 16);
             this.label38.TabIndex = 23;
@@ -550,7 +564,7 @@
             // CbAdjustColumnOver100
             // 
             this.CbAdjustColumnOver100.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbAdjustColumnOver100.Location = new System.Drawing.Point(8, 471);
+            this.CbAdjustColumnOver100.Location = new System.Drawing.Point(8, 532);
             this.CbAdjustColumnOver100.Name = "CbAdjustColumnOver100";
             this.CbAdjustColumnOver100.Size = new System.Drawing.Size(254, 34);
             this.CbAdjustColumnOver100.TabIndex = 22;
@@ -560,7 +574,7 @@
             // CbSeparateSelectable
             // 
             this.CbSeparateSelectable.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbSeparateSelectable.Location = new System.Drawing.Point(8, 398);
+            this.CbSeparateSelectable.Location = new System.Drawing.Point(8, 459);
             this.CbSeparateSelectable.Name = "CbSeparateSelectable";
             this.CbSeparateSelectable.Size = new System.Drawing.Size(254, 17);
             this.CbSeparateSelectable.TabIndex = 21;
@@ -571,7 +585,7 @@
             // 
             this.label37.AutoSize = true;
             this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label37.Location = new System.Drawing.Point(5, 368);
+            this.label37.Location = new System.Drawing.Point(5, 429);
             this.label37.Name = "label37";
             this.label37.Size = new System.Drawing.Size(69, 16);
             this.label37.TabIndex = 20;
@@ -580,7 +594,7 @@
             // CbImportWorkflowAuto
             // 
             this.CbImportWorkflowAuto.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbImportWorkflowAuto.Location = new System.Drawing.Point(8, 317);
+            this.CbImportWorkflowAuto.Location = new System.Drawing.Point(8, 378);
             this.CbImportWorkflowAuto.Name = "CbImportWorkflowAuto";
             this.CbImportWorkflowAuto.Size = new System.Drawing.Size(338, 35);
             this.CbImportWorkflowAuto.TabIndex = 19;
@@ -592,7 +606,7 @@
             // 
             this.label36.AutoSize = true;
             this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label36.Location = new System.Drawing.Point(5, 298);
+            this.label36.Location = new System.Drawing.Point(5, 359);
             this.label36.Name = "label36";
             this.label36.Size = new System.Drawing.Size(151, 16);
             this.label36.TabIndex = 18;
@@ -1076,15 +1090,24 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // CBTrimImport
+            // label40
             // 
-            this.CBTrimImport.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CBTrimImport.Location = new System.Drawing.Point(11, 569);
-            this.CBTrimImport.Name = "CBTrimImport";
-            this.CBTrimImport.Size = new System.Drawing.Size(254, 34);
-            this.CBTrimImport.TabIndex = 26;
-            this.CBTrimImport.Text = "Bei Import \"Trim\" ausführen";
-            this.CBTrimImport.UseVisualStyleBackColor = true;
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(8, 316);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(225, 13);
+            this.label40.TabIndex = 27;
+            this.label40.Text = "Tastenkombination zum Bearbeiten einer Zelle";
+            // 
+            // TxTShortcut
+            // 
+            this.TxTShortcut.Location = new System.Drawing.Point(249, 313);
+            this.TxTShortcut.Name = "TxTShortcut";
+            this.TxTShortcut.ReadOnly = true;
+            this.TxTShortcut.Size = new System.Drawing.Size(130, 20);
+            this.TxTShortcut.TabIndex = 30;
+            this.TxTShortcut.Click += new System.EventHandler(this.TxTShortcut_Click);
+            this.TxTShortcut.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxTShortcut_KeyDown);
             // 
             // SettingForm
             // 
@@ -1216,5 +1239,7 @@
         private System.Windows.Forms.NumericUpDown NumMaxRows;
         private System.Windows.Forms.Label label39;
         private System.Windows.Forms.CheckBox CBTrimImport;
+        private System.Windows.Forms.TextBox TxTShortcut;
+        private System.Windows.Forms.Label label40;
     }
 }

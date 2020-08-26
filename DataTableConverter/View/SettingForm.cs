@@ -70,6 +70,7 @@ namespace DataTableConverter.View
             CbAdjustColumnOver100.Checked = Properties.Settings.Default.NotAdjustColumnOver100;
             NumMaxRows.Value = Properties.Settings.Default.MaxRows;
             CBTrimImport.Checked = Properties.Settings.Default.TrimImport;
+            TxTShortcut.Text = new KeysConverter().ConvertToString(Properties.Settings.Default.EditShortcut);
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -190,9 +191,42 @@ namespace DataTableConverter.View
             folderBrowser.Dispose();
         }
 
-        private void DgVSecondExample_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void TxTShortcut_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode != Keys.Back)
+            {
+                Keys modifierKeys = e.Modifiers;
+                Keys pressedKey = e.KeyData ^ modifierKeys; //remove modifier keys
 
+                if (modifierKeys != Keys.None && pressedKey != Keys.None)
+                {
+                    var converter = new KeysConverter();
+                    Properties.Settings.Default.EditShortcut = e.KeyData;
+                    TxTShortcut.Text = converter.ConvertToString(e.KeyData);
+                }
+            }
+            else
+            {
+                e.Handled = false;
+                e.SuppressKeyPress = true;
+
+                TxTShortcut.Text = string.Empty;
+            }
+        }
+
+        private void TxTShortcut_Click(object sender, EventArgs e)
+        {
+            if (ModifierKeys != Keys.None) {
+                TxTShortcut.KeyDown -= TxTShortcut_KeyDown;
+
+                var converter = new KeysConverter();
+                var keyData = ModifierKeys | Keys.LButton;
+                Properties.Settings.Default.EditShortcut = keyData;
+                TxTShortcut.Text = converter.ConvertToString(keyData);
+                ActiveControl = label40;
+
+                TxTShortcut.KeyDown += TxTShortcut_KeyDown;
+            }
         }
     }
 }

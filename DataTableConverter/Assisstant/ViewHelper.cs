@@ -421,7 +421,7 @@ namespace DataTableConverter
 
         internal static int[] SelectedRowsOfDataGridView(DataGridView view)
         {
-            return view.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.RowIndex).Where(row => row != view.Rows.Count - 1).Distinct().OrderByDescending(index => index).ToArray();
+            return view.SelectedCells.Cast<DataGridViewCell>().Select(cell => cell.RowIndex).Where(row => row != view.Rows.Count - 1).Distinct().ToArray();
         }
 
         internal static void SetControlColor(Control control)
