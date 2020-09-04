@@ -24,6 +24,7 @@ namespace DataTableConverter.View
         private List<string> Separators = new List<string>();
         private readonly string MultiSeparatorText = "(Mehrfach)";
         private readonly ContextMenuStrip GlobalContext;
+        private readonly int DetectedEncoding;
 
         internal DataTable DataTable { get; set; }
         internal TextFormat(string path, bool multipleFiles, ContextMenuStrip ctxRow)
@@ -35,7 +36,7 @@ namespace DataTableConverter.View
             SetSize();
             this.path = path;
             ViewHelper.SetEncodingCmb(cmbEncoding);
-            cmbEncoding.SelectedValue = DetectEncoding(path).CodePage;
+            cmbEncoding.SelectedValue = DetectedEncoding = DetectEncoding(path).CodePage;
             cbTakeOver.Visible = multipleFiles;
             SetDataGridViewStyle();
             SetFileName(Path.GetFileName(path));
@@ -102,8 +103,13 @@ namespace DataTableConverter.View
         private void cmbEncoding_SelectedIndexChanged(object sender, EventArgs e)
         {
             radioButton_CheckedChanged(null, null);
+            CheckEncoding((int)cmbEncoding.SelectedValue);
         }
 
+        private void CheckEncoding(int codePage)
+        {
+            LblCodePageMessage.Visible = DetectedEncoding != codePage;
+        }
 
         private void loadSettings()
         {

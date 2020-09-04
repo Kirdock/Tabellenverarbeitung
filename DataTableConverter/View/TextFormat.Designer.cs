@@ -73,6 +73,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.LblFileName = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LblCodePageMessage = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
@@ -112,6 +113,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.LblCodePageMessage);
             this.groupBox1.Controls.Add(this.cbTakeOver);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.cmbEncoding);
@@ -558,6 +560,17 @@
             this.LblFileName.Size = new System.Drawing.Size(31, 17);
             this.LblFileName.Text = "Pfad";
             // 
+            // LblCodePageMessage
+            // 
+            this.LblCodePageMessage.AutoSize = true;
+            this.LblCodePageMessage.ForeColor = System.Drawing.Color.Red;
+            this.LblCodePageMessage.Location = new System.Drawing.Point(12, 80);
+            this.LblCodePageMessage.Name = "LblCodePageMessage";
+            this.LblCodePageMessage.Size = new System.Drawing.Size(287, 13);
+            this.LblCodePageMessage.TabIndex = 5;
+            this.LblCodePageMessage.Text = "Die CodePage entspricht nicht der festgestellten CodePage";
+            this.LblCodePageMessage.Visible = false;
+            // 
             // TextFormat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -639,5 +652,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel LblFileName;
+        private System.Windows.Forms.Label LblCodePageMessage;
     }
 }
