@@ -57,113 +57,144 @@ namespace DataTableConverter.Classes.WorkProcs
                 return;
             }
             string path = null;
+            List<string> files = new List<string>();
             string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
             if (!CheckFile(filePath, ref path)) //find file
             {
-                OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(false);
-                DialogResult result = DialogResult.Cancel;
+                OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(true);
+                DialogResult res = DialogResult.Cancel;
                 invokeForm.Invoke(new MethodInvoker(() =>
                 {
-                    result = dialog.ShowDialog(invokeForm);
+                    res = dialog.ShowDialog(invokeForm);
                 }));
-                if (result == DialogResult.OK)
+                if (res == DialogResult.OK)
                 {
-                    path = dialog.FileName;
+                    files.AddRange(dialog.FileNames);
                 }
                 dialog.Dispose();
             }
-            if (!string.IsNullOrWhiteSpace(path))
+            else
             {
-                Dictionary<string, ImportSettings> dict = null;
-                ImportSettings setting = ImportHelper.GenerateSettingsThroughPreset(PresetType, SettingPreset);
-                int fileEncoding = 0;
+                files.Add(path);
+            }
+            Dictionary<string, ImportSettings> dict = new Dictionary<string, ImportSettings>();
+            ImportSettings setting = ImportHelper.GenerateSettingsThroughPreset(PresetType, SettingPreset);
+            DataTable importTables = null;
+            int fileEncoding = 0;
+
+            foreach (string file in files)
+            {
                 if (setting != null)
                 {
-                    dict = new Dictionary<string, ImportSettings>
-                    {
-                        { Path.GetExtension(path).ToLower(), setting }
-                    };
+                    dict.Add(Path.GetExtension(file).ToLower(), setting);
                     fileEncoding = setting.CodePage;
                 }
-                
-                DataTable newTable = ImportHelper.ImportFile(path, false, dict, ctxRow, null,invokeForm, ref fileEncoding); //load file
+
+                DataTable newTable = ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
                 if (newTable != null)
                 {
-                    DialogResult res = DialogResult.Yes;
-                    if (table.Rows.Count != newTable.Rows.Count)
+                    string[] ImportHeaders = newTable.HeadersOfDataTableAsString();
+                    List<string> notFoundHeaders = new List<string>();
+                        
+                    if (!newTable.Columns.Contains(IdentifyAppend))
                     {
-                        res = invokeForm.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {newTable.Rows.Count})!\nTrotzdem fortfahren?");
+                        notFoundHeaders.Add(IdentifyAppend);
                     }
-                    if (res == DialogResult.Yes)
+                    if (!newTable.Columns.Contains(invalidColumnName))
                     {
-                        object[] ImportHeaders = newTable.HeadersOfDataTable();
-                        List<string> notFoundHeaders = new List<string>();
-                        string[] importColumns = new string[0];
-                        if (!newTable.Columns.Contains(IdentifyAppend))
+                        notFoundHeaders.Add(invalidColumnName);
+                    }
+                        
+
+                    if (notFoundHeaders.Count > 0)
+                    {
+                        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders, true)
                         {
-                            notFoundHeaders.Add(IdentifyAppend);
+                            Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
+                        };
+                        DialogResult res2 = DialogResult.Cancel;
+                        invokeForm.Invoke(new MethodInvoker(() =>
+                        {
+                            res2 = form.ShowDialog(invokeForm);
+                        }));
+                        if (res2 == DialogResult.OK)
+                        {
+                            string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
+                            string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
+
+                            for (int i = 0; i < from.Length; i++)
+                            {
+                                if (from[i] == invalidColumnName)
+                                {
+                                    invalidColumnName = to[i];
+                                }
+                                if (from[i] == IdentifyAppend)
+                                {
+                                    IdentifyAppend = to[i];
+                                }
+                            }
+                            notFoundHeaders.Clear();
                         }
-                        else if (!newTable.Columns.Contains(invalidColumnName))
+                    }
+                    if (notFoundHeaders.Count == 0)
+                    {
+                        if(importTables == null)
                         {
-                            notFoundHeaders.Add(invalidColumnName);
+                            importTables = newTable;
                         }
                         else
                         {
-                            importColumns = ImportHeaders.Cast<string>().ToArray();
-                        }
-
-                        if (notFoundHeaders.Count > 0)
-                        {
-                            SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders, true)
-                            {
-                                Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
-                            };
-                            DialogResult result = DialogResult.Cancel;
-                            invokeForm.Invoke(new MethodInvoker(() =>
-                            {
-                                result = form.ShowDialog(invokeForm);
-                            }));
-                            if (result == DialogResult.OK)
-                            {
-                                string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
-                                string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
-
-                                for (int i = 0; i < from.Length; i++)
-                                {
-                                    if (from[i] == invalidColumnName)
-                                    {
-                                        invalidColumnName = to[i];
-                                    }
-                                    if (from[i] == IdentifyAppend)
-                                    {
-                                        IdentifyAppend = to[i];
-                                    }
-                                }
-                                notFoundHeaders.Clear();
-                                importColumns = ImportHeaders.Cast<string>().ToArray();
-                            }
-                        }
-                        if (notFoundHeaders.Count == 0)
-                        {
-                            table.AddColumnsOfDataTable(newTable, importColumns, table.Columns.IndexOf(IdentifySource), newTable.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
-                            newOrderIndices = newIndices;
-                            if (Properties.Settings.Default.SplitPVM)
-                            {
-                                int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
-                                if(count != 0 && !invokeForm.IsDisposed)
-                                {
-                                    invokeForm.Invoke(new MethodInvoker(() =>
-                                    {
-                                        invokeForm.ValidRows = count;
-                                    }));
-                                }
-                            }
-                            foreach (DataRow row in table.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
-                            {
-                                row.Delete();
-                            }
+                            importTables.ConcatTable(newTable,Path.GetFileName(path), Path.GetFileName(file));
                         }
                     }
+                }
+            }
+            string[] importColumns = new string[0];
+            int sourceMergeIndex = -1;
+            int importMergeIndex = -1;
+            DialogResult result = DialogResult.No;
+
+            if ((sourceMergeIndex = table.Columns.IndexOf(IdentifyAppend)) > -1)
+            {
+                if ((importMergeIndex = importTables.Columns.IndexOf(IdentifyAppend)) > -1)
+                {
+                    importColumns = importTables.HeadersOfDataTableAsString();
+                    result = DialogResult.Yes;
+                    if (table.Rows.Count != importTables.Rows.Count)
+                    {
+                        result = invokeForm.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {importTables.Rows.Count})!\nTrotzdem fortfahren?");
+                    }
+                }
+                else
+                {
+                    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabellen haben keine Spalte mit der Bezeichnung {IdentifyAppend}");
+                    result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
+                }
+            }
+            else
+            {
+                invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {IdentifyAppend}");
+                result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
+            }
+
+            if (result != DialogResult.No)
+            {
+                table.AddColumnsOfDataTable(importTables, importColumns, table.Columns.IndexOf(IdentifySource), importTables.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
+                newOrderIndices = newIndices;
+                if (Properties.Settings.Default.SplitPVM)
+                {
+                    int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
+                    if (count != 0 && !invokeForm.IsDisposed)
+                    {
+                        invokeForm.Invoke(new MethodInvoker(() =>
+                        {
+                            invokeForm.ValidRows = count;
+                        }));
+                    }
+                }
+                foreach (DataRow row in table.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
+                {
+                    row.Delete();
                 }
             }
         }

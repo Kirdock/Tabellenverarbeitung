@@ -131,7 +131,7 @@ namespace DataTableConverter.Assisstant
             return table;
         }
 
-        internal static OpenFileDialog GetOpenFileDialog(bool status)
+        internal static OpenFileDialog GetOpenFileDialog(bool multiselect)
         {
             return new OpenFileDialog
             {
@@ -143,7 +143,7 @@ namespace DataTableConverter.Assisstant
                             + $"|Excel-Dateien (*.xl*)|{ExcelExt}"
                             + "|Alle Dateien (*.*)|*.*",
                 RestoreDirectory = true,
-                Multiselect = status
+                Multiselect = multiselect
             };
         }
 

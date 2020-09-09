@@ -13,11 +13,15 @@ namespace DataTableConverter.View
     public partial class DeleteRows : Form
     {
         internal int[] Range;
+        internal string ColumnText, Column;
+        internal bool EqualsText => CBEquals.Checked;
 
-        internal DeleteRows(int max)
+        internal DeleteRows(int max, string[] headers)
         {
             InitializeComponent();
             NbEnd.Maximum = max;
+            CmBHeaders.Items.AddRange(headers);
+            CmBHeaders.SelectedIndex = 0;
         }
 
         private void BtnConfirmMulti_Click(object sender, EventArgs e)
@@ -36,6 +40,13 @@ namespace DataTableConverter.View
         private void BtnConfirmSingle_Click(object sender, EventArgs e)
         {
             Range = new int[] { (int)NbSingle.Value - 1 };
+            DialogResult = DialogResult.OK;
+        }
+
+        private void BtnConfirmMatchText_Click(object sender, EventArgs e)
+        {
+            ColumnText = TxtValue.Text;
+            Column = (string)CmBHeaders.SelectedItem;
             DialogResult = DialogResult.OK;
         }
     }

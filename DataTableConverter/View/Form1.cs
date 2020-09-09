@@ -676,7 +676,7 @@ namespace DataTableConverter
 
             if (string.IsNullOrWhiteSpace(Properties.Settings.Default.PVMIdentifier))
             {
-                result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
+                result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
             }
             else
             {
@@ -694,13 +694,13 @@ namespace DataTableConverter
                     else
                     {
                         this.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabelle \"{filename}\" hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                        result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
+                        result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
                     }
                 }
                 else
                 {
                     this.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                    result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename);
+                    result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
                 }
             }
             
@@ -766,14 +766,14 @@ namespace DataTableConverter
             }
         }
 
-        private DialogResult ShowMergeForm(ref string[] importColumns, ref int sourceMergeIndex, ref int importMergeIndex, DataTable sourceTable, DataTable importTable, string filename)
+        internal static DialogResult ShowMergeForm(ref string[] importColumns, ref int sourceMergeIndex, ref int importMergeIndex, DataTable sourceTable, DataTable importTable, string filename, Form invokeForm)
         {
             MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
             bool result;
             DialogResult res = DialogResult.Cancel;
-            Invoke(new MethodInvoker(() =>
+            invokeForm.Invoke(new MethodInvoker(() =>
             {
-                res = form.ShowDialog(this);
+                res = form.ShowDialog(invokeForm);
             }));
             if (result = ( res == DialogResult.Yes))
             {
@@ -1608,10 +1608,7 @@ namespace DataTableConverter
             {
                 Properties.Settings.Default.Form1Size = Size;
             }
-            else
-            {
-                Properties.Settings.Default.Form1Maximized = WindowState == FormWindowState.Maximized;
-            }
+            Properties.Settings.Default.Form1Maximized = WindowState == FormWindowState.Maximized;
             Properties.Settings.Default.Save();
         }
 
@@ -1853,12 +1850,54 @@ namespace DataTableConverter
 
         private void zeilenLöschenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            DeleteRows form = new DeleteRows(sourceTable.Rows.Count);
+            DeleteRows form = new DeleteRows(sourceTable.Rows.Count, sourceTable.HeadersOfDataTableAsString());
             form.ShowDialog();
             if (form.DialogResult == DialogResult.OK)
             {
-                DeleteRows(form.Range);
+                if (form.Range == null)
+                {
+                    DeleteRowsMatchingText(form.ColumnText, form.Column, form.EqualsText);
+                }
+                else
+                {
+                    DeleteRows(form.Range);
+                }
             }
+        }
+
+        private void DeleteRowsMatchingText(string value, string column, bool equals)
+        {
+            pgbLoading.StartLoadingBar(sourceTable.Rows.Count, this);
+            Thread thread = new Thread(() =>
+            {
+                List<CellMatrix> newHistoryEntry = new List<CellMatrix>();
+                for (int i = sourceTable.Rows.Count - 1; i >= 0; i--)
+                {
+                    DataRow row = sourceTable.Rows[i];
+                    if (equals ? row[column].ToString() == value : row[column].ToString().Contains(value))
+                    {
+                        object[][] oldContent = new object[1][];
+                        oldContent[0] = row.ItemArray.Clone() as object[];
+
+                        newHistoryEntry.Add(new CellMatrix(new History { State = State.DeleteRow, Row = oldContent, RowIndex = i }));
+
+                        row.Delete();
+                    }
+                    pgbLoading.UpdateLoadingBar(this);
+                }
+                StopLoadingBar();
+
+                AddDataSourceAddHistory(newHistoryEntry);
+                sourceTable.AcceptChanges();
+                Invoke(new MethodInvoker(() =>
+                {
+                    ResetPage();
+                    AssignDataSource();
+                }));
+                SetRowCount();
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

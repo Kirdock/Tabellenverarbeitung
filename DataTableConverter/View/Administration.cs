@@ -867,17 +867,21 @@ namespace DataTableConverter.View
             txtIdentifierSource.SetText(proc.IdentifySource);
             txtIdentifierAppend.SetText(proc.IdentifyAppend);
 
-            int index = 0;
-            for(int i = 0; i < CmBPresetPVMImport.Items.Count; i++)
+            if (CmBPresetPVMImport.Items.Count != 0)
             {
-                ImportHelper.KeyVal item = CmBPresetPVMImport.Items[i] as ImportHelper.KeyVal;
-                if(item.Key == proc.SettingPreset && item.Val == proc.PresetType)
+                int index = 0;
+                for (int i = 0; i < CmBPresetPVMImport.Items.Count; i++)
                 {
-                    index = i;
-                    break;
+                    ImportHelper.KeyVal item = CmBPresetPVMImport.Items[i] as ImportHelper.KeyVal;
+                    if (item.Key == proc.SettingPreset && item.Val == proc.PresetType)
+                    {
+                        index = i;
+                        break;
+                    }
                 }
+
+                CmBPresetPVMImport.SelectedIndex = index;
             }
-            CmBPresetPVMImport.SelectedIndex = index;
             CmBPVMImportEncoding.SelectedValue = proc.FileEncoding;
         }
 
@@ -2226,106 +2230,117 @@ namespace DataTableConverter.View
             {
                 int lastId = -1;
                 bool abort = false;
+                List<string> errorOnImport = new List<string>();
                 foreach(string file in dialog.FileNames)
                 {
                     Work work = ImportHelper.LoadWorkflow(file);
-                    work.Name = Path.GetFileNameWithoutExtension(file);
-                    List<ProcDuplicate> cases = work.Procedures.OfType<ProcDuplicate>().ToList();
-                    List<ProcUser> procs = work.Procedures.OfType<ProcUser>().ToList();
-
-                    if (Properties.Settings.Default.ImportWorkflowAuto)
+                    if (work != null)
                     {
-                        for (int i = 0; i < cases.Count; i++)
-                        {
-                            ProcDuplicate importCase = cases[i];
-                            var found = Cases.FirstOrDefault(c => c.Name == importCase.Name);
-                            if (found != null)
-                            {
-                                importCase.ProcedureId = found.Id;
-                                cases.RemoveAt(i);
-                                i--;
-                            }
-                        }
-                    }
+                        work.Name = Path.GetFileNameWithoutExtension(file);
+                        List<ProcDuplicate> cases = work.Procedures.OfType<ProcDuplicate>().ToList();
+                        List<ProcUser> procs = work.Procedures.OfType<ProcUser>().ToList();
 
-                    if (cases.Count > 0)
-                    {
-                        SelectDuplicateColumns form = new SelectDuplicateColumns(cases.Select(c => c.Name).ToArray(), Cases.Select(c => c.Name).ToArray(), false, "Zuweisung der Einträge in \"Duplikate\"", "Einträge");
-                        if (form.ShowDialog(this) == DialogResult.OK)
+                        if (Properties.Settings.Default.ImportWorkflowAuto)
                         {
-                            for (int i = 0; i < form.Table.Rows.Count; i++)
+                            for (int i = 0; i < cases.Count; i++)
                             {
-                                if (form.Table.Rows[i][1].ToString() == SelectDuplicateColumns.IgnoreColumn)
+                                ProcDuplicate importCase = cases[i];
+                                var found = Cases.FirstOrDefault(c => c.Name == importCase.Name);
+                                if (found != null)
                                 {
-                                    work.Procedures.RemoveAll(proc => proc is ProcDuplicate && proc.ProcedureId == cases[i].ProcedureId);
-                                }
-                                else
-                                {
-                                    Case selectedCase = Cases.Find(c => c.Name == form.Table.Rows[i][0].ToString());
-                                    cases[i].ProcedureId = selectedCase.Id;
-                                    cases[i].Name = selectedCase.Name;
+                                    importCase.ProcedureId = found.Id;
+                                    cases.RemoveAt(i);
+                                    i--;
                                 }
                             }
                         }
-                        else
-                        {
-                            abort = true;
-                        }
-                        form.Dispose();
-                    }
 
-                    if (Properties.Settings.Default.ImportWorkflowAuto)
-                    {
-                        for (int i = 0; i < procs.Count; i++)
+                        if (cases.Count > 0)
                         {
-                            ProcUser importCase = procs[i];
-                            var found = Procedures.FirstOrDefault(c => c.Name == importCase.Name);
-                            if (found != null)
+                            SelectDuplicateColumns form = new SelectDuplicateColumns(cases.Select(c => c.Name).ToArray(), Cases.Select(c => c.Name).ToArray(), false, "Zuweisung der Einträge in \"Duplikate\"", "Einträge");
+                            if (form.ShowDialog(this) == DialogResult.OK)
                             {
-                                importCase.ProcedureId = found.Id;
-                                procs.RemoveAt(i);
-                                i--;
+                                for (int i = 0; i < form.Table.Rows.Count; i++)
+                                {
+                                    if (form.Table.Rows[i][1].ToString() == SelectDuplicateColumns.IgnoreColumn)
+                                    {
+                                        work.Procedures.RemoveAll(proc => proc is ProcDuplicate && proc.ProcedureId == cases[i].ProcedureId);
+                                    }
+                                    else
+                                    {
+                                        Case selectedCase = Cases.Find(c => c.Name == form.Table.Rows[i][0].ToString());
+                                        cases[i].ProcedureId = selectedCase.Id;
+                                        cases[i].Name = selectedCase.Name;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                abort = true;
+                            }
+                            form.Dispose();
+                        }
+
+                        if (Properties.Settings.Default.ImportWorkflowAuto)
+                        {
+                            for (int i = 0; i < procs.Count; i++)
+                            {
+                                ProcUser importCase = procs[i];
+                                var found = Procedures.FirstOrDefault(c => c.Name == importCase.Name);
+                                if (found != null)
+                                {
+                                    importCase.ProcedureId = found.Id;
+                                    procs.RemoveAt(i);
+                                    i--;
+                                }
+                            }
+                        }
+
+                        if (!abort && procs.Count > 0)
+                        {
+                            SelectDuplicateColumns form = new SelectDuplicateColumns(procs.Select(c => c.Name).ToArray(), Procedures.Select(c => c.Name).ToArray(), false, "Zuweisung der Einträge in \"Suchen & Ersetzen\"", "Einträge");
+                            if (form.ShowDialog(this) == DialogResult.OK)
+                            {
+                                for (int i = 0; i < form.Table.Rows.Count; i++)
+                                {
+                                    if (form.Table.Rows[i][1].ToString() == SelectDuplicateColumns.IgnoreColumn)
+                                    {
+                                        work.Procedures.RemoveAll(proc => proc is ProcUser && proc.ProcedureId == procs[i].ProcedureId);
+                                    }
+                                    else
+                                    {
+                                        Proc proc = Procedures.Find(c => c.Name == form.Table.Rows[i][1].ToString());
+                                        procs[i].ProcedureId = proc.Id;
+                                        procs[i].Name = proc.Name;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                abort = true;
+                            }
+                            form.Dispose();
+                        }
+                        if (!abort && work.Procedures.Count > 0)
+                        {
+                            work.Id = MaxIdWorkflow() + 1;
+                            work.Locked = false;
+                            SetWorkflowOrdinal(work);
+                            if (CheckWorkflow(work))
+                            {
+                                bindingWorkflow.Add(work);
+                                lastId = work.Id;
                             }
                         }
                     }
-
-                    if (!abort && procs.Count > 0)
+                    else
                     {
-                        SelectDuplicateColumns form = new SelectDuplicateColumns(procs.Select(c => c.Name).ToArray(), Procedures.Select(c => c.Name).ToArray(), false, "Zuweisung der Einträge in \"Suchen & Ersetzen\"", "Einträge");
-                        if (form.ShowDialog(this) == DialogResult.OK)
-                        {
-                            for (int i = 0; i < form.Table.Rows.Count; i++)
-                            {
-                                if (form.Table.Rows[i][1].ToString() == SelectDuplicateColumns.IgnoreColumn)
-                                {
-                                    work.Procedures.RemoveAll(proc => proc is ProcUser && proc.ProcedureId == procs[i].ProcedureId);
-                                }
-                                else
-                                {
-                                    Proc proc = Procedures.Find(c => c.Name == form.Table.Rows[i][1].ToString());
-                                    procs[i].ProcedureId = proc.Id;
-                                    procs[i].Name = proc.Name;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            abort = true;
-                        }
-                        form.Dispose();
+                        errorOnImport.Add(file);
                     }
-                    if (!abort && work.Procedures.Count > 0)
-                    {
-                        work.Id = MaxIdWorkflow() + 1;
-                        work.Locked = false;
-                        SetWorkflowOrdinal(work);
-                        if (CheckWorkflow(work))
-                        {
-
-                            bindingWorkflow.Add(work);
-                            lastId = work.Id;
-                        }
-                    }
+                }
+                if(errorOnImport.Count != 0)
+                {
+                    MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, $"Folgende Dateien konnten nicht importiert werden, da es sich hier nicht um gültige Arbeitsabläufe handelt:\n{string.Join(", ", errorOnImport)}");
                 }
                 if (lastId != -1)
                 {
