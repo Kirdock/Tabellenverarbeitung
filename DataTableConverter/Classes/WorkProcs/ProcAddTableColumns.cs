@@ -86,7 +86,10 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 if (setting != null)
                 {
-                    dict.Add(Path.GetExtension(file).ToLower(), setting);
+                    if (!dict.ContainsKey(file))
+                    {
+                        dict.Add(Path.GetExtension(file).ToLower(), setting);
+                    }
                     fileEncoding = setting.CodePage;
                 }
 
