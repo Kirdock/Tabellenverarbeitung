@@ -94,63 +94,18 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
 
                 DataTable newTable = ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
-                if (newTable != null)
+                if(ImportHelper.ValidateImport(newTable, invokeForm, ref IdentifyAppend, ref invalidColumnName))
                 {
-                    string[] ImportHeaders = newTable.HeadersOfDataTableAsString();
-                    List<string> notFoundHeaders = new List<string>();
-                        
-                    if (!newTable.Columns.Contains(IdentifyAppend))
+                    if (importTables == null)
                     {
-                        notFoundHeaders.Add(IdentifyAppend);
+                        importTables = newTable;
                     }
-                    if (!newTable.Columns.Contains(invalidColumnName))
+                    else
                     {
-                        notFoundHeaders.Add(invalidColumnName);
-                    }
-                        
-
-                    if (notFoundHeaders.Count > 0)
-                    {
-                        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders, true)
-                        {
-                            Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
-                        };
-                        DialogResult res2 = DialogResult.Cancel;
-                        invokeForm.Invoke(new MethodInvoker(() =>
-                        {
-                            res2 = form.ShowDialog(invokeForm);
-                        }));
-                        if (res2 == DialogResult.OK)
-                        {
-                            string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
-                            string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
-
-                            for (int i = 0; i < from.Length; i++)
-                            {
-                                if (from[i] == invalidColumnName)
-                                {
-                                    invalidColumnName = to[i];
-                                }
-                                if (from[i] == IdentifyAppend)
-                                {
-                                    IdentifyAppend = to[i];
-                                }
-                            }
-                            notFoundHeaders.Clear();
-                        }
-                    }
-                    if (notFoundHeaders.Count == 0)
-                    {
-                        if(importTables == null)
-                        {
-                            importTables = newTable;
-                        }
-                        else
-                        {
-                            importTables.ConcatTable(newTable,Path.GetFileName(path), Path.GetFileName(file));
-                        }
+                        importTables.ConcatTable(newTable, Path.GetFileName(path), Path.GetFileName(file));
                     }
                 }
+
             }
             string[] importColumns = new string[0];
             int sourceMergeIndex = -1;
