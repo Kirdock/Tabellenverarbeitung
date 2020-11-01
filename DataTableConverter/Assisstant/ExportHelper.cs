@@ -682,6 +682,7 @@ namespace DataTableConverter
 
         internal static DataTable ExportCount(string selectedValue, int count, bool showFromTo, DataTable oldTable, OrderType orderType)
         {
+            //Select selectedValue, count(selectedValue) from main group by selectedValue;
             DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", orderType, -1).ToTable();
             int columnIndex = table.Columns.IndexOf(selectedValue);
             DataTable newTable = new DataTable();

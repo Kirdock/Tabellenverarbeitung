@@ -50,6 +50,12 @@ namespace DataTableConverter.Assisstant
         {
             Transaction.Dispose();
             Connection.Close();
+            DeleteDatabase();
+        }
+
+        private static void DeleteDatabase()
+        {
+            File.Delete(HistoryPath);
         }
 
         internal static void Reset()
