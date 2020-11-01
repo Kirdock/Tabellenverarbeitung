@@ -2,6 +2,7 @@
 using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.Extensions;
+using DataTableConverter.Temp;
 using DataTableConverter.View;
 using DataTableConverter.View.WorkProcViews;
 using System;
@@ -568,7 +569,7 @@ namespace DataTableConverter
         private void importToolStripMenuItem_Click(ImportState state = ImportState.None, string[] openFiles = null)
         {
             OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state != ImportState.Header);
-            DataTable oldTable = GetDataSource();
+            string oldTable = DatabaseHelper.DefaultTable;
             string mergePath = string.Empty;
             bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
             if (openFiles != null || validMerge || dialog.ShowDialog(this) == DialogResult.OK)
@@ -581,7 +582,7 @@ namespace DataTableConverter
                     bool fileNameSet = state != ImportState.None;
                     bool multipleFiles = filenames.Length > 1;
                     Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
-                    DataTable newTable = null;
+                    string newTable = null;
                     string fileNameBefore = Path.GetFileName(filenames[0]);
                     int fileEncoding = 0;
                     foreach (string file in filenames)
@@ -589,30 +590,30 @@ namespace DataTableConverter
                         try
                         {
                             string filename = Path.GetFileName(file);
-                            DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding);
-                            if (table != null)
+                            string tableName = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding);
+
+                            if (newTable != null)
                             {
-                                if (newTable != null)
-                                {
-                                    newTable.ConcatTable(table, fileNameBefore, filename);
-                                }
-                                else
-                                {
-                                    newTable = table;
-                                }
-                                fileNameBefore = filename;
-                                if (!fileNameSet)
-                                {
-                                    fileNameSet = true;
-                                    SetFileMeta(file, fileEncoding);
-                                }
+                                DatabaseHelper.ConcatTable(newTable, tableName, fileNameBefore, filename);
+                            }
+                            else
+                            {
+                                newTable = tableName;
+                            }
+                            fileNameBefore = filename;
+                            if (!fileNameSet)
+                            {
+                                fileNameSet = true;
+                                SetFileMeta(file, fileEncoding);
                             }
                         }
                         catch (Exception ex)
                         {
                             ErrorHelper.LogMessage(ex, this);
                         }
+                        //don't forget to delete unused tables
                     }
+
                     FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]), fileEncoding);
                 });
                 thread.SetApartmentState(ApartmentState.STA);
@@ -637,42 +638,60 @@ namespace DataTableConverter
             FilePath = path;
         }
 
-        private void FinishImport(DataTable table, ImportState state, DataTable oldTable, string filename, int encoding)
+        private void FinishImport(string tableName, ImportState state, string oldTable, string filename, int encoding)
         {
-            if(table != null) {
+            if(tableName != null) {
                 switch (state)
                 {
                     case ImportState.Merge:
-                        StartMerge(table, oldTable, filename, encoding);
+                        StartMerge(tableName, oldTable, filename, encoding);
+                        DatabaseHelper.SetSavepoint();
                         break;
 
                     case ImportState.Append:
-                        dgTable.BeginInvoke(new MethodInvoker(() => { MergeTables(table, filename); }));
+                        DatabaseHelper.ConcatTable(oldTable, tableName, Path.GetFileName(FilePath), filename);
+                        DatabaseHelper.SetSavepoint();
                         break;
 
                     case ImportState.Header:
-                        object[] headers = oldTable.HeadersOfDataTable();
-                        oldTable.OverrideHeaders(table);
-                        dgTable.BeginInvoke(new MethodInvoker(() => { AssignDataSource(oldTable); }));
-                        AddDataSourceHeadersChange(headers);
+                        DatabaseHelper.RenameColumns(oldTable, tableName);
+                        List<string> newHeaders = DatabaseHelper.HeadersOfTable(tableName);
+                        dgTable.BeginInvoke(new MethodInvoker(() =>
+                        {
+                            for (int i = 0; i < newHeaders.Count && i < dgTable.ColumnCount; ++i)
+                            {
+                                dgTable.Columns[i].Name = newHeaders[i];
+                            }
+                        }));
+                        DatabaseHelper.SetSavepoint();
                         break;
 
                     default:
                         ResetValidRowLabel();
-                        dgTable.BeginInvoke(new MethodInvoker(() => { AddDataSourceNewTable(table); }));
+                        //delete main table and rename table with tableName to main
+                        DatabaseHelper.ReplaceTable(tableName);
+                        //dgTable.BeginInvoke(new MethodInvoker(() => { AddDataSourceNewTable(tableName); }));
                         lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { SetRowCount(); }));
                         break;
                 }
+                LoadData();
             }
             StopLoadingBar();
         }
 
-        private void StartMerge(DataTable importTable, DataTable sourceTable, string filename, int encoding)
+        private void LoadData()
+        {
+            dgTable.DataSource = DatabaseHelper.GetData(DatabaseHelper.DefaultTable, SortingOrder, (int) ((Page - 1) * Properties.Settings.Default.MaxRows));
+            dgTable.Columns[0].Visible = false;
+        }
+
+        private void StartMerge(string importTable, string sourceTable, string filename, int encoding)
         {
             string[] importColumns = new string[0];
             int sourceMergeIndex = -1;
             int importMergeIndex = -1;
             DialogResult result = DialogResult.No;
+
 
             if (string.IsNullOrWhiteSpace(Properties.Settings.Default.PVMIdentifier))
             {
@@ -1600,6 +1619,7 @@ namespace DataTableConverter
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             SaveSize();
+            DatabaseHelper.Close();
         }
 
         private void SaveSize()
@@ -1898,6 +1918,12 @@ namespace DataTableConverter
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
+        }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TestDataGridView a = new TestDataGridView();
+            a.Show();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

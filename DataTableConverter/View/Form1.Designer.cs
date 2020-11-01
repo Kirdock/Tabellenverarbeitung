@@ -58,6 +58,7 @@
             this.zählenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.zeichenAuffüllenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeilenAusTabelleHinzufügenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zeilenLöschenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.zeilenZusammenfassenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ersetzenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.arbeitsablaufToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -98,7 +99,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.zeilenLöschenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -140,7 +141,8 @@
             this.bearbeitenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.rückgängigToolStripMenuItem,
             this.wiederholenToolStripMenuItem,
-            this.einstellungenToolStripMenuItem});
+            this.einstellungenToolStripMenuItem,
+            this.testToolStripMenuItem});
             this.bearbeitenToolStripMenuItem.Name = "bearbeitenToolStripMenuItem";
             this.bearbeitenToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
             this.bearbeitenToolStripMenuItem.Text = "Bearbeiten";
@@ -319,6 +321,13 @@
             this.zeilenAusTabelleHinzufügenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.zeilenAusTabelleHinzufügenToolStripMenuItem.Text = "Zeilen aus Tabelle hinzufügen";
             this.zeilenAusTabelleHinzufügenToolStripMenuItem.Click += new System.EventHandler(this.tabelleHinzufügenToolStripMenuItem_Click);
+            // 
+            // zeilenLöschenToolStripMenuItem1
+            // 
+            this.zeilenLöschenToolStripMenuItem1.Name = "zeilenLöschenToolStripMenuItem1";
+            this.zeilenLöschenToolStripMenuItem1.Size = new System.Drawing.Size(229, 22);
+            this.zeilenLöschenToolStripMenuItem1.Text = "Zeilen löschen";
+            this.zeilenLöschenToolStripMenuItem1.Click += new System.EventHandler(this.zeilenLöschenToolStripMenuItem1_Click);
             // 
             // zeilenZusammenfassenToolStripMenuItem
             // 
@@ -652,12 +661,12 @@
             this.dgTable.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgTable_KeyDown);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
-            // zeilenLöschenToolStripMenuItem1
+            // testToolStripMenuItem
             // 
-            this.zeilenLöschenToolStripMenuItem1.Name = "zeilenLöschenToolStripMenuItem1";
-            this.zeilenLöschenToolStripMenuItem1.Size = new System.Drawing.Size(229, 22);
-            this.zeilenLöschenToolStripMenuItem1.Text = "Zeilen löschen";
-            this.zeilenLöschenToolStripMenuItem1.Click += new System.EventHandler(this.zeilenLöschenToolStripMenuItem1_Click);
+            this.testToolStripMenuItem.Name = "testToolStripMenuItem";
+            this.testToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.testToolStripMenuItem.Text = "Test";
+            this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -762,6 +771,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown NumPage;
         private System.Windows.Forms.ToolStripMenuItem zeilenLöschenToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
     }
 }
 

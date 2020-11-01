@@ -36,15 +36,11 @@ namespace DataTableConverter.Extensions
 
         internal static void AdjustDBASEImport(this DataTable table)
         {
-            //remove Null-Value and newLine
+            //remove newLine
             foreach (DataRow row in table.AsEnumerable())
             {
                 for (int i = 0; i < row.ItemArray.Length; i++)
                 {
-                    if (row[i] == DBNull.Value)
-                    {
-                        row[i] = string.Empty;
-                    }
                     row[i] = row[i].ToString().Replace("\n", string.Empty);
                 }
             }
