@@ -26,11 +26,11 @@ namespace DataTableConverter
         internal static void AdjustComboBoxGridView(DataGridView dataGridView, int comboBoxIndex, object[] headers)
         {
             dataGridView.EditMode = DataGridViewEditMode.EditOnEnter;
-            dataGridView.CellFormatting += (sender, e) => DataGridView_CellFormatting(sender, e, comboBoxIndex, headers);
+            dataGridView.CellFormatting += (sender, e) => DataGridView_CellFormatting(e, comboBoxIndex, headers);
             dataGridView.EditingControlShowing += dataGridView_EditingControlShowing;
         }
 
-        private static void DataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
+        private static void DataGridView_CellFormatting(DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
         {
             if (e.ColumnIndex == comboBoxIndex && string.IsNullOrWhiteSpace(e.Value?.ToString()))
             {

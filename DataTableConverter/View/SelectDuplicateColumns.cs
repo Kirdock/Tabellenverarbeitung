@@ -15,35 +15,38 @@ namespace DataTableConverter.View
         internal DataTable Table { get; set; }
         internal static readonly string IgnoreColumn = "Ignorieren";
         private int ComboBoxIndex;
-        internal SelectDuplicateColumns(string[] caseHeaders, object[] headers, bool mustBeAssigned, string heading = null, string firstColumnName = null)
+        internal SelectDuplicateColumns(string[] caseHeaders, Dictionary<string,string> importTableColumnAliasMapping, bool mustBeAssigned, string heading = null, string firstColumnName = null)
         {
             InitializeComponent();
             if(heading != null)
             {
                 Text = heading;
             }
-            setDataGridView(caseHeaders, headers, mustBeAssigned, firstColumnName);
-            ViewHelper.AdjustComboBoxGridView(dgDuplicate, ComboBoxIndex, headers);
+            setDataGridView(caseHeaders, importTableColumnAliasMapping, mustBeAssigned, firstColumnName);
+            ViewHelper.AdjustComboBoxGridView(dgDuplicate, ComboBoxIndex, importTableColumnAliasMapping.Values.Cast<object>().ToArray());
             ViewHelper.SetDataGridViewStyle(dgDuplicate);
         }
 
-        private void setDataGridView(string[] caseHeaders, object[] headers, bool mustBeAssigned, string firstColumnName)
+        private void setDataGridView(string[] caseHeaders, Dictionary<string, string> importTableColumnAliasMapping, bool mustBeAssigned, string firstColumnName)
         {
             DataTable table = new DataTable { TableName = "Duplicates" };
             table.Columns.Add(firstColumnName ?? "Spalte");
             table.Columns.Add("Zuweisung");
-            object[] newHeaders;
+            Dictionary<string,string> newHeaders;
+            
             if (mustBeAssigned)
             {
-                newHeaders = headers;
+                newHeaders = importTableColumnAliasMapping;
             }
             else
             {
-                newHeaders = new object[headers.Length + 1];
-                newHeaders[0] = IgnoreColumn;
-                for (int i = 0; i < headers.Length; i++)
+                newHeaders = new Dictionary<string, string>
                 {
-                    newHeaders[i + 1] = headers[i];
+                    { IgnoreColumn, null },
+                };
+                foreach(KeyValuePair<string,string> pair in importTableColumnAliasMapping)
+                {
+                    newHeaders.Add(pair.Key, pair.Value);
                 }
             }
 
@@ -51,16 +54,19 @@ namespace DataTableConverter.View
 
             DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
             {
-                DataSource = newHeaders,
+                DataSource = new BindingSource(newHeaders,null),
+                DisplayMember = "key",
+                ValueMember = "value",
                 DataPropertyName = "Zuweisung",
                 HeaderText = "Zuweisung "
             };
+
             ComboBoxIndex = dgDuplicate.Columns.Count;
             dgDuplicate.Columns.Add(cmb);
-
+            string firstValue = newHeaders.First().Value;
             foreach (string header in caseHeaders)
             {
-                table.Rows.Add(new object[] { header, newHeaders[0] });
+                table.Rows.Add(new object[] { header, firstValue });
             }
             dgDuplicate.Columns[0].ReadOnly = true;
             dgDuplicate.Columns[1].Visible = false;

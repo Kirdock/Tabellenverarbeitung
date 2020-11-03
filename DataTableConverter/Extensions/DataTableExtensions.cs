@@ -560,7 +560,7 @@ namespace DataTableConverter.Extensions
 
         internal static DataView GetSortedView(this DataTable table, string order, OrderType orderType, int page, Action addHistory = null)
         {
-            //sselect ROW_NUMBER() over(order by name) as rnumber, name, hint from main ORDER by
+            //Select ROW_NUMBER() over(order by name) as rnumber, name, hint from main ORDER by
                 //case
                 //	when rnumber > half  then(rnumber - (half-0.5))
                 //    when rnumber <= half then rnumber

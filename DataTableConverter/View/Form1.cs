@@ -2,12 +2,12 @@
 using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.Extensions;
-using DataTableConverter.Temp;
 using DataTableConverter.View;
 using DataTableConverter.View.WorkProcViews;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -473,7 +473,7 @@ namespace DataTableConverter
                         columns.Add(col);
                     }
                 }
-                SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), table.HeadersOfDataTable(), false);
+                SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), DatabaseHelper.GetColumnAliasMapping(), false);
                 if (form.ShowDialog(this) == DialogResult.OK) {
                     string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
                     string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
@@ -569,7 +569,6 @@ namespace DataTableConverter
         private void importToolStripMenuItem_Click(ImportState state = ImportState.None, string[] openFiles = null)
         {
             OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state != ImportState.Header);
-            string oldTable = DatabaseHelper.DefaultTable;
             string mergePath = string.Empty;
             bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
             if (openFiles != null || validMerge || dialog.ShowDialog(this) == DialogResult.OK)
@@ -614,7 +613,7 @@ namespace DataTableConverter
                         //don't forget to delete unused tables
                     }
 
-                    FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]), fileEncoding);
+                    FinishImport(newTable, state, Path.GetFileName(filenames[0]), fileEncoding);
                 });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
@@ -638,24 +637,24 @@ namespace DataTableConverter
             FilePath = path;
         }
 
-        private void FinishImport(string tableName, ImportState state, string oldTable, string filename, int encoding)
+        private void FinishImport(string tableName, ImportState state, string filename, int encoding)
         {
             if(tableName != null) {
                 switch (state)
                 {
                     case ImportState.Merge:
-                        StartMerge(tableName, oldTable, filename, encoding);
+                        StartMerge(tableName, filename, encoding);
                         DatabaseHelper.SetSavepoint();
                         break;
 
                     case ImportState.Append:
-                        DatabaseHelper.ConcatTable(oldTable, tableName, Path.GetFileName(FilePath), filename);
+                        DatabaseHelper.ConcatTable(tableName, Path.GetFileName(FilePath), filename);
                         DatabaseHelper.SetSavepoint();
                         break;
 
                     case ImportState.Header:
-                        DatabaseHelper.RenameColumns(oldTable, tableName);
-                        List<string> newHeaders = DatabaseHelper.HeadersOfTable(tableName);
+                        DatabaseHelper.RenameColumns(tableName);
+                        List<string> newHeaders = DatabaseHelper.GetSortedColumnsAsAlias(tableName);
                         dgTable.BeginInvoke(new MethodInvoker(() =>
                         {
                             for (int i = 0; i < newHeaders.Count && i < dgTable.ColumnCount; ++i)
@@ -681,45 +680,55 @@ namespace DataTableConverter
 
         private void LoadData()
         {
-            dgTable.DataSource = DatabaseHelper.GetData(DatabaseHelper.DefaultTable, SortingOrder, (int) ((Page - 1) * Properties.Settings.Default.MaxRows));
+            dgTable.DataSource = DatabaseHelper.GetData(SortingOrder, OrderType, (int) ((Page - 1) * Properties.Settings.Default.MaxRows));
             dgTable.Columns[0].Visible = false;
         }
 
-        private void StartMerge(string importTable, string sourceTable, string filename, int encoding)
+        private void StartMerge(string importTable, string filename, int encoding)
         {
-            string[] importColumns = new string[0];
-            int sourceMergeIndex = -1;
-            int importMergeIndex = -1;
+            string[] importColumnNames = new string[0];
+            string sourceIdentifierColumnName = null;
+            string importIdentifierColumnName = null;
             DialogResult result = DialogResult.No;
-
+            int sourceTable;
+            int importRowCount = DatabaseHelper.GetRowCount(importTable);
+            int originalRowCount = DatabaseHelper.GetRowCount();
+            Dictionary<string,string> importTableColumnAliasMapping = DatabaseHelper.GetColumnAliasMapping(importTable);
+            Dictionary<string, string> originalTableColumnAliasMapping = DatabaseHelper.GetColumnAliasMapping();
 
             if (string.IsNullOrWhiteSpace(Properties.Settings.Default.PVMIdentifier))
             {
-                result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
+                result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, this);
             }
             else
             {
-                if ((sourceMergeIndex = sourceTable.Columns.IndexOf(Properties.Settings.Default.PVMIdentifier)) > -1)
+                
+                if (originalTableColumnAliasMapping.ContainsKey(Properties.Settings.Default.PVMIdentifier))
                 {
-                    if ((importMergeIndex = importTable.Columns.IndexOf(Properties.Settings.Default.PVMIdentifier)) > -1)
+                    sourceIdentifierColumnName = Properties.Settings.Default.PVMIdentifier;
+                    
+                    
+                    if (importTableColumnAliasMapping.ContainsKey(Properties.Settings.Default.PVMIdentifier))
                     {
-                        importColumns = importTable.HeadersOfDataTableAsString();
+                        importIdentifierColumnName = Properties.Settings.Default.PVMIdentifier;
+                        
+                        importColumnNames = importTableColumnAliasMapping.Values.Cast<string>().ToArray();
                         result = DialogResult.Yes;
-                        if (sourceTable.Rows.Count != importTable.Rows.Count)
+                        if (originalRowCount != importRowCount)
                         {
-                            result = this.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({sourceTable.Rows.Count} zu {importTable.Rows.Count})!\nTrotzdem fortfahren?");
+                            result = this.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({originalRowCount} zu {importRowCount })!\nTrotzdem fortfahren?");
                         }
                     }
                     else
                     {
                         this.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabelle \"{filename}\" hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                        result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
+                        result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, this);
                     }
                 }
                 else
                 {
                     this.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                    result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
+                    result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, this);
                 }
             }
             
@@ -728,10 +737,10 @@ namespace DataTableConverter
                 Thread thread = new Thread(() =>
                 {
                     try {
-                        string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
-                        if (!importTable.Columns.Contains(invalidColumnName))
+                        string invalidColumnAlias = Properties.Settings.Default.InvalidColumnName;
+                        if (!importColumnNames.Contains(invalidColumnAlias))
                         {
-                            SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, importTable.HeadersOfDataTable(), true);
+                            SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnAlias }, importTableColumnAliasMapping, true);
                             DialogResult res = DialogResult.Cancel;
                             Invoke(new MethodInvoker(() =>
                             {
@@ -739,17 +748,19 @@ namespace DataTableConverter
                             }));
                             if (res == DialogResult.OK)
                             {
-                                invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
+                                invalidColumnAlias = f.Table.AsEnumerable().First()[1].ToString();
                             }
                         }
 
-                        sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, this, pgbLoading);
+                        DatabaseHelper.AppendColumnContents(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, importTableColumnAliasMapping, originalTableColumnAliasMapping);
+                        
+                        sourceTable.AddColumnsOfDataTable(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, out int[] newIndices, this, pgbLoading);
                         int count = 0;
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
+                            count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnAlias);
                         }
-                        foreach (DataRow row in sourceTable.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
+                        foreach (DataRow row in sourceTable.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnAlias].ToString() == Properties.Settings.Default.FailAddressValue))
                         {
                             row.Delete();
                         }
@@ -758,13 +769,11 @@ namespace DataTableConverter
                         History[] history = new History[2];
                         history[0] = new History { State = State.ValueChange, Table = sourceTable.ChangesOfDataTable(), Order= GetSorting() };
 
-                        sourceTable.Columns.Remove(Extensions.DataTableExtensions.TempSort);
+                        //sourceTable.Columns.Remove(Extensions.DataTableExtensions.TempSort);
                         dgTable.Invoke(new MethodInvoker(()=> {
                             AssignDataSource(sourceTable);
                         }));
 
-                        history[1] = new History { State = State.OrderIndexChange, NewOrderIndices = newIndices, Order = GetSorting()};
-                        historyHelper.AddHistory(history);
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
 
                         if (count != 0)
@@ -785,9 +794,9 @@ namespace DataTableConverter
             }
         }
 
-        internal static DialogResult ShowMergeForm(ref string[] importColumns, ref int sourceMergeIndex, ref int importMergeIndex, DataTable sourceTable, DataTable importTable, string filename, Form invokeForm)
+        internal static DialogResult ShowMergeForm(ref string[] importColumns, ref string sourceColumnName, ref string importColumnName, Dictionary<string,string> originalTableHeaders, int originalRowCount, Dictionary<string, string> importTableHeaders, int importRowCount, string filename, Form invokeForm)
         {
-            MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
+            MergeTable form = new MergeTable(originalTableHeaders, importTableHeaders, filename, originalRowCount, importRowCount);
             bool result;
             DialogResult res = DialogResult.Cancel;
             invokeForm.Invoke(new MethodInvoker(() =>
@@ -796,9 +805,9 @@ namespace DataTableConverter
             }));
             if (result = ( res == DialogResult.Yes))
             {
-                importColumns = form.getSelectedColumns();
-                sourceMergeIndex = form.getSelectedOriginal();
-                importMergeIndex = form.getSelectedMerge();
+                importColumns = form.SelectedColumns.ToArray();
+                sourceColumnName = form.OriginalIdentifierColumnName;
+                importColumnName = form.ImportIdentifierColumnName;
             }
             form.Dispose();
             return result ? DialogResult.Yes : DialogResult.No;
@@ -1918,12 +1927,6 @@ namespace DataTableConverter
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
-        }
-
-        private void testToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            TestDataGridView a = new TestDataGridView();
-            a.Show();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)

@@ -9,21 +9,27 @@ namespace DataTableConverter.View
     public partial class MergeTable : Form
     {
         private bool SameRowCount;
+        internal IEnumerable<string> SelectedColumns => clbColumns.CheckedItems.Cast<KeyValuePair<string,string>>().Select(x => x.Value);
+        internal string OriginalIdentifierColumnName => cmbIdentifierOriginal.SelectedValue.ToString();
+        internal string ImportIdentifierColumnName => cmbIdentifierMerge.SelectedValue.ToString();
 
-        internal MergeTable(object[] headersOriginal, object[] headersMerge, string filename, int sourceCount, int importCount)
+
+        internal MergeTable(Dictionary<string,string> originalHeaders, Dictionary<string,string> importHeaders, string filename, int sourceCount, int importCount)
         {
+            //key: alias, value: columnName
             InitializeComponent();
+            
             SetListBoxStyle();
-            setCmbItems(cmbIdentifierOriginal, headersOriginal);
-            setCmbItems(cmbIdentifierMerge, headersMerge);
-            setListItems(headersMerge);
+            SetCmbItems(cmbIdentifierOriginal, originalHeaders);
+            SetCmbItems(cmbIdentifierMerge, importHeaders);
+            SetListItems(importHeaders);
             lblImportTable.Text = filename;
 
             lblRowCountImport.ForeColor = lblRowCountSource.ForeColor = lblSourceTable.ForeColor = lblImportTableText.ForeColor = sourceCount == importCount ? System.Drawing.Color.Green : System.Drawing.Color.Red;
             lblRowCountImport.Text = importCount.ToString();
             lblRowCountSource.Text = sourceCount.ToString();
             SameRowCount = sourceCount == importCount;
-            markAll(true);
+            MarkAll(true);
         }
 
         private void SetListBoxStyle()
@@ -31,33 +37,20 @@ namespace DataTableConverter.View
             ViewHelper.SetListBoxStyle(clbColumns);
         }
 
-        private void setListItems(object[] items)
+        private void SetListItems(Dictionary<string,string> items)
         {
-            clbColumns.Items.AddRange(items);
+            ListBox box = clbColumns;
+            box.DataSource = new BindingSource(items, null);
+            box.DisplayMember = "key";
+            box.ValueMember = "value";
         }
 
-        private void setCmbItems(ComboBox cmb, object[] items)
+        private void SetCmbItems(ComboBox cmb, Dictionary<string,string> items)
         {
-            cmb.Items.AddRange(items);
+            cmb.DataSource = new BindingSource(items, null);
+            cmb.DisplayMember = "key";
+            cmb.ValueMember = "value";
             cmb.SelectedIndex = 0;
-        }
-
-        internal int getSelectedOriginal()
-        {
-            return cmbIdentifierOriginal.SelectedIndex;
-        }
-
-        internal int getSelectedMerge()
-        {
-            return cmbIdentifierMerge.SelectedIndex;
-        }
-
-        internal string[] getSelectedColumns()
-        {
-            return clbColumns.CheckedItems.Cast<object>()
-                                 .Select(x => x.ToString())
-                                 //.Where(x => x != cmbIdentifierMerge.SelectedItem.ToString())
-                                 .ToArray();
         }
 
         private void btnTakeOver_Click(object sender, EventArgs e)
@@ -77,12 +70,12 @@ namespace DataTableConverter.View
         }
         
 
-        private void btnSelectAll_Click(object sender, EventArgs e)
+        private void BtnSelectAll_Click(object sender, EventArgs e)
         {
-            markAll(true);
+            MarkAll(true);
         }
 
-        private void markAll(bool status)
+        private void MarkAll(bool status)
         {
             for (int i = 0; i < clbColumns.Items.Count; i++)
             {
@@ -90,9 +83,9 @@ namespace DataTableConverter.View
             }
         }
 
-        private void btnRemoveAll_Click(object sender, EventArgs e)
+        private void BtnRemoveAll_Click(object sender, EventArgs e)
         {
-            markAll(false);
+            MarkAll(false);
         }
     }
 }

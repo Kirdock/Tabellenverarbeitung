@@ -99,7 +99,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -141,8 +140,7 @@
             this.bearbeitenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.rückgängigToolStripMenuItem,
             this.wiederholenToolStripMenuItem,
-            this.einstellungenToolStripMenuItem,
-            this.testToolStripMenuItem});
+            this.einstellungenToolStripMenuItem});
             this.bearbeitenToolStripMenuItem.Name = "bearbeitenToolStripMenuItem";
             this.bearbeitenToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
             this.bearbeitenToolStripMenuItem.Text = "Bearbeiten";
@@ -661,13 +659,6 @@
             this.dgTable.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgTable_KeyDown);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
-            // testToolStripMenuItem
-            // 
-            this.testToolStripMenuItem.Name = "testToolStripMenuItem";
-            this.testToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.testToolStripMenuItem.Text = "Test";
-            this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AllowDrop = true;
@@ -771,7 +762,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown NumPage;
         private System.Windows.Forms.ToolStripMenuItem zeilenLöschenToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
     }
 }
 
