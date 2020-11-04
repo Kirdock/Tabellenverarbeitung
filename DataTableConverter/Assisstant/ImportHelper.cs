@@ -843,7 +843,7 @@ namespace DataTableConverter.Assisstant
             if (result != string.Empty)
             {
                 string multiHeader = count == 0 ? header : header + count;
-                if (!DatabaseHelper.ContainsColumn(tableName, multiHeader))
+                if (!DatabaseHelper.ContainsAlias(tableName, multiHeader))
                 {
                     DatabaseHelper.AddColumn(tableName, multiHeader);
                 }

@@ -34,6 +34,19 @@ namespace DataTableConverter.Extensions
             }
         }
 
+        internal static object[,] ToObjectArray(this DataTable table)
+        {
+            object[,] data = new object[table.Rows.Count, table.Columns.Count];
+            for (int row = 0; row < table.Rows.Count; row++)
+            {
+                for (int column = 0; column < table.Columns.Count; column++)
+                {
+                    data[row, column] = table.Rows[row][column];
+                }
+            }
+            return data;
+        }
+
         internal static void AdjustDBASEImport(this DataTable table)
         {
             //remove newLine

@@ -752,26 +752,20 @@ namespace DataTableConverter
                             }
                         }
 
-                        DatabaseHelper.AppendColumnContents(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, importTableColumnAliasMapping, originalTableColumnAliasMapping);
+                        bool abort = DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, importTableColumnAliasMapping, originalTableColumnAliasMapping, this);
+
+                        if (abort) return;
+
                         
-                        sourceTable.AddColumnsOfDataTable(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, out int[] newIndices, this, pgbLoading);
                         int count = 0;
                         if (Properties.Settings.Default.SplitPVM)
                         {
-                            count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnAlias);
+                            count = DatabaseHelper.PVMSplit(FilePath, this, encoding, invalidColumnAlias);
                         }
-                        foreach (DataRow row in sourceTable.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnAlias].ToString() == Properties.Settings.Default.FailAddressValue))
-                        {
-                            row.Delete();
-                        }
+                        DatabaseHelper.DeleteInvalidRows();
 
-
-                        History[] history = new History[2];
-                        history[0] = new History { State = State.ValueChange, Table = sourceTable.ChangesOfDataTable(), Order= GetSorting() };
-
-                        //sourceTable.Columns.Remove(Extensions.DataTableExtensions.TempSort);
                         dgTable.Invoke(new MethodInvoker(()=> {
-                            AssignDataSource(sourceTable);
+                            AssignDataSource();
                         }));
 
                         pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
