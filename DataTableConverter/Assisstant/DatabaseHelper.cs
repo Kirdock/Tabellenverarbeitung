@@ -22,7 +22,7 @@ namespace DataTableConverter.Assisstant
         internal static readonly string IdColumnName = "rowid"; //could be a problem as primary key if VACUUM command is executed
         private static string SortOrderColumnName = "__SORT_ORDER__";
         private static readonly string IndexAffix = "_INDEX";
-        private static int SavePoints = 0, Pointer = 0; //0 => after main Table with data is created
+        private static int SavePoints, Pointer; //0 => after main Table with data is created
         private static SQLiteConnection Connection, TempConnection; //Second file and connection is needed because of Trace
         private static SQLiteTraceEventHandler UpdateHandler = null;
         private static SQLiteTransaction Transaction, TempTransaction;
@@ -41,6 +41,7 @@ namespace DataTableConverter.Assisstant
 
         internal static void Init()
         {
+            Reset();
             SortOrderColumnName = IdColumnName == "rowid" ? SortOrderColumnName : IdColumnName;
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
             DatabaseHistory.CreateDatabase();
@@ -194,12 +195,14 @@ namespace DataTableConverter.Assisstant
 
         private static void Reset()
         {
-            SavePoints = Pointer = 0;
+            SavePoints = Pointer = -1;
         }
 
         private static void DeleteMainDatabase()
         {
             Connection.Close();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             File.Delete(DatabasePath);
         }
 
@@ -695,6 +698,18 @@ namespace DataTableConverter.Assisstant
             CreateSavePoint();
         }
 
+        private static void CreateSavePoint()
+        {
+            ++SavePoints;
+            ++Pointer;
+            using (SQLiteCommand command = Connection.CreateCommand())
+            {
+                command.CommandText = $"SAVEPOINT \"{SavePoints}\"";
+                command.ExecuteNonQuery();
+            }
+            DatabaseHistory.CreateSavePoint(SavePoints);
+        }
+
         private static void Update(object sender, TraceEventArgs e)
         {
             if (!IgnoreCommands.Contains(GetCommandType(e.Statement)))
@@ -707,18 +722,6 @@ namespace DataTableConverter.Assisstant
         {
             int index = command.IndexOf(" ");
             return command.Substring(0, index == -1 ? command.Length -1 : index).ToUpper();
-        }
-
-        private static void CreateSavePoint()
-        {
-            using (SQLiteCommand command = Connection.CreateCommand())
-            {
-                command.CommandText = $"SAVEPOINT \"{SavePoints}\"";
-                command.ExecuteNonQuery();
-            }
-            ++SavePoints;
-            ++Pointer;
-            DatabaseHistory.CreateSavePoint(SavePoints);
         }
 
         internal static int PVMSplit(string path, Form1 invokeForm, int encoding, string invalidColumnAlias, string tableName = "main")
