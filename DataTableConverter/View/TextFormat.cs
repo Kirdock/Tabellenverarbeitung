@@ -28,10 +28,10 @@ namespace DataTableConverter.View
         private readonly string TableName;
 
         internal DataTable DataTable { get; set; }
-        internal TextFormat(string path, bool multipleFiles, ContextMenuStrip ctxRow)
+        internal TextFormat(string tableName, string path, bool multipleFiles, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
-            TableName = Guid.NewGuid().ToString();
+            TableName = tableName;
             GlobalContext = ctxRow;
             ViewHelper = new ViewHelper(ctxRow, EndHeadersEdit, null);
             SetHeaderDataGridView();

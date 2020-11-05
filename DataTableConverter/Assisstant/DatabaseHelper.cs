@@ -19,7 +19,7 @@ namespace DataTableConverter.Assisstant
         private static readonly string FileNameColumn = "dateiname";
         private static readonly string DefaultTable = "main";
         private static readonly string MetaTableAffix = "_meta";
-        private static readonly string IdColumnName = "rowid"; //could be a problem as primary key if VACUUM command is executed
+        internal static readonly string IdColumnName = "rowid"; //could be a problem as primary key if VACUUM command is executed
         private static string SortOrderColumnName = "__SORT_ORDER__";
         private static readonly string IndexAffix = "_INDEX";
         private static int SavePoints = 0, Pointer = 0; //0 => after main Table with data is created
@@ -36,6 +36,7 @@ namespace DataTableConverter.Assisstant
             "CREATE"
         };
         //Autoincrement only works on primary keys. BUT primary keys can be updated
+        //Warning: Selection of "rowid" is equal to selecting primary key
         //Problem with DataTables to edit data: if there is a change in a row, the update statement contains all columns of the row, not only the changed ones
 
         internal static void Init()
@@ -205,6 +206,10 @@ namespace DataTableConverter.Assisstant
         private static void DeleteTempDatabase()
         {
             TempConnection.Close();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             File.Delete(TempDatabasePath);
         }
 
@@ -496,15 +501,15 @@ namespace DataTableConverter.Assisstant
                 if(orderType == OrderType.Reverse)
                 {
                     int half = GetRowCount(tableName)/2;
-                    command.CommandText = $"SELECT {IdColumnName}, {headerString}, ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] ORDER BY case when rnumber > {half}  then(rnumber - ({half}-0.5)) when rnumber <= {half} then rnumber end LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}"; //append ASC or DESC
+                    command.CommandText = $"SELECT {IdColumnName} AS {IdColumnName}, {headerString}, ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] ORDER BY case when rnumber > {half}  then(rnumber - ({half}-0.5)) when rnumber <= {half} then rnumber end LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}"; //append ASC or DESC
                 }
                 else if(orderType == OrderType.Windows && order != string.Empty)
                 {
-                    command.CommandText = $"SELECT {IdColumnName},{headerString} FROM [{tableName}] ORDER BY {order} LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}";
+                    command.CommandText = $"SELECT {IdColumnName} AS {IdColumnName},{headerString} FROM [{tableName}] ORDER BY {order} LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}";
                 }
                 else
                 {
-                    command.CommandText = $"SELECT {IdColumnName},{headerString} FROM [{tableName}] ORDER BY {SortOrderColumnName} LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}";
+                    command.CommandText = $"SELECT {IdColumnName} AS {IdColumnName},{headerString} FROM [{tableName}] ORDER BY {SortOrderColumnName} LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}";
                 }
 
                 SQLiteDataAdapter sqlda = new SQLiteDataAdapter(command);
@@ -655,7 +660,7 @@ namespace DataTableConverter.Assisstant
             return rowCount;
         }
 
-        private static void Delete(string tableName, bool ifExists = false)
+        internal static void Delete(string tableName, bool ifExists = false)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
@@ -716,29 +721,6 @@ namespace DataTableConverter.Assisstant
             DatabaseHistory.CreateSavePoint(SavePoints);
         }
 
-        internal static void Undo()
-        {
-            Pointer--;
-            GoToSavePoint(Pointer);
-        }
-
-        private static void GoToSavePoint(int savePoint)
-        {
-            using (SQLiteCommand command = Connection.CreateCommand())
-            {
-                command.CommandText = $"ROLLBACK TO \"{savePoint}\"";
-                command.ExecuteNonQuery();
-            }
-        }
-
-        internal static void Redo()
-        {
-            Connection.Trace -= UpdateHandler;
-
-
-            Connection.Trace += UpdateHandler;
-        }
-
         internal static int PVMSplit(string path, Form1 invokeForm, int encoding, string invalidColumnAlias, string tableName = "main")
         {
             
@@ -760,9 +742,19 @@ namespace DataTableConverter.Assisstant
 
 
                 //Create file with all headers (columnAliasMapping.Keys)
-                rowCount = ExportHelper.Save(tableName, originalFilePath, fileName, encoding, Properties.Settings.Default.PVMSaveFormat, invokeForm, command);
+                rowCount = ExportHelper.Save(originalFilePath, fileName, encoding, Properties.Settings.Default.PVMSaveFormat, invokeForm, command, null, tableName);
             }
             return rowCount;
+        }
+
+        internal static SQLiteCommand GetDataCommand(string tableName)
+        {
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
+            Dictionary<string, string> columnAliasMapping = GetColumnAliasMapping(tableName);
+            command.CommandText = $"SELECT {GetHeaderString(columnAliasMapping.Values)} from [{tableName}] limit {Properties.Settings.Default.MaxRows} offset $offset";
+            command.Parameters.Add(new SQLiteParameter("$offset"));
+
+            return command;
         }
 
         internal static void DeleteInvalidRows(string tableName = "main")
@@ -817,6 +809,56 @@ namespace DataTableConverter.Assisstant
                 }
             }
             return max;
+        }
+
+        internal static void Undo()
+        {
+            Pointer--;
+            GoToSavePoint(Pointer);
+        }
+
+        internal static void Redo()
+        {
+            if (Pointer < SavePoints)
+            {
+                Connection.Trace -= UpdateHandler;
+                
+
+                DatabaseHistory.Redo(Pointer);
+                Pointer++;
+
+                Connection.Trace += UpdateHandler;
+            }
+        }
+
+        internal static void ExecuteCommand(string sql, string tableName = "main")
+        {
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private static void GoToSavePoint(int savePoint)
+        {
+            using (SQLiteCommand command = Connection.CreateCommand())
+            {
+                command.CommandText = $"ROLLBACK TO \"{savePoint}\"";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal static void UpdateCell(string value, string alias, string id, string tableName = "main")
+        {
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                string columnName = GetColumnName(alias, tableName);
+                command.CommandText = $"UPDATE [{tableName}] set [{columnName}] = ? where rowid = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = value });
+                command.Parameters.Add(new SQLiteParameter() { Value = id });
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

@@ -593,19 +593,23 @@ namespace DataTableConverter
                             string filename = Path.GetFileName(file);
                             string tableName = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding);
 
-                            if (newTable != null)
+                            if (tableName != null)
                             {
-                                DatabaseHelper.ConcatTable(newTable, tableName, fileNameBefore, filename);
-                            }
-                            else
-                            {
-                                newTable = tableName;
-                            }
-                            fileNameBefore = filename;
-                            if (!fileNameSet)
-                            {
-                                fileNameSet = true;
-                                SetFileMeta(file, fileEncoding);
+
+                                if (newTable != null)
+                                {
+                                    DatabaseHelper.ConcatTable(newTable, tableName, fileNameBefore, filename);
+                                }
+                                else
+                                {
+                                    newTable = tableName;
+                                }
+                                fileNameBefore = filename;
+                                if (!fileNameSet)
+                                {
+                                    fileNameSet = true;
+                                    SetFileMeta(file, fileEncoding);
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -668,10 +672,12 @@ namespace DataTableConverter
 
                     default:
                         ResetValidRowLabel();
-                        //delete main table and rename table with tableName to main
                         DatabaseHelper.ReplaceTable(tableName);
-                        //dgTable.BeginInvoke(new MethodInvoker(() => { AddDataSourceNewTable(tableName); }));
                         lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { SetRowCount(); }));
+                        BeginInvoke(new MethodInvoker(()=>
+                        {
+                            SetMenuEnabled(true);
+                        }));
                         break;
                 }
                 LoadData();
@@ -1085,17 +1091,13 @@ namespace DataTableConverter
 
         private void rückgängigToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable oldTable = GetDataSource();
             StartLoadingBar();
 
             new Thread(() =>
             {
                 try {
-                    DataTable newTable = historyHelper.GoBack(oldTable, GetSorting());
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        TakeOverHistory(newTable, historyHelper.OrderString);
-                    }));
+                    DatabaseHelper.Undo();
+                    LoadData();
                     StopLoadingBar();
                 }
                 catch (Exception ex)
@@ -1116,18 +1118,14 @@ namespace DataTableConverter
 
         private void wiederholenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable oldTable = GetDataSource();
             StartLoadingBar();
 
             new Thread(() =>
             {
                 try
                 {
-                    DataTable newTable = historyHelper.Repeat(GetDataSource(), GetSorting());
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        TakeOverHistory(newTable, historyHelper.OrderString);
-                    }));
+                    DatabaseHelper.Redo();
+                    LoadData();
                     StopLoadingBar();
                 }
                 catch (Exception ex)
@@ -1139,14 +1137,16 @@ namespace DataTableConverter
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            int width = TextRenderer.MeasureText(dgTable[e.ColumnIndex, e.RowIndex].Value.ToString(), dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
+            string value = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
+            string id = dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString();
+            int width = TextRenderer.MeasureText(value, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
             DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
             if (width > col.Width)
             {
                 ColumnWidths[col.Name] = col.Width = width;
             }
-            AssignDataSource();
-            AddDataSourceCellChanged(tableValueBefore, e.ColumnIndex, rowBefore);
+            DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].Name, id);
+            DatabaseHelper.SetSavepoint();
         }
 
         private void dgTable_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
@@ -1200,9 +1200,7 @@ namespace DataTableConverter
 
         private void cSVToolStripMenuItem_Click(object sender, EventArgs e, DataTable dt = null, string path = null)
         {
-            if (dgTable.DataSource != null)
-            {
-                DataTable table = dt ?? GetDataSource(true);
+            
                 SaveFileDialog saveFileDialog1 = new SaveFileDialog
                 {
                     Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
@@ -1213,13 +1211,13 @@ namespace DataTableConverter
                 if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
-                    StartLoadingBarCount(table.Rows.Count);
+                    StartLoadingBarCount(DatabaseHelper.GetRowCount());
                     new Thread(() =>
                     {
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), FileEncoding, this, UpdateLoadingBar);
+                            ExportHelper.Save(path, Path.GetFileNameWithoutExtension(path), FileEncoding, 0, this, null, UpdateLoadingBar);
                             StopLoadingBar();
                             SaveFinished();
                         }
@@ -1229,7 +1227,7 @@ namespace DataTableConverter
                         }
                     }).Start();
                 }
-            }
+            
         }
 
         private void UpdateLoadingBar()

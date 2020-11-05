@@ -104,7 +104,7 @@ namespace DataTableConverter.Assisstant
                 }
                 else
                 {
-                    TextFormat form = new TextFormat(file, multipleFiles, ctxRow);
+                    TextFormat form = new TextFormat(tableName, file, multipleFiles, ctxRow);
                     DialogResult result = DialogResult.Cancel;
                     mainForm.Invoke(new MethodInvoker(() =>
                     {
@@ -119,6 +119,11 @@ namespace DataTableConverter.Assisstant
                         }
                         fileEncoding = form.ImportSettings.CodePage;
                         return ImportFile(file, multipleFiles, fileImportSettings, ctxRow, progressBar, mainForm, ref fileEncoding, form.ImportSettings);
+                    }
+                    else
+                    {
+                        DatabaseHelper.Delete(tableName, true);
+                        tableName = null;
                     }
                 }
             }
@@ -280,7 +285,9 @@ namespace DataTableConverter.Assisstant
                 while (values.Length > headers.Count)
                 {
                     string colName = "Spalte" + headers.Count;
-                    DatabaseHelper.AddColumn(tableName, colName);
+                    
+                    DatabaseHelper.AddColumn(tableName, colName); //have to check if exists
+                    //colName = DatabaseHelper.AddColumnsWithAdditionalIfExists()  //adjust it for this case
                     headers.Add(colName);
                 }
                 DatabaseHelper.InsertRow(headers, values, tableName);

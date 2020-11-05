@@ -241,14 +241,19 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static int Save(string tableName, string originalFilePath, string fileName, int encoding, int format, Form1 invokeForm, SQLiteCommand command)
+        internal static int Save(string originalFilePath, string fileName, int encoding, int format, Form1 invokeForm, SQLiteCommand command, System.Action updateLoadingBar = null, string tableName = "main")
         {
             int rowCount = 0;
+            if (command == null)
+            {
+                command = DatabaseHelper.GetDataCommand(tableName);
+            }
+
             switch (format)
             {
                 //CSV
                 case 0:
-                    rowCount = ExportCsv(originalFilePath, fileName, encoding, command, invokeForm);
+                    rowCount = ExportCsv(originalFilePath, fileName, encoding, command, invokeForm, updateLoadingBar);
                     break;
 
                 //Dbase
@@ -330,7 +335,6 @@ namespace DataTableConverter
                     #region Adjust Header. Update number of records
                     using (FileStream stream = new FileStream(fullpath, FileMode.Open))
                     {
-                        
                         byte[] bytes = new byte[1] { 0x1A };
                         stream.Position = stream.Length - 1;
 
@@ -344,25 +348,27 @@ namespace DataTableConverter
                         {
                             command.Parameters["$offset"].Value = offset;
 
-                            SQLiteDataReader reader = command.ExecuteReader();
-                            if (!reader.HasRows)
+                            using (SQLiteDataReader reader = command.ExecuteReader())
                             {
-                                running = false;
-                            }
-                            else
-                            {
-                                int y = 0;
-                                for (; reader.Read(); y++)
+                                if (!reader.HasRows)
                                 {
-                                    StringBuilder builder = new StringBuilder(" ");
-                                    for (int i = 0; i < columns.Length; i++)
-                                    {
-                                        string temp = reader.GetString(i);
-                                        builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[i]));
-                                    }
-                                    stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                                    running = false;
                                 }
-                                offset += y;
+                                else
+                                {
+                                    int y = 0;
+                                    for (; reader.Read(); y++)
+                                    {
+                                        StringBuilder builder = new StringBuilder(" ");
+                                        for (int i = 0; i < columns.Length; i++)
+                                        {
+                                            string temp = reader.GetString(i);
+                                            builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[i]));
+                                        }
+                                        stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                                    }
+                                    offset += y;
+                                }
                             }
                         }
 
@@ -396,7 +402,7 @@ namespace DataTableConverter
             return offset;
         }
 
-        private static int ExportCsv(string originalFilePath, string fileName, int encoding, SQLiteCommand command, Form1 invokeForm)
+        internal static int ExportCsv(string originalFilePath, string fileName, int encoding, SQLiteCommand command, Form1 invokeForm, System.Action updateLoadingBar = null)
         {
             int offset = 0;
             string path = Path.Combine(Path.GetDirectoryName(originalFilePath),fileName+ ".csv");
@@ -425,38 +431,41 @@ namespace DataTableConverter
                         {
                             command.Parameters["$offset"].Value = offset;
 
-                            SQLiteDataReader reader = command.ExecuteReader();
-                            if (!reader.HasRows)
+                            using (SQLiteDataReader reader = command.ExecuteReader())
                             {
-                                running = false;
-                            }
-                            else
-                            {
-                                int rowCount = 0;
-                                if(offset == 0) //write header
+                                if (!reader.HasRows)
                                 {
-                                    for (var i = 0; i < reader.FieldCount -1; i++)
-                                    {
-                                        writer.Write(reader.GetName(i));
-                                        writer.Write(CSVSeparator);
-                                    }
-                                    writer.Write(reader.GetName(reader.FieldCount - 1));
-                                    writer.Write(writer.NewLine);
+                                    running = false;
                                 }
+                                else
+                                {
+                                    int rowCount = 0;
+                                    if (offset == 0) //write header
+                                    {
+                                        for (var i = 0; i < reader.FieldCount - 1; i++)
+                                        {
+                                            writer.Write(reader.GetName(i));
+                                            writer.Write(CSVSeparator);
+                                        }
+                                        writer.Write(reader.GetName(reader.FieldCount - 1));
+                                        writer.Write(writer.NewLine);
+                                    }
 
-                                for (; reader.Read(); rowCount++)
-                                {
-                                    
-                                    for (int i = 0; i < reader.FieldCount -1; i++)
+                                    for (; reader.Read(); rowCount++)
                                     {
-                                        writer.Write(reader.GetString(i));
-                                        writer.Write(CSVSeparator);
+
+                                        for (int i = 0; i < reader.FieldCount - 1; i++)
+                                        {
+                                            writer.Write(reader.GetString(i));
+                                            writer.Write(CSVSeparator);
+                                        }
+                                        writer.Write(reader.GetString(reader.FieldCount - 1));
+                                        writer.Write(writer.NewLine);
+                                        updateLoadingBar?.Invoke();
                                     }
-                                    writer.Write(reader.GetString(reader.FieldCount - 1));
-                                    writer.Write(writer.NewLine);
+                                    running = rowCount < Properties.Settings.Default.MaxRows;
+                                    offset += rowCount;
                                 }
-                                running = rowCount < Properties.Settings.Default.MaxRows;
-                                offset += rowCount;
                             }
                         }
                     }
@@ -535,40 +544,41 @@ namespace DataTableConverter
                 {
                     command.Parameters["$offset"].Value = offset;
 
-                    SQLiteDataReader reader = command.ExecuteReader();
-
-                    if (offset == 0) //write header
+                    using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        columnNames = new string[reader.FieldCount];
-                        for (var i = 0; i < reader.FieldCount; i++)
+                        if (offset == 0) //write header
                         {
-                            columnNames[i] = reader.GetName(i);
-                        }
-                        InsertHeadersToExcel(columnNames, worksheet);
-                    }
-
-                    if (reader.HasRows)
-                    {
-                        int rowCount = 0;
-                        object[,] data = new object[(int)Properties.Settings.Default.MaxRows, columnNames.Length];
-                        for (; reader.Read(); rowCount++)
-                        {
-                            object[] row = new object[columnNames.Length];
-                            for (int y = 0; y < columnNames.Length; y++)
+                            columnNames = new string[reader.FieldCount];
+                            for (var i = 0; i < reader.FieldCount; i++)
                             {
-                                data[rowCount, y] = reader.GetString(y);
+                                columnNames[i] = reader.GetName(i);
                             }
+                            InsertHeadersToExcel(columnNames, worksheet);
                         }
 
-                        InsertRowsSkeleton(worksheet, rowCount, columnNames.Length, offset);
-                        InsertRowsToExcel(worksheet, data, offset + 2, rowCount - 1, columnNames.Length); //+2 because index starts at 1 and header is first
+                        if (reader.HasRows)
+                        {
+                            int rowCount = 0;
+                            object[,] data = new object[(int)Properties.Settings.Default.MaxRows, columnNames.Length];
+                            for (; reader.Read(); rowCount++)
+                            {
+                                object[] row = new object[columnNames.Length];
+                                for (int y = 0; y < columnNames.Length; y++)
+                                {
+                                    data[rowCount, y] = reader.GetString(y);
+                                }
+                            }
 
-                        offset += rowCount;
-                        running = rowCount < Properties.Settings.Default.MaxRows;
-                    }
-                    else
-                    {
-                        running = false;
+                            InsertRowsSkeleton(worksheet, rowCount, columnNames.Length, offset);
+                            InsertRowsToExcel(worksheet, data, offset + 2, rowCount - 1, columnNames.Length); //+2 because index starts at 1 and header is first
+
+                            offset += rowCount;
+                            running = rowCount < Properties.Settings.Default.MaxRows;
+                        }
+                        else
+                        {
+                            running = false;
+                        }
                     }
                 }
                 command.Dispose();

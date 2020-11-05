@@ -59,6 +59,8 @@ namespace DataTableConverter.Assisstant
 
         private static void DeleteDatabase()
         {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             File.Delete(HistoryPath);
         }
 
@@ -90,20 +92,56 @@ namespace DataTableConverter.Assisstant
             
             using (SQLiteCommand command = Connection.CreateCommand())
             {
-                command.CommandText = $"insert into log (spoint, command) values ($spoint, $command)";
-                command.Parameters.Add(new SQLiteParameter("$point", savePoints));
-                command.Parameters.Add(new SQLiteParameter("$command", cmd));
+                command.CommandText = $"insert into log (spoint, command) values (?, ?)";
+                command.Parameters.Add(new SQLiteParameter() { Value = savePoints });
+                command.Parameters.Add(new SQLiteParameter() { Value = cmd });
                 command.ExecuteNonQuery();
             }
 
         }
 
-        internal static void CreateSavePoint(int savePoints)
+        internal static void CreateSavePoint(int savePoint)
         {
             using (SQLiteCommand command = Connection.CreateCommand())
             {
-                command.CommandText = $"insert into history values ({savePoints})";
+                command.CommandText = $"insert into history values ({savePoint})";
                 command.ExecuteNonQuery();
+            }
+        }
+
+        internal static void Redo(int savepoint)
+        {
+            using(SQLiteCommand command = Connection.CreateCommand())
+            {
+                int offset = 0;
+                command.CommandText = $"SELECT command from log where spoint = ? order by rowid LIMIT {Properties.Settings.Default.MaxRows} OFFSET ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = savepoint });
+                command.Parameters.Add(new SQLiteParameter());
+
+                bool running = true;
+                while (running)
+                {
+                    command.Parameters[1].Value = offset;
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        int readRows = 0;
+                        while (reader.Read())
+                        {
+                            DatabaseHelper.ExecuteCommand(reader.GetString(0));
+                            ++offset;
+                            ++readRows;
+                        }
+                        if(readRows < Properties.Settings.Default.MaxRows)
+                        {
+                            running = false;
+                        }
+                    }
+                    else
+                    {
+                        running = false;
+                    }
+                }
             }
         }
     }
