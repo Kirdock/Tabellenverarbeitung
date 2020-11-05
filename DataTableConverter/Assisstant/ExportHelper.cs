@@ -241,7 +241,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static int Save(string originalFilePath, string fileName, int encoding, int format, Form1 invokeForm, SQLiteCommand command)
+        internal static int Save(string tableName, string originalFilePath, string fileName, int encoding, int format, Form1 invokeForm, SQLiteCommand command)
         {
             int rowCount = 0;
             switch (format)
@@ -253,7 +253,7 @@ namespace DataTableConverter
 
                 //Dbase
                 case 1:
-                    rowCount = ExportDbase(originalFilePath, fileName, command, invokeForm);
+                    rowCount = ExportDbase(tableName, originalFilePath, fileName, command, invokeForm);
                     break;
 
                 //Excel
@@ -264,11 +264,10 @@ namespace DataTableConverter
             return rowCount;
         }
 
-        private static int ExportDbase(string originalFilePath, string fileName, SQLiteCommand command, Form1 invokeForm)
+        private static int ExportDbase(string tableName, string originalFilePath, string fileName, SQLiteCommand command, Form1 invokeForm)
         {
             string originalFileDirectory = Path.GetDirectoryName(originalFilePath);
             int offset = 0;
-            string tableName = command.Parameters["$table"].Value.ToString();
             List<string> duplicates = new List<string>();
             string[] headers = DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray();
             for (int i = 1; i < headers.Length; i++)
@@ -421,8 +420,6 @@ namespace DataTableConverter
                 {
                     using (StreamWriter writer = new StreamWriter(fileStream, Encoding.GetEncoding(encoding)))
                     {
-                        writer.WriteLine(string.Join(CSVSeparator, DatabaseHelper.GetSortedColumnsAsAlias(command.Parameters["$table"].Value.ToString())));
-
                         bool running = true;
                         while (running)
                         {
@@ -436,8 +433,20 @@ namespace DataTableConverter
                             else
                             {
                                 int rowCount = 0;
+                                if(offset == 0) //write header
+                                {
+                                    for (var i = 0; i < reader.FieldCount -1; i++)
+                                    {
+                                        writer.Write(reader.GetName(i));
+                                        writer.Write(CSVSeparator);
+                                    }
+                                    writer.Write(reader.GetName(reader.FieldCount - 1));
+                                    writer.Write(writer.NewLine);
+                                }
+
                                 for (; reader.Read(); rowCount++)
                                 {
+                                    
                                     for (int i = 0; i < reader.FieldCount -1; i++)
                                     {
                                         writer.Write(reader.GetString(i));
@@ -520,13 +529,23 @@ namespace DataTableConverter
                 
 
                 bool running = true;
-                string[] columnNames = DatabaseHelper.GetSortedColumnsAsAlias(command.Parameters["$table"].Value.ToString()).ToArray();
-                InsertHeadersToExcel(columnNames, worksheet);
+                string[] columnNames = new string[0];
+                
                 while (running)
                 {
                     command.Parameters["$offset"].Value = offset;
 
                     SQLiteDataReader reader = command.ExecuteReader();
+
+                    if (offset == 0) //write header
+                    {
+                        columnNames = new string[reader.FieldCount];
+                        for (var i = 0; i < reader.FieldCount; i++)
+                        {
+                            columnNames[i] = reader.GetName(i);
+                        }
+                        InsertHeadersToExcel(columnNames, worksheet);
+                    }
 
                     if (reader.HasRows)
                     {

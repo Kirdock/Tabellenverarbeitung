@@ -93,68 +93,71 @@ namespace DataTableConverter.Classes.WorkProcs
                     fileEncoding = setting.CodePage;
                 }
 
-                DataTable newTable = ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
-                if(ImportHelper.ValidateImport(newTable, invokeForm, ref IdentifyAppend, ref invalidColumnName))
-                {
-                    if (importTables == null)
-                    {
-                        importTables = newTable;
-                    }
-                    else
-                    {
-                        importTables.ConcatTable(newTable, Path.GetFileName(path), Path.GetFileName(file));
-                    }
-                }
+                //DataTable newTable = ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
+
+
+                ////Try to outsorce the method StartMerge in Form1
+                //if(ImportHelper.ValidateImport(newTable, invokeForm, ref IdentifyAppend, ref invalidColumnName))
+                //{
+                //    if (importTables == null)
+                //    {
+                //        importTables = newTable;
+                //    }
+                //    else
+                //    {
+                //        importTables.ConcatTable(newTable, Path.GetFileName(path), Path.GetFileName(file));
+                //    }
+                //}
 
             }
-            string[] importColumns = new string[0];
-            int sourceMergeIndex = -1;
-            int importMergeIndex = -1;
-            DialogResult result = DialogResult.No;
+            //string[] importColumns = new string[0];
+            //int sourceMergeIndex = -1;
+            //int importMergeIndex = -1;
+            //DialogResult result = DialogResult.No;
 
-            if ((sourceMergeIndex = table.Columns.IndexOf(IdentifyAppend)) > -1)
-            {
-                if ((importMergeIndex = importTables.Columns.IndexOf(IdentifyAppend)) > -1)
-                {
-                    importColumns = importTables.HeadersOfDataTableAsString();
-                    result = DialogResult.Yes;
-                    if (table.Rows.Count != importTables.Rows.Count)
-                    {
-                        result = invokeForm.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {importTables.Rows.Count})!\nTrotzdem fortfahren?");
-                    }
-                }
-                else
-                {
-                    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabellen haben keine Spalte mit der Bezeichnung {IdentifyAppend}");
-                    result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
-                }
-            }
-            else
-            {
-                invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {IdentifyAppend}");
-                result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
-            }
+            //if ((sourceMergeIndex = table.Columns.IndexOf(IdentifyAppend)) > -1)
+            //{
+            //    if ((importMergeIndex = importTables.Columns.IndexOf(IdentifyAppend)) > -1)
+            //    {
+            //        importColumns = importTables.HeadersOfDataTableAsString();
+            //        result = DialogResult.Yes;
+            //        if (table.Rows.Count != importTables.Rows.Count)
+            //        {
+            //            result = invokeForm.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {importTables.Rows.Count})!\nTrotzdem fortfahren?");
+            //        }
+            //    }
+            //    else
+            //    {
+            //        invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabellen haben keine Spalte mit der Bezeichnung {IdentifyAppend}");
+            //        result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
+            //    }
+            //}
+            //else
+            //{
+            //    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {IdentifyAppend}");
+            //    result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
+            //}
 
-            if (result != DialogResult.No)
-            {
-                table.AddColumnsOfDataTable(importTables, importColumns, table.Columns.IndexOf(IdentifySource), importTables.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
-                newOrderIndices = newIndices;
-                if (Properties.Settings.Default.SplitPVM)
-                {
-                    int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
-                    if (count != 0 && !invokeForm.IsDisposed)
-                    {
-                        invokeForm.Invoke(new MethodInvoker(() =>
-                        {
-                            invokeForm.ValidRows = count;
-                        }));
-                    }
-                }
-                foreach (DataRow row in table.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
-                {
-                    row.Delete();
-                }
-            }
+            //if (result != DialogResult.No)
+            //{
+            //    table.AddColumnsOfDataTable(importTables, importColumns, table.Columns.IndexOf(IdentifySource), importTables.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
+            //    newOrderIndices = newIndices;
+            //    if (Properties.Settings.Default.SplitPVM)
+            //    {
+            //        int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
+            //        if (count != 0 && !invokeForm.IsDisposed)
+            //        {
+            //            invokeForm.Invoke(new MethodInvoker(() =>
+            //            {
+            //                invokeForm.ValidRows = count;
+            //            }));
+            //        }
+            //    }
+            //    foreach (DataRow row in table.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
+            //    {
+            //        row.Delete();
+            //    }
+            //}
         }
 
         internal static bool CheckFile(string filePath, ref string path)

@@ -18,6 +18,10 @@ namespace DataTableConverter.Assisstant
 
         internal static void CreateDatabase()
         {
+            if (File.Exists(HistoryPath))
+            {
+                File.Delete(HistoryPath);
+            }
             SQLiteConnection.CreateFile(HistoryPath);
             File.SetAttributes(HistoryPath, FileAttributes.Hidden);
             Connect();
@@ -98,7 +102,7 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = Connection.CreateCommand())
             {
-                command.CommandText = $"insert into history ({savePoints})";
+                command.CommandText = $"insert into history values ({savePoints})";
                 command.ExecuteNonQuery();
             }
         }

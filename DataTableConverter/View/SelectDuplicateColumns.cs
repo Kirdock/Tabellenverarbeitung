@@ -27,43 +27,94 @@ namespace DataTableConverter.View
             ViewHelper.SetDataGridViewStyle(dgDuplicate);
         }
 
-        private void setDataGridView(string[] caseHeaders, Dictionary<string, string> importTableColumnAliasMapping, bool mustBeAssigned, string firstColumnName)
+        internal SelectDuplicateColumns(string[] caseHeaders, string[] headers, bool mustBeAssigned, string heading = null, string firstColumnName = null)
+        {
+            InitializeComponent();
+            if (heading != null)
+            {
+                Text = heading;
+            }
+            setDataGridView(caseHeaders, headers, mustBeAssigned, firstColumnName);
+            ViewHelper.AdjustComboBoxGridView(dgDuplicate, ComboBoxIndex, headers);
+            ViewHelper.SetDataGridViewStyle(dgDuplicate);
+        }
+
+        private void setDataGridView(string[] caseHeaders, object importTableColumnAliasMapping, bool mustBeAssigned, string firstColumnName)
         {
             DataTable table = new DataTable { TableName = "Duplicates" };
             table.Columns.Add(firstColumnName ?? "Spalte");
             table.Columns.Add("Zuweisung");
-            Dictionary<string,string> newHeaders;
-            
-            if (mustBeAssigned)
+            Dictionary<string,string> newHeadersDict = new Dictionary<string, string>();
+            string[] newHeadersArray = new string[0];
+            string firstValue;
+            bool isDictionary = importTableColumnAliasMapping is Dictionary<string, string>;
+
+            if (isDictionary)
             {
-                newHeaders = importTableColumnAliasMapping;
-            }
-            else
-            {
-                newHeaders = new Dictionary<string, string>
+                if (mustBeAssigned)
+                {
+                    newHeadersDict = (Dictionary<string, string>)importTableColumnAliasMapping;
+                }
+                else
+                {
+                    newHeadersDict = new Dictionary<string, string>
                 {
                     { IgnoreColumn, null },
                 };
-                foreach(KeyValuePair<string,string> pair in importTableColumnAliasMapping)
-                {
-                    newHeaders.Add(pair.Key, pair.Value);
+                    foreach (KeyValuePair<string, string> pair in (Dictionary<string, string>)importTableColumnAliasMapping)
+                    {
+                        newHeadersDict.Add(pair.Key, pair.Value);
+                    }
                 }
+                firstValue = newHeadersDict.First().Value;
             }
+            else
+            {
+                if (mustBeAssigned)
+                {
+                    newHeadersArray = (string[]) importTableColumnAliasMapping;
+                }
+                else
+                {
+                    string[] headers = (string[])importTableColumnAliasMapping;
+                    newHeadersArray = new string[headers.Length + 1];
+                    newHeadersArray[0] = IgnoreColumn;
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        newHeadersArray[i + 1] = headers[i];
+                    }
+                }
+                firstValue = newHeadersArray[0];
+            }
+             
 
             dgDuplicate.DataSource = table;
 
-            DataGridViewComboBoxColumn cmb = new DataGridViewComboBoxColumn
+            DataGridViewComboBoxColumn cmb;
+            if (isDictionary)
             {
-                DataSource = new BindingSource(newHeaders,null),
-                DisplayMember = "key",
-                ValueMember = "value",
-                DataPropertyName = "Zuweisung",
-                HeaderText = "Zuweisung "
-            };
+                cmb = new DataGridViewComboBoxColumn()
+                {
+                    DataSource = new BindingSource(newHeadersDict, null),
+                    DisplayMember = "key",
+                    ValueMember = "value",
+
+                };
+            }
+            else
+            {
+                cmb = new DataGridViewComboBoxColumn()
+                {
+                    DataSource = newHeadersArray,
+                };
+            }
+            
+            cmb.DataPropertyName = "Zuweisung";
+            cmb.HeaderText = "Zuweisung ";
 
             ComboBoxIndex = dgDuplicate.Columns.Count;
             dgDuplicate.Columns.Add(cmb);
-            string firstValue = newHeaders.First().Value;
+            
             foreach (string header in caseHeaders)
             {
                 table.Rows.Add(new object[] { header, firstValue });
