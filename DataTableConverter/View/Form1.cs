@@ -690,7 +690,6 @@ namespace DataTableConverter
             string sourceIdentifierColumnName = null;
             string importIdentifierColumnName = null;
             DialogResult result = DialogResult.No;
-            int sourceTable;
             int importRowCount = DatabaseHelper.GetRowCount(importTable);
             int originalRowCount = DatabaseHelper.GetRowCount();
             Dictionary<string,string> importTableColumnAliasMapping = DatabaseHelper.GetColumnAliasMapping(importTable);

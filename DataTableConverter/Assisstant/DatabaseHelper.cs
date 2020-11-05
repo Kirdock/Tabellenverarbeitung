@@ -722,11 +722,11 @@ namespace DataTableConverter.Assisstant
         {
             
             string invalidColumnName = GetColumnName(invalidColumnAlias ?? Properties.Settings.Default.InvalidColumnName, tableName);
-            SplitAndSavePVM(tableName, invalidColumnName, path.AppendFileName(Properties.Settings.Default.FailAddressText), encoding, invokeForm, false);
-            return SplitAndSavePVM(tableName, invalidColumnName, path.AppendFileName(Properties.Settings.Default.RightAddressText), encoding, invokeForm, true); //return count of rows
+            SplitAndSavePVM(tableName, invalidColumnName, path, path.AppendFileName(Properties.Settings.Default.FailAddressText), encoding, invokeForm, false);
+            return SplitAndSavePVM(tableName, invalidColumnName, path, path.AppendFileName(Properties.Settings.Default.RightAddressText), encoding, invokeForm, true); //return count of rows
         }
 
-        private static int SplitAndSavePVM(string tableName, string invalidColumnName, string filePath, int encoding, Form1 invokeForm, bool saveValidRows)
+        private static int SplitAndSavePVM(string tableName, string invalidColumnName, string originalFilePath, string fileName, int encoding, Form1 invokeForm, bool saveValidRows)
         {
             int rowCount = 0;
             using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -740,7 +740,7 @@ namespace DataTableConverter.Assisstant
 
 
                 //Create file with all headers (columnAliasMapping.Keys)
-                rowCount = ExportHelper.Save(filePath, encoding, Properties.Settings.Default.PVMSaveFormat, invokeForm, command);
+                rowCount = ExportHelper.Save(originalFilePath, fileName, encoding, Properties.Settings.Default.PVMSaveFormat, invokeForm, command);
             }
             return rowCount;
         }
@@ -785,6 +785,25 @@ namespace DataTableConverter.Assisstant
                 }
             }
             return columnNames;
+        }
+
+        internal static int[] GetMaxColumnLength(string tableName)
+        {
+            string[] columnNames = GetColumnNames(tableName).ToArray();
+            int[] max = new int[columnNames.Length];
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = "SELECT max(length($column)) from $table";
+                command.Parameters.Add(new SQLiteParameter("$table", tableName));
+                command.Parameters.Add(new SQLiteParameter("$column"));
+                
+                for(int i = 0; i < columnNames.Length; i++)
+                {
+                    command.Parameters[1].Value = columnNames[i];
+                    max[i] = Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+            return max;
         }
     }
 }
