@@ -15,20 +15,20 @@ namespace DataTableConverter.View
 {
     public partial class ExportCustom : Form
     {
-        internal IEnumerable<ExportCustomItem> SelectedColumnItems => CmBFileNames.Items.Cast<ExportCustomItem>().Where(item => item.Column == cmbColumn.SelectedItem.ToString());
+        private IEnumerable<ExportCustomItem> SelectedColumnItems => CmBFileNames.Items.Cast<ExportCustomItem>().Where(item => item.Column == cmbColumn.SelectedItem.ToString());
         internal IEnumerable<ExportCustomItem> Items => CmBFileNames.Items.Cast<ExportCustomItem>();
-        private readonly DataTable Table;
-        private Dictionary<string, Dictionary<string, int>> CacheDataTableGroupCount;
+        private readonly string Table;
         private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
         internal string ContinuedNumberName => CbContinuedNumber.Checked ? TxtContinuedNumber.Text : string.Empty;
-        internal ExportCustom(object[] headers, DataTable table)
+        internal ExportCustom(Dictionary<string,string> aliasColumnMapping, string tableName = "main")
         {
             InitializeComponent();
             clbValues.Dict = SelectedColumnItems;
-            CacheDataTableGroupCount = new Dictionary<string, Dictionary<string, int>>();
             SetListBoxStyle();
-            Table = table;
-            cmbColumn.Items.AddRange(headers);
+            Table = tableName;
+            cmbColumn.DataSource = aliasColumnMapping;
+            cmbColumn.DisplayMember = "key";
+            cmbColumn.DisplayMember = "value";
             
             SetEnabled();
         }
@@ -88,7 +88,7 @@ namespace DataTableConverter.View
             {
                 if(CmBFileNames.Items.Count > 1 && this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie wirklich eine andere Spalte verwenden?") == DialogResult.Yes || CmBFileNames.Items.Count == 1)
                 {
-                    SelectedItem.Column = cmbColumn.SelectedItem.ToString();
+                    SelectedItem.Column = cmbColumn.SelectedValue.ToString();
                     SetListValues();
                     SetValues(false);
                     SetSumCount();
@@ -96,7 +96,7 @@ namespace DataTableConverter.View
                 else
                 {
                     cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
-                    cmbColumn.SelectedIndex = cmbColumn.Items.Cast<string>().Select((value, index) => new { value, index }).Where(pair => pair.value == SelectedItem.Column).FirstOrDefault()?.index ?? 0;
+                    cmbColumn.SelectedValue = SelectedItem.Column;
                     cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
                 }
             }
@@ -104,21 +104,13 @@ namespace DataTableConverter.View
 
         private void SetListValues()
         {
-            string identifier = cmbColumn.SelectedItem.ToString();
+            string columnName = cmbColumn.SelectedValue.ToString();
 
-            Dictionary<string, int> pair;
-            if (CacheDataTableGroupCount.ContainsKey(identifier))
-            {
-                pair = CacheDataTableGroupCount[identifier];
-            }
-            else
-            {
-                pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
-                CacheDataTableGroupCount.Add(identifier, pair);
-            }
+            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName);
+
             clbValues.BeginUpdate();
             clbValues.Items.Clear();
-            foreach (string key in pair.Keys.OrderBy(key => key, new NaturalStringComparer(SortOrder.Ascending)))
+            foreach (string key in pair.Keys)
             {
                 clbValues.Items.Add(new CountListboxItem(pair[key], key));
             }
@@ -207,7 +199,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    ExportCustomItem item = new ExportCustomItem(newText, cmbColumn.Items[0].ToString());
+                    ExportCustomItem item = new ExportCustomItem(newText, ((KeyValuePair<string, string>)cmbColumn.Items[0]).Value);
                     int index = CmBFileNames.Items.Count;
                     ExportCustomItem lastItem = CmBFileNames.Items.Cast<ExportCustomItem>().LastOrDefault();
                     if (lastItem != null)

@@ -241,7 +241,13 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static int Save(string originalFilePath, string fileName, int encoding, int format, Form1 invokeForm, SQLiteCommand command, System.Action updateLoadingBar = null, string tableName = "main")
+        internal static int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, Form invokeForm, System.Action updateLoadingBar = null, string tableName = "main", string orderColumnName = null)
+        {
+            SQLiteCommand command = orderColumnName == string.Empty ? DatabaseHelper.GetDataCommand(tableName) : DatabaseHelper.GetDataCommand(tableName, orderColumnName);
+            return Save(directory, fileName, oldFileExtension, encoding, format, invokeForm, command, updateLoadingBar, tableName);
+        }
+
+        internal static int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, Form invokeForm, SQLiteCommand command, System.Action updateLoadingBar = null, string tableName = "main")
         {
             int rowCount = 0;
             if (command == null)
@@ -253,25 +259,24 @@ namespace DataTableConverter
             {
                 //CSV
                 case 0:
-                    rowCount = ExportCsv(originalFilePath, fileName, encoding, command, invokeForm, updateLoadingBar);
+                    rowCount = ExportCsv(directory, fileName, encoding, command, invokeForm, updateLoadingBar);
                     break;
 
                 //Dbase
                 case 1:
-                    rowCount = ExportDbase(tableName, originalFilePath, fileName, command, invokeForm);
+                    rowCount = ExportDbase(tableName, directory, fileName, command, invokeForm);
                     break;
 
                 //Excel
                 case 2:
-                    rowCount = ExportExcel(originalFilePath, fileName, command, invokeForm);
+                    rowCount = ExportExcel(directory, fileName, oldFileExtension, command, invokeForm);
                     break;
             }
             return rowCount;
         }
 
-        private static int ExportDbase(string tableName, string originalFilePath, string fileName, SQLiteCommand command, Form1 invokeForm)
+        private static int ExportDbase(string tableName, string directory, string fileName, SQLiteCommand command, Form invokeForm)
         {
-            string originalFileDirectory = Path.GetDirectoryName(originalFilePath);
             int offset = 0;
             List<string> duplicates = new List<string>();
             string[] headers = DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray();
@@ -296,7 +301,7 @@ namespace DataTableConverter
             {
                 fileName = fileName.Substring(0, DbaseMaxFileLength);
             }
-            string path = Path.Combine(originalFileDirectory, "temp");
+            string path = Path.Combine(Path.GetDirectoryName(directory), "temp");
             try
             {
                 Directory.CreateDirectory(path);
@@ -307,7 +312,7 @@ namespace DataTableConverter
                 return 0;
             }
             string fullpath = Path.Combine(path, fileName + ".DBF");
-            
+            string fullPathOriginal = Path.Combine(directory, fileName + ".DBF");
 
             if (File.Exists(fullpath))
             {
@@ -379,15 +384,16 @@ namespace DataTableConverter
                         stream.Write(records, 0, records.Length);
                         #endregion
                     }
-                    if (File.Exists(originalFilePath))
+                    if (File.Exists(fullPathOriginal))
                     {
-                        File.Delete(originalFilePath);
+                        File.Delete(fullPathOriginal);
                     }
-                    File.Move(fullpath, originalFilePath);
+                    File.Move(fullpath, fullPathOriginal);
                 }
                 catch (Exception ex)
                 {
                     ErrorHelper.LogMessage(ex, invokeForm);
+                    offset = 0;
                 }
                 finally
                 {
@@ -398,14 +404,15 @@ namespace DataTableConverter
             {
                 DeleteDirectory(path);
                 invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
+                offset = 0;
             }
             return offset;
         }
 
-        internal static int ExportCsv(string originalFilePath, string fileName, int encoding, SQLiteCommand command, Form1 invokeForm, System.Action updateLoadingBar = null)
+        internal static int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, System.Action updateLoadingBar = null)
         {
             int offset = 0;
-            string path = Path.Combine(Path.GetDirectoryName(originalFilePath),fileName+ ".csv");
+            string path = Path.Combine(directory,fileName+ ".csv");
 
             if (encoding == 0)
             {
@@ -475,50 +482,17 @@ namespace DataTableConverter
             return offset;
         }
 
-        internal static void ExportCsv(System.Data.DataTable dt, string directory, string filename, int codePage, Form mainForm, System.Action updateLoadingBar = null)
-        {
-            string path = Path.Combine(directory, filename + ".csv");
-            StreamWriter writer;
-            FileStream fileStream = null;
-            if (codePage == 0)
-            {
-                SelectEncoding form = new SelectEncoding();
-                DialogResult result = DialogResult.Cancel;
-                mainForm.Invoke(new MethodInvoker(() =>
-                {
-                    result = form.ShowDialog(mainForm);
-                }));
-                if(result == DialogResult.OK)
-                {
-                    codePage = form.FileEncoding;
-                }
-            }
-            if (codePage != 0)
-            {
-                fileStream = new FileStream(path, FileMode.Create);
-                writer = new StreamWriter(fileStream, Encoding.GetEncoding(codePage));
-
-                writer.WriteLine(string.Join(CSVSeparator, dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName)));
-                foreach (DataRow row in dt.Rows)
-                {
-                    writer.WriteLine(string.Join(CSVSeparator, row.ItemArray.Select(field => field.ToString())));
-                    updateLoadingBar?.Invoke();
-                }
-                writer.Close();
-                fileStream.Close();
-            }
-        }
-
-
-        private static int ExportExcel(string originalFilePath, string fileName, SQLiteCommand command, Form1 invokeForm)
+        private static int ExportExcel(string directory, string fileName, string oldFileExtension, SQLiteCommand command, Form invokeForm)
         {
             int offset = 0;
-
+            Workbooks workbooks = null;
+            Workbook workbook = null;
+            Microsoft.Office.Interop.Excel.Application excel = null;
             try
             {
                 string workSheetName = "Tabelle 1";
 
-                Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application
+                excel = new Microsoft.Office.Interop.Excel.Application
                 {
                     DisplayAlerts = false,
                     Visible = false,
@@ -526,8 +500,8 @@ namespace DataTableConverter
                     SheetsInNewWorkbook = 1
                 };
 
-                Workbooks workbooks = excel.Workbooks;
-                Workbook workbook = workbooks.Add(Type.Missing);
+                workbooks = excel.Workbooks;
+                workbook = workbooks.Add(Type.Missing);
 
                 Sheets worksheets = workbook.Sheets;
                 Worksheet worksheet = (Worksheet)worksheets[1];
@@ -583,35 +557,43 @@ namespace DataTableConverter
                 }
                 command.Dispose();
 
-                SaveExcelFile(originalFilePath, fileName, workbook, invokeForm);
-                
-                workbook.Close(false, Type.Missing, Type.Missing);
-                excel.Quit();
-
-                // Release our resources.
-                Marshal.ReleaseComObject(workbook);
-                Marshal.ReleaseComObject(workbooks);
-                Marshal.ReleaseComObject(excel);
-                Marshal.FinalReleaseComObject(excel);
+                SaveExcelFile(directory, fileName, oldFileExtension, workbook, invokeForm);
             }
             catch (Exception ex)
             {
                 ErrorHelper.LogMessage(ex, invokeForm);
+                offset = 0;
+            }
+            finally
+            {
+                workbook?.Close(false, Type.Missing, Type.Missing);
+                excel?.Quit();
+                
+
+
+                // Release our resources.
+                if(workbook != null) Marshal.ReleaseComObject(workbook);
+                if(workbooks != null) Marshal.ReleaseComObject(workbooks);
+                if (excel != null)
+                {
+                    Marshal.ReleaseComObject(excel);
+                    Marshal.FinalReleaseComObject(excel);
+                }
             }
 
             return offset;
         }
 
-        private static void SaveExcelFile(string originalFilePath, string fileName, Workbook workbook, Form1 invokeForm)
+        private static void SaveExcelFile(string directory, string fileName, string oldFileExtension, Workbook workbook, Form invokeForm)
         {
             string saveName = fileName + ".xls";
             XlFileFormat fileFormat = XlFileFormat.xlWorkbookNormal;
-            if (Path.GetExtension(originalFilePath) != ".xls")
+            if (oldFileExtension != ".xls")
             {
                 saveName += "x";
                 fileFormat = XlFileFormat.xlOpenXMLWorkbook;
             }
-            string path = Path.Combine(Path.GetDirectoryName(originalFilePath), saveName);
+            string path = Path.Combine(directory, saveName);
             try
             {
                 workbook.SaveAs(path, fileFormat, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
@@ -957,81 +939,41 @@ namespace DataTableConverter
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
-        internal static void ExportTableWithColumnCondition(System.Data.DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, System.Action stopLoadingBar, System.Action saveFinished, int codePage, Form mainForm, string continuedNumberColumn)
+
+        /// <summary>
+        /// Split table depending on row values. Each row with a specific value goes into another table
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="filePath"></param>
+        /// <param name="stopLoadingBar"></param>
+        /// <param name="saveFinished"></param>
+        /// <param name="codePage"></param>
+        /// <param name="mainForm"></param>
+        /// <param name="continuedNumberColumn"></param>
+        /// <param name="tableName"></param>
+        internal static void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, System.Action stopLoadingBar, System.Action saveFinished, int codePage, Form mainForm, string continuedNumberColumn, string tableName = "main")
         {
             new Thread(() =>
             {
 
                 foreach (ExportCustomItem item in items)
                 {
-                    Dictionary<string, System.Data.DataTable> Dict = new Dictionary<string, System.Data.DataTable>();
-                    System.Data.DataTable tableSkeleton = originalTable.Clone();
-                    if (item.CheckedAllValues)
-                    {
-                        foreach (string value in item.AllValues)
-                        {
-                            System.Data.DataTable table = tableSkeleton.Copy();
-                            table.TableName = $"{item.Name}_{value}";
-                            Dict.Add(value, table);
-                        }
-                    }
-                    else
-                    {
+                    Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
+                    IEnumerable<string> itemValues = item.CheckedAllValues ? item.AllValues : item.SelectedValues;
 
-                        System.Data.DataTable temp = tableSkeleton.Copy();
-                        temp.TableName = item.Name;
-                        foreach (string value in item.SelectedValues)
-                        {
-                            if (!Dict.TryGetValue(value, out System.Data.DataTable tables))
-                            {   
-                                Dict.Add(value, temp);
-                            }
-                        }
-                    }
-                    foreach(DataRow row in originalTable.Rows)
+                    foreach (string value in itemValues)
                     {
-                        if (Dict.TryGetValue(row[item.Column].ToString(), out System.Data.DataTable table))
-                        {
-                            table.ImportRow(row);
-                        }
+                        string newTable = Guid.NewGuid().ToString();
+                        DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
+
+                        dict.Add(value, new string[] { newTable, $"{item.Name}_{value}" });
                     }
 
-                    foreach (System.Data.DataTable table in Dict.Values.Distinct())
+                    DatabaseHelper.SplitTableOnRowValue(dict,item.Column);
+
+                    foreach (string[] tableInfo in dict.Values.Distinct())
                     {
-                        if(continuedNumberColumn != string.Empty)
-                        {
-                            string col = table.TryAddColumn(continuedNumberColumn);
-                            table.Columns[col].SetOrdinal(0);
-                            for(int i = 0; i < table.Rows.Count; i++)
-                            {
-                                table.Rows[i][col] = (i + 1).ToString();
-                            }
-                        }
-                        string FileName = table.TableName;
-                        string path = Path.GetDirectoryName(filePath);
-                        switch (item.Format)
-                        {
-                            //CSV
-                            case 0:
-                                {
-                                    ExportCsv(table, path, FileName, codePage, mainForm);
-                                }
-                                break;
-
-                            //Dbase
-                            case 1:
-                                {
-                                    ExportDbase(FileName, table, path, mainForm);
-                                }
-                                break;
-
-                            //Excel
-                            case 2:
-                                {
-                                    ExportExcel(table, path, FileName, mainForm);
-                                }
-                                break;
-                        }
+                        Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, item.Format, mainForm, null, tableInfo[0], continuedNumberColumn);
                     }
                 }
                 stopLoadingBar.Invoke();
@@ -1040,42 +982,28 @@ namespace DataTableConverter
             
         }
 
-        internal static System.Data.DataTable ExportCount(string selectedValue, int count, bool showFromTo, System.Data.DataTable oldTable, OrderType orderType)
+        /// <summary>
+        /// Export either group and count of column or {count} rows per distinct value in column
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="count"></param>
+        /// <param name="showFromTo"></param>
+        /// <param name="tableName"></param>
+        /// <param name="orderType"></param>
+        /// <returns></returns>
+        internal static string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName = "main")
         {
-            //Select selectedValue, count(selectedValue) from main group by selectedValue;
-            System.Data.DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", orderType, -1).ToTable();
-            int columnIndex = table.Columns.IndexOf(selectedValue);
-            System.Data.DataTable newTable = new System.Data.DataTable();
+            string newTable = Guid.NewGuid().ToString();
 
             if (count == 0)
             {
-                Dictionary<string, int> pair = table.GroupCountOfColumn(columnIndex);
-
-                newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
-                newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
+                Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName, tableName);
+                DatabaseHelper.DictionaryToDataTable(pair, columnName, showFromTo, newTable, DatabaseHelper.GetRowCount(tableName));
             }
             else
             {
-                Dictionary<string, int> pair = new Dictionary<string, int>();
-                foreach (string col in table.HeadersOfDataTable())
-                {
-                    newTable.Columns.Add(col);
-                }
-                foreach (DataRow row in table.Rows)
-                {
-                    string item = row[columnIndex].ToString();
-                    bool contains;
-                    if ((contains = pair.ContainsKey(item)) && pair[item] < count)
-                    {
-                        newTable.Rows.Add(row.ItemArray);
-                        pair[item] = pair[item] + 1;
-                    }
-                    else if (!contains)
-                    {
-                        pair.Add(item, 1);
-                        newTable.Rows.Add(row.ItemArray);
-                    }
-                }
+                DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName), newTable);
+                DatabaseHelper.InsertDataPerColumnValue(columnName, orderType, count, tableName, newTable);
             }
             return newTable;
         }

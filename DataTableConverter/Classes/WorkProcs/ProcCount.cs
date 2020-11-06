@@ -21,10 +21,9 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public ProcCount(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            newOrderIndices = new int[0];
-            DataTable newTable = ExportHelper.ExportCount(Column, CountChecked ? Count : 0, ShowFromTo, table, orderType);
+            string newTable = ExportHelper.ExportCount(DatabaseHelper.GetColumnName(Column, tableName), CountChecked ? Count : 0, ShowFromTo, orderType, tableName);
             invokeForm.BeginInvoke(new MethodInvoker(() =>
             {
                 new Form1(newTable).Show(invokeForm);

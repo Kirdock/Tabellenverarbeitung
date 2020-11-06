@@ -41,15 +41,15 @@ namespace DataTableConverter.View
         private Dictionary<Type, Action<WorkProc>> assignControls;
         private MemoryStream ProceduresBefore, WorkflowsBefore, TolerancesBefore, CasesBefore;
         private object[] Headers;
-        private DataTable Table;
         private ContextMenuStrip ContextGlobal;
+        private readonly string TableName;
 
-        internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
+        internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, string tableName = "main")
         {
             InitializeComponent();
             ContextGlobal = ctxRow;
             SetEncodingCmBs();
-            Table = table;
+            TableName = tableName;
             SetSize();
             AssignGroupBoxToEnum();
             SetHeaders(headers);
@@ -2399,10 +2399,10 @@ namespace DataTableConverter.View
 
         private void BtnSeparateLoadEntries_Click(object sender, EventArgs e)
         {
-            if (Table != null)
+            if (TableName != null)
             {
                 ExportSeparate selectedItem = GetSeparateSelectedItem();
-                SeparateLoadEntries form = new SeparateLoadEntries(selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, Table);
+                SeparateLoadEntries form = new SeparateLoadEntries(selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, TableName);
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     selectedItem.Column = form.SelectedItem.Column;

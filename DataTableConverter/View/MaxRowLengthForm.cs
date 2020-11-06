@@ -20,13 +20,15 @@ namespace DataTableConverter.View
                 return CBMinLength.Checked ? (int)NumMinLength.Value : -1;
             }
         }
-        internal string Column => CmBHeaders.SelectedItem.ToString();
+        internal string Column => CmBHeaders.SelectedValue.ToString();
 
-        public MaxRowLengthForm(object[] headers)
+        public MaxRowLengthForm(Dictionary<string,string> aliasColumnMapping)
         {
             InitializeComponent();
             CBMinLength_CheckedChanged(null, null);
-            CmBHeaders.Items.AddRange(headers);
+            CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
+            CmBHeaders.DisplayMember = "key";
+            CmBHeaders.ValueMember = "value";
             CmBHeaders.SelectedIndex = 0;
         }
 

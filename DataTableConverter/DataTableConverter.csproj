@@ -104,7 +104,6 @@
     <Compile Include="Assisstant\DatabaseHistory.cs" />
     <Compile Include="Assisstant\DataHelper.cs" />
     <Compile Include="Assisstant\ErrorHelper.cs" />
-    <Compile Include="Assisstant\HistoryHelper.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
     <Compile Include="Assisstant\UpdateHelper.cs" />
     <Compile Include="Assisstant\WorkflowHelper.cs" />
@@ -114,7 +113,6 @@
     <Compile Include="Classes\DetectTextEncoding.cs" />
     <Compile Include="Classes\ExportCustomItem.cs" />
     <Compile Include="Classes\ExportSeparate.cs" />
-    <Compile Include="Classes\History.cs" />
     <Compile Include="Classes\HistoryStates.cs" />
     <Compile Include="Classes\ImportSettings.cs" />
     <Compile Include="Classes\MergeFormat.cs" />

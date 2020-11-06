@@ -651,7 +651,6 @@
             this.dgTable.TabIndex = 0;
             this.dgTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellClick);
             this.dgTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgTable_CellPainting);
-            this.dgTable.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgTable_CellValidating);
             this.dgTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgTable_CellValueChanged);
             this.dgTable.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgTable_ColumnAdded);
             this.dgTable.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgTable_RowPostPaint);

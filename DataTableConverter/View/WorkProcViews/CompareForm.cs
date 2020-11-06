@@ -1,4 +1,5 @@
-﻿using DataTableConverter.Classes.WorkProcs;
+﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Classes.WorkProcs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,11 +15,11 @@ namespace DataTableConverter.View.WorkProcViews
     public partial class CompareForm : Form
     {
         internal ProcCompare Procedure;
-        private DataTable Table;
-        internal CompareForm(object[] headers, DataTable table)
+        private string TableName;
+        internal CompareForm(object[] headers, string tableName = "main")
         {
             InitializeComponent();
-            Table = table;
+            TableName = tableName;
             cbFirstColumn.Items.AddRange(headers);
             cbSecondColumn.Items.AddRange(headers);
             cbFirstColumn.SelectedIndex = cbSecondColumn.SelectedIndex = 0;
@@ -67,7 +68,7 @@ namespace DataTableConverter.View.WorkProcViews
             string secondColumn = cbSecondColumn.SelectedItem?.ToString();
             if (firstColumn != null && secondColumn != null)
             {
-                LblCount.Text = Table.AsEnumerable().Count(row => row[firstColumn].ToString() == row[secondColumn].ToString()).ToString();
+                LblCount.Text = DatabaseHelper.CompareColumnsCount(firstColumn, secondColumn, TableName).ToString();
             }
         }
     }

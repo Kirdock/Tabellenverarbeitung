@@ -12,8 +12,6 @@ namespace DataTableConverter.Classes
     abstract class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>
     {
         public int ProcedureId { get; set; }
-        public bool ReplacesTable = false;
-        internal bool CommitDelete = false;
         internal DataTable Columns { get; set; }
         internal string[] DuplicateColumns { get; set; }
         internal int Ordinal { get; set; }
@@ -61,6 +59,6 @@ namespace DataTableConverter.Classes
 
         abstract public void RenameHeaders(string oldName, string newName);
         abstract public void RemoveHeader(string colName);
-        abstract public void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices);
+        abstract public void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main");
     }
 }

@@ -12,12 +12,14 @@ namespace DataTableConverter.View
 {
     public partial class SelectHeader : Form
     {
-        internal string Column => CmBHeaders.SelectedItem.ToString();
+        internal string Column => CmBHeaders.SelectedValue.ToString();
 
-        internal SelectHeader(object[] headers)
+        internal SelectHeader(Dictionary<string,string> aliasColumnMapping)
         {
             InitializeComponent();
-            CmBHeaders.Items.AddRange(headers);
+            CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
+            CmBHeaders.DisplayMember = "key";
+            CmBHeaders.ValueMember = "value";
             CmBHeaders.SelectedIndex = 0;
         }
     }

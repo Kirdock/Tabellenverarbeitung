@@ -1,12 +1,6 @@
 ﻿using DataTableConverter.Classes.WorkProcs;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View.WorkProcViews
@@ -14,9 +8,9 @@ namespace DataTableConverter.View.WorkProcViews
     public partial class NumerationForm : Form
     {
         internal ProcNumber Procedure;
-        private object[] Headers;
+        private List<string> Headers;
 
-        internal NumerationForm(object[] headers)
+        internal NumerationForm(List<string> headers)
         {
             InitializeComponent();
             Headers = headers;

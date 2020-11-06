@@ -15,16 +15,15 @@ namespace DataTableConverter.View.WorkProcViews
 {
     public partial class SeparateLoadEntries : Form
     {
-        private DataTable Table;
-        private Dictionary<string, Dictionary<string, int>> CacheDataTableGroupCount = new Dictionary<string, Dictionary<string, int>>();
+        private string TableName;
         private IEnumerable<ExportCustomItem> items;
         internal ExportCustomItem SelectedItem;
         private IEnumerable<ExportCustomItem> Items => items.Where(item => item != null && item.Column == CmBColumns.SelectedItem.ToString());
 
-        internal SeparateLoadEntries(ExportSeparate selectedItem, BindingList<ExportSeparate> items, object[] headers, DataTable table)
+        internal SeparateLoadEntries(ExportSeparate selectedItem, BindingList<ExportSeparate> items, Dictionary<string,string> aliasColumnMapping, string tableName)
         {
             InitializeComponent();
-            Table = table;
+            TableName = tableName;
             SelectedItem = new ExportCustomItem(selectedItem.Name,selectedItem.Column);
             this.items = items.Where(item => item != selectedItem).Select(item => new ExportCustomItem(item.Name, item.Column, item.Table.AsEnumerable().Select(row => row[0].ToString()))).Concat(new ExportCustomItem[] { SelectedItem });
             CLBValues.Dict = Items;
@@ -78,17 +77,8 @@ namespace DataTableConverter.View.WorkProcViews
 
         private void SetCheckedListBox()
         {
-            Dictionary<string, int> pair;
-            string identifier = CmBColumns.SelectedItem.ToString();
-            if (CacheDataTableGroupCount.ContainsKey(identifier))
-            {
-                pair = CacheDataTableGroupCount[identifier];
-            }
-            else
-            {
-                pair = Table.GroupCountOfColumn(identifier);
-                CacheDataTableGroupCount.Add(identifier, pair);
-            }
+            string columnName = CmBColumns.SelectedValue.ToString(); //DataSource = AliasColumnMapping?
+            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName, TableName);
             
             CLBValues.BeginUpdate();
             CLBValues.Items.Clear();

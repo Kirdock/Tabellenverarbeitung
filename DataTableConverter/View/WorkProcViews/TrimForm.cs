@@ -14,10 +14,12 @@ namespace DataTableConverter.View.WorkProcViews
     public partial class TrimForm : Form
     {
         internal ProcTrim Proc;
-        internal TrimForm(string[] headers)
+        internal TrimForm(Dictionary<string,string> aliasColumnMapping)
         {
             InitializeComponent();
-            CCBHeaders.Items.AddRange(headers);
+            CCBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
+            CCBHeaders.ValueMember = "value";
+            CCBHeaders.DisplayMember = "key";
         }
 
         private void BtnConfirm_Click(object sender, EventArgs e)

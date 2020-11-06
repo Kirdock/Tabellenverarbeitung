@@ -17,13 +17,13 @@ namespace DataTableConverter.View
         private FormulaState Type;
         internal bool OldColumn => cbOldColumn.Checked;
 
-        internal Formula(FormulaState type, object[] headers)
+        internal Formula(FormulaState type, IEnumerable<string> aliases)
         {
             InitializeComponent();
             Type = type;
             AdjustForm();
             
-            cbHeaders.Items.AddRange(headers);
+            cbHeaders.Items.AddRange(aliases.ToArray());
             if (Type == FormulaState.Export)
             {
                 LoadSetting();
