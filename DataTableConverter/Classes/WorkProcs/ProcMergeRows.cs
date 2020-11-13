@@ -18,15 +18,13 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool Separator;
 
         public ProcMergeRows(int ordinal, int id, string name) : base(ordinal, id, name) {
-            CommitDelete = true;
             Columns = new DataTable { TableName = "MergeRows" };
             Columns.Columns.Add("Spalte", typeof(string));
             Columns.Columns.Add("Aktion", typeof(PlusListboxItem.RowMergeState));
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            newOrderIndices = new int[0];
             if (!string.IsNullOrWhiteSpace(Identifier))
             {
                 List<PlusListboxItem> additionalColumns = Columns.AsEnumerable().Select(row => new PlusListboxItem((PlusListboxItem.RowMergeState)Enum.ToObject(typeof(PlusListboxItem.RowMergeState), row[1] as int? ?? 0), row[0].ToString())).ToList();

@@ -22,16 +22,19 @@ namespace DataTableConverter.Assisstant
     class ImportHelper
     {
 
-        internal static readonly string ProjectWorkflows = ExportHelper.ProjectWorkflows;
-        internal static readonly string ProjectProcedures = ExportHelper.ProjectProcedures;
-        internal static readonly string ProjectTolerances = ExportHelper.ProjectTolerance;
-        internal static readonly string ProjectCases = ExportHelper.ProjectCases;
-        internal static readonly int PreviewRows = 4;
-        internal static readonly string TextExt = "*.txt";
-        internal static readonly string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
-        internal static readonly string DbfExt = "*.dbf";
-        internal static readonly string CsvExt = "*.csv";
-        internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+        internal readonly string ProjectWorkflows;
+        internal readonly string ProjectProcedures;
+        internal readonly string ProjectTolerances;
+        internal readonly string ProjectCases;
+        internal readonly int PreviewRows = 4;
+        internal readonly string TextExt = "*.txt";
+        internal readonly string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
+        internal readonly string DbfExt = "*.dbf";
+        internal readonly string CsvExt = "*.csv";
+        internal readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+        private readonly DatabaseHelper DatabaseHelper;
+        private readonly ExportHelper ExportHelper;
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         private static extern int GetShortPathName(
             [MarshalAs(UnmanagedType.LPTStr)]
@@ -39,6 +42,16 @@ namespace DataTableConverter.Assisstant
             [MarshalAs(UnmanagedType.LPTStr)]
         StringBuilder shortPath,
             int shortPathLength);
+
+        internal ImportHelper(ExportHelper exportHelper, DatabaseHelper databaseHelper)
+        {
+            ExportHelper = exportHelper;
+            DatabaseHelper = databaseHelper;
+            ProjectWorkflows = ExportHelper.ProjectWorkflows;
+            ProjectProcedures = ExportHelper.ProjectProcedures;
+            ProjectTolerances = ExportHelper.ProjectTolerance;
+            ProjectCases = ExportHelper.ProjectCases;
+    }
 
         internal class KeyVal : IEquatable<KeyVal>
         {
@@ -61,22 +74,19 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static string ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar, Form mainForm, ref int fileEncoding, ImportSettings settings = null)
+        internal string ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar, Form mainForm, ref int fileEncoding, ImportSettings settings = null)
         {
             string filename = Path.GetFileName(file);
             string extension = Path.GetExtension(file).ToLower();
             string tableName = Guid.NewGuid().ToString();
 
-
             if (extension == ".dbf")
             {
-                DataTable table = OpenDBF(file, progressBar, mainForm);
-                DatabaseHelper.CreateFromDataTable(tableName, table);
+                OpenDBF(file, progressBar, mainForm, tableName);
             }
             else if (extension != string.Empty && AccessExt.Contains(extension))
             {
-                DataTable table = OpenMSAccess(file, progressBar, mainForm);
-                DatabaseHelper.CreateFromDataTable(tableName, table);
+                OpenMSAccess(file, progressBar, mainForm, ref tableName);
             }
             else if (extension != string.Empty && ExcelExt.Contains(extension))
             {
@@ -100,11 +110,10 @@ namespace DataTableConverter.Assisstant
                     {
                         OpenTextBetween(tableName, file, settings.CodePage, settings.TextBegin, settings.TextEnd, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar, mainForm);
                     }
-
                 }
                 else
                 {
-                    TextFormat form = new TextFormat(tableName, file, multipleFiles, ctxRow);
+                    TextFormat form = new TextFormat(DatabaseHelper, this, ExportHelper, tableName, file, multipleFiles, ctxRow);
                     DialogResult result = DialogResult.Cancel;
                     mainForm.Invoke(new MethodInvoker(() =>
                     {
@@ -130,7 +139,7 @@ namespace DataTableConverter.Assisstant
             return tableName;
         }
 
-        internal static bool ValidateImport(DataTable newTable, Form1 invokeForm, ref string identifyAppend, ref string invalidColumnName)
+        internal bool ValidateImport(DataTable newTable, Form1 invokeForm, ref string identifyAppend, ref string invalidColumnName)
         {
             bool valid = false;
             //if (newTable != null)
@@ -183,7 +192,7 @@ namespace DataTableConverter.Assisstant
             return valid;
         }
 
-        internal static OpenFileDialog GetOpenFileDialog(bool multiselect)
+        internal OpenFileDialog GetOpenFileDialog(bool multiselect)
         {
             return new OpenFileDialog
             {
@@ -199,21 +208,21 @@ namespace DataTableConverter.Assisstant
             };
         }
 
-        internal static string[] LoadPresetsByName()
+        internal string[] LoadPresetsByName()
         {
             return Directory.GetFiles(ExportHelper.ProjectPresets, "*.bin")
                                          .Select(Path.GetFileNameWithoutExtension)
                                          .ToArray();
         }
 
-        internal static string[] LoadHeaderPresetsByName()
+        internal string[] LoadHeaderPresetsByName()
         {
             return Directory.GetFiles(ExportHelper.ProjectHeaderPresets, "*.bin")
                                          .Select(Path.GetFileNameWithoutExtension)
                                          .ToArray();
         }
 
-        internal static KeyVal[] LoadAllPresetsByName()
+        internal KeyVal[] LoadAllPresetsByName()
         {
 
             List<KeyVal> presets = new List<KeyVal>();
@@ -229,7 +238,7 @@ namespace DataTableConverter.Assisstant
             return presets.AsEnumerable().OrderBy(name => name.Key, new NaturalStringComparer(SortOrder.Ascending)).ThenBy(name => name.Val).ToArray();
         }
 
-        internal static void OpenText(string tableName, string path, List<string> separators, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
+        internal void OpenText(string tableName, string path, List<string> separators, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
 
             try
@@ -272,7 +281,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static void InsertTextIntoDataTable(IEnumerable<string> enumerable, string tableName, int skip, List<string> separators, List<string> headers, ProgressBar progressBar, Form mainForm)
+        private void InsertTextIntoDataTable(IEnumerable<string> enumerable, string tableName, int skip, List<string> separators, List<string> headers, ProgressBar progressBar, Form mainForm)
         {
             IEnumerable<string[]> enumerableArray = enumerable.Skip(skip)
                     .Select(x => x.Split(separators.ToArray(), StringSplitOptions.None));
@@ -295,7 +304,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void OpenTextBetween(string tableName, string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
+        internal void OpenTextBetween(string tableName, string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
             try
             {
@@ -379,7 +388,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static int RenameColumn(DataTable dt, string column, int counter)
+        private int RenameColumn(DataTable dt, string column, int counter)
         {
             try
             {
@@ -393,29 +402,42 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static DataTable OpenDBF(string path, ProgressBar progressBar, Form mainForm)
+        internal void OpenDBF(string path, ProgressBar progressBar, Form mainForm, string tableName)
         {
-            DataTable data = new DataTable();
             string directory = ToShortPathName(Path.GetDirectoryName(path));
             string shortPath = GetShortFileName(path);
             string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={directory};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
-            OleDbConnection con = new OleDbConnection(constr);
+            using (OleDbConnection con = new OleDbConnection(constr))
+            {
+                con.Open();
+                progressBar?.StartLoadingBar(GetDataReaderRowCount(con, shortPath, mainForm), mainForm);
 
-            var sql = $@"select * from [{ shortPath}]";
-            con.Open();
-            progressBar?.StartLoadingBar(GetDataReaderRowCount(con,shortPath, mainForm), mainForm);
-
-            DataRowChangeEventHandler handler = (sender, e) => FillDataTableNewRow(e, progressBar, mainForm);
-            data.RowChanged += handler;
-            OleDbDataAdapter da = new OleDbDataAdapter(new OleDbCommand(sql, con));
-            da.Fill(data);
-            da.Dispose();
-            data.RowChanged -= handler;
-            data.AdjustDBASEImport();
-            return data;
+                using (OleDbCommand command = con.CreateCommand())
+                {
+                    command.CommandText = $@"select * from [{ shortPath}]";
+                    using (OleDbDataReader reader = command.ExecuteReader())
+                    {
+                        string[] columnNames = new string[reader.FieldCount];
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            columnNames[i] = reader.GetName(i);
+                        }
+                        DatabaseHelper.CreateTable(columnNames, tableName);
+                        while (reader.Read())
+                        {
+                            object[] values = new object[reader.FieldCount];
+                            for (int i = 0; i < reader.FieldCount; ++i)
+                            {
+                                values[i] = reader.GetString(i).Replace("\n", string.Empty); //remove new lines in dbase
+                            }
+                            DatabaseHelper.InsertRow(columnNames, values, tableName);
+                        }
+                    }
+                }
+            }
         }
 
-        private static void FillDataTableNewRow(DataRowChangeEventArgs e, ProgressBar progressBar, Form mainForm)
+        private void FillDataTableNewRow(DataRowChangeEventArgs e, ProgressBar progressBar, Form mainForm)
         {
             if (e.Action == DataRowAction.Add)
             {
@@ -423,7 +445,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static int GetDataReaderRowCount(OleDbConnection con, string path, Form mainForm)
+        private int GetDataReaderRowCount(OleDbConnection con, string path, Form mainForm)
         {
             int count = 0;
             try
@@ -440,7 +462,7 @@ namespace DataTableConverter.Assisstant
             return count;
         }
 
-        private static int GetDataReaderTablesRowCount(OleDbConnection con, DataTable tables, Form mainForm)
+        private int GetDataReaderTablesRowCount(OleDbConnection con, DataTable tables, Form mainForm)
         {
             int count = 0;
             foreach(DataRow row in tables.Rows)
@@ -454,10 +476,9 @@ namespace DataTableConverter.Assisstant
             return count;
         }
 
-        internal static DataTable OpenMSAccess(string path, ProgressBar progressBar, Form mainForm)
+        internal string OpenMSAccess(string path, ProgressBar progressBar, Form mainForm, ref string tableName)
         {
-            DataTable table = new DataTable();
-
+            tableName = Guid.NewGuid().ToString();
             try
             {
                 OleDbConnection con = new OleDbConnection
@@ -467,20 +488,55 @@ namespace DataTableConverter.Assisstant
                 con.Open();
                 DataTable tables = con.GetSchema("Tables");
                 progressBar?.StartLoadingBar(GetDataReaderTablesRowCount(con, tables, mainForm), mainForm);
+                bool tableCreated = false;
+                List<string> allColumnNames = new List<string>();
                 
                 foreach (DataRow row in tables.Rows)
                 {
                     if (row["TABLE_TYPE"].ToString() == "TABLE")
                     {
-                        string tableName = row["TABLE_NAME"].ToString();
-                        using (OleDbDataAdapter dbAdapter = new OleDbDataAdapter($"Select * from [{tableName}]", con))
+                        string accessTableName = row["TABLE_NAME"].ToString();
+                        using (OleDbCommand command = con.CreateCommand())
                         {
-                            string fileName = Path.GetFileName(path) + "; " + tableName;
-                            DataTable temp = new DataTable();
-                            temp.RowChanged += (sender, e) => FillDataTableNewRow(e, progressBar, mainForm);
-                            dbAdapter.Fill(temp);
-                            temp = temp.Columns.Cast<DataColumn>().All(col => col.DataType == typeof(string)) ? temp : temp.SetColumnsTypeStringWithContainingData();
-                            table.ConcatTable(temp, fileName, fileName);
+                            command.CommandText = $"Select * from [{accessTableName}]";
+                            using (OleDbDataReader reader = command.ExecuteReader())
+                            {
+                                List<string> newColumnNames = new List<string>();
+                                string[] columnNames = new string[reader.FieldCount];
+                                for(int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    string columnName = reader.GetName(i);
+                                    if (!allColumnNames.Any(col => col.Equals(columnName, StringComparison.OrdinalIgnoreCase)))
+                                    {
+                                        newColumnNames.Add(columnName);
+                                    }
+                                    columnNames[i] = columnName;
+                                }
+                                if (!tableCreated)
+                                {
+                                    DatabaseHelper.CreateTable(newColumnNames, tableName);
+                                    tableCreated = true;
+                                }
+                                else if(newColumnNames.Count != 0)
+                                {
+                                    foreach(string columnName in newColumnNames)
+                                    {
+                                        DatabaseHelper.AddColumnFixedAlias(columnName, tableName);
+                                    }
+                                }
+
+                                SQLiteCommand liteCommand = null;
+                                while (reader.Read())
+                                {
+                                    object[] values = new object[reader.FieldCount];
+                                    for(int i = 0; i < reader.FieldCount; ++i)
+                                    {
+                                        values[0] = reader.GetString(i);
+                                    }
+                                    liteCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, liteCommand);
+                                    progressBar?.UpdateLoadingBar(mainForm);
+                                }
+                            }
                         }
                     }
                 }
@@ -489,11 +545,13 @@ namespace DataTableConverter.Assisstant
             catch (Exception ex)
             {
                 ErrorHelper.LogMessage(ex, mainForm);
+                DatabaseHelper.Delete(tableName, true);
+                tableName = null;
             }
-            return table;
+            return tableName;
         }
 
-        private static void CheckDataTableColumnHeader(DataTable table)
+        private void CheckDataTableColumnHeader(DataTable table)
         {
             if (Properties.Settings.Default.ImportHeaderUpperCase)
             {
@@ -505,7 +563,7 @@ namespace DataTableConverter.Assisstant
         }
 
         #region Excel Import
-        internal static void OpenExcel(string path, ProgressBar progressBar, Form mainForm, string tableName)
+        internal void OpenExcel(string path, ProgressBar progressBar, Form mainForm, string tableName)
         {
             Microsoft.Office.Interop.Excel.Application objXL = null;
             Microsoft.Office.Interop.Excel.Workbook objWB = null;
@@ -617,13 +675,13 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static void UnhideRowsAndColumns(Microsoft.Office.Interop.Excel.Worksheet objSHT)
+        private void UnhideRowsAndColumns(Microsoft.Office.Interop.Excel.Worksheet objSHT)
         {
             objSHT.Columns.EntireColumn.Hidden = false;
             objSHT.Rows.EntireRow.Hidden = false;
         }
 
-        private static void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, ProgressBar progressBar, Form mainForm)
+        private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, ProgressBar progressBar, Form mainForm)
         {
             
             List<string> headers = SetHeaderOfExcel(objSHT, cols);
@@ -648,14 +706,14 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static void RemoveTabsInCellsOfExcel(Microsoft.Office.Interop.Excel.Application objXL)
+        private void RemoveTabsInCellsOfExcel(Microsoft.Office.Interop.Excel.Application objXL)
         {
             objXL.Cells.Replace(What: "\t", Replacement: string.Empty, LookAt: Microsoft.Office.Interop.Excel.XlLookAt.xlPart,
                     SearchOrder: Microsoft.Office.Interop.Excel.XlSearchOrder.xlByRows
                     , MatchCase: false, SearchFormat: false, ReplaceFormat: false);
         }
 
-        private static List<string> SetHeaderOfExcel(Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols)
+        private List<string> SetHeaderOfExcel(Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols)
         {
             Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[1, 1];
             Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[1, cols];
@@ -666,7 +724,7 @@ namespace DataTableConverter.Assisstant
             return GetHeadersOfContent(content);
         }
 
-        private static void GetDataOfString(string content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm)
+        private void GetDataOfString(string content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm)
         {
             int maxLength = content.Length;
             StringBuilder cellBuilder = new StringBuilder();
@@ -730,7 +788,7 @@ namespace DataTableConverter.Assisstant
             AddContentDataRow(row, tableName, fileName);
         }
 
-        private static void AddContentDataRow(Dictionary<string,string> row, string fileName, string tableName)
+        private void AddContentDataRow(Dictionary<string,string> row, string fileName, string tableName)
         {
             if (row.Values.Any(value => !string.IsNullOrWhiteSpace(value.ToString()))) //Request: delete empty rows
             {
@@ -742,13 +800,13 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static void SetContentRowValue(Dictionary<string, string> row, string column, StringBuilder builder)
+        private void SetContentRowValue(Dictionary<string, string> row, string column, StringBuilder builder)
         {
             row.Add(column, builder.ToString());
             builder.Clear();
         }
 
-        private static List<string> GetHeadersOfContent(string content)
+        private List<string> GetHeadersOfContent(string content)
         {
             List<string> headers = new List<string>();
             StringBuilder header = new StringBuilder();
@@ -771,7 +829,7 @@ namespace DataTableConverter.Assisstant
             return headers;
         }
 
-        private static void AddHeaderOfContent(List<string> headers, StringBuilder header)
+        private void AddHeaderOfContent(List<string> headers, StringBuilder header)
         {
             string headerString = header.ToString();
             int counter = 0;
@@ -784,7 +842,7 @@ namespace DataTableConverter.Assisstant
             header.Clear();
         }
 
-        private static string TryAddColumn(List<string> headers, string headerName, int counter = 0)
+        private string TryAddColumn(List<string> headers, string headerName, int counter = 0)
         {
             string result;
             string name = counter == 0 ? headerName : headerName + counter;
@@ -801,7 +859,7 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        private static void GenerateMultiCell(string content, string tableName, Dictionary<string, string> row, string header, ref int i)
+        private void GenerateMultiCell(string content, string tableName, Dictionary<string, string> row, string header, ref int i)
         {
             ++i;
             int multiCellCount = 0;
@@ -843,7 +901,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static void AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, StringBuilder text)
+        private void AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, StringBuilder text)
         {
             string result = text.ToString();
             text.Clear();
@@ -858,14 +916,14 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private static bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)
+        private bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)
         {
             int nextIndex = i + 1;
             return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
         }
         #endregion
 
-        internal static void OpenTextFixed(string tableName, string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar, Form mainForm)
+        internal void OpenTextFixed(string tableName, string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
             if (header == null || config == null || header.Count == 0 || config.Count == 0)
             {
@@ -915,7 +973,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static List<Proc> LoadProcedures(Form mainForm)
+        internal List<Proc> LoadProcedures(Form mainForm)
         {
             List<Proc> data = new List<Proc>();
             if (File.Exists(ProjectProcedures))
@@ -968,7 +1026,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static List<Work> LoadWorkflows(Form mainForm)
+        internal List<Work> LoadWorkflows(Form mainForm)
         {
             List<Work> data = new List<Work>();
             if (File.Exists(ProjectWorkflows))
@@ -1021,7 +1079,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static Work LoadWorkflow(string path)
+        internal Work LoadWorkflow(string path)
         {
             Work result = null;
             using (Stream stream = File.Open(path, FileMode.Open))
@@ -1032,7 +1090,7 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        internal static Proc LoadProcedure(string path)
+        internal Proc LoadProcedure(string path)
         {
             Proc result = null;
             using(Stream stream = File.Open(path, FileMode.Open))
@@ -1043,7 +1101,7 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        internal static List<Tolerance> LoadTolerances()
+        internal List<Tolerance> LoadTolerances()
         {
             List<Tolerance> data = new List<Tolerance>();
             if (File.Exists(ProjectTolerances))
@@ -1064,7 +1122,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static List<Case> LoadCases()
+        internal List<Case> LoadCases()
         {
             List<Case> data = new List<Case>();
             if (File.Exists(ProjectTolerances))
@@ -1085,7 +1143,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        internal static TextImportTemplate LoadTextImportTemplate(string path)
+        internal TextImportTemplate LoadTextImportTemplate(string path)
         {
             TextImportTemplate data = null;
             if (File.Exists(path))
@@ -1106,7 +1164,7 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        private static string[] SelectExcelSheets(string[] sheets, Form mainForm)
+        private string[] SelectExcelSheets(string[] sheets, Form mainForm)
         {
             string[] checkedSheets = new string[0];
             if (sheets.Length == 1)
@@ -1130,7 +1188,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static ImportSettings GenerateSettingsThroughPreset(int presetType, string settingPreset)
+        internal ImportSettings GenerateSettingsThroughPreset(int presetType, string settingPreset)
         {
             ImportSettings setting = null;
             if (presetType == 0)
@@ -1166,7 +1224,7 @@ namespace DataTableConverter.Assisstant
             return setting;
         }
 
-        public static string ToShortPathName(string longName)
+        public string ToShortPathName(string longName)
         {
             int bufferSize = 256;
             // don´t allocate stringbuilder here but outside of the function for fast access
@@ -1175,7 +1233,7 @@ namespace DataTableConverter.Assisstant
             return shortNameBuffer.ToString();
         }
 
-        internal static string GetShortFileName(string path)
+        internal string GetShortFileName(string path)
         {
             StringBuilder temp = new StringBuilder(255);
 

@@ -298,6 +298,7 @@
             this.trimToolStripMenuItem.Name = "trimToolStripMenuItem";
             this.trimToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.trimToolStripMenuItem.Text = "Trim";
+            this.trimToolStripMenuItem.Click += new System.EventHandler(this.trimToolStripMenuItem_Click);
             // 
             // zählenToolStripMenuItem1
             // 

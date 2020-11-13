@@ -102,12 +102,10 @@
   <ItemGroup>
     <Compile Include="Assisstant\DatabaseHelper.cs" />
     <Compile Include="Assisstant\DatabaseHistory.cs" />
-    <Compile Include="Assisstant\DataHelper.cs" />
     <Compile Include="Assisstant\ErrorHelper.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
     <Compile Include="Assisstant\UpdateHelper.cs" />
     <Compile Include="Assisstant\WorkflowHelper.cs" />
-    <Compile Include="Classes\CellMatrix.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
     <Compile Include="Classes\CountListboxItem.cs" />
     <Compile Include="Classes\DetectTextEncoding.cs" />
@@ -148,7 +146,6 @@
     <Compile Include="Classes\WorkProcs\ProcDuplicate.cs" />
     <Compile Include="Classes\WorkProcs\ProcUpLowCase.cs" />
     <Compile Include="Classes\WorkProcs\ProcUser.cs" />
-    <Compile Include="Exceptions\TableNotFoundException.cs" />
     <Compile Include="Extensions\DataTableExtensions.cs" />
     <Compile Include="Extensions\ProgressBarExtension.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -355,9 +352,7 @@
     <Compile Include="View\WorkProcViews\SeparateLoadEntries.Designer.cs">
       <DependentUpon>SeparateLoadEntries.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\WorkProcViews\SortForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="View\WorkProcViews\SortForm.cs" />
     <Compile Include="View\WorkProcViews\SortForm.Designer.cs">
       <DependentUpon>SortForm.cs</DependentUpon>
     </Compile>

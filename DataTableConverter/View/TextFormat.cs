@@ -26,11 +26,16 @@ namespace DataTableConverter.View
         private readonly ContextMenuStrip GlobalContext;
         private readonly int DetectedEncoding;
         private readonly string TableName;
+        private readonly DatabaseHelper DatabaseHelper;
+        private readonly ImportHelper ImportHelper;
+        private readonly ExportHelper ExportHelper;
 
-        internal DataTable DataTable { get; set; }
-        internal TextFormat(string tableName, string path, bool multipleFiles, ContextMenuStrip ctxRow)
+        internal TextFormat(DatabaseHelper databaseHelper, ImportHelper importHelper, ExportHelper exportHelper, string tableName, string path, bool multipleFiles, ContextMenuStrip ctxRow)
         {
             InitializeComponent();
+            DatabaseHelper = databaseHelper;
+            ImportHelper = importHelper;
+            ExportHelper = exportHelper;
             TableName = tableName;
             GlobalContext = ctxRow;
             ViewHelper = new ViewHelper(ctxRow, EndHeadersEdit, null);

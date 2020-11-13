@@ -23,9 +23,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            string newTable = ExportHelper.ExportCount(DatabaseHelper.GetColumnName(Column, tableName), CountChecked ? Count : 0, ShowFromTo, orderType, tableName);
+            string newTable = invokeForm.ExportHelper.ExportCount(invokeForm.DatabaseHelper.GetColumnName(Column, tableName), CountChecked ? Count : 0, ShowFromTo, orderType, tableName);
             invokeForm.BeginInvoke(new MethodInvoker(() =>
             {
+                invokeForm.DatabaseHelper.CopyToNewDatabaseFile(newTable);
                 new Form1(newTable).Show(invokeForm);
             }));
         }

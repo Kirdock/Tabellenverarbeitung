@@ -19,10 +19,12 @@ namespace DataTableConverter.View.WorkProcViews
         private IEnumerable<ExportCustomItem> items;
         internal ExportCustomItem SelectedItem;
         private IEnumerable<ExportCustomItem> Items => items.Where(item => item != null && item.Column == CmBColumns.SelectedItem.ToString());
+        private readonly DatabaseHelper DatabaseHelper;
 
-        internal SeparateLoadEntries(ExportSeparate selectedItem, BindingList<ExportSeparate> items, Dictionary<string,string> aliasColumnMapping, string tableName)
+        internal SeparateLoadEntries(DatabaseHelper databaseHelper, ExportSeparate selectedItem, BindingList<ExportSeparate> items, object[] headers, string tableName)
         {
             InitializeComponent();
+            DatabaseHelper = databaseHelper;
             TableName = tableName;
             SelectedItem = new ExportCustomItem(selectedItem.Name,selectedItem.Column);
             this.items = items.Where(item => item != selectedItem).Select(item => new ExportCustomItem(item.Name, item.Column, item.Table.AsEnumerable().Select(row => row[0].ToString()))).Concat(new ExportCustomItem[] { SelectedItem });
@@ -77,12 +79,12 @@ namespace DataTableConverter.View.WorkProcViews
 
         private void SetCheckedListBox()
         {
-            string columnName = CmBColumns.SelectedValue.ToString(); //DataSource = AliasColumnMapping?
-            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName, TableName);
+            string alias = CmBColumns.SelectedItem.ToString(); //DataSource = AliasColumnMapping? NO, because it is used for a workflow
+            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(DatabaseHelper.GetColumnName(alias, TableName), TableName);
             
             CLBValues.BeginUpdate();
             CLBValues.Items.Clear();
-            foreach (string key in pair.Keys.OrderBy(key => key, new NaturalStringComparer(SortOrder.Ascending)))
+            foreach (string key in pair.Keys)
             {
                 CLBValues.Items.Add(new CountListboxItem(0, key));
             }

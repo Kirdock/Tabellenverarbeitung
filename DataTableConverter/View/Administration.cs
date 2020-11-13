@@ -43,10 +43,16 @@ namespace DataTableConverter.View
         private object[] Headers;
         private ContextMenuStrip ContextGlobal;
         private readonly string TableName;
+        private readonly DatabaseHelper DatabaseHelper;
+        private readonly ExportHelper ExportHelper;
+        private readonly ImportHelper ImportHelper;
 
-        internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, string tableName = "main")
+        internal Administration(DatabaseHelper databaseHelper, ExportHelper exportHelper, ImportHelper importHelper, object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, string tableName = "main")
         {
             InitializeComponent();
+            DatabaseHelper = databaseHelper;
+            ExportHelper = exportHelper;
+            ImportHelper = importHelper;
             ContextGlobal = ctxRow;
             SetEncodingCmBs();
             TableName = tableName;
@@ -2402,7 +2408,7 @@ namespace DataTableConverter.View
             if (TableName != null)
             {
                 ExportSeparate selectedItem = GetSeparateSelectedItem();
-                SeparateLoadEntries form = new SeparateLoadEntries(selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, TableName);
+                SeparateLoadEntries form = new SeparateLoadEntries(DatabaseHelper, selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, TableName);
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     selectedItem.Column = form.SelectedItem.Column;

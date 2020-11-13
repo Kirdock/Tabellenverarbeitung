@@ -12,11 +12,19 @@ namespace DataTableConverter.Assisstant
 {
     class DatabaseHistory
     {
-        private static readonly string HistoryPath = "History.sqlite";
-        private static SQLiteConnection Connection;
-        private static SQLiteTransaction Transaction;
+        private readonly string HistoryPath;
+        private SQLiteConnection Connection;
+        private SQLiteTransaction Transaction;
+        private readonly DatabaseHelper DatabaseHelper;
 
-        internal static void CreateDatabase()
+        internal DatabaseHistory(DatabaseHelper databaseHelper, string directory, string databaseName)
+        {
+            DatabaseHelper = databaseHelper;
+            HistoryPath = Path.Combine(directory, databaseName + "_history.sqlite");
+            CreateDatabase();
+        }
+
+        internal void CreateDatabase()
         {
             if (File.Exists(HistoryPath))
             {
@@ -27,7 +35,7 @@ namespace DataTableConverter.Assisstant
             Connect();
         }
 
-        private static void Connect()
+        private void Connect()
         {
             Connection = new SQLiteConnection($"Data Source={HistoryPath};Version=3;");
             Connection.Open();
@@ -37,7 +45,7 @@ namespace DataTableConverter.Assisstant
             Init();
         }
 
-        private static void Init()
+        private void Init()
         {
             using (SQLiteCommand command = Connection.CreateCommand())
             {
@@ -50,21 +58,21 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void Close()
+        internal void Close()
         {
             Transaction.Dispose();
             Connection.Close();
             DeleteDatabase();
         }
 
-        private static void DeleteDatabase()
+        private void DeleteDatabase()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
             File.Delete(HistoryPath);
         }
 
-        internal static void Reset()
+        internal void Reset()
         {
             try
             {
@@ -73,7 +81,7 @@ namespace DataTableConverter.Assisstant
             catch { }
         }
 
-        private static void DeleteSavePoint(int savePoint)
+        private void DeleteSavePoint(int savePoint)
         {
             using (SQLiteCommand command = Connection.CreateCommand())
             {
@@ -82,7 +90,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void Log(int pointer, ref int savePoints, string cmd)
+        internal void Log(int pointer, ref int savePoints, string cmd)
         {
             while(pointer < savePoints)
             {
@@ -100,7 +108,7 @@ namespace DataTableConverter.Assisstant
 
         }
 
-        internal static void CreateSavePoint(int savePoint)
+        internal void CreateSavePoint(int savePoint)
         {
             using (SQLiteCommand command = Connection.CreateCommand())
             {
@@ -109,7 +117,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal static void Redo(int savepoint)
+        internal void Redo(int savepoint)
         {
             using(SQLiteCommand command = Connection.CreateCommand())
             {

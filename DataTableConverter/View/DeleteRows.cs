@@ -13,14 +13,16 @@ namespace DataTableConverter.View
     public partial class DeleteRows : Form
     {
         internal int[] Range;
-        internal string ColumnText, Column;
+        internal string ColumnText, ColumnName;
         internal bool EqualsText => CBEquals.Checked;
 
-        internal DeleteRows(int max, string[] headers)
+        internal DeleteRows(int max, Dictionary<string,string> aliasColumnMapping)
         {
             InitializeComponent();
             NbEnd.Maximum = max;
-            CmBHeaders.Items.AddRange(headers);
+            CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
+            CmBHeaders.ValueMember = "value";
+            CmBHeaders.DisplayMember = "key";
             CmBHeaders.SelectedIndex = 0;
         }
 
@@ -46,7 +48,7 @@ namespace DataTableConverter.View
         private void BtnConfirmMatchText_Click(object sender, EventArgs e)
         {
             ColumnText = TxtValue.Text;
-            Column = (string)CmBHeaders.SelectedItem;
+            ColumnName = CmBHeaders.SelectedValue.ToString();
             DialogResult = DialogResult.OK;
         }
     }

@@ -24,9 +24,8 @@ namespace DataTableConverter.Classes.WorkProcs
         }
 
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            newOrderIndices = new int[0];
             NewColumn = string.IsNullOrEmpty(NewColumn) ? "FTNR" : NewColumn;
             foreach (ExportSeparate item in Files)
             {
@@ -34,7 +33,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 DataTable tableSkeleton = table.Clone();
                 if (item.CheckedAllValues)
                 {
-                    foreach (string value in table.GroupCountOfColumn(item.Column).Keys)
+                    foreach (string value in DatabaseHelper.GroupCountOfColumn(item.Column,tableName).Keys)
                     {
                         DataTable dictTable = tableSkeleton.Copy();
                         dictTable.TableName = $"{item.Name}_{value}";

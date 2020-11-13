@@ -40,22 +40,28 @@ namespace DataTableConverter
         internal static string WorkflowPath => Path.Combine(ProjectPath, "Arbeitsabläufe");
         internal static string ProcedurePath => Path.Combine(ProjectPath, "Suchen & Ersetzen");
         internal static string ProjectHeaderPresets => Path.Combine(ProjectPath, "Vorlagen Überschriften");
-        private static readonly string CSVSeparator = ";";
-        private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
-        internal static readonly int DbaseMaxFileLength = 8;
-        private static readonly int DbaseMaxHeaderLength = 10;
-        private static readonly int DbaseMaxCharacterLength = 254;
-        private static readonly int DbaseMaxRecordCharacterLength = 3999;
-        private static readonly string FontFileName = "seguisym.ttf";
+        private readonly string CSVSeparator = ";";
+        private readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
+        internal readonly int DbaseMaxFileLength = 8;
+        private readonly int DbaseMaxHeaderLength = 10;
+        private readonly int DbaseMaxCharacterLength = 254;
+        private readonly int DbaseMaxRecordCharacterLength = 3999;
+        private readonly string FontFileName = "seguisym.ttf";
+        private readonly DatabaseHelper DatabaseHelper;
 
 
-        internal static void CheckRequired()
+        internal ExportHelper(DatabaseHelper databaseHelper)
+        {
+            DatabaseHelper = databaseHelper;
+        }
+
+        internal void CheckRequired()
         {
             CheckFolders();
             CheckFont();
         }
 
-        private static void CheckFolders()
+        private void CheckFolders()
         {
             if (!Directory.Exists(ProjectPath))
             {
@@ -76,7 +82,7 @@ namespace DataTableConverter
             }
         }
 
-        private static void CheckFont()
+        private void CheckFont()
         {
             string fontName = "Segoe UI Symbol";
             float fontSize = 12;
@@ -98,7 +104,7 @@ namespace DataTableConverter
             }
         }
         
-        internal static bool SaveProcedures(List<Proc> procedures, Form mainForm)
+        internal bool SaveProcedures(List<Proc> procedures, Form mainForm)
         {
             bool error = false;
             List<string> files = new List<string>(GetProcedures());
@@ -131,7 +137,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static string RemoveSpecialCharacters(string text)
+        internal string RemoveSpecialCharacters(string text)
         {
             return text.Replace("?", "？")
                        .Replace(" : ", "：")
@@ -144,7 +150,7 @@ namespace DataTableConverter
                        .Replace("*", "＊");
         }
 
-        internal static bool SaveWorkflows(List<Work> workflows, Form mainForm)
+        internal bool SaveWorkflows(List<Work> workflows, Form mainForm)
         {
             bool error = false;
             List<string> files = new List<string>(GetWorkflows());
@@ -177,17 +183,17 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static string[] GetWorkflows()
+        internal string[] GetWorkflows()
         {
             return Directory.GetFiles(WorkflowPath, "*.bin");
         }
 
-        internal static string[] GetProcedures()
+        internal string[] GetProcedures()
         {
             return Directory.GetFiles(ProcedurePath, "*.bin");
         }
 
-        internal static bool SaveTextImportTemplate(TextImportTemplate template, string path)
+        internal bool SaveTextImportTemplate(TextImportTemplate template, string path)
         {
             bool error = false;
             try
@@ -205,7 +211,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool SaveTolerances(List<Tolerance> tolerances)
+        internal bool SaveTolerances(List<Tolerance> tolerances)
         {
             bool error = false;
             try
@@ -223,7 +229,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool SaveCases(List<Case> cases)
+        internal bool SaveCases(List<Case> cases)
         {
             bool error = false;
             try
@@ -241,13 +247,13 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, Form invokeForm, System.Action updateLoadingBar = null, string tableName = "main", string orderColumnName = null)
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, Form invokeForm, System.Action updateLoadingBar = null, string tableName = "main", string orderColumnName = null)
         {
             SQLiteCommand command = orderColumnName == string.Empty ? DatabaseHelper.GetDataCommand(tableName) : DatabaseHelper.GetDataCommand(tableName, orderColumnName);
             return Save(directory, fileName, oldFileExtension, encoding, format, invokeForm, command, updateLoadingBar, tableName);
         }
 
-        internal static int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, Form invokeForm, SQLiteCommand command, System.Action updateLoadingBar = null, string tableName = "main")
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, Form invokeForm, SQLiteCommand command, System.Action updateLoadingBar = null, string tableName = "main")
         {
             int rowCount = 0;
             if (command == null)
@@ -275,7 +281,7 @@ namespace DataTableConverter
             return rowCount;
         }
 
-        private static int ExportDbase(string tableName, string directory, string fileName, SQLiteCommand command, Form invokeForm)
+        private int ExportDbase(string tableName, string directory, string fileName, SQLiteCommand command, Form invokeForm)
         {
             int offset = 0;
             List<string> duplicates = new List<string>();
@@ -409,7 +415,7 @@ namespace DataTableConverter
             return offset;
         }
 
-        internal static int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, System.Action updateLoadingBar = null)
+        internal int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, System.Action updateLoadingBar = null)
         {
             int offset = 0;
             string path = Path.Combine(directory,fileName+ ".csv");
@@ -482,7 +488,7 @@ namespace DataTableConverter
             return offset;
         }
 
-        private static int ExportExcel(string directory, string fileName, string oldFileExtension, SQLiteCommand command, Form invokeForm)
+        private int ExportExcel(string directory, string fileName, string oldFileExtension, SQLiteCommand command, Form invokeForm)
         {
             int offset = 0;
             Workbooks workbooks = null;
@@ -584,7 +590,7 @@ namespace DataTableConverter
             return offset;
         }
 
-        private static void SaveExcelFile(string directory, string fileName, string oldFileExtension, Workbook workbook, Form invokeForm)
+        private void SaveExcelFile(string directory, string fileName, string oldFileExtension, Workbook workbook, Form invokeForm)
         {
             string saveName = fileName + ".xls";
             XlFileFormat fileFormat = XlFileFormat.xlWorkbookNormal;
@@ -605,7 +611,7 @@ namespace DataTableConverter
             }
         }
 
-        internal static string ExportExcel(System.Data.DataTable dt, string directory, string filename, Form mainForm)
+        internal string ExportExcel(System.Data.DataTable dt, string directory, string filename, Form mainForm)
         {
             string path = null;
             int rowRange = 10000;
@@ -688,12 +694,12 @@ namespace DataTableConverter
             return path;
         }
 
-        private static Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(System.Data.DataTable table, Microsoft.Office.Interop.Excel.Worksheet worksheet)
+        private Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(System.Data.DataTable table, Microsoft.Office.Interop.Excel.Worksheet worksheet)
         {
             return InsertHeadersToExcel(table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray(), worksheet);
         }
 
-        private static Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(string[] columns, Microsoft.Office.Interop.Excel.Worksheet worksheet)
+        private Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(string[] columns, Microsoft.Office.Interop.Excel.Worksheet worksheet)
         {
             // Insert column headers.
             object[,] data = new object[1, columns.Length];
@@ -716,7 +722,7 @@ namespace DataTableConverter
                                                    Type.Missing);
         }
 
-        private static void InsertRowsToExcel( Microsoft.Office.Interop.Excel.Worksheet worksheet, object[,] data, int rowStart, int rowCount, int columnCount)
+        private void InsertRowsToExcel( Microsoft.Office.Interop.Excel.Worksheet worksheet, object[,] data, int rowStart, int rowCount, int columnCount)
         {
             Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowStart, 1];
             Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowStart + rowCount, columnCount];
@@ -725,7 +731,7 @@ namespace DataTableConverter
             range.Value2 = data;
         }
 
-        private static void InsertRowsSkeleton(Microsoft.Office.Interop.Excel.Worksheet worksheet, int rowCount, int columnCount, int rowOffset = 0)
+        private void InsertRowsSkeleton(Microsoft.Office.Interop.Excel.Worksheet worksheet, int rowCount, int columnCount, int rowOffset = 0)
         {
             Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[2 + rowOffset, 1];
             Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowCount, columnCount];
@@ -733,7 +739,7 @@ namespace DataTableConverter
             addNewRows.Insert(Microsoft.Office.Interop.Excel.XlInsertShiftDirection.xlShiftDown, Microsoft.Office.Interop.Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove);
         }
 
-        internal static bool ExportDbase(string originalFileName, System.Data.DataTable dataTable, string originalPath, Form mainForm, System.Action updateLoadingBar = null)
+        internal bool ExportDbase(string originalFileName, System.Data.DataTable dataTable, string originalPath, Form mainForm, System.Action updateLoadingBar = null)
         {
             bool saved = false;
 
@@ -856,7 +862,7 @@ namespace DataTableConverter
         /// Depth-first recursive delete, with handling for descendant 
         /// directories open in Windows Explorer.
         /// </summary>
-        private static void DeleteDirectory(string path)
+        private void DeleteDirectory(string path)
         {
             foreach (string directory in Directory.GetDirectories(path))
             {
@@ -877,12 +883,12 @@ namespace DataTableConverter
             }
         }
 
-        private static void CreateTable(System.Data.DataTable table, int[] max, string path, string filename, ref string query)
+        private void CreateTable(System.Data.DataTable table, int[] max, string path, string filename, ref string query)
         {
             CreateTable(table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray(), max, path, filename, ref query);
         }
 
-        private static void CreateTable(string[] columns, int[] max, string path, string filename, ref string query)
+        private void CreateTable(string[] columns, int[] max, string path, string filename, ref string query)
         {
             query = CreateQuery(columns, filename, max);
 
@@ -894,7 +900,7 @@ namespace DataTableConverter
             cmd.Dispose();
         }
 
-        private static string CreateQuery(string[] columns, string filename, int[] max)
+        private string CreateQuery(string[] columns, string filename, int[] max)
         {
             StringBuilder csb = new StringBuilder($"create table [{filename}] (");
             for (int i = 0; i < columns.Length; i++)
@@ -906,7 +912,7 @@ namespace DataTableConverter
             return csb.ToString();
         }
 
-        private static int[] MaxLengthOfColumns(System.Data.DataTable dataTable)
+        private int[] MaxLengthOfColumns(System.Data.DataTable dataTable)
         {
             int[] max = new int[dataTable.Columns.Count];
             for(int i = 0; i < max.Length; i++)
@@ -934,7 +940,7 @@ namespace DataTableConverter
             return max;
         }
 
-        private static string GetConnection(string path)
+        private string GetConnection(string path)
         {
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
@@ -951,7 +957,7 @@ namespace DataTableConverter
         /// <param name="mainForm"></param>
         /// <param name="continuedNumberColumn"></param>
         /// <param name="tableName"></param>
-        internal static void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, System.Action stopLoadingBar, System.Action saveFinished, int codePage, Form mainForm, string continuedNumberColumn, string tableName = "main")
+        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, System.Action stopLoadingBar, System.Action saveFinished, int codePage, Form mainForm, string continuedNumberColumn, string tableName = "main")
         {
             new Thread(() =>
             {
@@ -991,7 +997,7 @@ namespace DataTableConverter
         /// <param name="tableName"></param>
         /// <param name="orderType"></param>
         /// <returns></returns>
-        internal static string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName = "main")
+        internal string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName = "main")
         {
             string newTable = Guid.NewGuid().ToString();
 
