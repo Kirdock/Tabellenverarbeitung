@@ -17,10 +17,12 @@ namespace DataTableConverter.Classes
         };
         internal RowMergeState State = RowMergeState.Nothing;
         internal string Value;
+        internal string DisplayValue;
 
-        public PlusListboxItem(string value)
+        public PlusListboxItem(string value, string displayValue)
         {
             Value = value;
+            DisplayValue = displayValue;
         }
 
         public PlusListboxItem(RowMergeState state, string value)

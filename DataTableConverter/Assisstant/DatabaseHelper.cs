@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DataTableConverter.Assisstant.SQL_Functions;
 using DataTableConverter.Classes;
 using DataTableConverter.Extensions;
 
@@ -59,6 +60,8 @@ namespace DataTableConverter.Assisstant
             Reset();
             SortOrderColumnName = IdColumnName == "rowid" ? SortOrderColumnName : IdColumnName;
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
+            SQLiteFunction.RegisterFunction(typeof(ParseDecimal)); //PARSEDECIMAL(myValue)
+            SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
 
             if (createMainDatabase)
             {
@@ -170,9 +173,9 @@ namespace DataTableConverter.Assisstant
             CreateMetaData(tableName, columnNames);
         }
 
-        private void CreateMetaData(string tableName, IEnumerable<string> columnNames)
+        private void CreateMetaData(string tableName, IEnumerable<string> columnNames, SQLiteConnection connection = null)
         {
-            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            using(SQLiteCommand command = (connection ?? GetConnection(tableName)).CreateCommand())
             {
                 command.CommandText = $"DROP table if exists [{tableName + MetaTableAffix}]";
                 command.ExecuteNonQuery();
@@ -677,12 +680,14 @@ namespace DataTableConverter.Assisstant
             return table;
         }
 
-        private void AddColumnIfNotExists(string tableName, string column, string defaultValue = "")
+        private bool AddColumnIfNotExists(string tableName, string column, string defaultValue = "")
         {
-            if(!ContainsAlias(tableName, column))
+            bool status;
+            if(! (status = ContainsAlias(tableName, column)))
             {
                 AddColumn(tableName, column, defaultValue);
             }
+            return status;
         }
 
         /// <summary>
@@ -1201,19 +1206,69 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void CopyToNewDatabaseFile(string tableName)
+        /// <summary>
+        /// Before a new main instance with a table is opened, copy the table into it's own file
+        /// </summary>
+        /// <param name="tableName"></param>
+        internal void CopyToNewDatabaseFile(string tableName, string sourceTable = "main")
         {
-            string directory = Path.Combine(DatabaseDirectory, tableName + ".sqlite");
-            CreateDatabase(directory);
-            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            string path = Path.Combine(DatabaseDirectory, tableName + ".sqlite");
+            CreateDatabase(path);
+            SQLiteConnection connection = new SQLiteConnection($"Data Source={path};Version=3;");
+            connection.Open();
+            SQLiteTransaction transaction = connection.BeginTransaction();
+            //SQLiteConnection mainConnection;
+            //bool isMain = sourceTable == "main";
+            //if (isMain)
+            //{
+            //    mainConnection = Connection;
+            //    mainConnection.Trace -= UpdateHandler;
+            //}
+            //else
+            //{
+            //    mainConnection = TempConnection;
+            //}
+
+            //using (SQLiteCommand command = mainConnection.CreateCommand())
+            //{
+            //    command.CommandText = $"ATTACH database [{path}] as [{tableName}]";
+            //    command.ExecuteNonQuery();
+
+            //    string colType = "varchar(255) not null default '' COLLATE NATURALSORT";
+            //    Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(sourceTable);
+            //    command.CommandText = $"CREATE table [{tableName}].main ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", aliasColumnMapping.Keys)}] {colType})";
+
+            //    command.CommandText = $"INSERT into [{tableName}].main SELECT {GetHeaderString(aliasColumnMapping.Values)} from [{sourceTable}]"; //not SELECT * because in sourceTable there may be "deleted" columns
+            //    command.ExecuteNonQuery();
+
+
+            //    command.CommandText = $"DETACH database [{tableName}]";
+            //    command.ExecuteNonQuery();
+            //}
+            //if (isMain)
+            //{
+            //    mainConnection.Trace += UpdateHandler;
+            //}
+            Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(sourceTable);
+            using (SQLiteCommand command = connection.CreateCommand())
             {
-                //append new database
-                //create new table with name "main"
-                //insert everything from tableName into main
-                //commit it, because here are all connections closed
-                //the next application opens it again
-                implement;
+                command.CommandText = $"ATTACH database [{DatabasePath}] as main";
+                command.ExecuteNonQuery();
+
+                string colType = "varchar(255) not null default '' COLLATE NATURALSORT";
+                command.CommandText = $"CREATE table main ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", aliasColumnMapping.Keys)}] {colType})";
+
+                command.CommandText = $"INSERT into main SELECT [{IdColumnName}], {GetHeaderString(aliasColumnMapping.Values)} from main.[{sourceTable}]"; //not SELECT * because in sourceTable there may be "deleted" columns
+                command.ExecuteNonQuery();
+
+
+                command.CommandText = $"DETACH database main";
+                command.ExecuteNonQuery();
             }
+            CreateMetaData(tableName, aliasColumnMapping.Keys, connection);
+            transaction.Commit();
+            connection.Close();
+
             Delete(tableName);
         }
 
@@ -1221,80 +1276,181 @@ namespace DataTableConverter.Assisstant
         /// Rows with the same value in the given column "identifier" are merged.
         /// <para>Columns are either summed, counted or a new one is created</para>
         /// </summary>
-        /// <param name="identifier"></param>
+        /// <param name="columnName"></param>
         /// <param name="additionalColumns"></param>
         /// <param name="updateLoadingBar"></param>
         /// <returns></returns>
-        internal void MergeRows(string identifier, List<PlusListboxItem> additionalColumns, bool separator, Action updateLoadingBar, string tableName = "main")
+        internal void MergeRows(string columnName, List<PlusListboxItem> additionalColumns, bool separator, Form1 invokeForm, Action updateLoadingBar, string tableName = "main")
         {
-            //SELECT max(cnt) from (SELECT count(identifier) as cnt from [{tableName}] group by identifier)
-            //Columns * (max-1) = # new columns
+            //additionalColumns[...].Value is the columnName
+            Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(tableName);
             string separatorText = separator ? "#,0.###" : string.Empty;
-
-            Dictionary<string, MergeRowsInfo> dict = new Dictionary<string, MergeRowsInfo>();
-            for (int i = 0; i < table.Rows.Count; i++)
+            CreateIndexOn(tableName, columnName, invokeForm, false);
+            string[] sumColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Sum).Select(item => item.Value).ToArray();
+            string[] countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count).Select(item => item.Value).ToArray();
+            string[] appendArray = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Nothing).Select(item => item.Value).ToArray();
+            if (countColumns.Length != 0)
             {
-                string key = table.Rows[i][identifier].ToString();
-                if (dict.TryGetValue(key, out MergeRowsInfo firstRow))
+                SetRowCountByIdentifier(columnName, countColumns, tableName);
+            }
+            if(sumColumns.Length != 0)
+            {
+                SetSumByIdentifier(columnName, sumColumns, tableName, separatorText);
+            }
+            
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                string headerString = appendArray.Length == 0 ? string.Empty : "t1.[" + string.Join("], t1.[", appendArray.Concat(sumColumns)) + "]";
+                command.CommandText = $"SELECT t1.[{IdColumnName}], t1.[{columnName}], {headerString} from [{tableName}] t1 join (Select t2.[{columnName}] from [{tableName}] t2 group by t2.[{columnName}] having count(*) > 1) t2 on t1.[{columnName}] = t2.[{columnName}] order by [{columnName}]";
+                int offset = 2; //ofset till the values of "headerString"
+                int sumOffset = offset + appendArray.Length;
+                bool containsSumColumns = sumColumns.Length != 0;
+                SQLiteCommand sumCommand = null;
+                using(SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    firstRow.RowsMerged++;
-                    foreach (PlusListboxItem column in additionalColumns)
+                    if (reader.Read())
                     {
-                        if (column.State == PlusListboxItem.RowMergeState.Count)
-                        {
-                            firstRow.CountDict[column.Value]++;
-                        }
-                        else if (column.State == PlusListboxItem.RowMergeState.Sum)
-                        {
-                            if (decimal.TryParse(table.Rows[i][column.Value].ToString(), out decimal result))
-                            {
-                                firstRow.CountDict[column.Value] += result;
-                            }
-                        }
-                        else
-                        {
-                            string value = table.Rows[i][column.Value].ToString();
-                            if (value != string.Empty)
-                            {
-                                string header = column.Value + firstRow.RowsMerged;
-                                if (!table.Columns.Contains(header))
-                                {
-                                    header = table.TryAddColumn(column.Value, firstRow.RowsMerged);
-                                }
-                                firstRow.Row[header] = value;
-                            }
-                            //table.Columns[header].SetOrdinal(table.Columns.IndexOf(column.Value) + firstRow.RowsMerged);
-                        }
-                    }
+                        #region Init
+                        //Dictionary<string, decimal> sum = new Dictionary<string, decimal>(); //Dictionary instead of single variable because we can sum several columns
 
-                    table.Rows[i].Delete();
-                }
-                else
-                {
-                    MergeRowsInfo info = new MergeRowsInfo(table.Rows[i]);
-                    foreach (PlusListboxItem column in additionalColumns)
-                    {
-                        if (column.State == PlusListboxItem.RowMergeState.Count)
+                        string id = reader.GetString(0);
+                        string nameBefore = reader.GetString(1);
+                        int counter = 1;
+                        
+                        //for (int i = 0; i < sumColumns.Length; ++i)
+                        //{
+                        //    decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
+                        //    sum.Add(sumColumns[i], result);
+                        //}
+                        #endregion
+
+                        while (reader.Read())
                         {
-                            info.CountDict.Add(column.Value.ToString(), 1);
+                            string name = reader.GetString(1);
+                            if(name != nameBefore)
+                            {
+                                //sumCommand = UpdateRow(id, sum.Keys.ToArray(), sum.Values.Select(value => value.ToString(separatorText)).ToArray(), tableName, sumCommand);
+
+                                #region InitNew
+                                id = reader.GetString(0); //newId
+                                
+                                //for (int i = 0; i < sumColumns.Length; ++i)
+                                //{
+                                //    decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
+                                //    sum[sumColumns[i]] = result;
+                                //}
+                                counter = 1;
+                                #endregion
+                            }
+                            else
+                            {
+                                if (appendArray.Length != 0)
+                                {
+                                    string[] newColumnNames = new string[appendArray.Length];
+                                    string[] newRowValues = new string[appendArray.Length];
+                                    for (int i = 0; i < appendArray.Length; ++i)
+                                    {
+                                        string newAlias = appendArray[i] + counter;
+                                        string colName;
+
+                                        if (!aliasColumnMapping.ContainsKey(newAlias))
+                                        {
+                                            colName = AddColumnFixedAlias(newAlias, tableName);
+                                            aliasColumnMapping.Add(newAlias, colName);
+                                        }
+                                        else
+                                        {
+                                            colName = aliasColumnMapping[newAlias];
+                                        }
+                                        newColumnNames[i] = colName;
+                                        newRowValues[i] = reader.GetString(i + offset);
+                                    }
+                                    UpdateRow(id, newColumnNames, newRowValues, tableName);
+                                }
+                                //for (int i = 0; i < sumColumns.Length; ++i)
+                                //{
+                                //    if(decimal.TryParse(reader.GetString(i + sumOffset), out decimal result))
+                                //    {
+                                //        sum[sumColumns[i]] += result;
+                                //    }
+                                    
+                                //}
+                                counter++;
+                                DeleteRow(id, tableName);
+                            }
+                            nameBefore = name;
                         }
-                        if (column.State == PlusListboxItem.RowMergeState.Sum)
-                        {
-                            decimal.TryParse(info.Row[column.Value].ToString(), out decimal result);
-                            info.CountDict.Add(column.Value.ToString(), result);
-                        }
+                        //UpdateRow(id, sum.Keys.ToArray(), sum.Values.Select(value => value.ToString(separatorText)).ToArray(), tableName, sumCommand);
                     }
-                    dict.Add(key, info);
                 }
-                updateLoadingBar();
             }
 
-            foreach (MergeRowsInfo info in dict.Values)
+            DeleteIndexOn(tableName, columnName);
+        }
+
+        private void SetSumByIdentifier(string identifier, string[] columnNames, string tableName, string separatorText)
+        {
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                foreach (string column in info.CountDict.Keys)
+                foreach(string columnName in columnNames)
                 {
-                    info.Row[column] = info.CountDict[column].ToString(separatorText);
+                    command.CommandText = $"UPDATE [{tableName}] set [{columnName}] = TOSTRING(" +
+                        $"(select sum(PARSEDECIMAL(t2.[{columnName}])) from [{tableName}] t2 group by t2.[{identifier}] having [{tableName}].[{IdColumnName}]= t2.[{IdColumnName}])," +
+                        $"\"{separatorText})\")";
+                    command.ExecuteNonQuery();
                 }
+            }
+        }
+
+        private void SetRowCountByIdentifier(string identifier, string[] columnNames, string tableName)
+        {
+            //count (just unique rows): update [{tableName}] set col1 = "1", col2 = "1",... where [{IdColumnName}] in (Select t2.[{IdColumnName}] from [{tableName}] t2 group by t2.[{Identifier}] having count(*) = 1)
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName}] set {string.Join("=", columnNames)} = (Select count(t2.[{identifier}]) from [{tableName}] t2 group by t2.[{identifier}] having [{tableName}].[{IdColumnName}] = t2.[{IdColumnName}]) "; //col1 = col2 = ... works
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private SQLiteCommand UpdateRow(string id, string[] columnNames, string[] columnValues, string tableName, SQLiteCommand command = null)
+        {
+            
+            if(command == null)
+            {
+                command = GetConnection(tableName).CreateCommand();
+                command.CommandText = $"UPDATE [{tableName}] SET {GetUpdateCommandText(columnNames)} WHERE [{IdColumnName}] = ?";
+                foreach(string value in columnValues)
+                {
+                    command.Parameters.Add(new SQLiteParameter() { Value = value });
+                }
+                command.Parameters.Add(new SQLiteParameter() { Value = id });
+            }
+            else
+            {
+                for (int i = 0; i < columnValues.Length; ++i)
+                {
+                    command.Parameters[i].Value = columnValues[i];
+                }
+                command.Parameters[command.Parameters.Count - 1].Value = id;
+            }
+            command.ExecuteNonQuery();
+            return command;
+        }
+
+        private string GetUpdateCommandText(string[] columnNames)
+        {
+            StringBuilder builder = new StringBuilder();
+            for(int i = 0; i < columnNames.Length -1; ++i)
+            {
+                AppendColumn(builder, columnNames[i]).Append(",");
+            }
+            AppendColumn(builder, columnNames[columnNames.Length - 1]);
+
+            return builder.ToString();
+
+            StringBuilder AppendColumn(StringBuilder bd, string column)
+            {
+                return bd.Append("[").Append(column).Append("]=?");
             }
         }
 

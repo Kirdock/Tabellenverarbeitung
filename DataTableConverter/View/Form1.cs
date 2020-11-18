@@ -577,6 +577,7 @@ namespace DataTableConverter
 
         private void StartMerge(string importTable, string filename, int encoding)
         {
+            adjust;
             string[] importColumnNames = new string[0];
             string sourceIdentifierColumnName = null;
             string importIdentifierColumnName = null;
@@ -1324,12 +1325,11 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            using (MergeColumns form = new MergeColumns(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (MergeColumns form = new MergeColumns(DatabaseHelper.GetAliasColumnMapping()))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
-                    string identifier = form.Identifier;
-                    int identifierIndex = form.IdentifierIndex;
+                    string columnName = form.Identifier;
                     bool separator = form.Separator;
                     List<PlusListboxItem> additionalColumns = form.AdditionalColumns;
 
@@ -1338,7 +1338,7 @@ namespace DataTableConverter
                         try
                         {
                             StartLoadingBarCount(RowCount);
-                            DatabaseHelper.MergeRows(identifier, additionalColumns, separator, UpdateLoadingBar);
+                            DatabaseHelper.MergeRows(columnName, additionalColumns, separator, this, UpdateLoadingBar);
                             DatabaseHelper.SetSavepoint();
                             LoadData(true);
                         }

@@ -13,26 +13,26 @@ namespace DataTableConverter.View
 {
     public partial class MergeColumns : Form
     {
-        internal string Identifier => CmBHeaders.SelectedItem.ToString();
-        internal int IdentifierIndex => CmBHeaders.SelectedIndex;
+        internal string Identifier => CmBHeaders.SelectedValue.ToString();
         internal bool Separator => CBSeparator.Checked;
         internal List<PlusListboxItem> AdditionalColumns { get
             {
-                return ClBHeaders.CheckedItems.Cast<PlusListboxItem>().Where(item => item.ToString() != Identifier).ToList();
+                return ClBHeaders.CheckedItems.Cast<PlusListboxItem>().Where(item => item.Value != Identifier).ToList();
             }
         }
 
-        internal MergeColumns(object[] headers)
+        internal MergeColumns(Dictionary<string,string> aliasColumnMapping)
         {
             InitializeComponent();
             SetListBoxStyle();
-            CmBHeaders.Items.AddRange(headers);
-            List<PlusListboxItem> list = new List<PlusListboxItem>();
-            foreach(string header in headers)
-            {
-                list.Add(new PlusListboxItem(header));
-            }
-            ClBHeaders.Items.AddRange(list.ToArray());
+            CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
+            CmBHeaders.DisplayMember = "key";
+            CmBHeaders.ValueMember = "value";
+            
+            ListBox box = ClBHeaders;
+            box.DataSource = new BindingSource(aliasColumnMapping.Select(pair => new PlusListboxItem(pair.Value, pair.Key)).ToArray(), null);
+            box.DisplayMember = "DisplayValue";
+            box.ValueMember = "Value";
             CmBHeaders.SelectedIndex = 0;
             ViewHelper.ResizePlusListBox(ClBHeaders);
         }

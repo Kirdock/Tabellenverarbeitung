@@ -36,6 +36,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
+            
             DataTable saveTable = table.GetSortedView(sortingOrder, orderType, -1).ToTable();
             IEnumerable<string> sourceColumns = saveTable.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray();
             List<string> destHeaders = new List<string>(GetHeaders());

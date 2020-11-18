@@ -625,11 +625,10 @@ namespace DataTableConverter.Assisstant
                         objSHT.AutoFilter.ShowAllData();
                     }
                     int rows = objSHT.UsedRange.Rows.Count;
-                    int cols = objSHT.UsedRange.Columns.Count;
-                    while (cols > 0 && objSHT.Cells[1, cols].Text == string.Empty)
-                    {
-                        cols--;
-                    }
+                    int cols = objSHT.Cells.Find("*", System.Reflection.Missing.Value,
+                                                   System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                                                   Microsoft.Office.Interop.Excel.XlSearchOrder.xlByColumns, Microsoft.Office.Interop.Excel.XlSearchDirection.xlPrevious,
+                                                   false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Column;
                     if (cols == 0)
                     {
                         continue;

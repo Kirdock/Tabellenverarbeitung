@@ -352,7 +352,9 @@
     <Compile Include="View\WorkProcViews\SeparateLoadEntries.Designer.cs">
       <DependentUpon>SeparateLoadEntries.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\WorkProcViews\SortForm.cs" />
+    <Compile Include="View\WorkProcViews\SortForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="View\WorkProcViews\SortForm.Designer.cs">
       <DependentUpon>SortForm.cs</DependentUpon>
     </Compile>
