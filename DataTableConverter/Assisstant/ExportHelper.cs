@@ -277,81 +277,81 @@ namespace DataTableConverter
         {
             string path = null;
             int rowRange = 10000;
-            try
+            int columns = dt.Columns.Count;
+            // Add the +1 to allow room for column headers.
+            int rowCount = dt.Rows.Count;
+            if (rowCount != 0)
             {
-                string workSheetName = "Tabelle 1";
-
-                Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application
-                {
-                    DisplayAlerts = false,
-                    Visible = false,
-                    ScreenUpdating = false,
-                    SheetsInNewWorkbook = 1
-                };
-
-                Microsoft.Office.Interop.Excel.Workbooks workbooks = excel.Workbooks;
-                Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Type.Missing);
-
-                Microsoft.Office.Interop.Excel.Sheets worksheets = workbook.Sheets;
-                Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)worksheets[1];
-
-                excel.Calculation = Microsoft.Office.Interop.Excel.XlCalculation.xlCalculationManual;
-                worksheet.Name = workSheetName;
-
-                
-                int columns = dt.Columns.Count;
-                // Add the +1 to allow room for column headers.
-
-
-                int rowCount = dt.Rows.Count;
-                InsertHeadersToExcel(dt, worksheet);
-                InsertRowsSkeleton(worksheet, rowCount, columns);
-                
-                int rowStart = 2;
-                for (int step = 0; step < rowCount; step += rowRange)
-                {
-                    int rows = Math.Min(rowRange, rowCount-step);
-                    object[,] data = new object[rows, columns];
-                    for (int srcRow = step, dstRow = 0; dstRow < rows; srcRow++, dstRow++)
-                    {
-                        for (int column = 0; column < columns; column++)
-                        {
-                            data[dstRow, column] = dt.Rows[srcRow][column];
-                        }
-                    }
-                    InsertRowsToExcel(worksheet, data, rowStart, rows - 1, columns);
-                    rowStart += rows;
-                }
-
-                string saveName = Path.GetFileNameWithoutExtension(filename)+".xls";
-                Microsoft.Office.Interop.Excel.XlFileFormat fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal;
-                if (Path.GetExtension(filename) != ".xls")
-                {
-                    saveName += "x";
-                    fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook;
-                }
-                path = Path.Combine(directory, saveName);
                 try
                 {
-                    workbook.SaveAs(Path.Combine(directory, saveName), fileFormat, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-                }
-                catch(Exception ex)
-                {
-                    mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gespeichert werden! Wird die Datei gerade verwendet?");
-                    ErrorHelper.LogMessage(ex,mainForm, false);
-                }
-                workbook.Close(false, Type.Missing, Type.Missing);
-                excel.Quit();
+                    string workSheetName = "Tabelle 1";
 
-                // Release our resources.
-                Marshal.ReleaseComObject(workbook);
-                Marshal.ReleaseComObject(workbooks);
-                Marshal.ReleaseComObject(excel);
-                Marshal.FinalReleaseComObject(excel);
-            }
-            catch (Exception ex)
-            {
-                ErrorHelper.LogMessage(ex, mainForm);
+                    Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application
+                    {
+                        DisplayAlerts = false,
+                        Visible = false,
+                        ScreenUpdating = false,
+                        SheetsInNewWorkbook = 1
+                    };
+
+                    Microsoft.Office.Interop.Excel.Workbooks workbooks = excel.Workbooks;
+                    Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Type.Missing);
+
+                    Microsoft.Office.Interop.Excel.Sheets worksheets = workbook.Sheets;
+                    Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)worksheets[1];
+
+                    excel.Calculation = Microsoft.Office.Interop.Excel.XlCalculation.xlCalculationManual;
+                    worksheet.Name = workSheetName;
+
+                    InsertHeadersToExcel(dt, worksheet);
+                    InsertRowsSkeleton(worksheet, rowCount, columns);
+
+                    int rowStart = 2;
+                    for (int step = 0; step < rowCount; step += rowRange)
+                    {
+                        int rows = Math.Min(rowRange, rowCount - step);
+                        object[,] data = new object[rows, columns];
+                        for (int srcRow = step, dstRow = 0; dstRow < rows; srcRow++, dstRow++)
+                        {
+                            for (int column = 0; column < columns; column++)
+                            {
+                                data[dstRow, column] = dt.Rows[srcRow][column];
+                            }
+                        }
+                        InsertRowsToExcel(worksheet, data, rowStart, rows - 1, columns);
+                        rowStart += rows;
+                    }
+
+                    string saveName = Path.GetFileNameWithoutExtension(filename) + ".xls";
+                    Microsoft.Office.Interop.Excel.XlFileFormat fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal;
+                    if (Path.GetExtension(filename) != ".xls")
+                    {
+                        saveName += "x";
+                        fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook;
+                    }
+                    path = Path.Combine(directory, saveName);
+                    try
+                    {
+                        workbook.SaveAs(Path.Combine(directory, saveName), fileFormat, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                    }
+                    catch (Exception ex)
+                    {
+                        mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gespeichert werden! Wird die Datei gerade verwendet?");
+                        ErrorHelper.LogMessage(ex, mainForm, false);
+                    }
+                    workbook.Close(false, Type.Missing, Type.Missing);
+                    excel.Quit();
+
+                    // Release our resources.
+                    Marshal.ReleaseComObject(workbook);
+                    Marshal.ReleaseComObject(workbooks);
+                    Marshal.ReleaseComObject(excel);
+                    Marshal.FinalReleaseComObject(excel);
+                }
+                catch (Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex, mainForm);
+                }
             }
             return path;
         }
