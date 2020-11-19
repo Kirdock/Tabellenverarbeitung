@@ -97,8 +97,7 @@ namespace DataTableConverter.View
                 {
                     DataSource = new BindingSource(newHeadersDict, null),
                     DisplayMember = "key",
-                    ValueMember = "value",
-
+                    ValueMember = "value"
                 };
             }
             else

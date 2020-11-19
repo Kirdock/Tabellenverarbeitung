@@ -365,15 +365,23 @@ namespace DataTableConverter.Assisstant
             AddColumnWithAlias(column, column, tableName, defaultValue);
         }
 
-        internal void RenameAlias(string from, string to, string tableName = "")
+        internal string RenameAlias(string from, string to, string tableName = "main")
         {
-            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            string newAlias = to;
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
+                int counter = 1;
+                while(ContainsAlias(tableName, newAlias))
+                {
+                    newAlias = to + counter;
+                    counter++;
+                }
                 command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] set alias = ? where alias = ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = to });
                 command.Parameters.Add(new SQLiteParameter() { Value = from });
                 command.ExecuteNonQuery();
             }
+            return newAlias;
         }
 
         //it is not possible to remove a column from a table
@@ -771,12 +779,6 @@ namespace DataTableConverter.Assisstant
                     }
                 }
             }
-            
-            //SQLiteCommand command = new SQLiteCommand(Connection)
-            //{
-            //    CommandText = $"INSERT INTO {originalTable} SELECT * FROM {newTable}"
-            //};
-            //command.ExecuteNonQuery();
 
             Delete(newTable);
         }
@@ -852,11 +854,11 @@ namespace DataTableConverter.Assisstant
             return command.Substring(0, index == -1 ? command.Length -1 : index).ToUpper();
         }
 
-        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnAlias, string tableName = "main")
+        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnName, string tableName = "main")
         {
             string directory = Path.GetDirectoryName(sourceFilePath);
             string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
-            string invalidColumnName = GetColumnName(invalidColumnAlias ?? Properties.Settings.Default.InvalidColumnName, tableName);
+            
             SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.FailAddressText, encoding, invokeForm, false);
             return SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.RightAddressText, encoding, invokeForm, true); //return count of rows
         }
@@ -912,7 +914,7 @@ namespace DataTableConverter.Assisstant
             {
                 command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where alias = $alias";
                 command.Parameters.Add(new SQLiteParameter("$alias", alias));
-                columnName = command.ExecuteScalar().ToString();
+                columnName = command.ExecuteScalar()?.ToString();
             }
             return columnName;
         }
@@ -932,6 +934,38 @@ namespace DataTableConverter.Assisstant
                 }
             }
             return columnNames;
+        }
+
+        /// <summary>
+        /// Renames the given column to column+affix and creates a new one with alias
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <param name="tableName"></param>
+        /// <returns>columnName of the created column</returns>
+        internal string CopyColumn(string alias, string tableName)
+        {
+            //pre condition alias exists
+            RenameAlias(alias, alias + Properties.Settings.Default.OldAffix);
+            return AddColumnWithAdditionalIfExists(alias, string.Empty, tableName);
+        }
+
+        internal bool AddColumnWithDialog(string alias, Form invokeForm, string tableName, out string columnName)
+        {
+            bool inserted = true;
+            columnName = GetColumnName(alias, tableName);
+            if (columnName != null)
+            {
+                inserted = MessageHandler.MessagesYesNo(invokeForm, MessageBoxIcon.Warning, $"Es gibt bereits eine Spalte mit der Bezeichnung \"{alias}\".\nSpalte überschreiben?") == DialogResult.Yes;
+                if (inserted) //if yes override everything with empty
+                {
+                    SetColumnValues(alias, string.Empty, tableName);
+                }
+            }
+            else
+            {
+                columnName = AddColumnFixedAlias(alias, tableName);
+            }
+            return inserted;
         }
 
         internal void InsertDataPerColumnValue(string columnName, OrderType orderType, int limit, string sourceTable, string destinationTable)
@@ -1252,7 +1286,7 @@ namespace DataTableConverter.Assisstant
             Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(sourceTable);
             using (SQLiteCommand command = connection.CreateCommand())
             {
-                command.CommandText = $"ATTACH database [{DatabasePath}] as main";
+                command.CommandText = $"ATTACH database [{DatabasePath}] as main"; //probably everything not available because it is not commited
                 command.ExecuteNonQuery();
 
                 string colType = "varchar(255) not null default '' COLLATE NATURALSORT";

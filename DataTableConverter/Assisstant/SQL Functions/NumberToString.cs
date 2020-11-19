@@ -12,7 +12,8 @@ namespace DataTableConverter.Assisstant.SQL_Functions
     {
         public override object Invoke(object[] args)
         {
-            return ((decimal)args[0]).ToString(args[1].ToString());
+            decimal.TryParse(args[0].ToString(), out decimal result);
+            return result.ToString(args[1].ToString());
         }
     }
 }

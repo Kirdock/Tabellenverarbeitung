@@ -102,7 +102,10 @@
   <ItemGroup>
     <Compile Include="Assisstant\DatabaseHelper.cs" />
     <Compile Include="Assisstant\DatabaseHistory.cs" />
+    <Compile Include="Assisstant\DataHelper.cs" />
     <Compile Include="Assisstant\ErrorHelper.cs" />
+    <Compile Include="Assisstant\SQL Functions\NumberToString.cs" />
+    <Compile Include="Assisstant\SQL Functions\ParseDecimal.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
     <Compile Include="Assisstant\UpdateHelper.cs" />
     <Compile Include="Assisstant\WorkflowHelper.cs" />
@@ -120,7 +123,7 @@
     <Compile Include="Classes\PlusListboxItem.cs" />
     <Compile Include="Classes\Proc.cs" />
     <Compile Include="Classes\Case.cs" />
-    <Compile Include="Classes\SQLiteComparator.cs" />
+    <Compile Include="Assisstant\SQL Functions\SQLiteComparator.cs" />
     <Compile Include="Classes\TextImportTemplate.cs" />
     <Compile Include="Classes\Tolerance.cs" />
     <Compile Include="Classes\Work.cs" />

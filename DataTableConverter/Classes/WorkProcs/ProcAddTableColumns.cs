@@ -29,7 +29,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public ProcAddTableColumns(int ordinal, int id, string name) :base(ordinal, id, name)
         {
-            ReplacesTable = true;
+
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -47,21 +47,17 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            //I should first load the File (before workflow.start; right after header-check)
-            //additional method in WorkProc and only this class overrides it
-            //new SelectDuplicateColumns dialog only for second table
-            
-
             if (string.IsNullOrWhiteSpace(IdentifyAppend) || string.IsNullOrWhiteSpace(IdentifySource))
             {
                 return;
             }
             string path = null;
+
             List<string> files = new List<string>();
-            string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
+            string invalidColumnAlias = Properties.Settings.Default.InvalidColumnName;
             if (!CheckFile(filePath, ref path)) //find file
             {
-                OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(true);
+                OpenFileDialog dialog = invokeForm.ImportHelper.GetOpenFileDialog(true);
                 DialogResult res = DialogResult.Cancel;
                 invokeForm.Invoke(new MethodInvoker(() =>
                 {
@@ -78,8 +74,8 @@ namespace DataTableConverter.Classes.WorkProcs
                 files.Add(path);
             }
             Dictionary<string, ImportSettings> dict = new Dictionary<string, ImportSettings>();
-            ImportSettings setting = ImportHelper.GenerateSettingsThroughPreset(PresetType, SettingPreset);
-            DataTable importTables = null;
+            ImportSettings setting = invokeForm.ImportHelper.GenerateSettingsThroughPreset(PresetType, SettingPreset);
+            string importTables = null;
             int fileEncoding = 0;
 
             foreach (string file in files)
@@ -93,71 +89,18 @@ namespace DataTableConverter.Classes.WorkProcs
                     fileEncoding = setting.CodePage;
                 }
 
-                //DataTable newTable = ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
+                string newTable = invokeForm.ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
 
-
-                ////Try to outsorce the method StartMerge in Form1
-                //if(ImportHelper.ValidateImport(newTable, invokeForm, ref IdentifyAppend, ref invalidColumnName))
-                //{
-                //    if (importTables == null)
-                //    {
-                //        importTables = newTable;
-                //    }
-                //    else
-                //    {
-                //        importTables.ConcatTable(newTable, Path.GetFileName(path), Path.GetFileName(file));
-                //    }
-                //}
-
+                if (importTables == null)
+                {
+                    importTables = newTable;
+                }
+                else
+                {
+                    invokeForm.DatabaseHelper.ConcatTable(newTable, Path.GetFileName(path), Path.GetFileName(file), importTables);
+                }
             }
-            //string[] importColumns = new string[0];
-            //int sourceMergeIndex = -1;
-            //int importMergeIndex = -1;
-            //DialogResult result = DialogResult.No;
-
-            //if ((sourceMergeIndex = table.Columns.IndexOf(IdentifyAppend)) > -1)
-            //{
-            //    if ((importMergeIndex = importTables.Columns.IndexOf(IdentifyAppend)) > -1)
-            //    {
-            //        importColumns = importTables.HeadersOfDataTableAsString();
-            //        result = DialogResult.Yes;
-            //        if (table.Rows.Count != importTables.Rows.Count)
-            //        {
-            //            result = invokeForm.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({table.Rows.Count} zu {importTables.Rows.Count})!\nTrotzdem fortfahren?");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabellen haben keine Spalte mit der Bezeichnung {IdentifyAppend}");
-            //        result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
-            //    }
-            //}
-            //else
-            //{
-            //    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {IdentifyAppend}");
-            //    result = Form1.ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, table, importTables, string.Empty, invokeForm);
-            //}
-
-            //if (result != DialogResult.No)
-            //{
-            //    table.AddColumnsOfDataTable(importTables, importColumns, table.Columns.IndexOf(IdentifySource), importTables.Columns.IndexOf(IdentifyAppend), out int[] newIndices, null);
-            //    newOrderIndices = newIndices;
-            //    if (Properties.Settings.Default.SplitPVM)
-            //    {
-            //        int count = table.SplitDataTable(filePath, invokeForm, fileEncoding == 0 ? FileEncoding : fileEncoding, invalidColumnName);
-            //        if (count != 0 && !invokeForm.IsDisposed)
-            //        {
-            //            invokeForm.Invoke(new MethodInvoker(() =>
-            //            {
-            //                invokeForm.ValidRows = count;
-            //            }));
-            //        }
-            //    }
-            //    foreach (DataRow row in table.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
-            //    {
-            //        row.Delete();
-            //    }
-            //}
+            DataHelper.StartMerge(importTables, fileEncoding == 0 ? FileEncoding : fileEncoding, filePath, IdentifySource, IdentifyAppend, invalidColumnAlias, invokeForm, tableName);
         }
 
         internal static bool CheckFile(string filePath, ref string path)

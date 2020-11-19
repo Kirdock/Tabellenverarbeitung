@@ -124,9 +124,9 @@
             this.lblImportTable.AutoSize = true;
             this.lblImportTable.Location = new System.Drawing.Point(374, 9);
             this.lblImportTable.Name = "lblImportTable";
-            this.lblImportTable.Size = new System.Drawing.Size(63, 13);
+            this.lblImportTable.Size = new System.Drawing.Size(127, 13);
             this.lblImportTable.TabIndex = 11;
-            this.lblImportTable.Text = "ImportTable";
+            this.lblImportTable.Text = "Zu importierende Tabelle:";
             // 
             // lblSourceTable
             // 

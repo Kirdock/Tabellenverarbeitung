@@ -506,7 +506,31 @@ namespace DataTableConverter
                 switch (state)
                 {
                     case ImportState.Merge:
-                        StartMerge(tableName, filename, encoding);
+                        Thread thread = new Thread(() =>
+                        {
+                            try
+                            {
+                                StartLoadingBar();
+                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, this);
+                                StopLoadingBar();
+                                DatabaseHelper.SetSavepoint();
+                                LoadData(true);
+
+                                if (count != 0)
+                                {
+                                    Invoke(new MethodInvoker(() =>
+                                    {
+                                        ValidRows = count;
+                                    }));
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ErrorHelper.LogMessage(ex, this);
+                            }
+                        });
+                        thread.SetApartmentState(ApartmentState.STA);
+                        thread.Start();
                         break;
 
                     case ImportState.Append:
@@ -573,126 +597,6 @@ namespace DataTableConverter
 
 
             }));
-        }
-
-        private void StartMerge(string importTable, string filename, int encoding)
-        {
-            adjust;
-            string[] importColumnNames = new string[0];
-            string sourceIdentifierColumnName = null;
-            string importIdentifierColumnName = null;
-            DialogResult result = DialogResult.No;
-            int importRowCount = DatabaseHelper.GetRowCount(importTable);
-            int originalRowCount = DatabaseHelper.GetRowCount();
-            Dictionary<string,string> importTableColumnAliasMapping = DatabaseHelper.GetAliasColumnMapping(importTable);
-            Dictionary<string, string> originalTableColumnAliasMapping = DatabaseHelper.GetAliasColumnMapping();
-
-            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.PVMIdentifier))
-            {
-                result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, this);
-            }
-            else
-            {
-                if (originalTableColumnAliasMapping.ContainsKey(Properties.Settings.Default.PVMIdentifier))
-                {
-                    sourceIdentifierColumnName = Properties.Settings.Default.PVMIdentifier;
-                    
-                    
-                    if (importTableColumnAliasMapping.ContainsKey(Properties.Settings.Default.PVMIdentifier))
-                    {
-                        importIdentifierColumnName = Properties.Settings.Default.PVMIdentifier;
-                        
-                        importColumnNames = importTableColumnAliasMapping.Values.Cast<string>().ToArray();
-                        result = DialogResult.Yes;
-                        if (originalRowCount != importRowCount)
-                        {
-                            result = this.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({originalRowCount} zu {importRowCount })!\nTrotzdem fortfahren?");
-                        }
-                    }
-                    else
-                    {
-                        this.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabelle \"{filename}\" hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                        result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, this);
-                    }
-                }
-                else
-                {
-                    this.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                    result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, this);
-                }
-            }
-            
-            if (result == DialogResult.Yes)
-            {
-                Thread thread = new Thread(() =>
-                {
-                    try {
-                        string invalidColumnAlias = Properties.Settings.Default.InvalidColumnName;
-                        if (!importColumnNames.Contains(invalidColumnAlias))
-                        {
-                            SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnAlias }, importTableColumnAliasMapping, true);
-                            DialogResult res = DialogResult.Cancel;
-                            Invoke(new MethodInvoker(() =>
-                            {
-                                res = f.ShowDialog(this);
-                            }));
-                            if (res == DialogResult.OK)
-                            {
-                                invalidColumnAlias = f.Table.AsEnumerable().First()[1].ToString();
-                            }
-                        }
-
-                        bool abort = DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, this);
-
-                        if (abort) return;
-
-                        
-                        int count = 0;
-                        if (Properties.Settings.Default.SplitPVM)
-                        {
-                            count = DatabaseHelper.PVMSplit(FilePath, this, encoding, invalidColumnAlias);
-                        }
-                        DatabaseHelper.DeleteInvalidRows();
-
-                        DatabaseHelper.SetSavepoint();
-                        LoadData(true);
-
-                        if (count != 0)
-                        {
-                            Invoke(new MethodInvoker(() =>
-                            {
-                                ValidRows = count;
-                            }));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorHelper.LogMessage(ex, this);
-                    }
-                    StopLoadingBar();
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
-            }
-        }
-
-        internal static DialogResult ShowMergeForm(ref string[] importColumns, ref string sourceColumnName, ref string importColumnName, Dictionary<string,string> originalTableHeaders, int originalRowCount, Dictionary<string, string> importTableHeaders, int importRowCount, string filename, Form invokeForm)
-        {
-            MergeTable form = new MergeTable(originalTableHeaders, importTableHeaders, filename, originalRowCount, importRowCount);
-            bool result;
-            DialogResult res = DialogResult.Cancel;
-            invokeForm.Invoke(new MethodInvoker(() =>
-            {
-                res = form.ShowDialog(invokeForm);
-            }));
-            if (result = ( res == DialogResult.Yes))
-            {
-                importColumns = form.SelectedColumns.ToArray();
-                sourceColumnName = form.OriginalIdentifierColumnName;
-                importColumnName = form.ImportIdentifierColumnName;
-            }
-            form.Dispose();
-            return result ? DialogResult.Yes : DialogResult.No;
         }
 
         private void SetRowCount(int count)

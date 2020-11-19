@@ -28,7 +28,7 @@ namespace DataTableConverter.Classes.WorkProcs
             if (!string.IsNullOrWhiteSpace(Identifier))
             {
                 List<PlusListboxItem> additionalColumns = Columns.AsEnumerable().Select(row => new PlusListboxItem((PlusListboxItem.RowMergeState)Enum.ToObject(typeof(PlusListboxItem.RowMergeState), row[1] as int? ?? 0), row[0].ToString())).ToList();
-                table.MergeRows(Identifier, additionalColumns, Separator, null, null);
+                invokeForm.DatabaseHelper.MergeRows(Identifier, additionalColumns, Separator, invokeForm, null, tableName);
             }
         }
 

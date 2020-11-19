@@ -139,59 +139,6 @@ namespace DataTableConverter.Assisstant
             return tableName;
         }
 
-        internal bool ValidateImport(DataTable newTable, Form1 invokeForm, ref string identifyAppend, ref string invalidColumnName)
-        {
-            bool valid = false;
-            //if (newTable != null)
-            //{
-            //    string[] ImportHeaders = newTable.HeadersOfDataTableAsString();
-            //    List<string> notFoundHeaders = new List<string>();
-
-            //    if (!newTable.Columns.Contains(identifyAppend))
-            //    {
-            //        notFoundHeaders.Add(identifyAppend);
-            //    }
-            //    if (!newTable.Columns.Contains(invalidColumnName))
-            //    {
-            //        notFoundHeaders.Add(invalidColumnName);
-            //    }
-
-
-            //    if (notFoundHeaders.Count > 0)
-            //    {
-            //        SelectDuplicateColumns form = new SelectDuplicateColumns(notFoundHeaders.ToArray(), ImportHeaders, true)
-            //        {
-            //            Text = "Folgende Spalten der zu importierenden Tabelle wurden nicht gefunden"
-            //        };
-            //        DialogResult result = DialogResult.Cancel;
-            //        invokeForm.Invoke(new MethodInvoker(() =>
-            //        {
-            //            result = form.ShowDialog(invokeForm);
-            //        }));
-            //        if (result == DialogResult.OK)
-            //        {
-            //            string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
-            //            string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
-
-            //            for (int i = 0; i < from.Length; i++)
-            //            {
-            //                if (from[i] == invalidColumnName)
-            //                {
-            //                    invalidColumnName = to[i];
-            //                }
-            //                if (from[i] == identifyAppend)
-            //                {
-            //                    identifyAppend = to[i];
-            //                }
-            //            }
-            //            notFoundHeaders.Clear();
-            //        }
-            //    }
-            //    valid = notFoundHeaders.Count == 0;
-            //}
-            return valid;
-        }
-
         internal OpenFileDialog GetOpenFileDialog(bool multiselect)
         {
             return new OpenFileDialog
