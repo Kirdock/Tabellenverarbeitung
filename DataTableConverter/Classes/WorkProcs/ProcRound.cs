@@ -44,7 +44,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 if (row.ItemArray[0].ToString() == oldName)
                 {
-                    row.SetField(0, newName);
+                    row[0] = newName;
                 }
             }
         }
@@ -54,80 +54,29 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            newOrderIndices = new int[0];
             string[] columns = GetHeaders();
+            string[] sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
+            string[] destinationColumns;
 
             if (CopyOldColumn)
             {
-                //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
-                table.CopyColumns(columns);
+                destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
             }
-            bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
-            string c = newCol && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
-            bool intoNewCol = c != null;
-            
-
-            if (!newCol || c != null)
+            else if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                int lastCol = table.Columns.IndexOf(NewColumn);
-                List<int> headerIndices = table.HeaderIndices(columns);
-                foreach (DataRow row in table.Rows)
-                {
-                    for (int i = 0; i < row.ItemArray.Length; i++)
-                    {
-                        if (columns == null || headerIndices.Contains(i))
-                        {
-                            int index = intoNewCol ? lastCol : i;
-                            if (float.TryParse(row[i].ToString(), out float result))
-                            {
-                                row[index] = Round(result);
-                            }
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
             }
-        }
-
-        private string Round(float number)
-        {
-            string result;
-            switch (Type)
+            else
             {
-                //normal round
-                case 0:
-                    {
-                        result = Math.Round(number, Decimals, MidpointRounding.AwayFromZero).ToString();
-                    }
-                    break;
-
-                //ceiling
-                case 1:
-                    {
-                        result = RoundUp(number).ToString();
-                    }
-                    break;
-                //floor
-                default:
-                    {
-                        result = RoundDown(number).ToString();
-                    }
-                    break;
+                destinationColumns = sourceColumns;
             }
-            return result;
-        }
 
-        private double RoundUp(float input)
-        {
-            double multiplier = Math.Pow(10, Convert.ToDouble(Decimals));
-            return Math.Ceiling(input * multiplier) / multiplier;
-        }
-
-        private double RoundDown(float input)
-        {
-            double multiplier = Math.Pow(10, Convert.ToDouble(Decimals));
-            return Math.Floor(input * multiplier) / multiplier;
+            if (destinationColumns != null)
+            {
+                invokeForm.DatabaseHelper.RoundColumns(sourceColumns, destinationColumns, Type, Decimals, tableName);
+            }
         }
     }
 }

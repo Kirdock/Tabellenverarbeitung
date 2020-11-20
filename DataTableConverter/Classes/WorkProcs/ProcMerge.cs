@@ -111,14 +111,11 @@ namespace DataTableConverter.Classes.WorkProcs
                 string column = NewColumn;
                 if (CopyOldColumn && invokeForm.DatabaseHelper.GetColumnName(NewColumn, tableName) != null)
                 {
-                    column = invokeForm.DatabaseHelper.CopyColumn(NewColumn, tableName);
+                    column = invokeForm.DatabaseHelper.CopyColumn(NewColumn, tableName); //destinationColumn
                 }
                 else if(!CopyOldColumn)
                 {
-                    if (!invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out column))
-                    {
-                        column = null;
-                    }
+                    invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out column);
                 }
                 //column is columnName now
                 if (column != null)

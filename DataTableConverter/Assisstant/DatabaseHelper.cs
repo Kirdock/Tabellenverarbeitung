@@ -62,6 +62,7 @@ namespace DataTableConverter.Assisstant
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
             SQLiteFunction.RegisterFunction(typeof(ParseDecimal)); //PARSEDECIMAL(myValue)
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
+            SQLiteFunction.RegisterFunction(typeof(Round)); //ROUND2(myValue, type, decimalCount)
 
             if (createMainDatabase)
             {
@@ -70,6 +71,23 @@ namespace DataTableConverter.Assisstant
             CreateDatabase(TempDatabasePath);
             ConnectMain();
             ConnectTemp();
+        }
+
+        internal void RoundColumns(string[] sourceColumns, string[] destinationColumns, int type, int decimals, string tableName)
+        {
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder();
+                for(int i = 0; i < sourceColumns.Length; ++i)
+                {
+                    builder.Append("[").Append(destinationColumns[i]).Append("]=ROUND2([").Append(sourceColumns[i]).Append("],?,?), ");
+                }
+                builder.Remove(builder.Length - 2, 2);
+                command.CommandText = $"UPDATE [{tableName}] SET {builder}";
+                command.Parameters.Add(new SQLiteParameter() { Value = type });
+                command.Parameters.Add(new SQLiteParameter() { Value = decimals });
+                command.ExecuteNonQuery();
+            }
         }
 
         internal void CreateDatabase(string path)
@@ -180,7 +198,7 @@ namespace DataTableConverter.Assisstant
                 command.CommandText = $"DROP table if exists [{tableName + MetaTableAffix}]";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE table [{tableName + MetaTableAffix}] (column varchar(255) not null default '', alias varchar(255), sortorder INTEGER primary key AUTOINCREMENT)";
+                command.CommandText = $"CREATE table [{tableName + MetaTableAffix}] (column varchar(255) not null default '' COLLATE NATURALSORT, alias varchar(255) COLLATE NATURALSORT, sortorder INTEGER primary key AUTOINCREMENT)";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"INSERT INTO [{tableName + MetaTableAffix}] (column, alias) values ($column, $alias)";
@@ -919,6 +937,33 @@ namespace DataTableConverter.Assisstant
             return columnName;
         }
 
+        internal string[] GetColumnNames(string[] aliases, string tableName)
+        {
+            string[] columnNames = new string[aliases.Length];
+            aliases = aliases.OrderBy(alias => alias, new NaturalStringComparer()).ToArray();
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder();
+                builder.Append("alias = ?");
+                for(int i = 1; i < aliases.Length; ++i)
+                {
+                    builder.Append(" or alias = ?");
+                    command.Parameters.Add(new SQLiteParameter() { Value = aliases[i] });
+                }
+                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where {builder} order by alias";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    int i = 0;
+                    while (reader.Read())
+                    {
+                        columnNames[i] = reader.GetString(0);
+                        ++i;
+                    }
+                }
+            }
+            return columnNames;
+        }
+
         internal List<string> GetColumnNames(string tableName = "main", bool includeDeleted = false)
         {
             List<string> columnNames = new List<string>();
@@ -949,6 +994,29 @@ namespace DataTableConverter.Assisstant
             return AddColumnWithAdditionalIfExists(alias, string.Empty, tableName);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="aliases"></param>
+        /// <param name="tableName"></param>
+        /// <returns>Colum names of new columns</returns>
+        internal string[] CopyColumns(string[] aliases, string tableName)
+        {
+            for(int i = 0; i < aliases.Length; ++i)
+            {
+                aliases[i] = CopyColumn(aliases[i], tableName);
+            }
+            return aliases;
+        }
+
+        /// <summary>
+        /// Adds a column. If the column already exists the user is asked if he wants to override it
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <param name="invokeForm"></param>
+        /// <param name="tableName"></param>
+        /// <param name="columnName"></param>
+        /// <returns>Status if creation was successfull</returns>
         internal bool AddColumnWithDialog(string alias, Form invokeForm, string tableName, out string columnName)
         {
             bool inserted = true;
@@ -960,12 +1028,37 @@ namespace DataTableConverter.Assisstant
                 {
                     SetColumnValues(alias, string.Empty, tableName);
                 }
+                else
+                {
+                    columnName = null;
+                }
             }
             else
             {
                 columnName = AddColumnFixedAlias(alias, tableName);
             }
             return inserted;
+        }
+
+        /// <summary>
+        /// Adds columns. If one column already exists the user is asked if he wants to override it
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <param name="originalAlias"></param>
+        /// <param name="invokeForm"></param>
+        /// <param name="tableName"></param>
+        /// <param name="columnNames"></param>
+        /// <returns>Status if all columns were created</returns>
+        internal bool AddColumnsWithDialog(string alias, string[] originalAlias, Form invokeForm, string tableName, out string[] columnNames)
+        {
+            bool result = true;
+            columnNames = new string[originalAlias.Length];
+            for(int i = 0; i < originalAlias.Length; ++i)
+            {
+                result &= AddColumnWithDialog($"{originalAlias[i]}_{alias}", invokeForm, tableName, out string columnName);
+                columnNames[i] = columnName;
+            }
+            return result;
         }
 
         internal void InsertDataPerColumnValue(string columnName, OrderType orderType, int limit, string sourceTable, string destinationTable)
@@ -1339,7 +1432,7 @@ namespace DataTableConverter.Assisstant
                 int offset = 2; //ofset till the values of "headerString"
                 int sumOffset = offset + appendArray.Length;
                 bool containsSumColumns = sumColumns.Length != 0;
-                SQLiteCommand sumCommand = null;
+                //SQLiteCommand sumCommand = null;
                 using(SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
@@ -1532,6 +1625,7 @@ namespace DataTableConverter.Assisstant
                     }
                 }
             }
+            
             return id;
         }
 
