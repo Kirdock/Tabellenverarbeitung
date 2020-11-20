@@ -19,7 +19,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.FirstOrDefault()?.ToString()));
         }
 
         public ProcRound(int ordinal, int id, string name) : base(ordinal, id, name) { }
@@ -42,7 +42,7 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             foreach (DataRow row in Columns.Rows)
             {
-                if (row.ItemArray[0].ToString() == oldName)
+                if (row[0].ToString() == oldName)
                 {
                     row[0] = newName;
                 }

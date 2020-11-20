@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using DataTableConverter.Assisstant.SQL_Functions;
 using DataTableConverter.Classes;
+using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.Extensions;
 
 namespace DataTableConverter.Assisstant
@@ -63,6 +64,7 @@ namespace DataTableConverter.Assisstant
             SQLiteFunction.RegisterFunction(typeof(ParseDecimal)); //PARSEDECIMAL(myValue)
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
             SQLiteFunction.RegisterFunction(typeof(Round)); //ROUND2(myValue, type, decimalCount)
+            SQLiteFunction.RegisterFunction(typeof(DataTableConverter.Assisstant.SQL_Functions.Padding)); //PADDING(value, type, count, character)
 
             if (createMainDatabase)
             {
@@ -88,6 +90,87 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter() { Value = decimals });
                 command.ExecuteNonQuery();
             }
+        }
+
+        /// <summary>
+        /// Padding for columns depending on given conditions (if column = value)
+        /// </summary>
+        /// <param name="sourceColumns"></param>
+        /// <param name="destinationColumns"></param>
+        /// <param name="conditions"></param>
+        /// <param name="operationSide"></param>
+        /// <param name="counter"></param>
+        /// <param name="character"></param>
+        /// <param name="tableName"></param>
+        internal void Padding(string[] sourceColumns, string[] destinationColumns, DataTable conditions, ProcPadding.Side operationSide, int counter, char character, string tableName)
+        {
+            //UPDATE [{tableName}] SET destination1 = CASE
+            //        WHEN cond1Col = cond1Val or ... THEN PADDING(source1, type, counter, character)
+            //                       ELSE source1
+            //        END
+            TranslateAliasOfDataRowAndRemoveEmpty(conditions, (int)ProcPadding.ConditionColumn.Spalte, tableName);
+
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] SET ");
+                if (conditions.Rows.Count == 0)
+                {
+                    for (int i = 0; i < sourceColumns.Length; ++i)
+                    {
+                        builder.Append("[").Append(destinationColumns[i]).Append("] = PADDING([").Append(sourceColumns[i]).Append("],?,?,?),");
+                        command.Parameters.Add(new SQLiteParameter() { Value = (int)operationSide });
+                        command.Parameters.Add(new SQLiteParameter() { Value = counter });
+                        command.Parameters.Add(new SQLiteParameter() { Value = character });
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < sourceColumns.Length; ++i)
+                    {
+                        builder.Append("CASE WHEN ");
+                        foreach (DataRow rep in conditions.AsEnumerable())
+                        {
+                            string column = rep[(int)ProcPadding.ConditionColumn.Spalte].ToString();
+                            string value = rep[(int)ProcPadding.ConditionColumn.Wert].ToString();
+                            builder.Append("[").Append(column).Append("]=? or ");
+                            command.Parameters.Add(new SQLiteParameter() { Value = column });
+                        }
+                        builder.Remove(builder.Length - 3, 3);
+                        builder.Append("THEN PADDING([").Append(sourceColumns[i]).Append("],?,?,?)");
+                        command.Parameters.Add(new SQLiteParameter() { Value = (int)operationSide });
+                        command.Parameters.Add(new SQLiteParameter() { Value = counter });
+                        command.Parameters.Add(new SQLiteParameter() { Value = character });
+                        builder.Append(" ELSE [").Append(sourceColumns[i]).Append("] END ,");
+                    }
+                }
+
+                builder.Remove(builder.Length - 1, 1);
+                command.CommandText = builder.ToString();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Renames the column alias to column name on a given index
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="index"></param>
+        /// <param name="tableName"></param>
+        private void TranslateAliasOfDataRowAndRemoveEmpty(DataTable table, int index, string tableName)
+        {
+            foreach(DataRow row in table.AsEnumerable())
+            {
+                string column = row[index].ToString();
+                if (string.IsNullOrWhiteSpace(column))
+                {
+                    row.Delete();
+                }
+                else
+                {
+                    row[index] = GetColumnName(column, tableName);
+                }
+            }
+            table.AcceptChanges();
         }
 
         internal void CreateDatabase(string path)

@@ -17,9 +17,9 @@ namespace DataTableConverter.Classes.WorkProcs
         public char? Character = null;
         public int Counter = 1;
         public DataTable Conditions;
-        internal enum Side { Left, Right};
+        internal enum Side { Left = 0, Right = 1};
         internal Side OperationSide = Side.Right;
-        private enum ConditionColumn : int { Spalte = 0, Wert = 1};
+        internal enum ConditionColumn : int { Spalte = 0, Wert = 1};
 
         public ProcPadding(int ordinal, int id, string name) :base(ordinal, id, name)
         {
@@ -47,12 +47,11 @@ namespace DataTableConverter.Classes.WorkProcs
 
         internal string[] GetAffectedHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.FirstOrDefault()?.ToString()));
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            newOrderIndices = new int[0];
             string[] columns = GetAffectedHeaders();
             
             if (!Character.HasValue)
@@ -60,53 +59,25 @@ namespace DataTableConverter.Classes.WorkProcs
                 return;
             }
 
+            string[] sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
+            string[] destinationColumns;
+
             if (CopyOldColumn)
             {
-                //it would be easier/faster to rename oldColumn and create a new one with the old name; but with that method it is much for table.GetChanges() (History ValueChange)
-                table.CopyColumns(columns);
+                destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
+            }
+            else if (!string.IsNullOrWhiteSpace(NewColumn))
+            {
+                invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
+            }
+            else
+            {
+                destinationColumns = sourceColumns;
             }
 
-            bool newCol = !string.IsNullOrWhiteSpace(NewColumn);
-            string c = newCol && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
-            bool intoNewCol = c != null;
-            if (!newCol || c != null)
+            if (destinationColumns != null)
             {
-                foreach (DataRow row in table.Rows)
-                {
-                    foreach (string col in columns)
-                    {
-                        bool valid = Conditions.Rows.Count == 0;
-                        string index = c ?? col;
-                        bool result = false;
-                        foreach (DataRow rep in Conditions.Rows)
-                        {
-                            string column = rep[(int)ConditionColumn.Spalte].ToString();
-                            string value = rep[(int)ConditionColumn.Wert].ToString();
-                            if (!string.IsNullOrWhiteSpace(column))
-                            {
-                                result |= row[column].ToString() == value;
-                            }
-                        }
-                        if (valid || result)
-                        {
-                            switch (OperationSide)
-                            {
-                                case Side.Left:
-                                    row[index] = row[col].ToString().PadLeft(Counter, Character.Value);
-                                    break;
-
-                                case Side.Right:
-                                default:
-                                    row[index] = row[col].ToString().PadRight(Counter, Character.Value);
-                                    break;
-                            }
-                        }
-                        else if (intoNewCol)
-                        {
-                            row[index] = row[col];
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.Padding(sourceColumns, destinationColumns, Conditions, OperationSide, Counter, Character.Value, tableName);
             }
         }
 
