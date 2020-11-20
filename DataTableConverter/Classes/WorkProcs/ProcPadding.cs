@@ -59,23 +59,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 return;
             }
 
-            string[] sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
-            string[] destinationColumns;
-
-            if (CopyOldColumn)
-            {
-                destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
-            }
-            else if (!string.IsNullOrWhiteSpace(NewColumn))
-            {
-                invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
-            }
-            else
-            {
-                destinationColumns = sourceColumns;
-            }
-
-            if (destinationColumns != null)
+            if (PrepareMultiple(columns, invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))
             {
                 invokeForm.DatabaseHelper.Padding(sourceColumns, destinationColumns, Conditions, OperationSide, Counter, Character.Value, tableName);
             }

@@ -40,6 +40,7 @@ namespace DataTableConverter.Assisstant
             "DROP",
             "CREATE"
         };
+
         //Autoincrement only works on primary keys. BUT primary keys can be updated
         //Warning: Selection of "rowid" is equal to selecting primary key
         //Problem with DataTables to edit data: if there is a change in a row, the update statement contains all columns of the row, not only the changed ones
@@ -1773,10 +1774,14 @@ namespace DataTableConverter.Assisstant
             return deleteCount;
         }
 
-        //internal void CheckHeaders(List<string> tableHeader, List<string> notFoundColumns, string[] aliases, string tableName = "main")
-        //{
-        //    Dictionary<string,string> aliasColumnMapping = GetAliasColumnMapping(tableName);
-        //    notFoundColumns.AddRange( aliases.Where(header => !tableHeader.Contains(header, System.StringComparer.OrdinalIgnoreCase)));
-        //}
+        internal void EmptyColumnByCondition(string sourceColumn, string destinationColumn, string compareAlias, string tableName)
+        {
+            string compareColumn = GetColumnName(compareAlias, tableName);
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName}] SET [{destinationColumn}] = CASE WHEN [{sourceColumn}] = [{compareColumn}] THEN '' ELSE [{sourceColumn}]";
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }

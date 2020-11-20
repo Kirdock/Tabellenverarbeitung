@@ -57,23 +57,8 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
             string[] columns = GetHeaders();
-            string[] sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
-            string[] destinationColumns;
 
-            if (CopyOldColumn)
-            {
-                destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
-            }
-            else if (!string.IsNullOrWhiteSpace(NewColumn))
-            {
-                invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
-            }
-            else
-            {
-                destinationColumns = sourceColumns;
-            }
-
-            if (destinationColumns != null)
+            if (PrepareMultiple(columns, invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))
             {
                 invokeForm.DatabaseHelper.RoundColumns(sourceColumns, destinationColumns, Type, Decimals, tableName);
             }

@@ -55,6 +55,40 @@ namespace DataTableConverter.Classes
             return hashCode;
         }
 
+        protected bool PrepareMultiple(string[] columns, Form1 invokeForm, string tableName, out string[] sourceColumns, out string[] destinationColumns)
+        {
+            sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
+
+            if (CopyOldColumn)
+            {
+                destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
+            }
+            else if (!string.IsNullOrWhiteSpace(NewColumn))
+            {
+                invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
+            }
+            else
+            {
+                destinationColumns = sourceColumns;
+            }
+            return destinationColumns != null;
+        }
+
+        protected bool PrepareSingle(ref string sourceColumn, Form1 invokeForm, string tableName, out string destinationColumn)
+        {
+            sourceColumn = invokeForm.DatabaseHelper.GetColumnName(sourceColumn, tableName);
+            destinationColumn = sourceColumn;
+            if (CopyOldColumn)
+            {
+                destinationColumn = invokeForm.DatabaseHelper.CopyColumn(sourceColumn, tableName);
+            }
+            else if (!string.IsNullOrWhiteSpace(NewColumn))
+            {
+                invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out destinationColumn);
+            }
+            return destinationColumn != null;
+        }
+
         abstract public string[] GetHeaders();
 
         abstract public void RenameHeaders(string oldName, string newName);

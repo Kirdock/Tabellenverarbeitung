@@ -29,42 +29,14 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            bool isNewColumn = !string.IsNullOrWhiteSpace(NewColumn);
             if (string.IsNullOrWhiteSpace(SourceColumn) || string.IsNullOrWhiteSpace(CompareColumn))
             {
                 return;
             }
 
-            string column = SourceColumn;
-            if (CopyOldColumn)
+            if (PrepareSingle(ref SourceColumn, invokeForm, tableName, out string destinationColumn))
             {
-                table.CopyColumns(new string[] { SourceColumn });
-            }
-            else if (isNewColumn)
-            {
-                column = table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
-            }
-
-            if (column != null)
-            {
-                if (isNewColumn)
-                {
-                    foreach (DataRow row in table.Rows)
-                    {
-                        string source = row[SourceColumn].ToString();
-                        row[column] = source == row[CompareColumn].ToString() ? string.Empty : source;
-                    }
-                }
-                else
-                {
-                    foreach (DataRow row in table.Rows)
-                    {
-                        if (row[SourceColumn].ToString() == row[CompareColumn].ToString())
-                        {
-                            row[column] = string.Empty;
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.EmptyColumnByCondition(SourceColumn, destinationColumn, CompareColumn, tableName);
             }
         }
 
