@@ -289,9 +289,25 @@ namespace DataTableConverter
             }
             if (view.Name == "dgCaseColumns")
             {
-                WorkflowHelper.RemoveRowThroughCaseChange(Workflows, rowIndizes, SelectedCase);
+                RemoveRowThroughCaseChange(Workflows, rowIndizes, SelectedCase);
             }
             MyFunction?.Invoke(null, null);
+        }
+
+        private void RemoveRowThroughCaseChange(List<Work> workflows, List<int> rowIndizes, int casId)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == casId && proc.GetType() == typeof(Classes.WorkProcs.ProcDuplicate)).ToList().ForEach((caseProc) =>
+                {
+                    List<string> columns = caseProc.DuplicateColumns.ToList();
+                    foreach (int index in rowIndizes.OrderByDescending(x => x))
+                    {
+                        columns.RemoveAt(index);
+                    }
+                    caseProc.DuplicateColumns = columns.ToArray();
+                });
+            }
         }
 
         private void InsertRowClick(DataGridView view, int rowIndex)
@@ -304,9 +320,22 @@ namespace DataTableConverter
 
             if (view.Name == "dgCaseColumns")
             {
-                WorkflowHelper.InsertRowThroughCaseChange(Workflows, rowIndex, SelectedCase);
+                InsertRowThroughCaseChange(Workflows, rowIndex, SelectedCase);
             }
             MyFunction?.Invoke(null, null);
+        }
+
+        private void InsertRowThroughCaseChange(List<Work> workflows, int rowIndex, int casId)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == casId).ToList().ForEach((caseProc) =>
+                {
+                    List<string> columns = caseProc.DuplicateColumns.ToList();
+                    columns.Insert(rowIndex, string.Empty);
+                    caseProc.DuplicateColumns = columns.ToArray();
+                });
+            }
         }
 
 

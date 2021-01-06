@@ -18,7 +18,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool AllColumns { get; set; }
         public override string[] GetHeaders()
         {
-            return AllColumns ? new string[0] : WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return AllColumns ? new string[0] : RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public ProcUpLowCase(int ordinal, int id,string name) : base(ordinal, id, name) {
@@ -53,10 +53,8 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            newOrderIndices = new int[0];
-
             string[] columns = GetHeaders();
             List<int> headerIndices = table.HeaderIndices(columns);
 

@@ -28,7 +28,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(DuplicateColumns);
+            return RemoveEmptyHeaders(DuplicateColumns);
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -47,24 +47,29 @@ namespace DataTableConverter.Classes.WorkProcs
             DuplicateColumns = DuplicateColumns.Where(x => x != colName).ToArray();
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
             DuplicateColumns = GetHeaders();
-            newOrderIndices = new int[0];
             Hashtable hTable = new Hashtable();
             Hashtable totalTable = new Hashtable();
 
             int[] subStringBegin = duplicateCase.getBeginSubstring();
             int[] subStringEnd = duplicateCase.getEndSubstring();
 
-
-            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
+            //we could calculate an identifier and save it into another table (make it with an index but not primary key)
+            //first iteration => save identifier and rowId into another table
+            //second iteration => select everything with count > 1
+            string column = null;
+            if (!string.IsNullOrWhiteSpace(NewColumn))
+            {
+                invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out column);
+            }
 
             if (column != null)
             {
                 for (int index = 0; index < table.Rows.Count; index++)
                 {
-                    string identifierTotal = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, null, null, null);
+                    string identifierTotal = GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, null, null, null);
                     bool isTotal;
                     if (isTotal = totalTable.Contains(identifierTotal))
                     {
@@ -77,7 +82,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
                     if (!isTotal)
                     {
-                        string identifier = WorkflowHelper.GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
+                        string identifier = GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
                         if (hTable.Contains(identifier))
                         {
                             table.Rows[(int)hTable[identifier]].SetField(column, duplicateCase.Shortcut);
@@ -90,6 +95,60 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
                 }
             }
+        }
+
+        private string GetColumnsAsObjectArray(DataRow row, string[] columns, int[] subStringBegin, int[] subStringEnd, List<Tolerance> tolerances)
+        {
+            StringBuilder res = new StringBuilder();
+            for (int i = 0; i < columns.Length; i++)
+            {
+                #region Set Tolerances
+                StringBuilder result = new StringBuilder(row[columns[i]].ToString().ToLower());
+                if (tolerances != null)
+                {
+                    foreach (Tolerance tol in tolerances)
+                    {
+                        List<string> array = new List<string>(tol.getColumnsAsArrayToLower()) { tol.Name }.Distinct().ToList();
+                        string replaceWith = array.Contains(string.Empty) ? string.Empty : tol.Name;
+                        array.Remove(string.Empty);
+
+                        foreach (string t in array)
+                        {
+                            result.Replace(t, replaceWith);
+                        }
+                    }
+                }
+                #endregion
+
+                string resultString = result.ToString();
+
+                #region Set Substring
+                if (subStringBegin != null)
+                {
+                    int begin = subStringBegin[i];
+                    int end = subStringEnd[i];
+                    if (begin != 0 && end != 0 && end >= begin)
+                    {
+                        if (begin - 1 > resultString.Length)
+                        {
+                            resultString = string.Empty;
+                        }
+                        else
+                        {
+                            int count = end - begin + 1;
+                            if (begin + count > resultString.Length)
+                            {
+                                count = resultString.Length - begin + 1;
+                            }
+                            resultString = resultString.Substring(begin - 1, count);
+                        }
+                    }
+                }
+                #endregion
+
+                res.Append("|").Append(resultString);
+            }
+            return res.ToString();
         }
 
     }

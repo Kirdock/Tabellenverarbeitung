@@ -20,7 +20,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public Proc Procedure;
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
+            return RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
         public ProcUser(int ordinal, int id,string name) : base(ordinal, id, name) { }

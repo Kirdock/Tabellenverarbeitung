@@ -83,12 +83,12 @@ namespace DataTableConverter.Assisstant
                 StringBuilder builder = new StringBuilder();
                 for(int i = 0; i < sourceColumns.Length; ++i)
                 {
-                    builder.Append("[").Append(destinationColumns[i]).Append("]=ROUND2([").Append(sourceColumns[i]).Append("],?,?), ");
+                    builder.Append("[").Append(destinationColumns[i]).Append("]=ROUND2([").Append(sourceColumns[i]).Append("],$type,$decimals), ");
                 }
                 builder.Remove(builder.Length - 2, 2);
+                command.Parameters.AddWithValue("$type", type);
+                command.Parameters.AddWithValue("$decimals", decimals);
                 command.CommandText = $"UPDATE [{tableName}] SET {builder}";
-                command.Parameters.Add(new SQLiteParameter() { Value = type });
-                command.Parameters.Add(new SQLiteParameter() { Value = decimals });
                 command.ExecuteNonQuery();
             }
         }
@@ -118,10 +118,7 @@ namespace DataTableConverter.Assisstant
                 {
                     for (int i = 0; i < sourceColumns.Length; ++i)
                     {
-                        builder.Append("[").Append(destinationColumns[i]).Append("] = PADDING([").Append(sourceColumns[i]).Append("],?,?,?),");
-                        command.Parameters.Add(new SQLiteParameter() { Value = (int)operationSide });
-                        command.Parameters.Add(new SQLiteParameter() { Value = counter });
-                        command.Parameters.Add(new SQLiteParameter() { Value = character });
+                        builder.Append("[").Append(destinationColumns[i]).Append("] = PADDING([").Append(sourceColumns[i]).Append("],$side,$counter,$char),");
                     }
                 }
                 else
@@ -134,17 +131,16 @@ namespace DataTableConverter.Assisstant
                             string column = rep[(int)ProcPadding.ConditionColumn.Spalte].ToString();
                             string value = rep[(int)ProcPadding.ConditionColumn.Wert].ToString();
                             builder.Append("[").Append(column).Append("]=? or ");
-                            command.Parameters.Add(new SQLiteParameter() { Value = column });
+                            command.Parameters.Add(new SQLiteParameter() { Value = value });
                         }
                         builder.Remove(builder.Length - 3, 3);
-                        builder.Append("THEN PADDING([").Append(sourceColumns[i]).Append("],?,?,?)");
-                        command.Parameters.Add(new SQLiteParameter() { Value = (int)operationSide });
-                        command.Parameters.Add(new SQLiteParameter() { Value = counter });
-                        command.Parameters.Add(new SQLiteParameter() { Value = character });
+                        builder.Append("THEN PADDING([").Append(sourceColumns[i]).Append("],$side,$counter,$char)");
                         builder.Append(" ELSE [").Append(sourceColumns[i]).Append("] END ,");
                     }
                 }
-
+                command.Parameters.AddWithValue("$side", (int)operationSide);
+                command.Parameters.AddWithValue("$counter", counter);
+                command.Parameters.AddWithValue("$char", character);
                 builder.Remove(builder.Length - 1, 1);
                 command.CommandText = builder.ToString();
                 command.ExecuteNonQuery();

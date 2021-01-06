@@ -114,7 +114,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Files.Select(file => file.Column));
+            return RemoveEmptyHeaders(Files.Select(file => file.Column));
         }
 
         public override void RenameHeaders(string oldName, string newName)

@@ -337,8 +337,7 @@ namespace DataTableConverter
                     headers.AddRange(wpHeaders.Select(header => header + Properties.Settings.Default.OldAffix));
                 }
 
-                WorkflowHelper.CheckHeaders(headers, notFoundColumns, wpHeaders);
-                
+                notFoundColumns.AddRange(wpHeaders.Where(header => !headers.Contains(header, System.StringComparer.OrdinalIgnoreCase)));
 
                 if(notFoundColumns.Count > 0)
                 {

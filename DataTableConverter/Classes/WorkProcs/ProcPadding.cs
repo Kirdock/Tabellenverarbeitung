@@ -42,12 +42,12 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             HashSet<string> headers = new HashSet<string>(GetAffectedHeaders());
             Conditions.AsEnumerable().Select(row => row[(int)ConditionColumn.Spalte].ToString()).ToList().ForEach(header => headers.Add(header));
-            return WorkflowHelper.RemoveEmptyHeaders(headers);
+            return RemoveEmptyHeaders(headers);
         }
 
         internal string[] GetAffectedHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.FirstOrDefault()?.ToString()));
+            return RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.FirstOrDefault()?.ToString()));
         }
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")

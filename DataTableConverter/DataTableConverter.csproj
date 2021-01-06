@@ -105,10 +105,12 @@
     <Compile Include="Assisstant\DataHelper.cs" />
     <Compile Include="Assisstant\ErrorHelper.cs" />
     <Compile Include="Assisstant\SQL Functions\NumberToString.cs" />
+    <Compile Include="Assisstant\SQL Functions\Padding.cs" />
     <Compile Include="Assisstant\SQL Functions\ParseDecimal.cs" />
+    <Compile Include="Assisstant\SQL Functions\Round.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
     <Compile Include="Assisstant\UpdateHelper.cs" />
-    <Compile Include="Assisstant\WorkflowHelper.cs" />
+    <Compile Include="Assisstant\WorkflowFactory.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
     <Compile Include="Classes\CountListboxItem.cs" />
     <Compile Include="Classes\DetectTextEncoding.cs" />

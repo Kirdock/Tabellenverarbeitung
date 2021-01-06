@@ -1273,14 +1273,27 @@ namespace DataTableConverter.View
                 if (cmbProcedureType.SelectedIndex == 3)
                 {
                     int index = GetWorkflowIndexThroughId((int)lbProcedures.SelectedValue);
-                    workflow.Procedures.AddRange(WorkflowHelper.CopyProcedures(Workflows[index].Procedures));
+                    workflow.Procedures.AddRange(CopyProcedures(Workflows[index].Procedures));
                 }
                 else
                 {
-                    workflow.Procedures.Add(WorkflowHelper.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
+                    workflow.Procedures.Add(WorkflowFactory.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
                 }
 
                 SetWorkflowProcedures(workflow.Procedures);
+            }
+        }
+
+        private List<WorkProc> CopyProcedures(List<WorkProc> proc)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                formatter.Serialize(memoryStream, proc);
+
+                memoryStream.Position = 0;
+
+                return (List<WorkProc>)formatter.Deserialize(memoryStream);
             }
         }
 
@@ -1602,8 +1615,24 @@ namespace DataTableConverter.View
         private void dgCaseColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             ViewHelper.EndDataGridViewEdit(dgCaseColumns);
-            WorkflowHelper.AdjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
+            AdjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
             lbUsedProcedures_SelectedIndexChanged(null, null);
+        }
+
+        private void AdjustDuplicateColumns(Case selectedItem, List<Work> workflows)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == selectedItem.Id).ToList().ForEach((caseProc) =>
+                {
+                    if (selectedItem.Columns.Rows.Count > caseProc.DuplicateColumns.Length)
+                    {
+                        List<string> temp = caseProc.DuplicateColumns.ToList();
+                        temp.Add(string.Empty);
+                        caseProc.DuplicateColumns = temp.ToArray();
+                    }
+                });
+            }
         }
 
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)

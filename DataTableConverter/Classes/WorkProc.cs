@@ -89,6 +89,11 @@ namespace DataTableConverter.Classes
             return destinationColumn != null;
         }
 
+        protected static string[] RemoveEmptyHeaders(IEnumerable<string> headers)
+        {
+            return headers.Where(header => !string.IsNullOrWhiteSpace(header)).ToArray();
+        }
+
         abstract public string[] GetHeaders();
 
         abstract public void RenameHeaders(string oldName, string newName);

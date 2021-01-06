@@ -19,7 +19,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.FirstOrDefault()?.ToString()));
+            return RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.FirstOrDefault()?.ToString()));
         }
 
         public ProcRound(int ordinal, int id, string name) : base(ordinal, id, name) { }
@@ -57,7 +57,6 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
             string[] columns = GetHeaders();
-
             if (PrepareMultiple(columns, invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))
             {
                 invokeForm.DatabaseHelper.RoundColumns(sourceColumns, destinationColumns, Type, Decimals, tableName);

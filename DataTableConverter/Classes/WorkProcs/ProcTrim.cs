@@ -54,7 +54,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return AllColumns ? new string[0] : WorkflowHelper.RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
+            return AllColumns ? new string[0] : RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -79,9 +79,9 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            newOrderIndices = new int[0];
+            //could use own SQL function here because of regex
             if (Characters.Contains(" "))
             {
                 Characters += (char)160;

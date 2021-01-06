@@ -34,7 +34,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.AsEnumerable().Select(row => row[0].ToString()).Concat(new string[] { Identifier }).Distinct());
+            return RemoveEmptyHeaders(Columns.AsEnumerable().Select(row => row[0].ToString()).Concat(new string[] { Identifier }).Distinct());
         }
 
         public override void RenameHeaders(string oldName, string newName)

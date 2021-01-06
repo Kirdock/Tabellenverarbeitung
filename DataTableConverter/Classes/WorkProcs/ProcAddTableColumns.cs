@@ -24,7 +24,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(new string[] { IdentifySource });
+            return RemoveEmptyHeaders(new string[] { IdentifySource });
         }
 
         public ProcAddTableColumns(int ordinal, int id, string name) :base(ordinal, id, name)
