@@ -65,6 +65,10 @@ namespace DataTableConverter.Assisstant
             SQLiteFunction.RegisterFunction(typeof(ParseDecimal)); //PARSEDECIMAL(myValue)
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
             SQLiteFunction.RegisterFunction(typeof(Round)); //ROUND2(myValue, type, decimalCount)
+            SQLiteFunction.RegisterFunction(typeof(CountString)); //COUNTSTRING(myValue, mySubstring)
+            SQLiteFunction.RegisterFunction(typeof(GetSplit)); //GETSPLIT(myValue, mySubstring, myIndex)
+            SQLiteFunction.RegisterFunction(typeof(CustomUppercase)); //CUSTOMUPPERCASE(myValue, myOption)
+            SQLiteFunction.RegisterFunction(typeof(CustomTrim)); //CUSTOMTRIM(myValue, myCharacters, isDeleteDouble, trimType)
             SQLiteFunction.RegisterFunction(typeof(DataTableConverter.Assisstant.SQL_Functions.Padding)); //PADDING(value, type, count, character)
 
             if (createMainDatabase)
@@ -530,6 +534,14 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="tableName"></param>
+        /// <param name="destinationTableColumnAliasMapping"></param>
+        /// <returns>Column name of created column</returns>
         internal string AddColumnWithAdditionalIfExists(string columnName, string defaultValue = "", string tableName = "main", Dictionary<string,string> destinationTableColumnAliasMapping = null)
         {
             destinationTableColumnAliasMapping = destinationTableColumnAliasMapping  ?? GetAliasColumnMapping(tableName);
@@ -549,6 +561,7 @@ namespace DataTableConverter.Assisstant
         /// <param name="alias"></param>
         /// <param name="tableName"></param>
         /// <param name="defaultValue"></param>
+        /// /// <returns>Column name of created column</returns>
         internal string AddColumnFixedAlias(string alias, string tableName = "main", string defaultValue = "", IEnumerable<string> columnNames = null)
         {
             columnNames = columnNames ?? GetColumnNames(tableName, true);
@@ -1344,6 +1357,22 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        internal void UpdateCells(List<KeyValuePair<string, int>> updates, string column, string tableName = "main")
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName}] set [{column}] = ? where [{IdColumnName}] = ?";
+                command.Parameters.Add(new SQLiteParameter());
+                command.Parameters.Add(new SQLiteParameter());
+                foreach(KeyValuePair<string, int> pair in updates)
+                {
+                    command.Parameters[0].Value = pair.Key;
+                    command.Parameters[1].Value = pair.Value;
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
         internal void UpdateCell(string value, string alias, string id, bool aliasIsColumnName = false, string tableName = "main")
         {
             using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -1776,6 +1805,198 @@ namespace DataTableConverter.Assisstant
             using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = $"UPDATE [{tableName}] SET [{destinationColumn}] = CASE WHEN [{sourceColumn}] = [{compareColumn}] THEN '' ELSE [{sourceColumn}]";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private int GetMaxOccurenciesOfString(string sourceAlias, string subString, string tableName)
+        {
+            int max = 0;
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"Select max(Select COUNTSTRING([{GetColumnName(sourceAlias, tableName)}], ?) from [${tableName}])";
+                command.Parameters.Add(new SQLiteParameter() { Value = subString });
+                max = (int)command.ExecuteScalar();
+            }
+            return max;
+        }
+
+        internal void SplitColumnByString(string sourceAlias, string newColumn, string splitText, string tableName = "main")
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                int max = GetMaxOccurenciesOfString(sourceAlias, splitText, tableName);
+                StringBuilder builder = new StringBuilder($"Update [{tableName}] set ");
+                for (int i = 1; i <= max; i++)
+                {
+                    string createdColumn = AddColumnWithAdditionalIfExists($"{newColumn}{i}", string.Empty, tableName);
+                    builder.Append($"[{createdColumn}] = GETSPLIT([{createdColumn}], $splitText,{i - 1}),");
+                }
+                command.CommandText = builder.Remove(builder.Length - 1, 1).ToString();
+                command.Parameters.AddWithValue("$splitText", splitText);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal void Enumerate(string destinationColumn, int start, int end, bool repeat, string order, OrderType orderType, string tableName = "main")
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName}] SET [{IdColumnName}] = - [{IdColumnName}]";
+                command.ExecuteNonQuery();
+
+                command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, -1, true, tableName);
+
+                List<KeyValuePair<string, int>> updates = new List<KeyValuePair<string, int>>();
+                using(SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    int count = start;
+                    bool noEnd = end != 0;
+                    while (reader.Read())
+                    {
+                        updates.Add(new KeyValuePair<string, int>(reader.GetString(0), count));
+                        
+                        count++;
+                        if (noEnd && count > end)
+                        {
+                            if (repeat)
+                            {
+                                count = start;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                UpdateCells(updates, destinationColumn, tableName);
+            }
+        }
+
+        internal void ReplaceColumnValues(IEnumerable<DataRow> distinctDataTale, string tableName)
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] set ");
+
+                foreach (DataRow replaceRow in distinctDataTale)
+                {
+                    builder.Append($"[{GetColumnName(replaceRow[(int)ProcReplaceWhole.ColumnIndex.Column].ToString(), tableName)}] = ?,");
+                    command.Parameters.Add(new SQLiteParameter() { Value = replaceRow[(int)ProcReplaceWhole.ColumnIndex.Value].ToString() });
+                }
+
+                command.CommandText = builder.Remove(builder.Length - 1, 1).ToString();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal void SetCustomUppercase(string[] aliases, int option, string tableName = "main")
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                string[] columns = GetColumnNames(aliases, tableName);
+                StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] set ");
+                foreach(string column in columns)
+                {
+                    builder.Append($"[{column}] = CUSTOMUPPERCASE([{column}], {option}),");
+                }
+                command.CommandText = builder.Remove(builder.Length - 1, 1).ToString();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal void Trim(string characters, string[] columnAlias, bool deleteDouble, ProcTrim.TrimType type, string tableName = "main")
+        {
+            string[] columns = columnAlias == null ? GetColumnNames(tableName).ToArray() : GetColumnNames(columnAlias, tableName);
+            using(SQLiteCommand commmand = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] set ");
+                foreach(string column in columns)
+                {
+                    builder.Append($"[{column}]=CUSTOMTRIM([{column}],$characters,$deleteDouble, $type),");
+                }
+                commmand.Parameters.AddWithValue("$characters", characters);
+                commmand.Parameters.AddWithValue("$deleteDouble", deleteDouble);
+                commmand.Parameters.AddWithValue("$type", type == ProcTrim.TrimType.Start ? 0 : type == ProcTrim.TrimType.End ? 1 : 2);
+                commmand.CommandText = builder.Remove(builder.Length - 1, 1).ToString();
+                commmand.ExecuteNonQuery();
+            }
+        }
+
+        internal void SearchAndShortcut(string sourceColumn, string destinationColumn, bool totalSearch, string searchText, string shortcut, int from, int to, string order, OrderType orderType, string tableName = "main")
+        {
+            Func<string, string, bool> search;
+            if (totalSearch)
+            {
+                search = SearchTotal;
+            }
+            else
+            {
+                search = PartialSearch;
+            }
+            
+            if (string.IsNullOrWhiteSpace(shortcut))
+            {
+                int counter = from;
+                bool found = false;
+
+
+                using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+                {
+                    command.CommandText = GetSortedSelectString(GetHeaderString(new string[] { sourceColumn }), order, orderType, -1, -1, true, tableName);
+
+                    List<KeyValuePair<string, int>> updates = new List<KeyValuePair<string, int>>();
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (found)
+                            {
+                                if (counter > to)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    updates.Add(new KeyValuePair<string, int>(reader.GetString(0), counter));
+                                    counter++;
+                                }
+                            }
+                            else if (search.Invoke(reader.GetString(1), searchText))
+                            {
+                                updates.Add(new KeyValuePair<string, int>(reader.GetString(0), counter));
+                                found = true;
+                                counter++;
+                            }
+                        }
+                    }
+                    UpdateCells(updates, destinationColumn, tableName);
+                }
+            }
+            else
+            {
+                SetShortcut(searchText, shortcut, sourceColumn, destinationColumn, totalSearch, tableName);
+            }
+        }
+
+        private bool SearchTotal(string value, string searchText)
+        {
+            return value == searchText;
+        }
+
+        private bool PartialSearch(string value, string searchText)
+        {
+            return value.Contains(searchText);
+        }
+
+        private void SetShortcut(string searchText, string shortcut, string sourceColumn, string destinationColumn, bool totalSearch, string tableName)
+        {
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName}] set [{sourceColumn}] = ? where [{destinationColumn}] {(totalSearch ? "= ?" : "like %?%")}";
+                command.Parameters.Add(new SQLiteParameter() { Value = shortcut });
+                command.Parameters.Add(new SQLiteParameter() { Value = searchText });
                 command.ExecuteNonQuery();
             }
         }

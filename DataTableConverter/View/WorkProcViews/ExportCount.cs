@@ -17,10 +17,12 @@ namespace DataTableConverter.View
         internal int Count => (int)nbCount.Value;
         internal bool ShowFromTo => cbShowFromTo.Checked;
         internal string Table;
+        private readonly DatabaseHelper DatabaseHelper;
 
-        public ExportCount(Dictionary<string,string> aliasColumnMapping, string tableName = "main")
+        internal ExportCount(Dictionary<string,string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName = "main")
         {
             InitializeComponent();
+            DatabaseHelper = databaseHelper;
             Table = tableName;
             SetHeaders(aliasColumnMapping);
             cbShowFromTo.Checked = Properties.Settings.Default.CountFromTo;

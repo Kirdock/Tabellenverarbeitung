@@ -42,70 +42,15 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            int index = table.Columns.IndexOf(Header);
-            if (index != -1 && From <= To )
+            string column = invokeForm.DatabaseHelper.GetColumnName(Header, tableName);
+            if (column != null && From <= To )
             {
                 if (!string.IsNullOrWhiteSpace(NewColumn))
                 {
-                    string col = table.Columns.Contains(NewColumn) ? NewColumn : table.TryAddColumn(NewColumn);
-                    
-                    Func<string, string, bool> search;
-                    if (TotalSearch)
-                    {
-                        search = SearchTotal;
-                    }
-                    else
-                    {
-                        search = PartialSearch;
-                    }
-                    if (string.IsNullOrWhiteSpace(Shortcut))
-                    {
-                        int counter = From;
-                        bool found = false;
-                        foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
-                        {
-                            if (found)
-                            {
-                                if (counter > To)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    row[col] = counter;
-                                    counter++;
-                                }
-                            }
-                            else if (search.Invoke(row[index].ToString(), SearchText))
-                            {
-                                row[col] = counter;
-                                found = true;
-                                counter++;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
-                        {
-                            if (search.Invoke(row[index].ToString(), SearchText))
-                            {
-                                row[col] = Shortcut;
-                            }
-                        }
-                    }
+                    string col = invokeForm.DatabaseHelper.GetColumnName(NewColumn, tableName) ?? invokeForm.DatabaseHelper.AddColumnWithAdditionalIfExists(NewColumn);
+                    invokeForm.DatabaseHelper.SearchAndShortcut(Header, col, TotalSearch, SearchText, Shortcut, From, To, sortingOrder, orderType, tableName);
                 }
             }
-        }
-
-        private bool SearchTotal(string value, string searchText)
-        {
-            return value == searchText;
-        }
-
-        private bool PartialSearch(string value, string searchText)
-        {
-            return value.Contains(searchText);
         }
 
         public override string[] GetHeaders()

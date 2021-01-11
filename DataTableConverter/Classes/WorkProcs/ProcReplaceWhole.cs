@@ -47,7 +47,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return new string[0];
         }
 
-        private IEnumerable<DataRow> GetFoundRows(DataColumnCollection columns)
+        private IEnumerable<DataRow> GetFoundRows(List<string> columns)
         {
             return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr.ItemArray[0].ToString()));
         }
@@ -70,14 +70,8 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            IEnumerable<DataRow> distinctDataTale = GetFoundRows(table.Columns);
-            foreach (DataRow row in table.Rows)
-            {
-                foreach(DataRow replaceRow in distinctDataTale)
-                {
-                    row[replaceRow[(int)ColumnIndex.Column].ToString()] = replaceRow[(int)ColumnIndex.Value].ToString();
-                }
-            }
+            IEnumerable<DataRow> distinctDataTale = GetFoundRows(invokeForm.DatabaseHelper.GetSortedColumnsAsAlias());
+            invokeForm.DatabaseHelper.ReplaceColumnValues(distinctDataTale, tableName);
         }
     }
 }

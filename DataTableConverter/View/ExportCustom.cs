@@ -20,9 +20,11 @@ namespace DataTableConverter.View
         private readonly string Table;
         private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
         internal string ContinuedNumberName => CbContinuedNumber.Checked ? TxtContinuedNumber.Text : string.Empty;
-        internal ExportCustom(Dictionary<string,string> aliasColumnMapping, string tableName = "main")
+        private readonly DatabaseHelper DatabaseHelper;
+        internal ExportCustom(Dictionary<string,string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName = "main")
         {
             InitializeComponent();
+            DatabaseHelper = databaseHelper;
             clbValues.Dict = SelectedColumnItems;
             SetListBoxStyle();
             Table = tableName;

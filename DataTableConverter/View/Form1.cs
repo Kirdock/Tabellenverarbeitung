@@ -1026,7 +1026,7 @@ namespace DataTableConverter
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ExportCustom export = new ExportCustom(DatabaseHelper.GetAliasColumnMapping()))
+            using (ExportCustom export = new ExportCustom(DatabaseHelper.GetAliasColumnMapping(), DatabaseHelper))
             {
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1056,9 +1056,8 @@ namespace DataTableConverter
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ExportCount export = new ExportCount(DatabaseHelper.GetAliasColumnMapping()))
+            using (ExportCount export = new ExportCount(DatabaseHelper.GetAliasColumnMapping(), DatabaseHelper))
             {
-
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
@@ -1371,7 +1370,7 @@ namespace DataTableConverter
 
         private void spaltenVergleichenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (CompareForm form = new CompareForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (CompareForm form = new CompareForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray(), DatabaseHelper))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {

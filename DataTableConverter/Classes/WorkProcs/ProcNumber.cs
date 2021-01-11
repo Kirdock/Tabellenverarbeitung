@@ -30,31 +30,10 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            string column = null;
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out column);
-            }
-            if (column != null)
-            {
-                int count = Start;
-                bool noEnd = End != 0;
-                foreach (DataRow row in table.GetSortedTable(sortingOrder,orderType))
-                {
-                    row[column] = count;
-                    count++;
-                    if (noEnd && count > End)
-                    {
-                        if (Repeat)
-                        {
-                            count = Start;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out string column);
+                invokeForm.DatabaseHelper.Enumerate(column, Start, End, Repeat, sortingOrder, orderType, tableName);
             }
         }
 

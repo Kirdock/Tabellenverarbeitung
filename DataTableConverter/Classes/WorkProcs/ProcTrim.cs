@@ -81,43 +81,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            //could use own SQL function here because of regex
-            if (Characters.Contains(" "))
-            {
-                Characters += (char)160;
-            }
-            char[] charArray = Characters.ToCharArray();
-            string[] columns = AllColumns ? table.HeadersOfDataTableAsString() : GetHeaders();
-
-            if (DeleteDouble)
-            {
-                foreach (DataRow row in table.Rows)
-                {
-                    foreach (char c in charArray)
-                    {
-                        Regex regex = new Regex("[" + c + "]{2,}", RegexOptions.None);
-                        foreach (string col in columns)
-                        {
-                            row[col] = regex.Replace(GetTrimmed(row[col].ToString(), charArray), c.ToString());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (DataRow row in table.Rows)
-                {
-                    foreach (string col in columns)
-                    {
-                        row[col] = GetTrimmed(row[col].ToString(), charArray);
-                    }
-                }
-            }
-
-            foreach (DataColumn col in table.Columns)
-            {
-                col.ColumnName = GetTrimmed(col.ColumnName, charArray);
-            }
+            invokeForm.DatabaseHelper.Trim(Characters, AllColumns ? null : GetHeaders(), DeleteDouble, Type, tableName);
         }
 
         /// <summary>
@@ -132,25 +96,6 @@ namespace DataTableConverter.Classes.WorkProcs
             return regex.Replace(value.Trim(), " ");
         }
 
-        private string GetTrimmed(string text, char[] charArray)
-        {
-            string result;
-            switch (Type)
-            {
-                case TrimType.Start:
-                    result = text.TrimStart(charArray);
-                    break;
-
-                case TrimType.End:
-                    result = text.TrimEnd(charArray);
-                    break;
-
-                case TrimType.Both:
-                default:
-                    result = text.Trim(charArray);
-                    break;
-            }
-            return result;
-        }
+        
     }
 }

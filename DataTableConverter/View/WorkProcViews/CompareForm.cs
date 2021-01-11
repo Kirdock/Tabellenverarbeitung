@@ -16,10 +16,12 @@ namespace DataTableConverter.View.WorkProcViews
     {
         internal ProcCompare Procedure;
         private string TableName;
-        internal CompareForm(object[] headers, string tableName = "main")
+        private readonly DatabaseHelper DatabaseHelper;
+        internal CompareForm(object[] headers, DatabaseHelper databaseHelper, string tableName = "main")
         {
             InitializeComponent();
             TableName = tableName;
+            DatabaseHelper = databaseHelper;
             cbFirstColumn.Items.AddRange(headers);
             cbSecondColumn.Items.AddRange(headers);
             cbFirstColumn.SelectedIndex = cbSecondColumn.SelectedIndex = 0;

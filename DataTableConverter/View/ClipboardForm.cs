@@ -158,7 +158,7 @@ namespace DataTableConverter.View
                     while(cols.Length > counter)
                     {
                         counter++;
-                        table.TryAddColumn(header + counter);
+                        TryAddColumn(table, header, counter);
                     }
                     for(int i = 0; i <cols.Length; i++)
                     {
@@ -169,6 +169,23 @@ namespace DataTableConverter.View
 
             }
             form.Dispose();
+        }
+
+        private string TryAddColumn(DataTable table, string header, int counter = 0)
+        {
+            string result;
+            string name = counter == 0 ? header : header + counter;
+            if (table.Columns.Contains(name))
+            {
+                counter++;
+                result = TryAddColumn(table, header, counter);
+            }
+            else
+            {
+                result = name;
+                table.Columns.Add(name, typeof(string));
+            }
+            return result;
         }
 
         private void dgTable_ColumnDisplayIndexChanged(object sender, DataGridViewColumnEventArgs e)

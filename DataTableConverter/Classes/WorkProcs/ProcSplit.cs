@@ -29,25 +29,7 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             if (!string.IsNullOrWhiteSpace(NewColumn) && !string.IsNullOrWhiteSpace(Column) && SplitText?.Length > 0)
             {
-                int counter = 1;
-                List<string> newColumns = new List<string>() { table.TryAddColumn(NewColumn, counter) };
-                foreach (DataRow row in table.Rows)
-                {
-                    string[] result = row[Column].ToString().Split(new string[] { SplitText }, StringSplitOptions.RemoveEmptyEntries);
-                    if (result.Length > 1)
-                    {
-                        while (counter < result.Length)
-                        {
-                            newColumns.Add(table.TryAddColumn(NewColumn, counter));
-                            counter++;
-                        }
-
-                        for (int i = 0; i < result.Length; i++)
-                        {
-                            row[newColumns[i]] = result[i];
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.SplitColumnByString(Column, NewColumn, SplitText, tableName);
             }
         }
 
