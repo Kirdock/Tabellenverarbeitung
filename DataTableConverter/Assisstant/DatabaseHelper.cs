@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using DataTableConverter.Assisstant.SQL_Functions;
 using DataTableConverter.Classes;
@@ -69,6 +70,7 @@ namespace DataTableConverter.Assisstant
             SQLiteFunction.RegisterFunction(typeof(GetSplit)); //GETSPLIT(myValue, mySubstring, myIndex)
             SQLiteFunction.RegisterFunction(typeof(CustomUppercase)); //CUSTOMUPPERCASE(myValue, myOption)
             SQLiteFunction.RegisterFunction(typeof(CustomTrim)); //CUSTOMTRIM(myValue, myCharacters, isDeleteDouble, trimType)
+            SQLiteFunction.RegisterFunction(typeof(CustomSubstring)); //CUSTOMSUBSTRING(myValue, replaceText, start, end, isReplace, isReverse)
             SQLiteFunction.RegisterFunction(typeof(DataTableConverter.Assisstant.SQL_Functions.Padding)); //PADDING(value, type, count, character)
 
             if (createMainDatabase)
@@ -767,6 +769,11 @@ namespace DataTableConverter.Assisstant
             return selectString;
         }
 
+        private string GetSelectString(string headerString, bool includeId, string tableName)
+        {
+            return $"SELECT {(includeId ? $"{IdColumnName}," : string.Empty)}{headerString} FROM [{tableName}]";
+        }
+
         private List<string> GetSortedHeadersIncludeAsAlias(string tableName = "main")
         {
             List<string> headers = new List<string>();
@@ -1378,7 +1385,7 @@ namespace DataTableConverter.Assisstant
             using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 string columnName = aliasIsColumnName ? alias : GetColumnName(alias, tableName);
-                command.CommandText = $"UPDATE [{tableName}] set [{columnName}] = ? where rowid = ?";
+                command.CommandText = $"UPDATE [{tableName}] set [{columnName}] = ? where [{IdColumnName}] = ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = value });
                 command.Parameters.Add(new SQLiteParameter() { Value = id });
                 command.ExecuteNonQuery();
@@ -1998,6 +2005,125 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter() { Value = shortcut });
                 command.Parameters.Add(new SQLiteParameter() { Value = searchText });
                 command.ExecuteNonQuery();
+            }
+        }
+
+        internal void Substring(string[] sourceColumns, string[] destinationColumns, string replaceText, int start, int end, bool replaceChecked, bool reverseCheck, string tableName = "main")
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] SET ");
+                for (int i = 0; i < sourceColumns.Length; ++i)
+                {
+                    builder.Append("[").Append(destinationColumns[i]).Append("] = CUSTOMSUBSTRING([").Append(sourceColumns[i]).Append("],$replaceText,$start,$end, $replaceChecked, $reverseCheck),");
+                }
+                command.Parameters.AddWithValue("$replaceText", replaceText);
+                command.Parameters.AddWithValue("$start", start);
+                command.Parameters.AddWithValue("$end", end);
+                command.Parameters.AddWithValue("$replaceChecked", replaceChecked);
+                command.Parameters.AddWithValue("$reverseCheck", reverseCheck);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal void SearchAndReplace(string[] sourceColumns, string[] destinationColumns, bool checkTotal, bool checkWord, bool leaveEmpty, string replaceEmptyString, string replaceWholeText, bool containsEmpty, bool containsReplaceWhole, IEnumerable<DataRow> replaceWithoutEmpty, string tableName)
+        {
+            //3 dimensions
+            // id, column (destinationColumn), value
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = GetSelectString(GetHeaderString(sourceColumns), true, tableName);
+
+                List<KeyValuePair<string, string[]>> updates = new List<KeyValuePair<string, string[]>>();
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string[] newValues = new string[sourceColumns.Length];
+
+                        for (int i = 0; i < sourceColumns.Length; i++)
+                        {
+
+                            string index = destinationColumns[i];
+                            string value = reader.GetString(i + 1);
+                            string result = value;
+                            bool changed = false;
+
+                            if (checkTotal)
+                            {
+                                DataRow foundRows = replaceWithoutEmpty.FirstOrDefault(replace => replace[0].ToString() == value);
+                                if (foundRows != null)
+                                {
+                                    result = foundRows[1].ToString();
+                                    changed = true;
+                                }
+                            }
+                            else if (checkWord)
+                            {
+                                foreach (DataRow rep in replaceWithoutEmpty)
+                                {
+                                    string pattern = @"(?<=^|[\s>])" + Regex.Escape(rep[0].ToString()) + @"(?!\w)";
+                                    if (Regex.IsMatch(result, pattern))
+                                    {
+                                        result = Regex.Replace(result, pattern, rep[1].ToString());
+                                        changed = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (DataRow rep in replaceWithoutEmpty)
+                                {
+                                    string pattern = rep[0].ToString();
+                                    if (result.Contains(pattern))
+                                    {
+                                        result = result.Replace(pattern, rep[1].ToString());
+                                        changed = true;
+                                    }
+                                }
+                            }
+
+                            if (containsEmpty && !changed && result == string.Empty)
+                            {
+                                result = replaceEmptyString;
+                                changed = true;
+                            }
+                            if (containsReplaceWhole && !changed && result != string.Empty)
+                            {
+                                result = replaceWholeText;
+                                changed = true;
+                            }
+                            newValues[i] = !changed && leaveEmpty ? string.Empty : ProcTrim.Trim(result);
+                        }
+                        updates.Add(new KeyValuePair<string, string[]>(reader.GetString(0), newValues));
+                    }
+                }
+                UpdateRows(updates, destinationColumns, tableName);
+            }
+        }
+
+        private void UpdateRows(List<KeyValuePair<string, string[]>> updates, string[] destinationColumns, string tableName)
+        {
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] SET ");
+                foreach(string column in destinationColumns)
+                {
+                    builder.Append($"[{column}]=?");
+                    command.Parameters.Add(new SQLiteParameter());
+                }
+                builder.Append($" WHERE [{IdColumnName}]=?");
+                command.Parameters.Add(new SQLiteParameter());
+                command.CommandText = builder.ToString();
+                foreach (KeyValuePair<string, string[]> update in updates)
+                {
+                    for(int i = 0; i < destinationColumns.Length; ++i)
+                    {
+                        command.Parameters[i].Value = update.Value[i];
+                    }
+                    command.Parameters[command.Parameters.Count - 1].Value = update.Key;
+                    command.ExecuteNonQuery();
+                }
             }
         }
     }
