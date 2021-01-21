@@ -100,7 +100,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     invokeForm.DatabaseHelper.ConcatTable(newTable, Path.GetFileName(path), Path.GetFileName(file), importTables);
                 }
             }
-            DataHelper.StartMerge(importTables, fileEncoding == 0 ? FileEncoding : fileEncoding, filePath, IdentifySource, IdentifyAppend, invalidColumnAlias, invokeForm, tableName);
+            DataHelper.StartMerge(importTables, fileEncoding == 0 ? FileEncoding : fileEncoding, filePath, IdentifySource, IdentifyAppend, invalidColumnAlias, sortingOrder, orderType, invokeForm, tableName);
         }
 
         internal static bool CheckFile(string filePath, ref string path)

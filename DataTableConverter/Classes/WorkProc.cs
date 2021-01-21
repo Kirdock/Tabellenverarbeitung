@@ -74,13 +74,13 @@ namespace DataTableConverter.Classes
             return destinationColumns != null;
         }
 
-        protected bool PrepareSingle(ref string sourceColumn, Form1 invokeForm, string tableName, out string destinationColumn)
+        protected bool PrepareSingle(ref string aliasToColumn, Form1 invokeForm, string tableName, out string destinationColumn)
         {
-            sourceColumn = invokeForm.DatabaseHelper.GetColumnName(sourceColumn, tableName);
-            destinationColumn = sourceColumn;
+            aliasToColumn = invokeForm.DatabaseHelper.GetColumnName(aliasToColumn, tableName);
+            destinationColumn = aliasToColumn;
             if (CopyOldColumn)
             {
-                destinationColumn = invokeForm.DatabaseHelper.CopyColumn(sourceColumn, tableName);
+                destinationColumn = invokeForm.DatabaseHelper.CopyColumn(aliasToColumn, tableName);
             }
             else if (!string.IsNullOrWhiteSpace(NewColumn))
             {

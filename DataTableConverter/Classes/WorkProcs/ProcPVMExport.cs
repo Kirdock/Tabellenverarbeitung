@@ -36,32 +36,19 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            
-            DataTable saveTable = table.GetSortedView(sortingOrder, orderType, -1).ToTable();
-            IEnumerable<string> sourceColumns = saveTable.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray();
-            List<string> destHeaders = new List<string>(GetHeaders());
-            foreach (string col in sourceColumns)
-            {
-                if (!destHeaders.Contains(col))
-                {
-                    saveTable.Columns.Remove(col);
-                }
-            }
+            PrepareMultiple(GetHeaders(), invokeForm, tableName, out string[] sourceColumns, out _);
+
+            System.Data.SQLite.SQLiteCommand command = invokeForm.DatabaseHelper.SplitTableOnColumnsCommand(sourceColumns, sortingOrder, orderType, tableName);
+
             string path = Properties.Settings.Default.AutoSavePVM ? Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath)) + Properties.Settings.Default.PVMAddressText + ".csv" : null;
 
             SaveFileDialog saveFileDialog1 = new SaveFileDialog
             {
-                Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
+                Filter = $"CSV Dateien ({invokeForm.ImportHelper.CsvExt})|{invokeForm.ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
 
-            SaveFileDialog saveFileDialog2 = new SaveFileDialog
-            {
-                Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
-                FilterIndex = 1,
-                RestoreDirectory = true
-            };
             DialogResult result = DialogResult.Cancel;
             if (path == null)
             {
@@ -76,7 +63,8 @@ namespace DataTableConverter.Classes.WorkProcs
                 try
                 {
                     int fileEncoding = invokeForm.FileEncoding == 0 ? FileEncoding : invokeForm.FileEncoding;
-                    ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), fileEncoding, invokeForm, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
+                    //saveTable
+                    invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, command, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
                     
                     if(Properties.Settings.Default.PVMSaveTwice)
                     {
@@ -88,19 +76,19 @@ namespace DataTableConverter.Classes.WorkProcs
                             {
                                 invokeForm.Invoke(new MethodInvoker(() =>
                                 {
-                                    result2 = saveFileDialog2.ShowDialog(invokeForm);
+                                    result2 = saveFileDialog1.ShowDialog(invokeForm);
                                 }));
                             }
                             if (result2 == DialogResult.OK)
                             {
-                                path = saveFileDialog2.FileName;
-                                ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), fileEncoding, invokeForm, UpdateLoadingBar);
+                                path = saveFileDialog1.FileName;
+                                invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, command, UpdateLoadingBar);
                             }
                         }
                         else
                         {
                             path = Path.Combine(SecondFileName, Path.GetFileNameWithoutExtension(path));
-                            ExportHelper.ExportCsv(saveTable, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), fileEncoding, invokeForm, UpdateLoadingBar);
+                            invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, command, UpdateLoadingBar);
                         }
                     }
                 }
@@ -110,7 +98,6 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
             }
             saveFileDialog1.Dispose();
-            saveFileDialog2.Dispose();
         }
 
         public override string[] GetHeaders()

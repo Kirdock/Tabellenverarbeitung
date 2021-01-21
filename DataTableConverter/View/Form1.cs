@@ -510,7 +510,7 @@ namespace DataTableConverter
                             try
                             {
                                 StartLoadingBar();
-                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, this);
+                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, GetSorting(), OrderType, this);
                                 StopLoadingBar();
                                 DatabaseHelper.SetSavepoint();
                                 LoadData(true);
@@ -737,7 +737,7 @@ namespace DataTableConverter
         private void Save(string path, SaveFormat format)
         {
             StartLoadingBarCount(RowCount);
-            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileName(path), Path.GetExtension(FilePath), FileEncoding, (int)format, this, UpdateLoadingBar) != 0;
+            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileName(path), Path.GetExtension(FilePath), FileEncoding, (int)format, GetSorting(), OrderType, this, UpdateLoadingBar) != 0;
             StopLoadingBar();
             if (saved)
             {
@@ -1031,7 +1031,7 @@ namespace DataTableConverter
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
-                    ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, this, export.ContinuedNumberName);
+                    ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName);
 
                 }
             }

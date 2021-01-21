@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,88 +27,79 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
+            //just create a SELECT command
+            //DON'T FORGET ABOUT THE ORDER
+            //ExportHelper.Save with given command
+            //maybe create an index before
             NewColumn = string.IsNullOrEmpty(NewColumn) ? "FTNR" : NewColumn;
+            List<string> columnsAliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName);
+
             foreach (ExportSeparate item in Files)
             {
-                Dictionary<string, DataTable> Dict = new Dictionary<string, DataTable>();
-                DataTable tableSkeleton = table.Clone();
+                Dictionary<string, string> dict = new Dictionary<string, string>();
+                string columnName = invokeForm.DatabaseHelper.GetColumnName(item.Column, tableName);
+
                 if (item.CheckedAllValues)
                 {
-                    foreach (string value in DatabaseHelper.GroupCountOfColumn(item.Column,tableName).Keys)
+                    foreach (string value in invokeForm.DatabaseHelper.GroupCountOfColumn(columnName, tableName).Keys)
                     {
-                        DataTable dictTable = tableSkeleton.Copy();
-                        dictTable.TableName = $"{item.Name}_{value}";
-                        Dict.Add(value, dictTable);
+                        string newTable = $"{item.Name}_{value}";
+                        invokeForm.DatabaseHelper.CreateTable(columnsAliases, newTable);
+                        dict.Add(value, newTable);
                     }
                 }
                 else if (item.SaveRemaining)
                 {
-                    DataTable temp = tableSkeleton.Copy();
-                    temp.TableName = item.Name;
-                    foreach (string value in table.GroupCountOfColumn(item.Column).Keys.Where(key => !Files.Any(file => file.Column == item.Column && file.Values.Contains(key))))
+                    string newTable = item.Name;
+                    foreach (string value in invokeForm.DatabaseHelper.GroupCountOfColumn(columnName, tableName).Keys.Where(key => !Files.Any(file => file.Column == columnName && file.Values.Contains(key))))
                     {
-                        if (!Dict.ContainsKey(value))
+                        if (!dict.ContainsKey(value))
                         {
-                            Dict.Add(value, temp);
+                            dict.Add(value, newTable);
                         }
                     }
                 }
                 else
                 {
-                    DataTable temp = tableSkeleton.Copy();
-                    temp.TableName = item.Name;
+                    string newTable = item.Name;
                     foreach (string value in item.Values)
                     {
-                        if (!Dict.ContainsKey(value))
+                        if (!dict.ContainsKey(value))
                         {
-                            Dict.Add(value, temp);
+                            dict.Add(value, newTable);
                         }
                     }
                 }
-                foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
+
+
+                SQLiteCommand command =  invokeForm.DatabaseHelper.GetDataCommand(tableName, sortingOrder, orderType);
+                using(SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    if (Dict.TryGetValue(row[item.Column].ToString(), out DataTable dictTable))
+                    if (reader.HasRows)
                     {
-                        dictTable.ImportRow(row);
+                        int columnIndex;
+                        for(columnIndex = 0; columnIndex < reader.FieldCount && reader.GetName(columnIndex) != item.Column; columnIndex++){}
+                        SQLiteCommand tempCommand = null;
+                        while (reader.Read())
+                        {
+                            if (dict.TryGetValue(reader.GetString(columnIndex), out string tempTable))
+                            {
+                                tempCommand = invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, tempCommand);
+                            }
+                        }
                     }
                 }
 
-                foreach (DataTable dictTable in Dict.Values.Distinct())
+                foreach (string tempTable in dict.Values.Distinct())
                 {
                     if (ContinuedColumn)
                     {
-                        string col = dictTable.TryAddColumn(NewColumn);
-                        dictTable.Columns[col].SetOrdinal(0);
-                        for (int i = 0; i < dictTable.Rows.Count; i++)
-                        {
-                            dictTable.Rows[i][col] = (i + 1).ToString();
-                        }
+                        string destinationColumn = invokeForm.DatabaseHelper.AddColumnAt(0, NewColumn, tempTable);
+                        invokeForm.DatabaseHelper.Enumerate(destinationColumn, -1, -1, false, sortingOrder, orderType, tempTable);
                     }
-                    string FileName = dictTable.TableName;
+
                     string path = Path.GetDirectoryName(filePath);
-                    switch (item.Format)
-                    {
-                        //CSV
-                        case 0:
-                            {
-                                ExportHelper.ExportCsv(dictTable, path, FileName, invokeForm.FileEncoding, invokeForm);
-                            }
-                            break;
-
-                        //Dbase
-                        case 1:
-                            {
-                                ExportHelper.ExportDbase(FileName, dictTable, path, invokeForm);
-                            }
-                            break;
-
-                        //Excel
-                        case 2:
-                            {
-                                ExportHelper.ExportExcel(dictTable, path, FileName, invokeForm);
-                            }
-                            break;
-                    }
+                    invokeForm.ExportHelper.Save(path, tempTable, Path.GetExtension(filePath), invokeForm.FileEncoding, item.Format, sortingOrder, orderType, invokeForm, null, tableName);
                 }
             }
         }

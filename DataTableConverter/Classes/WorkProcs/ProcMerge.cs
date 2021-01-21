@@ -107,21 +107,17 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
+                
                 //column is alias
                 string column = NewColumn;
-                if (CopyOldColumn && invokeForm.DatabaseHelper.GetColumnName(NewColumn, tableName) != null)
-                {
-                    column = invokeForm.DatabaseHelper.CopyColumn(NewColumn, tableName); //destinationColumn
-                }
-                else if(!CopyOldColumn)
-                {
-                    invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out column);
-                }
+                PrepareSingle(ref column, invokeForm, tableName, out string destinationColumn);
+
                 //column is columnName now
-                if (column != null)
+                if (destinationColumn != null)
                 {
                     List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName);
-                    using(System.Data.SQLite.SQLiteDataReader reader = invokeForm.DatabaseHelper.GetDataCommand(tableName, "id").ExecuteReader())
+                    List<KeyValuePair<string, string>> updates = new List<KeyValuePair<string, string>>();
+                    using (System.Data.SQLite.SQLiteDataReader reader = invokeForm.DatabaseHelper.GetDataCommand(tableName, "id").ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -149,9 +145,11 @@ namespace DataTableConverter.Classes.WorkProcs
                             }
                             MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
                             string result = format.IsStringFormat() ? GetFormat(aliasValueMapping, format.Formula, aliases, invokeForm) : GetFormat(aliasValueMapping, format, aliases);
-                            invokeForm.DatabaseHelper.UpdateCell(result, column, reader.GetString(0), true, tableName);
+                            updates.Add(new KeyValuePair<string, string>(reader.GetString(0), result));
                         }
                     }
+
+                    invokeForm.DatabaseHelper.UpdateCells(updates, destinationColumn, tableName);
                 }
             }
             else
