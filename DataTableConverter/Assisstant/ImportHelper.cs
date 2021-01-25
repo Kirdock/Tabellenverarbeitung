@@ -679,6 +679,7 @@ namespace DataTableConverter.Assisstant
             int headerCounter = 0;
             Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
             bool generatedMulti = false;
+            SQLiteCommand insertCommand = null;
             
             for (int i = 0; i < maxLength; i++)
             {
@@ -692,7 +693,7 @@ namespace DataTableConverter.Assisstant
                     generatedMulti = false;
                     headerCounter = 0;
 
-                    AddContentDataRow(row, fileName, tableName);
+                    insertCommand = AddContentDataRow(row, fileName, tableName, insertCommand);
 
                     row.Clear();
                     
@@ -701,7 +702,11 @@ namespace DataTableConverter.Assisstant
                     {
                         i++;
                         generatedMulti = true;
-                        GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
+                        bool addedColumns = GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
+                        if (addedColumns)
+                        {
+                            insertCommand = null;
+                        }
                     }
                     else
                     {
@@ -722,7 +727,11 @@ namespace DataTableConverter.Assisstant
                     {
                         i++;
                         generatedMulti = true;
-                        GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
+                        bool addedColumns = GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
+                        if (addedColumns)
+                        {
+                            insertCommand = null;
+                        }
                     }
                 }
                 else
@@ -731,10 +740,10 @@ namespace DataTableConverter.Assisstant
                 }
             }
             SetContentRowValue(row, headers[headerCounter], cellBuilder);
-            AddContentDataRow(row, tableName, fileName);
+            AddContentDataRow(row, tableName, fileName, insertCommand);
         }
 
-        private void AddContentDataRow(Dictionary<string,string> row, string fileName, string tableName)
+        private SQLiteCommand AddContentDataRow(Dictionary<string,string> row, string fileName, string tableName, SQLiteCommand command)
         {
             if (row.Values.Any(value => !string.IsNullOrWhiteSpace(value.ToString()))) //Request: delete empty rows
             {
@@ -742,8 +751,9 @@ namespace DataTableConverter.Assisstant
                 {
                     row.Add(Extensions.DataTableExtensions.FileName, fileName);
                 }
-                DatabaseHelper.InsertRow(row, tableName);
+                command = DatabaseHelper.InsertRow(row, tableName, command);
             }
+            return command;
         }
 
         private void SetContentRowValue(Dictionary<string, string> row, string column, StringBuilder builder)
@@ -805,12 +815,13 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        private void GenerateMultiCell(string content, string tableName, Dictionary<string, string> row, string header, ref int i)
+        private bool GenerateMultiCell(string content, string tableName, Dictionary<string, string> row, string header, ref int i)
         {
             ++i;
             int multiCellCount = 0;
             StringBuilder cell = new StringBuilder();
             bool newLine;
+            bool addedColumn = false;
             for (;i < content.Length; ++i)
             {
                 if (EndOfMultiCell(content, i, out bool isNotMultiCell))
@@ -824,14 +835,14 @@ namespace DataTableConverter.Assisstant
                     {
                         cell = new StringBuilder("\"").Append(cell).Append('\"');
                     }
-                    AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
+                    addedColumn |= AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
                     break;
                 }
                 else if((newLine = (content[i] == '\r')) || content[i] == '\n')
                 {
                     if (cell.Length != 0)
                     {
-                        AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
+                        addedColumn |= AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
 
                         if (newLine)
                         {
@@ -845,11 +856,13 @@ namespace DataTableConverter.Assisstant
                     cell.Append(content[i]);
                 }
             }
+            return addedColumn;
         }
 
-        private void AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, StringBuilder text)
+        private bool AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, StringBuilder text)
         {
             string result = text.ToString();
+            bool addedCollumn = false;
             text.Clear();
             if (result != string.Empty)
             {
@@ -857,9 +870,11 @@ namespace DataTableConverter.Assisstant
                 if (!DatabaseHelper.ContainsAlias(tableName, multiHeader))
                 {
                     DatabaseHelper.AddColumn(tableName, multiHeader);
+                    addedCollumn = true;
                 }
                 row.Add(multiHeader, result);
             }
+            return addedCollumn;
         }
 
         private bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)

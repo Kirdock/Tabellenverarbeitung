@@ -248,17 +248,22 @@ namespace DataTableConverter.Assisstant
             return aliases;
         }
 
-        internal void CreateTable(IEnumerable<string> columnsNames)
-        {
-            string tableName = "main";
-            CreateTable(columnsNames, tableName, Connection);
-        }
-
+        /// <summary>
+        /// Creates table and meta table
+        /// </summary>
+        /// <param name="columnNames"></param>
+        /// <param name="tableName"></param>
         internal void CreateTable(IEnumerable<string> columnNames, string tableName)
         {
             CreateTable(columnNames, tableName, TempConnection);
         }
 
+        /// <summary>
+        /// Creates table and meta table
+        /// </summary>
+        /// <param name="columnNames"></param>
+        /// <param name="tableName"></param>
+        /// <param name="connection"></param>
         private void CreateTable(IEnumerable<string> columnNames, string tableName, SQLiteConnection connection)
         {
 
@@ -398,6 +403,39 @@ namespace DataTableConverter.Assisstant
             return id;
         }
 
+        internal SQLiteCommand InsertRow(Dictionary<string, string> row, string tableName = "main", SQLiteCommand cmd = null)
+        {
+            SQLiteConnection connection = GetConnection(tableName);
+            SQLiteCommand command = cmd;
+            if (cmd == null)
+            {
+                command = connection.CreateCommand();
+                if (row == null || row.Keys.Count == 0)
+                {
+                    command.CommandText = $"INSERT into [{tableName}] DEFAULT VALUES";
+                }
+                else
+                {
+                    command.CommandText = $"INSERT into [{tableName}] ({GetHeaderString(row.Keys)}) values ({GetValueString(row.Keys.Count)})";
+                    foreach (string header in row.Keys)
+                    {
+                        command.Parameters.Add(new SQLiteParameter() { Value = row[header] });
+                    }
+                }
+            }
+            else
+            {
+                int i = 0;
+                foreach(KeyValuePair<string, string> pair in row)
+                {
+                    command.Parameters[i].Value = pair.Value.ToString();
+                    i++;
+                }
+            }
+            command.ExecuteNonQuery();
+            return command;
+        }
+
         /// <summary>
         /// Insert empty row before given id
         /// </summary>
@@ -446,7 +484,7 @@ namespace DataTableConverter.Assisstant
             return cmd;
         }
 
-        internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, SQLiteDataReader reader, string tableName, SQLiteCommand cmd = null)
+        internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, SQLiteDataReader reader, string tableName, SQLiteCommand cmd = null, SQLiteConnection connection = null)
         {
             string[] headers = eHeaders.ToArray();
             string headerString = GetHeaderString(headers);
@@ -454,14 +492,7 @@ namespace DataTableConverter.Assisstant
             SQLiteCommand command = cmd;
             if (cmd == null)
             {
-                command = GetConnection(tableName).CreateCommand();
-                command.CommandText = $"INSERT into [{tableName}] ({headerString}) values ({GetValueString(headers.Length)})";
-
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    command.Parameters.Add(new SQLiteParameter() { Value = reader.GetString(i) });
-                }
-                command.ExecuteNonQuery();
+                command = CreateInsertRowCommand(headers, tableName, reader, connection);
             }
             else
             {
@@ -469,9 +500,24 @@ namespace DataTableConverter.Assisstant
                 {
                     command.Parameters[i].Value = reader.GetString(i);
                 }
-                command.ExecuteNonQuery();
             }
+            command.ExecuteNonQuery();
             return cmd;
+        }
+
+        private SQLiteCommand CreateInsertRowCommand(IEnumerable<string> eHeaders, string tableName, SQLiteDataReader reader, SQLiteConnection connection = null)
+        {
+            string[] headers = eHeaders.ToArray();
+            string headerString = GetHeaderString(headers);
+
+            SQLiteCommand command = (connection ?? GetConnection(tableName)).CreateCommand();
+            command.CommandText = $"INSERT into [{tableName}] ({headerString}) values ({GetValueString(headers.Length)})";
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                command.Parameters.Add(new SQLiteParameter() { Value = reader.GetString(i) });
+            }
+            return command;
         }
 
         internal bool ContainsAlias(string tableName, string column)
@@ -573,6 +619,11 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        internal void Commit()
+        {
+            Transaction.Commit();
+        }
+
         private void AddColumnWithAlias(string columnName, string alias, string tableName, string defaultValue)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -656,7 +707,7 @@ namespace DataTableConverter.Assisstant
         /// <param name="invokeForm"></param>
         /// <param name="unique"></param>
         /// <returns>abort-status</returns>
-        private bool CreateIndexOn(string tableName, string columnName, Form1 invokeForm = null, bool unique = true)
+        internal bool CreateIndexOn(string tableName, string columnName, Form1 invokeForm = null, bool unique = true)
         {
             bool abort = false;
             using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -911,7 +962,7 @@ namespace DataTableConverter.Assisstant
             Dictionary<string, string> headerMapping = new Dictionary<string, string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT alias, column from [{tableName + MetaTableAffix}] where alias != null order by sortorder";
+                command.CommandText = $"SELECT alias, column from [{tableName + MetaTableAffix}] where alias is not null order by sortorder";
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -1094,9 +1145,24 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="aliases"></param>
+        /// <returns>Select command with rowid and given aliases</returns>
+        internal SQLiteCommand GetDataCommand(string tableName, string[] aliases)
+        {
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
+
+            command.CommandText = $"SELECT rowid, {GetHeaderString(GetColumnNames(aliases, tableName))} from [{tableName}]";
+
+            return command;
+        }
+
         internal SQLiteCommand GetDataCommand(string tableName, string order, OrderType orderType, string orderAlias = null)
         {
-
             SQLiteCommand command = GetConnection(tableName).CreateCommand();
             Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
 
@@ -1161,7 +1227,7 @@ namespace DataTableConverter.Assisstant
             List<string> columnNames = new List<string>();
             using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] {(includeDeleted ? string.Empty : "where alias != null")} order by sortorder";
+                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] {(includeDeleted ? string.Empty : "where alias is not null")} order by sortorder";
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -1456,9 +1522,9 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void UpdateCells(List<KeyValuePair<string, string>> updates, string column, string tableName = "main")
+        internal void UpdateCells(IEnumerable<KeyValuePair<string, string>> updates, string column, string tableName = "main")
         {
-            if (updates.Count != 0)
+            if (updates.Count() != 0)
             {
                 using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
                 {
@@ -1552,62 +1618,42 @@ namespace DataTableConverter.Assisstant
         {
             string path = Path.Combine(DatabaseDirectory, tableName + ".sqlite");
             CreateDatabase(path);
+
             SQLiteConnection connection = new SQLiteConnection($"Data Source={path};Version=3;");
             connection.Open();
             SQLiteTransaction transaction = connection.BeginTransaction();
-            //SQLiteConnection mainConnection;
-            //bool isMain = sourceTable == "main";
-            //if (isMain)
-            //{
-            //    mainConnection = Connection;
-            //    mainConnection.Trace -= UpdateHandler;
-            //}
-            //else
-            //{
-            //    mainConnection = TempConnection;
-            //}
+            IEnumerable<string> columns = GetAliasColumnMapping(sourceTable).Keys;
+            CreateTable(columns, "main", connection);
+            using (SQLiteCommand command = GetDataCommand(sourceTable))
+            {
+                using(SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    SQLiteCommand insertCommand = null;
+                    while (reader.Read())
+                    {
+                        insertCommand = InsertRow(columns, reader, "main", insertCommand, connection);
+                    }
+                }
+            }
 
-            //using (SQLiteCommand command = mainConnection.CreateCommand())
+            //using (SQLiteCommand command = connection.CreateCommand())
             //{
-            //    command.CommandText = $"ATTACH database [{path}] as [{tableName}]";
+            //    command.CommandText = $"ATTACH database [{DatabasePath}] as main"; //probably everything not available because it is not commited
             //    command.ExecuteNonQuery();
 
             //    string colType = "varchar(255) not null default '' COLLATE NATURALSORT";
-            //    Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(sourceTable);
-            //    command.CommandText = $"CREATE table [{tableName}].main ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", aliasColumnMapping.Keys)}] {colType})";
+            //    command.CommandText = $"CREATE table main ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", aliasColumnMapping.Keys)}] {colType})";
 
-            //    command.CommandText = $"INSERT into [{tableName}].main SELECT {GetHeaderString(aliasColumnMapping.Values)} from [{sourceTable}]"; //not SELECT * because in sourceTable there may be "deleted" columns
+            //    command.CommandText = $"INSERT into main SELECT [{IdColumnName}], {GetHeaderString(aliasColumnMapping.Values)} from main.[{sourceTable}]"; //not SELECT * because in sourceTable there may be "deleted" columns
             //    command.ExecuteNonQuery();
 
 
-            //    command.CommandText = $"DETACH database [{tableName}]";
+            //    command.CommandText = $"DETACH database main";
             //    command.ExecuteNonQuery();
             //}
-            //if (isMain)
-            //{
-            //    mainConnection.Trace += UpdateHandler;
-            //}
-            Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(sourceTable);
-            using (SQLiteCommand command = connection.CreateCommand())
-            {
-                command.CommandText = $"ATTACH database [{DatabasePath}] as main"; //probably everything not available because it is not commited
-                command.ExecuteNonQuery();
-
-                string colType = "varchar(255) not null default '' COLLATE NATURALSORT";
-                command.CommandText = $"CREATE table main ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", aliasColumnMapping.Keys)}] {colType})";
-
-                command.CommandText = $"INSERT into main SELECT [{IdColumnName}], {GetHeaderString(aliasColumnMapping.Values)} from main.[{sourceTable}]"; //not SELECT * because in sourceTable there may be "deleted" columns
-                command.ExecuteNonQuery();
-
-
-                command.CommandText = $"DETACH database main";
-                command.ExecuteNonQuery();
-            }
-            CreateMetaData(tableName, aliasColumnMapping.Keys, connection);
+            //CreateMetaData(tableName, aliasColumnMapping.Keys, connection);
             transaction.Commit();
             connection.Close();
-
-            Delete(tableName);
         }
 
         /// <summary>
@@ -2227,6 +2273,23 @@ namespace DataTableConverter.Assisstant
             SQLiteCommand command = GetConnection(tableName).CreateCommand();
             command.CommandText = GetSortedSelectString(GetHeaderString(sourceColumns), order, orderType, -1, -1, false, tableName);
             return command;
+        }
+
+        internal bool ExistsValueInColumn(string column, string value, string tableName, string idColumn, out string id)
+        {
+            object result = null;
+            id = null;
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"SELECT [{idColumn}] from [{tableName}] where [{column}] = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = value });
+                result = command.ExecuteScalar();
+                if(result != null)
+                {
+                    id = result.ToString();
+                }
+            }
+            return result != null;
         }
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +60,7 @@ namespace DataTableConverter.Classes.WorkProcs
             //we could calculate an identifier and save it into another table (make it with an index but not primary key)
             //first iteration => save identifier and rowId into another table
             //second iteration => select everything with count > 1
+            //delete temp table after finish
             string column = null;
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
@@ -67,43 +69,70 @@ namespace DataTableConverter.Classes.WorkProcs
 
             if (column != null)
             {
-                for (int index = 0; index < table.Rows.Count; index++)
+                SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, DuplicateColumns);
+                string sourceRowIdName = "sourceid";
+                string identifierColumn = "identifier";
+                string duplicateTableTotal = Guid.NewGuid().ToString();
+                string duplicateTableShort = Guid.NewGuid().ToString();
+                string[] duplicateColumns = new string[] { sourceRowIdName, identifierColumn };
+                
+                foreach(string table in new string[] { duplicateTableShort, duplicateTableTotal })
                 {
-                    string identifierTotal = GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, null, null, null);
-                    bool isTotal;
-                    if (isTotal = totalTable.Contains(identifierTotal))
+                    invokeForm.DatabaseHelper.CreateTable(duplicateColumns, table);
+                    invokeForm.DatabaseHelper.CreateIndexOn(table, identifierColumn, null, true);
+                }
+                Dictionary<string, string> updates = new Dictionary<string, string>();
+                
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    SQLiteCommand updateCommandTotal = null;
+                    SQLiteCommand updateCommandShort = null;
+                    while (reader.Read())
                     {
-                        table.Rows[(int)totalTable[identifierTotal]].SetField(column, duplicateCase.ShortcutTotal);
-                        table.Rows[index].SetField(column, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
-                    }
-                    else
-                    {
-                        totalTable.Add(identifierTotal, index);
-                    }
-                    if (!isTotal)
-                    {
-                        string identifier = GetColumnsAsObjectArray(table.Rows[index], DuplicateColumns, subStringBegin, subStringEnd, tolerances);
-                        if (hTable.Contains(identifier))
+                        string identifierTotal = GetColumnsAsObjectArray(reader, null, null, null);
+
+                        if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierTotal, duplicateTableTotal, sourceRowIdName, out string sourceId))
                         {
-                            table.Rows[(int)hTable[identifier]].SetField(column, duplicateCase.Shortcut);
-                            table.Rows[index].SetField(column, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                            if (!updates.ContainsKey(sourceId))
+                            {
+                                updates.Add(sourceId, duplicateCase.ShortcutTotal);
+                            }
+                            
+                            updates.Add(reader.GetString(0), duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
                         }
                         else
                         {
-                            hTable.Add(identifier, index);
+                            updateCommandTotal = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0), identifierTotal }, duplicateTableTotal, updateCommandTotal);
+                            
+                            string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, tolerances);
+                            if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierShort, duplicateTableShort, sourceRowIdName, out string sourceId2))
+                            {
+                                if (!updates.ContainsKey(sourceId))
+                                {
+                                    updates.Add(sourceId2, duplicateCase.ShortcutTotal);
+                                }
+                                updates.Add(reader.GetString(0), duplicateCase.Shortcut + duplicateCase.Shortcut);
+                            }
+                            else
+                            {
+                                updateCommandShort = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0),  identifierShort }, duplicateTableShort, updateCommandShort);
+                            }
                         }
                     }
                 }
+                invokeForm.DatabaseHelper.UpdateCells(updates.ToArray(), column, tableName);
+                invokeForm.DatabaseHelper.Delete(duplicateTableTotal);
+                invokeForm.DatabaseHelper.Delete(duplicateTableShort);
             }
         }
 
-        private string GetColumnsAsObjectArray(DataRow row, string[] columns, int[] subStringBegin, int[] subStringEnd, List<Tolerance> tolerances)
+        private string GetColumnsAsObjectArray(SQLiteDataReader reader, int[] subStringBegin, int[] subStringEnd, List<Tolerance> tolerances)
         {
             StringBuilder res = new StringBuilder();
-            for (int i = 0; i < columns.Length; i++)
+            for (int i = 0; i < reader.FieldCount; i++)
             {
                 #region Set Tolerances
-                StringBuilder result = new StringBuilder(row[columns[i]].ToString().ToLower());
+                StringBuilder result = new StringBuilder(reader.GetString(i).ToLower());
                 if (tolerances != null)
                 {
                     foreach (Tolerance tol in tolerances)
