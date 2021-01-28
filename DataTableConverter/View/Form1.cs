@@ -36,14 +36,15 @@ namespace DataTableConverter
         private OrderType OrderType = OrderType.Windows;
         private readonly Dictionary<string, int> ColumnWidths;
         private readonly int ColumnWidthTolerance = 10;
-        private int RowCount = 0, MaxPages = 0;
+        private int RowCount = 0;
+        private decimal MaxPages = 0;
         internal int FileEncoding = 0;
 
         //internal because of workflows; Form1 is passed on; no need for additional parameters DatabaseHelper, ImportHelper, ExportHelper
         internal readonly DatabaseHelper DatabaseHelper;
         internal readonly ExportHelper ExportHelper;
         internal readonly ImportHelper ImportHelper;
-        private enum SaveFormat {DBASE, CSV, EXCEL };
+        private enum SaveFormat {CSV, DBASE, EXCEL };
         private decimal Page {
             get {
                 return NumPage.Value;
@@ -90,7 +91,7 @@ namespace DataTableConverter
             LoadCases();
             SetMenuEnabled(false);
             öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click();
-            cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click(sender, e);
+            cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click();
             dBASEToolStripMenuItem1.Click += (sender, e) => dBASEToolStripMenuItem_Click(sender, e);
             excelToolStripMenuItem1.Click += (sender, e) => excelToolStripMenuItem_Click(sender, e);
             if (tableName != null)
@@ -576,6 +577,8 @@ namespace DataTableConverter
                 {
                     SaveWidthOfDataGridViewColumns();
                 }
+                MaxPages = Math.Ceiling(DatabaseHelper.GetRowCount() / Properties.Settings.Default.MaxRows);
+                SetPage();
 
                 int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
                 if (!preventLoading)
@@ -593,8 +596,6 @@ namespace DataTableConverter
                 SetWidth();
 
                 dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
-
-
             }));
         }
 
@@ -737,7 +738,7 @@ namespace DataTableConverter
         private void Save(string path, SaveFormat format)
         {
             StartLoadingBarCount(RowCount);
-            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileName(path), Path.GetExtension(FilePath), FileEncoding, (int)format, GetSorting(), OrderType, this, UpdateLoadingBar) != 0;
+            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(FilePath), FileEncoding, (int)format, GetSorting(), OrderType, this, UpdateLoadingBar) != 0;
             StopLoadingBar();
             if (saved)
             {
@@ -902,16 +903,19 @@ namespace DataTableConverter
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            string value = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
-            string id = dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString();
-            int width = TextRenderer.MeasureText(value, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
-            DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
-            if (width > col.Width)
+            if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
-                ColumnWidths[col.Name] = col.Width = width;
+                string value = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
+                string id = dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString();
+                int width = TextRenderer.MeasureText(value, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
+                DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
+                if (width > col.Width)
+                {
+                    ColumnWidths[col.Name] = col.Width = width;
+                }
+                DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].Name, id);
+                DatabaseHelper.SetSavepoint();
             }
-            DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].Name, id);
-            DatabaseHelper.SetSavepoint();
         }
 
         private void dgTable_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
@@ -949,7 +953,7 @@ namespace DataTableConverter
             SetMenuEnabled(dgTable.DataSource != null);
         }
 
-        private void cSVToolStripMenuItem_Click(object sender, EventArgs e, DataTable dt = null, string path = null)
+        private void cSVToolStripMenuItem_Click(string path = null)
         {
             SaveFileDialog saveFileDialog1 = new SaveFileDialog
             {
@@ -1216,7 +1220,7 @@ namespace DataTableConverter
             }
             else
             {
-                cSVToolStripMenuItem_Click(null, null, null, FileName);
+                cSVToolStripMenuItem_Click(FileName);
             }
         }
 

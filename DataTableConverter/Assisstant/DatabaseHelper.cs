@@ -619,11 +619,6 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void Commit()
-        {
-            Transaction.Commit();
-        }
-
         private void AddColumnWithAlias(string columnName, string alias, string tableName, string defaultValue)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -815,11 +810,6 @@ namespace DataTableConverter.Assisstant
             return builder.Append('?').ToString();
         }
 
-        private string GetValueString(IEnumerable<string> headers)
-        {
-            return "$" + string.Join(",$", headers);
-        }
-
         private string GetHeaderString(IEnumerable<string> headers)
         {
 
@@ -831,7 +821,7 @@ namespace DataTableConverter.Assisstant
             StringBuilder builder = new StringBuilder();
             foreach(KeyValuePair<string,string> pair in columnAliasMapping)
             {
-                builder.Append('[').Append(pair.Value).Append("] AS ").Append(pair.Key).Append(',');
+                builder.Append('[').Append(pair.Value).Append("] AS [").Append(pair.Key).Append("],");
             }
             return builder.Remove(builder.Length-1,1).ToString();
         }
@@ -879,7 +869,7 @@ namespace DataTableConverter.Assisstant
             string selectString = "SELECT ";
             if (includeId)
             {
-                selectString += $"{IdColumnName} AS {idAlias ?? IdColumnName},";
+                selectString += $"{IdColumnName} AS [{idAlias ?? IdColumnName}],";
             }
 
             if (orderType == OrderType.Reverse)
@@ -1635,23 +1625,6 @@ namespace DataTableConverter.Assisstant
                     }
                 }
             }
-
-            //using (SQLiteCommand command = connection.CreateCommand())
-            //{
-            //    command.CommandText = $"ATTACH database [{DatabasePath}] as main"; //probably everything not available because it is not commited
-            //    command.ExecuteNonQuery();
-
-            //    string colType = "varchar(255) not null default '' COLLATE NATURALSORT";
-            //    command.CommandText = $"CREATE table main ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", aliasColumnMapping.Keys)}] {colType})";
-
-            //    command.CommandText = $"INSERT into main SELECT [{IdColumnName}], {GetHeaderString(aliasColumnMapping.Values)} from main.[{sourceTable}]"; //not SELECT * because in sourceTable there may be "deleted" columns
-            //    command.ExecuteNonQuery();
-
-
-            //    command.CommandText = $"DETACH database main";
-            //    command.ExecuteNonQuery();
-            //}
-            //CreateMetaData(tableName, aliasColumnMapping.Keys, connection);
             transaction.Commit();
             connection.Close();
         }

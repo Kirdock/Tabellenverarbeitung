@@ -635,6 +635,7 @@ namespace DataTableConverter.Assisstant
             Clipboard.Clear();
             objXL.CutCopyMode = 0;
             int rowRange = 50000;
+            SQLiteCommand insertCommand = null;
             for(int i = 2; i <= rows; i++)
             {
                 Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[i, 1];
@@ -646,7 +647,7 @@ namespace DataTableConverter.Assisstant
                 string content = (string)data.GetData(DataFormats.UnicodeText);
                 if (content != null)
                 {
-                    GetDataOfString(content, tableName, fileName, headers, progressBar, mainForm);
+                    insertCommand = GetDataOfString(content, tableName, fileName, headers, progressBar, mainForm, insertCommand);
                 }
                 i = rowCount;
             }
@@ -670,7 +671,7 @@ namespace DataTableConverter.Assisstant
             return GetHeadersOfContent(content);
         }
 
-        private void GetDataOfString(string content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm)
+        private SQLiteCommand GetDataOfString(string content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm, SQLiteCommand insertCommand)
         {
             int maxLength = content.Length;
             StringBuilder cellBuilder = new StringBuilder();
@@ -679,7 +680,6 @@ namespace DataTableConverter.Assisstant
             int headerCounter = 0;
             Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
             bool generatedMulti = false;
-            SQLiteCommand insertCommand = null;
             
             for (int i = 0; i < maxLength; i++)
             {
@@ -741,6 +741,7 @@ namespace DataTableConverter.Assisstant
             }
             SetContentRowValue(row, headers[headerCounter], cellBuilder);
             AddContentDataRow(row, tableName, fileName, insertCommand);
+            return insertCommand;
         }
 
         private SQLiteCommand AddContentDataRow(Dictionary<string,string> row, string fileName, string tableName, SQLiteCommand command)
