@@ -902,7 +902,7 @@ namespace DataTableConverter.Assisstant
             List<string> headers = new List<string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT column, alias from [{tableName + MetaTableAffix}] order by sortorder asc";
+                command.CommandText = $"SELECT column, alias from [{tableName + MetaTableAffix}] where alias is not null order by sortorder asc";
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -1059,26 +1059,39 @@ namespace DataTableConverter.Assisstant
             adapter?.Update(table);
         }
 
-        internal void SetSavepoint()
+        internal void SetSavepoint(bool ignoreMax = false)
         {
             if(UpdateHandler == null)
             {
                 UpdateHandler = Update;
                 Connection.Trace += UpdateHandler;
             }
-            CreateSavePoint();
+            CreateSavePoint(ignoreMax);
         }
 
-        private void CreateSavePoint()
+        private void CreateSavePoint(bool ignoreMax)
         {
-            ++SavePoints;
+            int savepoint;
             ++Pointer;
+            if (!ignoreMax)
+            {
+                ++SavePoints;
+                savepoint = SavePoints;
+            }
+            else
+            {
+                savepoint = Pointer;
+            }
+            
             using (SQLiteCommand command = Connection.CreateCommand())
             {
-                command.CommandText = $"SAVEPOINT \"{SavePoints}\"";
+                command.CommandText = $"SAVEPOINT \"{savepoint}\"";
                 command.ExecuteNonQuery();
             }
-            DatabaseHistory.CreateSavePoint(SavePoints);
+            if (!ignoreMax)
+            {
+                DatabaseHistory.CreateSavePoint(SavePoints);
+            }
         }
 
         private void Update(object sender, TraceEventArgs e)
@@ -1472,26 +1485,30 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void Undo()
+        internal bool Undo()
         {
-            if (Pointer > 0)
+            bool status;
+            if (status = Pointer > 0)
             {
                 Pointer--;
                 GoToSavePoint(Pointer);
             }
+            return status;
         }
 
-        internal void Redo()
+        internal bool Redo()
         {
-            if (Pointer < SavePoints)
+            bool status;
+            if (status = Pointer < SavePoints)
             {
                 Connection.Trace -= UpdateHandler;
                 
                 DatabaseHistory.Redo(Pointer);
-                SetSavepoint();
+                SetSavepoint(true);
 
                 Connection.Trace += UpdateHandler;
             }
+            return status;
         }
 
         internal void ExecuteCommand(string sql, string tableName = "main")

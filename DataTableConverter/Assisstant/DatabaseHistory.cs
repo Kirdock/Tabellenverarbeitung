@@ -85,19 +85,29 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = Connection.CreateCommand())
             {
-                command.CommandText = $"DELETE FROM history where spoint = {savePoint}";
+                command.CommandText = "DELETE FROM history where spoint = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = savePoint });
+                command.ExecuteNonQuery();
+                command.CommandText = "DELETE FROM log where spoint = ?";
                 command.ExecuteNonQuery();
             }
         }
 
         internal void Log(int pointer, ref int savePoints, string cmd)
         {
-            while(pointer < savePoints)
+            bool status = savePoints > pointer;
+            while(savePoints > pointer)
             {
                 DeleteSavePoint(savePoints);
                 savePoints--;
             }
-            
+
+            if (status)
+            {
+                DeleteSavePoint(savePoints);
+                CreateSavePoint(savePoints);
+            }
+
             using (SQLiteCommand command = Connection.CreateCommand())
             {
                 command.CommandText = $"insert into log (spoint, command) values (?, ?)";
@@ -105,7 +115,8 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter() { Value = cmd });
                 command.ExecuteNonQuery();
             }
-
+            Transaction.Commit();
+            Transaction = Connection.BeginTransaction();
         }
 
         internal void CreateSavePoint(int savePoint)

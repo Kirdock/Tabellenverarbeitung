@@ -586,6 +586,7 @@ namespace DataTableConverter
                     DataTable table = DatabaseHelper.GetData(SortingOrder, OrderType, (int)((Page - 1) * Properties.Settings.Default.MaxRows));
 
                     dgTable.RowsAdded -= dgTable_RowsAdded;
+                    dgTable.DataSource = null; //else readded columns are at the wrong index
                     dgTable.DataSource = table;
                     dgTable.Columns[0].Visible = false;
                     dgTable.RowsAdded += dgTable_RowsAdded;
@@ -869,8 +870,10 @@ namespace DataTableConverter
             new Thread(() =>
             {
                 try {
-                    DatabaseHelper.Undo();
-                    LoadData(true);
+                    if (DatabaseHelper.Undo())
+                    {
+                        LoadData(true);
+                    }
                     StopLoadingBar();
                 }
                 catch (Exception ex)
@@ -890,8 +893,10 @@ namespace DataTableConverter
             {
                 try
                 {
-                    DatabaseHelper.Redo();
-                    LoadData(true);
+                    if (DatabaseHelper.Redo())
+                    {
+                        LoadData(true);
+                    }
                     StopLoadingBar();
                 }
                 catch (Exception ex)
