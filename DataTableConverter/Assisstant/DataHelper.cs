@@ -74,7 +74,7 @@ namespace DataTableConverter.Assisstant
                     }
                 }
 
-                bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, invokeForm, tableName);
+                bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm);
 
                 if (abort) return 0;
 

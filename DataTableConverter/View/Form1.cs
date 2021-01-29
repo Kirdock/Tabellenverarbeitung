@@ -30,8 +30,8 @@ namespace DataTableConverter
         private List<Tolerance> tolerances;
         private List<Case> cases;
         private string SortingOrder = string.Empty;
-        private Dictionary<string, SortOrder> dictSorting;
-        private List<string> dictKeys;
+        private Dictionary<string, SortOrder> DictSorting;
+        private Dictionary<string, string> AliasColumnMapping;
         private string FilePath = string.Empty;
         private OrderType OrderType = OrderType.Windows;
         private readonly Dictionary<string, int> ColumnWidths;
@@ -39,6 +39,7 @@ namespace DataTableConverter
         private int RowCount = 0;
         private decimal MaxPages = 0;
         internal int FileEncoding = 0;
+        private readonly string TableName = DatabaseHelper.DefaultTable;
 
         //internal because of workflows; Form1 is passed on; no need for additional parameters DatabaseHelper, ImportHelper, ExportHelper
         internal readonly DatabaseHelper DatabaseHelper;
@@ -79,9 +80,8 @@ namespace DataTableConverter
             ExportHelper = new ExportHelper(DatabaseHelper);
             DatabaseHelper.ExportHelper = ExportHelper;
             ImportHelper = new ImportHelper(ExportHelper, DatabaseHelper);
-            dictSorting = new Dictionary<string, SortOrder>();
+            DictSorting = new Dictionary<string, SortOrder>();
             ColumnWidths = new Dictionary<string, int>();
-            dictKeys = new List<string>();
             InitializeComponent();
             SetSize();
             ExportHelper.CheckRequired();
@@ -163,8 +163,8 @@ namespace DataTableConverter
             if (order != SortingOrder)
             {
                 SortingOrder = order;
-                dictSorting = ViewHelper.GenerateSortingList(GetSorting());
-                dictKeys = dictSorting.Keys.ToList();
+                DictSorting = ViewHelper.GenerateSortingList(GetSorting());
+                AliasColumnMapping = DatabaseHelper.GetAliasColumnMapping(TableName);
             }
         }
 
@@ -322,7 +322,7 @@ namespace DataTableConverter
         private void workflow_Click(Work workflow, Action finished = null)
         {
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
-            List<string> headers = DatabaseHelper.GetSortedColumnsAsAlias();
+            List<string> headers = DatabaseHelper.GetSortedColumnsAsAlias(TableName);
 
             foreach (WorkProc wp in workflow.Procedures)
             {
@@ -359,7 +359,7 @@ namespace DataTableConverter
                         columns.Add(col);
                     }
                 }
-                using (SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), DatabaseHelper.GetSortedColumnsAsAlias().ToArray(), false))
+                using (SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), false))
                 {
                     if (form.ShowDialog(this) == DialogResult.OK)
                     {
@@ -534,11 +534,11 @@ namespace DataTableConverter
                         break;
 
                     case ImportState.Append:
-                        DatabaseHelper.ConcatTable(tableName, Path.GetFileName(FilePath), filename);
+                        DatabaseHelper.ConcatTable(tableName, Path.GetFileName(FilePath), filename, TableName);
                         break;
 
                     case ImportState.Header:
-                        DatabaseHelper.RenameColumns(tableName);
+                        DatabaseHelper.RenameColumns(tableName, TableName);
                         List<string> newHeaders = DatabaseHelper.GetSortedColumnsAsAlias(tableName);
                         dgTable.BeginInvoke(new MethodInvoker(() =>
                         {
@@ -551,7 +551,7 @@ namespace DataTableConverter
 
                     default:
                         ResetValidRowLabel();
-                        DatabaseHelper.ReplaceTable(tableName);
+                        DatabaseHelper.ReplaceTable(tableName, TableName);
                         BeginInvoke(new MethodInvoker(()=>
                         {
                             SetMenuEnabled(true);
@@ -577,13 +577,13 @@ namespace DataTableConverter
                 {
                     SaveWidthOfDataGridViewColumns();
                 }
-                MaxPages = Math.Ceiling(DatabaseHelper.GetRowCount() / Properties.Settings.Default.MaxRows);
+                MaxPages = Math.Ceiling(DatabaseHelper.GetRowCount(TableName) / Properties.Settings.Default.MaxRows);
                 SetPage();
 
                 int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
                 if (!preventLoading)
                 {
-                    DataTable table = DatabaseHelper.GetData(SortingOrder, OrderType, (int)((Page - 1) * Properties.Settings.Default.MaxRows));
+                    DataTable table = DatabaseHelper.GetData(SortingOrder, OrderType, (int)((Page - 1) * Properties.Settings.Default.MaxRows), TableName);
 
                     dgTable.RowsAdded -= dgTable_RowsAdded;
                     dgTable.DataSource = null; //else readded columns are at the wrong index
@@ -591,7 +591,7 @@ namespace DataTableConverter
                     dgTable.Columns[0].Visible = false;
                     dgTable.RowsAdded += dgTable_RowsAdded;
 
-                    SetRowCount(DatabaseHelper.GetRowCount());
+                    SetRowCount(DatabaseHelper.GetRowCount(TableName));
                 }
                 RestoreDataGridSortMode();
                 SetWidth();
@@ -610,7 +610,7 @@ namespace DataTableConverter
         {
             if (dgTable.DataSource != null)
             {
-                TrimForm form = new TrimForm(DatabaseHelper.GetAliasColumnMapping());
+                TrimForm form = new TrimForm(DatabaseHelper.GetAliasColumnMapping(TableName));
                 if(form.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
@@ -648,7 +648,7 @@ namespace DataTableConverter
 
         private void procedure_Click(Proc procedure)
         {
-            using (Formula formula = new Formula(FormulaState.Procedure, DatabaseHelper.GetSortedColumnsAsAlias()))
+            using (Formula formula = new Formula(FormulaState.Procedure, DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
                 if (formula.ShowDialog(this) == DialogResult.OK)
                 {
@@ -760,7 +760,7 @@ namespace DataTableConverter
                 else
                 {
                     dgTable.Columns.Add(newColumn, newColumn);
-                    DatabaseHelper.AddColumnFixedAlias(newColumn);
+                    DatabaseHelper.AddColumnFixedAlias(newColumn, TableName);
                     DatabaseHelper.SetSavepoint();
                     LoadData();
                 }
@@ -802,7 +802,7 @@ namespace DataTableConverter
 
                 if(oldText != newText)
                 {
-                    DatabaseHelper.RenameAlias(oldText, newText);
+                    DatabaseHelper.RenameAlias(oldText, newText, TableName);
                     dgTable.Columns[selectedColumn].HeaderText = newText;
                     DatabaseHelper.SetSavepoint();
                 }
@@ -811,7 +811,7 @@ namespace DataTableConverter
 
         private void spalteLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DatabaseHelper.DeleteColumnThroughAlias(dgTable.Columns[selectedColumn].HeaderText);
+            DatabaseHelper.DeleteColumnThroughAlias(dgTable.Columns[selectedColumn].HeaderText, TableName);
             dgTable.Columns.RemoveAt(selectedColumn);
             DatabaseHelper.SetSavepoint();
         }
@@ -819,7 +819,7 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (Merge formula = new Merge(DatabaseHelper.GetSortedColumnsAsAlias().ToArray(), contextGlobal))
+            using (Merge formula = new Merge(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal))
             {
                 if (formula.ShowDialog(this) == DialogResult.OK)
                 {
@@ -911,14 +911,14 @@ namespace DataTableConverter
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
                 string value = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
-                string id = dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString();
+                int id = int.Parse(dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString());
                 int width = TextRenderer.MeasureText(value, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
                 DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
                 if (width > col.Width)
                 {
                     ColumnWidths[col.Name] = col.Width = width;
                 }
-                DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].Name, id);
+                DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].Name, id, TableName);
                 DatabaseHelper.SetSavepoint();
             }
         }
@@ -927,7 +927,7 @@ namespace DataTableConverter
         {
             if (dgTable.AllowUserToAddRows && e.RowIndex >= RowCount)
             {
-                string newId = DatabaseHelper.InsertRow();
+                string newId = DatabaseHelper.InsertRow(TableName);
                 DatabaseHelper.SetSavepoint();
                 dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value = newId; //CellValueChanged triggered?
                 
@@ -943,7 +943,7 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, DatabaseHelper.GetSortedColumnsAsAlias().ToArray(), contextGlobal, procedures,workflows,cases,tolerances);
+            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal, procedures,workflows,cases,tolerances);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show(this);
         }
@@ -1021,7 +1021,7 @@ namespace DataTableConverter
 
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (Formula formula = new Formula(FormulaState.Export, DatabaseHelper.GetSortedColumnsAsAlias()))
+            using (Formula formula = new Formula(FormulaState.Export, DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
                 if (formula.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1035,7 +1035,7 @@ namespace DataTableConverter
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ExportCustom export = new ExportCustom(DatabaseHelper.GetAliasColumnMapping(), DatabaseHelper))
+            using (ExportCustom export = new ExportCustom(DatabaseHelper.GetAliasColumnMapping(TableName), DatabaseHelper, TableName))
             {
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1065,7 +1065,7 @@ namespace DataTableConverter
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ExportCount export = new ExportCount(DatabaseHelper.GetAliasColumnMapping(), DatabaseHelper))
+            using (ExportCount export = new ExportCount(DatabaseHelper.GetAliasColumnMapping(TableName), DatabaseHelper))
             {
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1075,7 +1075,7 @@ namespace DataTableConverter
                         string newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, OrderType);
                         BeginInvoke(new MethodInvoker(() =>
                         {
-                            DatabaseHelper.CopyToNewDatabaseFile(newTable);
+                            DatabaseHelper.CopyToNewDatabaseFile(newTable, TableName);
                             new Form1(newTable).Show(this);
                         }));
                         StopLoadingBar();
@@ -1103,8 +1103,8 @@ namespace DataTableConverter
                 else
                 {
                     bool asc = col.HeaderCell.SortGlyphDirection == SortOrder.Ascending;
-
-                    SetSorting($"[{col.Name}] {(asc ? "DESC" : "ASC")}");
+                    
+                    SetSorting($"[{DatabaseHelper.GetColumnName(col.Name, TableName)}] COLLATE NATURALSORT {(asc ? "DESC" : "ASC")}");
                 }
                 LoadData(true);
             }
@@ -1136,7 +1136,7 @@ namespace DataTableConverter
         {
             foreach (int row in rows.OrderByDescending(index => index))
             {
-                DatabaseHelper.DeleteRow(dgTable[DatabaseHelper.IdColumnName, row].Value.ToString());
+                DatabaseHelper.DeleteRow(int.Parse(dgTable[DatabaseHelper.IdColumnName, row].Value.ToString()), TableName);
                 dgTable.Rows.RemoveAt(row);
             }
         }
@@ -1149,7 +1149,7 @@ namespace DataTableConverter
             }
             else
             {
-                DatabaseHelper.InsertRowAt(dgTable[0, selectedRow].Value.ToString());
+                DatabaseHelper.InsertRowAt(dgTable[0, selectedRow].Value.ToString(), TableName);
                 DatabaseHelper.SetSavepoint();
                 LoadData(false);
             }
@@ -1168,29 +1168,29 @@ namespace DataTableConverter
 
         private void dgTable_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (e.RowIndex == -1 && e.ColumnIndex > -1)
+            if (e.RowIndex == -1 && e.ColumnIndex > -1 && AliasColumnMapping != null && AliasColumnMapping.TryGetValue(e.Value.ToString(), out string header))
             {
-                string header = e.Value.ToString();
-                var count = dictKeys.IndexOf(header);
+                int count = DictSorting.Keys.ToList().IndexOf(header);
                 SortOrder order = SortOrder.None;
                 if (count >= 0)
                 {
                     count++;
                     e.Graphics.FillRectangle(new SolidBrush(e.CellStyle.BackColor), e.CellBounds);
                     e.Paint(e.ClipBounds, (DataGridViewPaintParts.All & ~DataGridViewPaintParts.Background));
-                    
-                    e.Graphics.DrawString($"{count}", dgTable.DefaultCellStyle.Font, new SolidBrush(Color.Black), e.CellBounds.X + e.CellBounds.Width-20, e.CellBounds.Y + 5, StringFormat.GenericDefault);
+
+                    e.Graphics.DrawString($"{count}", dgTable.DefaultCellStyle.Font, new SolidBrush(Color.Black), e.CellBounds.X + e.CellBounds.Width - 20, e.CellBounds.Y + 5, StringFormat.GenericDefault);
                     e.Handled = true;
-                    order = dictSorting[header];
+                    order = DictSorting[header];
                 }
                 dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = order;
+                
             }
 
         }
 
         private void großKleinschreibungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (UpLowCaseForm form = new UpLowCaseForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (UpLowCaseForm form = new UpLowCaseForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1201,7 +1201,7 @@ namespace DataTableConverter
 
         private void rundenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (RoundForm form = new RoundForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (RoundForm form = new RoundForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1236,7 +1236,7 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            using (MergeColumns form = new MergeColumns(DatabaseHelper.GetAliasColumnMapping()))
+            using (MergeColumns form = new MergeColumns(DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1249,7 +1249,7 @@ namespace DataTableConverter
                         try
                         {
                             StartLoadingBarCount(RowCount);
-                            DatabaseHelper.MergeRows(columnName, additionalColumns, separator, this, UpdateLoadingBar);
+                            DatabaseHelper.MergeRows(columnName, additionalColumns, separator, this, UpdateLoadingBar, TableName);
                             DatabaseHelper.SetSavepoint();
                             LoadData(true);
                         }
@@ -1266,7 +1266,7 @@ namespace DataTableConverter
 
         private void zeichenAuffüllenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PaddingForm form = new PaddingForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (PaddingForm form = new PaddingForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1283,7 +1283,7 @@ namespace DataTableConverter
                 {
                     string newText = form.NewText;
 
-                    DatabaseHelper.SetColumnValues(dgTable.Columns[selectedColumn].HeaderText, newText);
+                    DatabaseHelper.SetColumnValues(dgTable.Columns[selectedColumn].HeaderText, newText, TableName);
                     foreach (DataGridViewRow row in dgTable.Rows)
                     {
                         row.Cells[selectedColumn].Value = newText;
@@ -1295,7 +1295,7 @@ namespace DataTableConverter
 
         private void nummerierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (NumerationForm form = new NumerationForm(DatabaseHelper.GetSortedColumnsAsAlias()))
+            using (NumerationForm form = new NumerationForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1320,7 +1320,7 @@ namespace DataTableConverter
 
         private void substringToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SubstringForm form = new SubstringForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (SubstringForm form = new SubstringForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1331,7 +1331,7 @@ namespace DataTableConverter
 
         private void textErsetzenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            using (ReplaceWholeForm form = new ReplaceWholeForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray(), contextGlobal))
+            using (ReplaceWholeForm form = new ReplaceWholeForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1379,7 +1379,7 @@ namespace DataTableConverter
 
         private void spaltenVergleichenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (CompareForm form = new CompareForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray(), DatabaseHelper))
+            using (CompareForm form = new CompareForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), DatabaseHelper))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1390,7 +1390,7 @@ namespace DataTableConverter
 
         private void PrüfzifferToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SelectHeader headerForm = new SelectHeader(DatabaseHelper.GetAliasColumnMapping()))
+            using (SelectHeader headerForm = new SelectHeader(DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
                 if (headerForm.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1398,7 +1398,7 @@ namespace DataTableConverter
                     StartLoadingBarCount(RowCount);
                     new Thread(() =>
                     {
-                        DatabaseHelper.SetCheckSum(column, UpdateLoadingBar, this);
+                        DatabaseHelper.SetCheckSum(column, UpdateLoadingBar, this, TableName);
                         StopLoadingBar();
                         DatabaseHelper.SetSavepoint();
                         LoadData(true);
@@ -1409,7 +1409,7 @@ namespace DataTableConverter
 
         private void längsteZeileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (MaxRowLengthForm form = new MaxRowLengthForm(DatabaseHelper.GetAliasColumnMapping()))
+            using (MaxRowLengthForm form = new MaxRowLengthForm(DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
 
                 if (form.ShowDialog(this) == DialogResult.OK)
@@ -1421,19 +1421,19 @@ namespace DataTableConverter
                     StartLoadingBar();
                     Thread thread = new Thread(() =>
                     {
-                        string id = DatabaseHelper.GetRowWithMaxCharacters(GetSorting(), OrderType, out int index);
+                        int id = DatabaseHelper.GetRowWithMaxCharacters(GetSorting(), OrderType, out int index, TableName);
 
                         if (shortcut != string.Empty && newColumn != string.Empty)
                         {
-                            newColumn = DatabaseHelper.AddColumnWithAdditionalIfExists(newColumn);
+                            newColumn = DatabaseHelper.AddColumnWithAdditionalIfExists(newColumn, TableName);
 
                             if (minLength != -1)
                             {
-                                DatabaseHelper.UpdateRowsWithMinCharacters(newColumn, minLength, shortcut, newColumn);
+                                DatabaseHelper.UpdateRowsWithMinCharacters(newColumn, minLength, shortcut, newColumn, TableName);
                             }
                             else
                             {
-                                DatabaseHelper.UpdateCell(shortcut, newColumn, id, true);
+                                DatabaseHelper.UpdateCell(shortcut, newColumn, id, TableName, true);
                             }
                             DatabaseHelper.SetSavepoint();
                             LoadData(true);
@@ -1474,7 +1474,7 @@ namespace DataTableConverter
 
         private void suchenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SearchForm form = new SearchForm(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (SearchForm form = new SearchForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1494,7 +1494,7 @@ namespace DataTableConverter
 
         private void SearchAndSelect(string searchText, string alias, bool totalSearch)
         {
-            int index = DatabaseHelper.SearchValue(searchText, alias, totalSearch, GetSorting(), OrderType);
+            int index = DatabaseHelper.SearchValue(searchText, alias, totalSearch, GetSorting(), OrderType, TableName);
             SelectDataGridViewRow(index);
         }
 
@@ -1513,7 +1513,7 @@ namespace DataTableConverter
 
         private void aufteilenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SplitFormMain form = new SplitFormMain(DatabaseHelper.GetSortedColumnsAsAlias().ToArray()))
+            using (SplitFormMain form = new SplitFormMain(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1538,7 +1538,7 @@ namespace DataTableConverter
 
         private void zeilenLöschenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            using (DeleteRows form = new DeleteRows(RowCount, DatabaseHelper.GetAliasColumnMapping()))
+            using (DeleteRows form = new DeleteRows(RowCount, DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
                 form.ShowDialog();
                 if (form.DialogResult == DialogResult.OK)
@@ -1547,7 +1547,7 @@ namespace DataTableConverter
                     int deleted;
                     if (form.Range == null)
                     {
-                        deleted = DatabaseHelper.DeleteRowByMatch(form.ColumnText, form.ColumnName, form.EqualsText);
+                        deleted = DatabaseHelper.DeleteRowByMatch(form.ColumnText, form.ColumnName, form.EqualsText, TableName);
                     }
                     else
                     {
@@ -1563,10 +1563,11 @@ namespace DataTableConverter
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SortForm form = new SortForm(DatabaseHelper.GetAliasColumnMapping(), SortingOrder, OrderType))
+            using (SortForm form = new SortForm(DatabaseHelper.GetAliasColumnMapping(TableName), SortingOrder, OrderType))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
+
                     OrderType = form.OrderType;
                     SetSorting(form.SortString);
                     LoadData(true);

@@ -12,10 +12,10 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         {
             string value = args[0].ToString();
             string replaceText = args[1].ToString();
-            int start = (int)args[2];
-            int end = (int)args[3];
-            bool replace = (bool)args[4];
-            Func<string, int, int, string> substring = (bool)args[5] ? (Func<string, int, int, string>)SubstringReverse : Substring;
+            int start = int.Parse(args[2].ToString());
+            int end = int.Parse(args[3].ToString());
+            bool replace = bool.Parse(args[4].ToString());
+            Func<string, int, int, string> substring = bool.Parse(args[5].ToString()) ? (Func<string, int, int, string>)SubstringReverse : Substring;
             if (!replace)
             {
                 

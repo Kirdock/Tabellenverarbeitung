@@ -81,7 +81,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     invokeForm.DatabaseHelper.CreateTable(duplicateColumns, table);
                     invokeForm.DatabaseHelper.CreateIndexOn(table, identifierColumn, null, true);
                 }
-                Dictionary<string, string> updates = new Dictionary<string, string>();
+                Dictionary<int, string> updates = new Dictionary<int, string>();
                 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
@@ -91,27 +91,27 @@ namespace DataTableConverter.Classes.WorkProcs
                     {
                         string identifierTotal = GetColumnsAsObjectArray(reader, null, null, null);
 
-                        if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierTotal, duplicateTableTotal, sourceRowIdName, out string sourceId))
+                        if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierTotal, duplicateTableTotal, sourceRowIdName, out int sourceId))
                         {
                             if (!updates.ContainsKey(sourceId))
                             {
                                 updates.Add(sourceId, duplicateCase.ShortcutTotal);
                             }
                             
-                            updates.Add(reader.GetString(0), duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
+                            updates.Add(reader.GetInt16(0), duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
                         }
                         else
                         {
                             updateCommandTotal = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0), identifierTotal }, duplicateTableTotal, updateCommandTotal);
                             
                             string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, tolerances);
-                            if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierShort, duplicateTableShort, sourceRowIdName, out string sourceId2))
+                            if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierShort, duplicateTableShort, sourceRowIdName, out int sourceId2))
                             {
                                 if (!updates.ContainsKey(sourceId))
                                 {
                                     updates.Add(sourceId2, duplicateCase.ShortcutTotal);
                                 }
-                                updates.Add(reader.GetString(0), duplicateCase.Shortcut + duplicateCase.Shortcut);
+                                updates.Add(reader.GetInt16(0), duplicateCase.Shortcut + duplicateCase.Shortcut);
                             }
                             else
                             {

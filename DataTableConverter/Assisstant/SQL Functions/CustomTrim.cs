@@ -11,8 +11,8 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         {
             string value = args[0].ToString();
             char[] charArray = args[1].ToString().ToArray();
-            bool deleteDouble = (bool)args[2];
-            int type = (int)args[3];
+            bool deleteDouble = bool.Parse(args[2].ToString());
+            int type = int.Parse(args[3].ToString());
 
             if (deleteDouble)
             {

@@ -14,7 +14,8 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         public override object Invoke(object[] args)
         {
             string value = args[0].ToString();
-            switch ((int)args[1])
+            int type = int.Parse(args[1].ToString());
+            switch (type)
             {
                 //Everything upper case letters
                 case 0:

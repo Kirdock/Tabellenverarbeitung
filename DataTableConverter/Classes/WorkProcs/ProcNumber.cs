@@ -33,7 +33,10 @@ namespace DataTableConverter.Classes.WorkProcs
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
                 invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out string column);
-                invokeForm.DatabaseHelper.Enumerate(column, Start, End, Repeat, sortingOrder, orderType, tableName);
+                if (column != null)
+                {
+                    invokeForm.DatabaseHelper.Enumerate(column, Start, End, Repeat, sortingOrder, orderType, tableName);
+                }
             }
         }
 

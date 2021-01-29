@@ -47,7 +47,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 if (!string.IsNullOrWhiteSpace(NewColumn))
                 {
-                    string col = invokeForm.DatabaseHelper.GetColumnName(NewColumn, tableName) ?? invokeForm.DatabaseHelper.AddColumnWithAdditionalIfExists(NewColumn);
+                    string col = invokeForm.DatabaseHelper.GetColumnName(NewColumn, tableName) ?? invokeForm.DatabaseHelper.AddColumnWithAdditionalIfExists(NewColumn, tableName);
                     invokeForm.DatabaseHelper.SearchAndShortcut(Header, col, TotalSearch, SearchText, Shortcut, From, To, sortingOrder, orderType, tableName);
                 }
             }

@@ -115,8 +115,6 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter() { Value = cmd });
                 command.ExecuteNonQuery();
             }
-            Transaction.Commit();
-            Transaction = Connection.BeginTransaction();
         }
 
         internal void CreateSavePoint(int savePoint)
@@ -147,7 +145,7 @@ namespace DataTableConverter.Assisstant
                         int readRows = 0;
                         while (reader.Read())
                         {
-                            DatabaseHelper.ExecuteCommand(reader.GetString(0));
+                            DatabaseHelper.ExecuteCommand(reader.GetString(0), DatabaseHelper.DefaultTable);
                             ++offset;
                             ++readRows;
                         }

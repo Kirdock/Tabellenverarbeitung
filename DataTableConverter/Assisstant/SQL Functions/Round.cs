@@ -14,7 +14,7 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         public override object Invoke(object[] args)
         {
             decimal.TryParse(args[0].ToString(), out decimal result);
-            return RoundNumber(result, (int)args[1], (int)args[2]);
+            return RoundNumber(result, int.Parse(args[1].ToString()), int.Parse(args[2].ToString()));
         }
 
         private string RoundNumber(decimal number, int type, int decimals)

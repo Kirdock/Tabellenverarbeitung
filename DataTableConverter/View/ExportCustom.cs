@@ -21,7 +21,8 @@ namespace DataTableConverter.View
         private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
         internal string ContinuedNumberName => CbContinuedNumber.Checked ? TxtContinuedNumber.Text : string.Empty;
         private readonly DatabaseHelper DatabaseHelper;
-        internal ExportCustom(Dictionary<string,string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName = "main")
+        private readonly string TableName;
+        internal ExportCustom(Dictionary<string,string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName)
         {
             InitializeComponent();
             DatabaseHelper = databaseHelper;
@@ -31,7 +32,7 @@ namespace DataTableConverter.View
             cmbColumn.DataSource = aliasColumnMapping;
             cmbColumn.DisplayMember = "key";
             cmbColumn.DisplayMember = "value";
-            
+            TableName = tableName;
             SetEnabled();
         }
 
@@ -108,7 +109,7 @@ namespace DataTableConverter.View
         {
             string columnName = cmbColumn.SelectedValue.ToString();
 
-            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName);
+            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName, TableName);
 
             clbValues.BeginUpdate();
             clbValues.Items.Clear();

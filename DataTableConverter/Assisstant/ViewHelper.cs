@@ -214,7 +214,7 @@ namespace DataTableConverter
             if (!string.IsNullOrWhiteSpace(orderBefore))
             {
 
-                string[] headersInformation = orderBefore.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                string[] headersInformation = orderBefore.Replace("COLLATE NATURALSORT ",string.Empty).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string info in headersInformation)
                 {
                     string[] headerInfo = info.Split(new string[] { "] " }, StringSplitOptions.RemoveEmptyEntries);

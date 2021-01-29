@@ -116,7 +116,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 if (destinationColumn != null)
                 {
                     List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName);
-                    List<KeyValuePair<string, string>> updates = new List<KeyValuePair<string, string>>();
+                    List<KeyValuePair<int, string>> updates = new List<KeyValuePair<int, string>>();
                     using (System.Data.SQLite.SQLiteDataReader reader = invokeForm.DatabaseHelper.GetDataCommand(tableName, "id").ExecuteReader())
                     {
                         while (reader.Read())
@@ -145,7 +145,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             }
                             MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
                             string result = format.IsStringFormat() ? GetFormat(aliasValueMapping, format.Formula, aliases, invokeForm) : GetFormat(aliasValueMapping, format, aliases);
-                            updates.Add(new KeyValuePair<string, string>(reader.GetString(0), result));
+                            updates.Add(new KeyValuePair<int, string>(reader.GetInt32(0), result));
                         }
                     }
 

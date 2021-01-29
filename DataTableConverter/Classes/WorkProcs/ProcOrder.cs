@@ -44,9 +44,9 @@ namespace DataTableConverter.Classes.WorkProcs
 
             foreach (DataRow row in Columns.Rows)
             {
-                object col = row[0];
+                string alias = row[0].ToString();
                 bool orderDESC = string.IsNullOrWhiteSpace(row[1]?.ToString()) ? false : (bool)row[1];
-                builder.Append("[").Append(col.ToString()).Append("] ").Append(orderDESC ? "DESC" : "ASC").Append(", ");
+                builder.Append("[").Append(invokeForm.DatabaseHelper.GetColumnName(alias, tableName)).Append("] COLLATE NATURALSORT ").Append(orderDESC ? "DESC" : "ASC").Append(", ");
             }
             string result = builder.ToString();
             if (result.Length > 2)

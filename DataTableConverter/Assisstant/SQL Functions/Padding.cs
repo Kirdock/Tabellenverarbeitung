@@ -14,9 +14,9 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         public override object Invoke(object[] args)
         {
             string result = args[0].ToString();
-            int counter = (int)args[2];
-            char character = (char)args[3];
-            switch ((int)args[1])
+            int counter = int.Parse(args[2].ToString());
+            char character = char.Parse(args[3].ToString());
+            switch (int.Parse(args[1].ToString()))
             {
                 case 0:
                     result = result.PadLeft(counter, character);
