@@ -29,7 +29,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 string newTable = invokeForm.ExportHelper.ExportCount(columnName, CountChecked ? Count : 0, ShowFromTo, orderType, tableName);
                 invokeForm.BeginInvoke(new MethodInvoker(() =>
                 {
-                    invokeForm.DatabaseHelper.CopyToNewDatabaseFile(newTable, tableName);
+                    invokeForm.DatabaseHelper.CopyToNewDatabaseFile(newTable);
                     new Form1(newTable).Show(invokeForm);
                 }));
             }

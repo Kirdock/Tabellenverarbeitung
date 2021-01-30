@@ -860,7 +860,7 @@ namespace DataTableConverter
         /// <param name="tableName"></param>
         /// <param name="orderType"></param>
         /// <returns></returns>
-        internal string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName = "main")
+        internal string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName)
         {
             string newTable = Guid.NewGuid().ToString();
 

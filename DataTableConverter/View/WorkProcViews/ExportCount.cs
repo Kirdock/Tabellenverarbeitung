@@ -55,7 +55,7 @@ namespace DataTableConverter.View
 
         internal string getSelectedValue()
         {
-            return cmbColumn.SelectedItem.ToString();
+            return cmbColumn.SelectedValue.ToString();
         }
 
         internal int getColumnIndex()

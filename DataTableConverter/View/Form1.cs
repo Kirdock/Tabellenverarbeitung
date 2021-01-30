@@ -74,15 +74,15 @@ namespace DataTableConverter
             }
         }
 
-        internal Form1(string tableName = null, string path = null)
+        internal Form1(string databaseName = null, string path = null)
         {
-            DatabaseHelper = new DatabaseHelper(tableName);
+            InitializeComponent();
+            DatabaseHelper = new DatabaseHelper(databaseName);
             ExportHelper = new ExportHelper(DatabaseHelper);
             DatabaseHelper.ExportHelper = ExportHelper;
             ImportHelper = new ImportHelper(ExportHelper, DatabaseHelper);
             DictSorting = new Dictionary<string, SortOrder>();
             ColumnWidths = new Dictionary<string, int>();
-            InitializeComponent();
             SetSize();
             ExportHelper.CheckRequired();
             LoadProcedures();
@@ -94,13 +94,15 @@ namespace DataTableConverter
             cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click();
             dBASEToolStripMenuItem1.Click += (sender, e) => dBASEToolStripMenuItem_Click(sender, e);
             excelToolStripMenuItem1.Click += (sender, e) => excelToolStripMenuItem_Click(sender, e);
-            if (tableName != null)
-            {
-                LoadData(true);
-            }
+            
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
-            if(path != null)
+            if (databaseName != null)
+            {
+                LoadData(true, false, true);
+                SetMenuEnabled(true);
+            }
+            else if (path != null)
             {
                 importToolStripMenuItem_Click(ImportState.None, new string[] { path });
             }
@@ -565,10 +567,21 @@ namespace DataTableConverter
             StopLoadingBar();
         }
 
-        private void LoadData(bool readjustColumnWidth = true, bool preventLoading = false)
+        private void LoadData(bool readjustColumnWidth = true, bool preventLoading = false, bool withoutInvoke = false)
         {
-            dgTable.Invoke(new MethodInvoker(() =>
+            if (withoutInvoke)
             {
+                load();
+            }
+            else
+            {
+                dgTable.Invoke(new MethodInvoker(() =>
+                {
+                    load();
+                }));
+            }
+
+            void load() {
                 if (readjustColumnWidth)
                 {
                     ColumnWidths.Clear();
@@ -597,8 +610,10 @@ namespace DataTableConverter
                 SetWidth();
 
                 dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
-            }));
+            }
         }
+
+        
 
         private void SetRowCount(int count)
         {
@@ -1072,10 +1087,10 @@ namespace DataTableConverter
                     StartLoadingBar();
                     Thread thread = new Thread(() =>
                     {
-                        string newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, OrderType);
+                        string newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, OrderType, TableName);
                         BeginInvoke(new MethodInvoker(() =>
                         {
-                            DatabaseHelper.CopyToNewDatabaseFile(newTable, TableName);
+                            DatabaseHelper.CopyToNewDatabaseFile(newTable);
                             new Form1(newTable).Show(this);
                         }));
                         StopLoadingBar();

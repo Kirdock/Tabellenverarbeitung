@@ -27,8 +27,10 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             if (!string.IsNullOrWhiteSpace(Identifier))
             {
+                string column = invokeForm.DatabaseHelper.GetColumnName(Identifier, tableName);
                 List<PlusListboxItem> additionalColumns = Columns.AsEnumerable().Select(row => new PlusListboxItem((PlusListboxItem.RowMergeState)Enum.ToObject(typeof(PlusListboxItem.RowMergeState), row[1] as int? ?? 0), row[0].ToString())).ToList();
-                invokeForm.DatabaseHelper.MergeRows(Identifier, additionalColumns, Separator, invokeForm, null, tableName);
+                additionalColumns.ForEach(item => item.Value = invokeForm.DatabaseHelper.GetColumnName(item.Value, tableName));
+                invokeForm.DatabaseHelper.MergeRows(column, additionalColumns, Separator, invokeForm, null, tableName);
             }
         }
 

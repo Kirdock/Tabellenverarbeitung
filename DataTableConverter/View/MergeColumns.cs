@@ -15,24 +15,25 @@ namespace DataTableConverter.View
     {
         internal string Identifier => CmBHeaders.SelectedValue.ToString();
         internal bool Separator => CBSeparator.Checked;
+        private Dictionary<string, string> AliasColumnMapping;
         internal List<PlusListboxItem> AdditionalColumns { get
             {
-                return ClBHeaders.CheckedItems.Cast<PlusListboxItem>().Where(item => item.Value != Identifier).ToList();
+                List<PlusListboxItem> result = ClBHeaders.CheckedItems.Cast<PlusListboxItem>().Where(item => item.Value != Identifier).ToList();
+                result.ForEach(item => item.Value = AliasColumnMapping[item.Value]);
+                return result.ToList();
             }
         }
 
         internal MergeColumns(Dictionary<string,string> aliasColumnMapping)
         {
             InitializeComponent();
+            AliasColumnMapping = aliasColumnMapping;
             SetListBoxStyle();
             CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
             CmBHeaders.DisplayMember = "key";
             CmBHeaders.ValueMember = "value";
             
-            ListBox box = ClBHeaders;
-            box.DataSource = new BindingSource(aliasColumnMapping.Select(pair => new PlusListboxItem(pair.Value, pair.Key)).ToArray(), null);
-            box.DisplayMember = "DisplayValue";
-            box.ValueMember = "Value";
+            ClBHeaders.Items.AddRange(aliasColumnMapping.Select(pair => new PlusListboxItem(pair.Key)).ToArray());
             CmBHeaders.SelectedIndex = 0;
             ViewHelper.ResizePlusListBox(ClBHeaders);
         }

@@ -63,7 +63,6 @@ namespace DataTableConverter.Assisstant
             Reset();
             SortOrderColumnName = IdColumnName == "rowid" ? SortOrderColumnName : IdColumnName;
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
-            SQLiteFunction.RegisterFunction(typeof(ParseDecimal)); //PARSEDECIMAL(myValue)
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
             SQLiteFunction.RegisterFunction(typeof(Round)); //ROUND2(myValue, type, decimalCount)
             SQLiteFunction.RegisterFunction(typeof(CountString)); //COUNTSTRING(myValue, mySubstring)
@@ -279,7 +278,7 @@ namespace DataTableConverter.Assisstant
             };
             
 
-            CreateMetaData(tableName, columnNames);
+            CreateMetaData(tableName, columnNames, connection);
         }
 
         private void CreateMetaData(string tableName, IEnumerable<string> columnNames, SQLiteConnection connection = null)
@@ -709,15 +708,13 @@ namespace DataTableConverter.Assisstant
             {
                 try
                 {
-                    command.CommandText = $"CREATE {(unique ? "UNIQUE" : string.Empty)} index if not exists $index on [{tableName}]($colName)";
-                    command.Parameters.Add(new SQLiteParameter("$colName", columnName));
-                    command.Parameters.Add(new SQLiteParameter("$index", columnName + IndexAffix + tableName)); //tableName because drop index does not specify a table
+                    command.CommandText = $"CREATE {(unique ? "UNIQUE" : string.Empty)} index if not exists [{columnName + IndexAffix + tableName}] on [{tableName}]([{columnName}])";
                     command.ExecuteNonQuery();
                 }
                 catch
                 {
                     DialogResult result = MessageHandler.MessagesYesNo(invokeForm, MessageBoxIcon.Warning, "Die angegebene identifizierende Spalte der geladenen Tabelle enthält Duplikate.\nTrotzdem fortfahren?");
-                    abort = result == DialogResult.Yes;
+                    abort = result != DialogResult.Yes;
                 }
             }
             return abort;
@@ -727,8 +724,7 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"DROP Index if exists ?";
-                command.Parameters.Add(new SQLiteParameter() { Value = columnName + IndexAffix + tableName });
+                command.CommandText = $"DROP Index if exists [{columnName + IndexAffix + tableName}]";
                 command.ExecuteNonQuery();
             }
         }
@@ -1131,16 +1127,21 @@ namespace DataTableConverter.Assisstant
             return rowCount;
         }
 
-        internal SQLiteCommand GetDataCommand(string tableName, string orderAlias = null)
+        /// <summary>
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="idAlias"></param>
+        /// <returns>Everything of a table if orderAlias is not null, else everything without the id</returns>
+        internal SQLiteCommand GetDataCommand(string tableName, string idAlias = null)
         {
             
             SQLiteCommand command = GetConnection(tableName).CreateCommand();
             Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
 
             command.CommandText = "SELECT ";
-            if (orderAlias != null)
+            if (idAlias != null)
             {
-                command.CommandText += $"rowid AS [{orderAlias}],";
+                command.CommandText += $"rowid AS [{idAlias}],";
             }
 
             command.CommandText += $"{GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}]";
@@ -1477,14 +1478,22 @@ namespace DataTableConverter.Assisstant
             InsertRow(new string[] { columnName }, new object[] { sourceRowCount.ToString() }, tableName, command);
         }
 
-        internal void DeleteRow(int id, string tableName)
+        internal SQLiteCommand DeleteRow(int id, string tableName, SQLiteCommand cmd = null)
         {
-            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            SQLiteCommand command;
+            if (cmd != null)
             {
+                command = cmd;
+                command.Parameters[0].Value = id;
+            }
+            else
+            {
+                command = GetConnection(tableName).CreateCommand();
                 command.CommandText = $"DELETE from [{tableName}] where rowid = ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = id });
-                command.ExecuteNonQuery();
             }
+            command.ExecuteNonQuery();
+            return command;
         }
 
         internal bool Undo()
@@ -1623,7 +1632,7 @@ namespace DataTableConverter.Assisstant
         /// Before a new main instance with a table is opened, copy the table into it's own file
         /// </summary>
         /// <param name="tableName"></param>
-        internal void CopyToNewDatabaseFile(string tableName, string sourceTable)
+        internal void CopyToNewDatabaseFile(string tableName)
         {
             string path = Path.Combine(DatabaseDirectory, tableName + ".sqlite");
             CreateDatabase(path);
@@ -1631,9 +1640,9 @@ namespace DataTableConverter.Assisstant
             SQLiteConnection connection = new SQLiteConnection($"Data Source={path};Version=3;");
             connection.Open();
             SQLiteTransaction transaction = connection.BeginTransaction();
-            IEnumerable<string> columns = GetAliasColumnMapping(sourceTable).Keys;
+            IEnumerable<string> columns = GetAliasColumnMapping(tableName).Keys;
             CreateTable(columns, "main", connection);
-            using (SQLiteCommand command = GetDataCommand(sourceTable))
+            using (SQLiteCommand command = GetDataCommand(tableName))
             {
                 using(SQLiteDataReader reader = command.ExecuteReader())
                 {
@@ -1661,133 +1670,168 @@ namespace DataTableConverter.Assisstant
             //additionalColumns[...].Value is the columnName
             Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(tableName);
             string separatorText = separator ? "#,0.###" : string.Empty;
-            CreateIndexOn(tableName, columnName, invokeForm, false);
+            
             string[] sumColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Sum).Select(item => item.Value).ToArray();
             string[] countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count).Select(item => item.Value).ToArray();
             string[] appendArray = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Nothing).Select(item => item.Value).ToArray();
-            if (countColumns.Length != 0)
+
+            //maybe easier to save each row in a temp-database and later call ReplaceTable(tableName, newTableName)
+            //NO ==> history gets lost!!
+            //Another way: save update/delete-commands into another table
+
+            string newTableName = Guid.NewGuid().ToString();
+            string[] tempColumns = new string[] {"id", "isAlias", "columns", "values" };
+            CreateTable(tempColumns, newTableName);
+            SQLiteCommand insertCommand = null;
+            bool hasAppend = appendArray.Length != 0;
+            List<int> deleteRows = new List<int>();
+            List<string> newColumns = new List<string>();
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                SetRowCountByIdentifier(columnName, countColumns, tableName);
-            }
-            if(sumColumns.Length != 0)
-            {
-                SetSumByIdentifier(columnName, sumColumns, tableName, separatorText);
-            }
-            
-            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
-            {
-                string headerString = appendArray.Length == 0 ? string.Empty : "t1.[" + string.Join("], t1.[", appendArray.Concat(sumColumns)) + "]";
-                command.CommandText = $"SELECT t1.[{IdColumnName}], t1.[{columnName}], {headerString} from [{tableName}] t1 join (Select t2.[{columnName}] from [{tableName}] t2 group by t2.[{columnName}] having count(*) > 1) t2 on t1.[{columnName}] = t2.[{columnName}] order by [{columnName}]";
+                string headerString = GetHeaderString(new string[] { columnName }.Concat(appendArray).Concat(sumColumns));
+                command.CommandText = GetSortedSelectString(headerString, $"[{columnName}] ASC", OrderType.Windows, -1, -1, true, tableName);
+                
+                
                 int offset = 2; //ofset till the values of "headerString"
                 int sumOffset = offset + appendArray.Length;
                 bool containsSumColumns = sumColumns.Length != 0;
-                //SQLiteCommand sumCommand = null;
-                using(SQLiteDataReader reader = command.ExecuteReader())
+                bool containsCountColumns = countColumns.Length != 0;
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
+                        int rowCount = 1;
                         updateLoadingBar?.Invoke();
                         #region Init
-                        //Dictionary<string, decimal> sum = new Dictionary<string, decimal>(); //Dictionary instead of single variable because we can sum several columns
-
                         int id = reader.GetInt32(0);
                         string nameBefore = reader.GetString(1);
                         int counter = 1;
+                        decimal[] sumResults = new decimal[sumColumns.Length];
                         
-                        //for (int i = 0; i < sumColumns.Length; ++i)
-                        //{
-                        //    decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
-                        //    sum.Add(sumColumns[i], result);
-                        //}
+                        int count = 1;
+                        Dictionary<string, string> newRowValues = new Dictionary<string, string>();
+                        
+                        
+                        for (int i = 0; i < sumColumns.Length; ++i)
+                        {
+                            decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
+                            sumResults[i] = result;
+                        }
+
                         #endregion
 
                         while (reader.Read())
                         {
+                            rowCount++;
+                            
                             string name = reader.GetString(1);
                             if(name != nameBefore)
                             {
-                                //sumCommand = UpdateRow(id, sum.Keys.ToArray(), sum.Values.Select(value => value.ToString(separatorText)).ToArray(), tableName, sumCommand);
+                                //save values of before
+                                //update where [{IdColumnName}] = ?   (id)
+                                //Combine values with \t
+                                if (newRowValues.Count != 0)
+                                {
+                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "1", string.Join("\t", newRowValues.Keys), string.Join("\t", newRowValues.Values) }, newTableName, insertCommand);
+                                    
+                                }
+                                if (containsSumColumns || containsCountColumns)
+                                {
+                                    //sumResults and count
+                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
+                                }
 
                                 #region InitNew
                                 id = reader.GetInt32(0); //newId
-                                
-                                //for (int i = 0; i < sumColumns.Length; ++i)
-                                //{
-                                //    decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
-                                //    sum[sumColumns[i]] = result;
-                                //}
+
+                                for (int i = 0; i < sumColumns.Length; ++i)
+                                {
+                                    decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
+                                    sumResults[i] = result;
+                                }
+
+                                newRowValues.Clear();
+
                                 counter = 1;
+                                count = 1;
                                 #endregion
                             }
                             else
                             {
-                                if (appendArray.Length != 0)
+                                count++;
+                                if (hasAppend)
                                 {
-                                    string[] newColumnNames = new string[appendArray.Length];
-                                    string[] newRowValues = new string[appendArray.Length];
                                     for (int i = 0; i < appendArray.Length; ++i)
                                     {
                                         string newAlias = appendArray[i] + counter;
-                                        string colName;
 
                                         if (!aliasColumnMapping.ContainsKey(newAlias))
                                         {
-                                            colName = AddColumnFixedAlias(newAlias, tableName);
-                                            aliasColumnMapping.Add(newAlias, colName);
+                                            newColumns.Add(newAlias);
+                                            aliasColumnMapping.Add(newAlias, newAlias);
                                         }
-                                        else
-                                        {
-                                            colName = aliasColumnMapping[newAlias];
-                                        }
-                                        newColumnNames[i] = colName;
-                                        newRowValues[i] = reader.GetString(i + offset);
+                                        
+                                        newRowValues.Add(newAlias, reader.GetString(i + offset));
                                     }
-                                    UpdateRow(id, newColumnNames, newRowValues, tableName);
+
+                                    counter++;
                                 }
-                                //for (int i = 0; i < sumColumns.Length; ++i)
-                                //{
-                                //    if(decimal.TryParse(reader.GetString(i + sumOffset), out decimal result))
-                                //    {
-                                //        sum[sumColumns[i]] += result;
-                                //    }
-                                    
-                                //}
-                                counter++;
-                                DeleteRow(id, tableName);
+                                for (int i = 0; i < sumColumns.Length; ++i)
+                                {
+                                    if (decimal.TryParse(reader.GetString(i + sumOffset), out decimal result))
+                                    {
+                                        sumResults[i] += result;
+                                    }
+
+                                }
+                                deleteRows.Add(reader.GetInt32(0));
                             }
+
                             nameBefore = name;
                             updateLoadingBar?.Invoke();
                         }
-                        //UpdateRow(id, sum.Keys.ToArray(), sum.Values.Select(value => value.ToString(separatorText)).ToArray(), tableName, sumCommand);
+                        if (newRowValues.Count != 0)
+                        {
+                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "1", string.Join("\t", newRowValues.Keys), string.Join("\t", newRowValues.Values) }, newTableName, insertCommand); //for last row
+                        }
+                        if (containsSumColumns || containsCountColumns)
+                        {
+                            //sumResults and count
+                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
+                        }
                     }
                 }
             }
-
-            DeleteIndexOn(tableName, columnName);
-        }
-
-        private void SetSumByIdentifier(string identifier, string[] columnNames, string tableName, string separatorText)
-        {
-            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            SQLiteCommand deleteCommand = null;
+            foreach(int id in deleteRows)
             {
-                foreach(string columnName in columnNames)
+                deleteCommand = DeleteRow(id, tableName, deleteCommand);
+            }
+            
+            foreach(string alias in newColumns)
+            {
+                AddColumnFixedAlias(alias, tableName);
+            }
+
+            aliasColumnMapping = GetAliasColumnMapping(tableName);
+            SQLiteCommand updateCommand = null;
+            using (SQLiteDataReader reader = GetDataCommand(newTableName).ExecuteReader())
+            {
+                while (reader.Read())
                 {
-                    command.CommandText = $"UPDATE [{tableName}] set [{columnName}] = TOSTRING(" +
-                        $"(select sum(PARSEDECIMAL(t2.[{columnName}])) from [{tableName}] t2 group by t2.[{identifier}] having [{tableName}].[{IdColumnName}]= t2.[{IdColumnName}])," +
-                        $"\"{separatorText})\")";
-                    command.ExecuteNonQuery();
+                    //0 = id of destination table
+                    //1 = type (isAlias, 0 or 1) if name is alias or column
+                    //2 = column/alias names
+                    //3 = values
+                    int id = int.Parse(reader.GetString(0));
+                    bool isAlias = reader.GetString(1) == "1";
+                    string[] names = reader.GetString(2).Split('\t');
+                    string[] columnNames = isAlias ? names.Select(name => aliasColumnMapping[name]).ToArray() : names;
+                    updateCommand = UpdateRow(id, columnNames, reader.GetString(3).Split('\t'), tableName, updateCommand);
                 }
             }
-        }
-
-        private void SetRowCountByIdentifier(string identifier, string[] columnNames, string tableName)
-        {
-            //count (just unique rows): update [{tableName}] set col1 = "1", col2 = "1",... where [{IdColumnName}] in (Select t2.[{IdColumnName}] from [{tableName}] t2 group by t2.[{Identifier}] having count(*) = 1)
-            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
-            {
-                command.CommandText = $"UPDATE [{tableName}] set {string.Join("=", columnNames)} = (Select count(t2.[{identifier}]) from [{tableName}] t2 group by t2.[{identifier}] having [{tableName}].[{IdColumnName}] = t2.[{IdColumnName}]) "; //col1 = col2 = ... works
-                command.ExecuteNonQuery();
-            }
+            Delete(newTableName);
         }
 
         private SQLiteCommand UpdateRow(int id, string[] columnNames, string[] columnValues, string tableName, SQLiteCommand command = null)
