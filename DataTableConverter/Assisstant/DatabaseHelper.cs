@@ -1538,6 +1538,12 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        /// <summary>
+        /// Updates all row values on the given column
+        /// </summary>
+        /// <param name="updates"></param>
+        /// <param name="column"></param>
+        /// <param name="tableName"></param>
         internal void UpdateCells(IEnumerable<KeyValuePair<int, string>> updates, string column, string tableName)
         {
             if (updates.Count() != 0)
@@ -1591,48 +1597,41 @@ namespace DataTableConverter.Assisstant
 
         internal void SetCheckSum(string columnName, Action updateLoadingBar, Form invokeForm, string tableName)
         {
+            Dictionary<int, string> updates = new Dictionary<int, string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                int offset = 0;
+                command.CommandText = $"SELECT [{IdColumnName}], [{columnName}] from [{tableName}]";
 
-                command.CommandText = $"SELECT rowid, [{columnName}] from [{tableName}] LIMIT {Properties.Settings.Default.MaxRows} OFFSET ?";
-                command.Parameters.Add(new SQLiteParameter());
-                bool hasRows = true;
                 bool askAgain = true;
-                while (hasRows)
+                using (SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    command.Parameters[0].Value = offset;
-                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    int rowCount = 0;
+                    while (reader.Read())
                     {
-                        int newRows = 0;
-                        while (reader.Read())
+                        rowCount++;
+                        string value = reader.GetString(1);
+                        int checkSum = ChecksumEAN9(value);
+                        if (checkSum == -1 && askAgain)
                         {
-                            newRows++;
-                            string value = reader.GetString(1);
-                            int checkSum = ChecksumEAN9(value);
-                            if (checkSum == -1 && askAgain)
+                            DialogResult result = MessageHandler.MessagesYesNo(invokeForm, MessageBoxIcon.Warning, $"Ungültige Zahl in Zeile {rowCount}. Trotzdem fortfahren?");
+                            if (result == DialogResult.No)
                             {
-                                DialogResult result = MessageHandler.MessagesYesNo(invokeForm, MessageBoxIcon.Warning, $"Ungültige Zahl in Zeile {offset + newRows}. Trotzdem fortfahren?");
-                                if (result == DialogResult.No)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    askAgain = false;
-                                }
+                                break;
                             }
                             else
                             {
-                                UpdateCell(value + checkSum, columnName, reader.GetInt32(0), tableName, true);
+                                askAgain = false;
                             }
-                            updateLoadingBar();
                         }
-                        offset += newRows;
-                        hasRows = reader.HasRows && newRows < Properties.Settings.Default.MaxRows;
+                        else if (checkSum != -1)
+                        {
+                            updates.Add(reader.GetInt32(0), value + checkSum);
+                        }
+                        updateLoadingBar();
                     }
                 }
             }
+            UpdateCells(updates, columnName, tableName);
         }
 
         /// <summary>
