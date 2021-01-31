@@ -10,7 +10,7 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         {
             string result = args[0].ToString();
             int counter = int.Parse(args[2].ToString());
-            char character = char.Parse(args[3].ToString());
+            char character = (char)int.Parse(args[3].ToString());
             switch (int.Parse(args[1].ToString()))
             {
                 case 0:

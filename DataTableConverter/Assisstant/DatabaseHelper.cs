@@ -129,7 +129,7 @@ namespace DataTableConverter.Assisstant
                 {
                     for (int i = 0; i < sourceColumns.Length; ++i)
                     {
-                        builder.Append("CASE WHEN ");
+                        builder.Append("[").Append(destinationColumns[i]).Append("] = CASE WHEN ");
                         foreach (DataRow rep in conditions.AsEnumerable())
                         {
                             string column = rep[(int)ProcPadding.ConditionColumn.Spalte].ToString();
