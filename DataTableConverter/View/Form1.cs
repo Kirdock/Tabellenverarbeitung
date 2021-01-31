@@ -52,7 +52,7 @@ namespace DataTableConverter
                 dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
                 dgTable.RowsAdded += dgTable_RowsAdded;
                 SetPage();
-                LoadData(true);
+                LoadData(true, false, true);
             }
         }
         internal int ValidRows
@@ -1467,23 +1467,24 @@ namespace DataTableConverter
 
         private void SelectDataGridViewRow(int index)
         {
-            int maxRecords = (int)Properties.Settings.Default.MaxRows;
-            int desiredPage = (index + 1) / maxRecords;
-            if (desiredPage != Page)
-            {
-                Page = desiredPage;
-            }
-            int newIndex = index;
+            decimal maxRecords = Properties.Settings.Default.MaxRows;
+            decimal desiredPage = Math.Ceiling((index + 1) / maxRecords);
+            decimal newIndex = index;
             while (newIndex > maxRecords)
             {
                 newIndex -= maxRecords;
             }
 
-            dgTable.Invoke(new MethodInvoker(() =>
+            Invoke(new MethodInvoker(() =>
             {
+                if (desiredPage != Page)
+                {
+                    NumPage.Value = desiredPage;
+                }
+
                 dgTable.ClearSelection();
-                dgTable.Rows[newIndex].Selected = true;
-                dgTable.FirstDisplayedScrollingRowIndex = newIndex;
+                dgTable.Rows[(int)newIndex].Selected = true;
+                dgTable.FirstDisplayedScrollingRowIndex = (int)newIndex;
             }));
         }
 

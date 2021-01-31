@@ -1949,11 +1949,12 @@ namespace DataTableConverter.Assisstant
             //strictMatch == false: column like %value% //nocase not needed; default of like is case insensitive
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName, $"where [{GetColumnName(alias, tableName)}] {(strictMatch ? "= ? COLLATE NOCASE" : "like %?%")}");
-                command.Parameters.Add(new SQLiteParameter() { Value = value });
+                command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName, $"where [{GetColumnName(alias, tableName)}] {(strictMatch ? "= ? COLLATE NOCASE" : "like ?")}");
+                command.Parameters.Add(new SQLiteParameter() { Value = $"%{value}%" });
                 string id = command.ExecuteScalar()?.ToString();
                 if (id != null)
                 {
+                    index = 0;
                     int parseId = int.Parse(id);
                     command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName);
                     command.Parameters.Clear();
@@ -1999,7 +2000,7 @@ namespace DataTableConverter.Assisstant
             string compareColumn = GetColumnName(compareAlias, tableName);
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"UPDATE [{tableName}] SET [{destinationColumn}] = CASE WHEN [{sourceColumn}] = [{compareColumn}] THEN '' ELSE [{sourceColumn}]";
+                command.CommandText = $"UPDATE [{tableName}] SET [{destinationColumn}] = CASE WHEN [{sourceColumn}] = [{compareColumn}] THEN '' ELSE [{sourceColumn}] END";
                 command.ExecuteNonQuery();
             }
         }
