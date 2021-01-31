@@ -1998,14 +1998,14 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private int GetMaxOccurenciesOfString(string sourceAlias, string subString, string tableName)
+        private int GetMaxOccurenciesOfString(string columnName, string subString, string tableName)
         {
             int max = 0;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"Select max(Select COUNTSTRING([{GetColumnName(sourceAlias, tableName)}], ?) from [${tableName}])";
+                command.CommandText = $"SELECT max(t1.sum) from (SELECT COUNTSTRING([{columnName}], ?) as sum from [{tableName}]) t1";
                 command.Parameters.Add(new SQLiteParameter() { Value = subString });
-                max = (int)command.ExecuteScalar();
+                max = int.Parse(command.ExecuteScalar().ToString());
             }
             return max;
         }
@@ -2014,16 +2014,20 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                int max = GetMaxOccurenciesOfString(sourceAlias, splitText, tableName);
-                StringBuilder builder = new StringBuilder($"Update [{tableName}] set ");
-                for (int i = 1; i <= max; i++)
+                string sourceColumn = GetColumnName(sourceAlias, tableName);
+                int max = GetMaxOccurenciesOfString(sourceColumn, splitText, tableName);
+                if (max != 0)
                 {
-                    string createdColumn = AddColumnWithAdditionalIfExists($"{newColumn}{i}", tableName);
-                    builder.Append($"[{createdColumn}] = GETSPLIT([{createdColumn}], $splitText,{i - 1}),");
+                    StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] set ");
+                    for (int i = 0; i < max; i++)
+                    {
+                        string createdColumn = AddColumnWithAdditionalIfExists($"{newColumn}{i + 1}", tableName);
+                        builder.Append($"[{createdColumn}] = GETSPLIT([{sourceColumn}], $splitText,{i}),");
+                    }
+                    command.CommandText = builder.Remove(builder.Length - 1, 1).ToString();
+                    command.Parameters.AddWithValue("$splitText", splitText);
+                    command.ExecuteNonQuery();
                 }
-                command.CommandText = builder.Remove(builder.Length - 1, 1).ToString();
-                command.Parameters.AddWithValue("$splitText", splitText);
-                command.ExecuteNonQuery();
             }
         }
 

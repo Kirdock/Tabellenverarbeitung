@@ -1555,8 +1555,7 @@ namespace DataTableConverter
         {
             using (DeleteRows form = new DeleteRows(RowCount, DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
-                form.ShowDialog();
-                if (form.DialogResult == DialogResult.OK)
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
                     int deleted;

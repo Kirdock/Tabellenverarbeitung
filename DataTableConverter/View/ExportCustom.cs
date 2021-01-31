@@ -10,9 +10,8 @@ namespace DataTableConverter.View
 {
     public partial class ExportCustom : Form
     {
-        private IEnumerable<ExportCustomItem> SelectedColumnItems => CmBFileNames.Items.Cast<ExportCustomItem>().Where(item => item.Column == cmbColumn.SelectedItem.ToString());
+        private IEnumerable<ExportCustomItem> SelectedColumnItems => CmBFileNames.Items.Cast<ExportCustomItem>().Where(item => item.Column == cmbColumn.SelectedValue.ToString());
         internal IEnumerable<ExportCustomItem> Items => CmBFileNames.Items.Cast<ExportCustomItem>();
-        private readonly string Table;
         private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
         internal string ContinuedNumberName => CbContinuedNumber.Checked ? TxtContinuedNumber.Text : string.Empty;
         private readonly DatabaseHelper DatabaseHelper;
@@ -22,12 +21,11 @@ namespace DataTableConverter.View
             InitializeComponent();
             DatabaseHelper = databaseHelper;
             clbValues.Dict = SelectedColumnItems;
+            TableName = tableName;
             SetListBoxStyle();
-            Table = tableName;
             cmbColumn.DataSource = aliasColumnMapping;
             cmbColumn.DisplayMember = "key";
             cmbColumn.DisplayMember = "value";
-            TableName = tableName;
             SetEnabled();
         }
 

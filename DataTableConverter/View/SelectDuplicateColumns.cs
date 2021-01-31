@@ -54,9 +54,9 @@ namespace DataTableConverter.View
                 else
                 {
                     newHeadersDict = new Dictionary<string, string>
-                {
-                    { IgnoreColumn, null },
-                };
+                    {
+                        { IgnoreColumn, null },
+                    };
                     foreach (KeyValuePair<string, string> pair in (Dictionary<string, string>)importTableColumnAliasMapping)
                     {
                         newHeadersDict.Add(pair.Key, pair.Value);
