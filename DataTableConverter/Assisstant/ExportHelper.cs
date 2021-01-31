@@ -829,14 +829,27 @@ namespace DataTableConverter
                 foreach (ExportCustomItem item in items)
                 {
                     Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
-                    IEnumerable<string> itemValues = item.CheckedAllValues ? item.AllValues : item.SelectedValues;
 
-                    foreach (string value in itemValues)
+                    if (item.CheckedAllValues)
+                    {
+                        foreach (string value in item.AllValues)
+                        {
+                            string newTable = Guid.NewGuid().ToString();
+                            DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
+                            dict.Add(value, new string[] { newTable, $"{item.Name}_{value}" });
+                        }
+                    }
+                    else
                     {
                         string newTable = Guid.NewGuid().ToString();
                         DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
-
-                        dict.Add(value, new string[] { newTable, $"{item.Name}_{value}" });
+                        foreach (string value in item.SelectedValues)
+                        {
+                            if (!dict.ContainsKey(value))
+                            {
+                                dict.Add(value, new string[] { newTable, item.Name });
+                            }
+                        }
                     }
 
                     DatabaseHelper.SplitTableOnRowValue(dict, item.Column, tableName);

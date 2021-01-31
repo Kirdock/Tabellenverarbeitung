@@ -23,9 +23,9 @@ namespace DataTableConverter.View
             clbValues.Dict = SelectedColumnItems;
             TableName = tableName;
             SetListBoxStyle();
-            cmbColumn.DataSource = aliasColumnMapping;
+            cmbColumn.DataSource = new BindingSource(aliasColumnMapping, null);
             cmbColumn.DisplayMember = "key";
-            cmbColumn.DisplayMember = "value";
+            cmbColumn.ValueMember= "value";
             SetEnabled();
         }
 
@@ -160,7 +160,7 @@ namespace DataTableConverter.View
         private void CmBFileNames_SelectedIndexChanged(object sender, EventArgs e)
         {
             cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
-            cmbColumn.SelectedItem = SelectedItem.Column;
+            cmbColumn.SelectedValue = SelectedItem.Column;
             cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
 
             CmBFormat.SelectedIndex = SelectedItem.Format;
