@@ -1576,7 +1576,6 @@ namespace DataTableConverter
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
-
                     OrderType = form.OrderType;
                     SetSorting(form.SortString);
                     LoadData(true);

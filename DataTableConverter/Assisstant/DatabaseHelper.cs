@@ -741,50 +741,38 @@ namespace DataTableConverter.Assisstant
         internal bool PVMImport(string importTable, string[] importColumnNames, string destinationIdentifierColumn, string importIdentifierColumn, string destinationTable, Form1 invokeForm = null)
         {
             bool abort;
-            if (abort = CreateIndexOn(destinationTable, destinationIdentifierColumn, invokeForm))
+            if (!(abort = CreateIndexOn(destinationTable, destinationIdentifierColumn, invokeForm)))
             {
                 AddColumnsWithAdditionalIfExists(importColumnNames.Where(col => col != importIdentifierColumn), string.Empty, out string[] destinationColumnNames, destinationTable);
-
+                string sortOrderColumn = AddColumnWithAdditionalIfExists("Importiersortierung", destinationTable);
                 //int rowCount = GetRowCount(importTable);
                 int sortOrder = 0;
                 using (SQLiteCommand destinationCommand = GetConnection(destinationTable).CreateCommand())
                 {
                     string headerString = GetHeaderString(destinationColumnNames);
-                    destinationCommand.CommandText = $"INSERT into [{destinationTable}] ({SortOrderColumnName},{headerString}) values ({GetValueString(destinationColumnNames.Length + 1)})"; //+1 because of sortOrder
+                    
+                    destinationCommand.CommandText = $"UPDATE [{destinationTable}] SET [{string.Join("]=?,[",new string[] { sortOrderColumn }.Concat(destinationColumnNames))}] =? where [{destinationIdentifierColumn}] = ?";
 
-                    for (int i = 0; i < destinationColumnNames.Length + 1; i++) //+1 because of sortOrder
+                    for (int i = 0; i < destinationColumnNames.Length + 2; i++) //+2 because of sortOrder and where statement
                     {
                         destinationCommand.Parameters.Add(new SQLiteParameter());
                     }
 
                     using (SQLiteCommand command = GetConnection(importTable).CreateCommand())
                     {
-                        command.CommandText = $"SELECT {GetHeaderString(importColumnNames)} from [{importTable}] LIMIT {Properties.Settings.Default.MaxRows} OFFSET ?";
-                        command.Parameters.Add(new SQLiteParameter());
-                        bool hasRows = true;
-                        int offset = 0;
-                        while (hasRows)
+                        command.CommandText = $"SELECT {GetHeaderString(importColumnNames.Concat(new string[] { importIdentifierColumn }))} from [{importTable}]";
+
+                        using (SQLiteDataReader reader = command.ExecuteReader())
                         {
-                            command.Parameters[0].Value = offset;
-                            using (SQLiteDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-
-                                int rowCount = 0;
-                                while (reader.Read())
+                                destinationCommand.Parameters[0].Value = sortOrder;
+                                for (int i = 0; i < reader.FieldCount; i++)
                                 {
-                                    destinationCommand.Parameters[0].Value = sortOrder;
-                                    for (int i = 0; i < reader.FieldCount; i++)
-                                    {
-                                        destinationCommand.Parameters[i + 1].Value = reader.GetString(i);
-                                    }
-                                    destinationCommand.ExecuteNonQuery();
-                                    sortOrder++;
-
-                                    ++rowCount;
+                                    destinationCommand.Parameters[i + 1].Value = reader.GetString(i);
                                 }
-
-                                hasRows = hasRows || rowCount < Properties.Settings.Default.MaxRows;
-                                offset += (int)Properties.Settings.Default.MaxRows;
+                                destinationCommand.ExecuteNonQuery();
+                                sortOrder++;
                             }
                         }
                     }
@@ -1173,14 +1161,13 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
-        internal void DeleteInvalidRows(string tableName)
+        internal void DeleteInvalidRows(string tableName, string invalidAliasName)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                string columnName = GetColumnName(Properties.Settings.Default.InvalidColumnName, tableName);
-                command.CommandText = $"DELETE FROM [{tableName}] where $column = $value";
-                command.Parameters.Add(new SQLiteParameter("$column", columnName));
-                command.Parameters.Add(new SQLiteParameter("$alias", Properties.Settings.Default.FailAddressValue));
+                string columnName = GetColumnName(invalidAliasName, tableName);
+                command.CommandText = $"DELETE FROM [{tableName}] where [{columnName}] = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = Properties.Settings.Default.FailAddressValue });
                 command.ExecuteNonQuery();
             }
         }

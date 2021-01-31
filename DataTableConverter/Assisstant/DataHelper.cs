@@ -57,6 +57,7 @@ namespace DataTableConverter.Assisstant
             if (result == DialogResult.Yes)
             {
                 importTableColumnAliasMapping.TryGetValue(invalidColumnAlias, out string invalidColumnName);
+                importColumnNames = importColumnNames.Where(name => name != importIdentifierColumnName).ToArray();
                 if (invalidColumnName == null || !importColumnNames.Contains(invalidColumnName))
                 {
                     SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnAlias }, importTableColumnAliasMapping, true);
@@ -79,7 +80,7 @@ namespace DataTableConverter.Assisstant
                 {
                     count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, order, orderType, tableName);
                 }
-                invokeForm.DatabaseHelper.DeleteInvalidRows(tableName);
+                invokeForm.DatabaseHelper.DeleteInvalidRows(tableName, invalidColumnName);
             }
             return count;
         }
@@ -94,7 +95,7 @@ namespace DataTableConverter.Assisstant
                 {
                     res = form.ShowDialog(invokeForm);
                 }));
-                if (result = (res == DialogResult.Yes))
+                if (result = (res == DialogResult.OK))
                 {
                     importColumns = form.SelectedColumns.ToArray();
                     sourceColumnName = form.OriginalIdentifierColumnName;
