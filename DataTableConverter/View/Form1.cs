@@ -1,22 +1,16 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
-using DataTableConverter.Extensions;
 using DataTableConverter.View;
 using DataTableConverter.View.WorkProcViews;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -45,9 +39,11 @@ namespace DataTableConverter
         internal readonly DatabaseHelper DatabaseHelper;
         internal readonly ExportHelper ExportHelper;
         internal readonly ImportHelper ImportHelper;
-        private enum SaveFormat {CSV, DBASE, EXCEL };
-        private decimal Page {
-            get {
+        private enum SaveFormat { CSV, DBASE, EXCEL };
+        private decimal Page
+        {
+            get
+            {
                 return NumPage.Value;
             }
             set
@@ -94,7 +90,7 @@ namespace DataTableConverter
             cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click();
             dBASEToolStripMenuItem1.Click += (sender, e) => dBASEToolStripMenuItem_Click(sender, e);
             excelToolStripMenuItem1.Click += (sender, e) => excelToolStripMenuItem_Click(sender, e);
-            
+
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
             if (databaseName != null)
@@ -124,12 +120,12 @@ namespace DataTableConverter
 
         private void SetMenuEnabled(bool status)
         {
-            foreach(ToolStripMenuItem item in new ToolStripMenuItem[] { speichernAlsToolStripMenuItem, benutzerdefiniertesSpeichernToolStripMenuItem1, arbeitsablaufToolStripMenuItem, funktionenToolStripMenuItem, ersetzenToolStripMenuItem, duplikateToolStripMenuItem })
+            foreach (ToolStripMenuItem item in new ToolStripMenuItem[] { speichernAlsToolStripMenuItem, benutzerdefiniertesSpeichernToolStripMenuItem1, arbeitsablaufToolStripMenuItem, funktionenToolStripMenuItem, ersetzenToolStripMenuItem, duplikateToolStripMenuItem })
             {
                 SetSubItemEnabled(status, item);
             }
-            
-            foreach(ToolStripMenuItem item in new ToolStripMenuItem[] { speichernToolStripMenuItem2 , sortierenToolStripMenuItem })
+
+            foreach (ToolStripMenuItem item in new ToolStripMenuItem[] { speichernToolStripMenuItem2, sortierenToolStripMenuItem })
             {
                 item.Enabled = status;
             }
@@ -249,7 +245,7 @@ namespace DataTableConverter
         private void LoadProcedures(List<Proc> proc = null)
         {
             ersetzenToolStripMenuItem.DropDownItems.Clear();
-            
+
             procedures = proc ?? ImportHelper.LoadProcedures(this);
 
             ToolStripMenuItem tempProcedure = new ToolStripMenuItem("Temporäre Eingabe");
@@ -263,7 +259,7 @@ namespace DataTableConverter
                 ToolStripMenuItem item = new ToolStripMenuItem(name);
                 item.Click += (sender, e) => procedure_Click(visibleProc[index]);
                 ersetzenToolStripMenuItem.DropDownItems.Add(item);
-            }   
+            }
         }
 
         private void LoadWorkflows(List<Work> work = null)
@@ -277,7 +273,7 @@ namespace DataTableConverter
             for (int i = 0; i < workflowsCopy.Count; i++)
             {
                 int index = i;
-                string name = workflowsCopy[i].Name.Replace("&","&&");
+                string name = workflowsCopy[i].Name.Replace("&", "&&");
                 ToolStripMenuItem item = new ToolStripMenuItem(name);
                 item.Click += (sender, e) => workflow_Click(workflowsCopy[index]);
                 arbeitsablaufToolStripMenuItem.DropDownItems.Add(item);
@@ -295,7 +291,7 @@ namespace DataTableConverter
 
         private void LoadTolerances(List<Tolerance> tol = null)
         {
-            tolerances = tol ??  ImportHelper.LoadTolerances();
+            tolerances = tol ?? ImportHelper.LoadTolerances();
         }
 
         private void LoadCases(List<Case> cas = null)
@@ -342,7 +338,7 @@ namespace DataTableConverter
 
                 notFoundColumns.AddRange(wpHeaders.Where(header => !headers.Contains(header, System.StringComparer.OrdinalIgnoreCase)));
 
-                if(notFoundColumns.Count > 0)
+                if (notFoundColumns.Count > 0)
                 {
                     notFound.Add(new NotFoundHeaders(notFoundColumns, wp));
                 }
@@ -367,7 +363,7 @@ namespace DataTableConverter
                     {
                         string[] from = new string[form.Table.Rows.Count];
                         string[] to = new string[form.Table.Rows.Count];
-                        for(int i = 0; i < form.Table.Rows.Count; ++i)
+                        for (int i = 0; i < form.Table.Rows.Count; ++i)
                         {
                             from[i] = form.Table.Rows[i][0].ToString();
                             to[i] = form.Table.Rows[i][1].ToString();
@@ -432,7 +428,7 @@ namespace DataTableConverter
         {
             OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state != ImportState.Header);
             string mergePath = string.Empty;
-            bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
+            bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath, ref mergePath);
             if (openFiles != null || validMerge || dialog.ShowDialog(this) == DialogResult.OK)
             {
                 string[] filenames = openFiles ?? (validMerge ? new string[1] { mergePath } : dialog.FileNames);
@@ -498,13 +494,14 @@ namespace DataTableConverter
             {
                 lblFilename.Text = Path.GetFileName(path);
             }));
-            
+
             FilePath = path;
         }
 
         private void FinishImport(string tableName, ImportState state, string filename, int encoding)
         {
-            if(tableName != null) {
+            if (tableName != null)
+            {
                 switch (state)
                 {
                     case ImportState.Merge:
@@ -554,7 +551,7 @@ namespace DataTableConverter
                     default:
                         ResetValidRowLabel();
                         DatabaseHelper.ReplaceTable(tableName, TableName);
-                        BeginInvoke(new MethodInvoker(()=>
+                        BeginInvoke(new MethodInvoker(() =>
                         {
                             SetMenuEnabled(true);
                         }));
@@ -562,7 +559,7 @@ namespace DataTableConverter
                 }
                 DatabaseHelper.SetSavepoint();
                 LoadData(true);
-                
+
             }
             StopLoadingBar();
         }
@@ -581,7 +578,8 @@ namespace DataTableConverter
                 }));
             }
 
-            void load() {
+            void load()
+            {
                 if (readjustColumnWidth)
                 {
                     ColumnWidths.Clear();
@@ -613,7 +611,7 @@ namespace DataTableConverter
             }
         }
 
-        
+
 
         private void SetRowCount(int count)
         {
@@ -625,8 +623,8 @@ namespace DataTableConverter
         {
             if (dgTable.DataSource != null)
             {
-                TrimForm form = new TrimForm(DatabaseHelper.GetAliasColumnMapping(TableName));
-                if(form.ShowDialog(this) == DialogResult.OK)
+                TrimForm form = new TrimForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName));
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
                     new Thread(() =>
@@ -637,7 +635,7 @@ namespace DataTableConverter
                             string order = GetSorting();
                             form.Proc.DoWork(ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
                             LoadData(true);
-                            
+
                         }
                         catch (Exception ex)
                         {
@@ -653,9 +651,9 @@ namespace DataTableConverter
         private void TempProcedure_Click(object sender, EventArgs e)
         {
             ProcedureForm form = new ProcedureForm(contextGlobal);
-            if(form.ShowDialog(this) == DialogResult.OK)
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
-                Proc proc = new Proc(form.Table,form.CheckTotal, form.CheckWord, form.LeaveEmpty);
+                Proc proc = new Proc(form.Table, form.CheckTotal, form.CheckWord, form.LeaveEmpty);
                 procedure_Click(proc);
             }
             form.Dispose();
@@ -697,7 +695,7 @@ namespace DataTableConverter
         private void ReplaceProcedure(Proc procedure, WorkProc wp)
         {
             string newOrder = GetSorting();
-            
+
             wp.DoWork(ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this);
 
             SetSorting(newOrder);
@@ -707,7 +705,8 @@ namespace DataTableConverter
         {
             Proc proc = null;
             int index = GetProcedureThroughId(id);
-            if (index != -1) {
+            if (index != -1)
+            {
                 proc = procedures[index];
             }
             return proc;
@@ -767,7 +766,7 @@ namespace DataTableConverter
             string newColumn = Microsoft.VisualBasic.Interaction.InputBox("Bitte Spaltennamen eingeben", "Spalte hinzufügen", string.Empty);
             if (!string.IsNullOrWhiteSpace(newColumn))
             {
-                if (dgTable.Columns.Cast<DataGridViewColumn>().Any(col => col.HeaderText.Equals(newColumn,StringComparison.OrdinalIgnoreCase)))
+                if (dgTable.Columns.Cast<DataGridViewColumn>().Any(col => col.HeaderText.Equals(newColumn, StringComparison.OrdinalIgnoreCase)))
                 {
                     MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Der Name der Spalte ist bereits vergeben");
                     spalteHinzufügenToolStripMenuItem_Click(sender, e);
@@ -786,11 +785,11 @@ namespace DataTableConverter
         {
             if (e.Button == MouseButtons.Right)
             {
-                selectedRow =  dgTable.HitTest(e.X, e.Y).RowIndex;
+                selectedRow = dgTable.HitTest(e.X, e.Y).RowIndex;
                 selectedColumn = dgTable.HitTest(e.X, e.Y).ColumnIndex;
-                if(selectedColumn > -1 && selectedRow > -1 && !dgTable[selectedColumn, selectedRow].Selected)
+                if (selectedColumn > -1 && selectedRow > -1 && !dgTable[selectedColumn, selectedRow].Selected)
                 {
-                    foreach(DataGridViewCell cell in dgTable.SelectedCells)
+                    foreach (DataGridViewCell cell in dgTable.SelectedCells)
                     {
                         cell.Selected = false;
                     }
@@ -801,7 +800,7 @@ namespace DataTableConverter
                 {
                     ctxHeader.Show(dgTable, new Point(e.X, e.Y));
                 }
-                else if(selectedColumn >= 0)
+                else if (selectedColumn >= 0)
                 {
                     ctxBody.Show(dgTable, new Point(e.X, e.Y));
                 }
@@ -815,7 +814,7 @@ namespace DataTableConverter
             {
                 string oldText = dgTable.Columns[selectedColumn].HeaderText;
 
-                if(oldText != newText)
+                if (oldText != newText)
                 {
                     DatabaseHelper.RenameAlias(oldText, newText, TableName);
                     dgTable.Columns[selectedColumn].HeaderText = newText;
@@ -884,7 +883,8 @@ namespace DataTableConverter
 
             new Thread(() =>
             {
-                try {
+                try
+                {
                     if (DatabaseHelper.Undo())
                     {
                         LoadData(true);
@@ -896,8 +896,8 @@ namespace DataTableConverter
                     ErrorHelper.LogMessage(ex, this);
                 }
             }).Start();
-            
-            
+
+
         }
 
         private void wiederholenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -945,10 +945,10 @@ namespace DataTableConverter
                 string newId = DatabaseHelper.InsertRow(TableName);
                 DatabaseHelper.SetSavepoint();
                 dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value = newId; //CellValueChanged triggered?
-                
+
             }
 
-            SetRowCount(RowCount+1);
+            SetRowCount(RowCount + 1);
         }
 
         private void tabellenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -958,7 +958,7 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal, procedures,workflows,cases,tolerances);
+            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal, procedures, workflows, cases, tolerances);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show(this);
         }
@@ -981,7 +981,7 @@ namespace DataTableConverter
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
-                
+
             if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 path = path ?? saveFileDialog1.FileName;
@@ -1004,17 +1004,17 @@ namespace DataTableConverter
         {
             try
             {
-                pgbLoading.Invoke(new MethodInvoker(() =>
+                if (pgbLoading.Value < pgbLoading.Maximum)
                 {
-                    if (pgbLoading.Value < pgbLoading.Maximum)
+                    pgbLoading.Invoke(new MethodInvoker(() =>
                     {
                         pgbLoading.Value++;
-                    }
-                }));
+                    }));
+                }
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} Maximum:{pgbLoading.Maximum}; Minimum:{pgbLoading.Minimum} Value:{pgbLoading.Value}",this, false);
+                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} Maximum:{pgbLoading.Maximum}; Minimum:{pgbLoading.Minimum} Value:{pgbLoading.Value}", this, false);
             }
         }
 
@@ -1118,7 +1118,7 @@ namespace DataTableConverter
                 else
                 {
                     bool asc = col.HeaderCell.SortGlyphDirection == SortOrder.Ascending;
-                    
+
                     SetSorting($"[{DatabaseHelper.GetColumnName(col.Name, TableName)}] COLLATE NATURALSORT {(asc ? "DESC" : "ASC")}");
                 }
                 LoadData(true);
@@ -1168,7 +1168,7 @@ namespace DataTableConverter
                 DatabaseHelper.SetSavepoint();
                 LoadData(false);
             }
-            
+
         }
 
         private void tabelleHinzufügenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1198,7 +1198,7 @@ namespace DataTableConverter
                     order = DictSorting[header];
                 }
                 dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = order;
-                
+
             }
 
         }
@@ -1469,16 +1469,16 @@ namespace DataTableConverter
         {
             int maxRecords = (int)Properties.Settings.Default.MaxRows;
             int desiredPage = (index + 1) / maxRecords;
-            if(desiredPage != Page)
+            if (desiredPage != Page)
             {
                 Page = desiredPage;
             }
             int newIndex = index;
-            while(newIndex > maxRecords)
+            while (newIndex > maxRecords)
             {
                 newIndex -= maxRecords;
             }
-            
+
             dgTable.Invoke(new MethodInvoker(() =>
             {
                 dgTable.ClearSelection();
@@ -1515,7 +1515,7 @@ namespace DataTableConverter
 
         private void Form1_DragDrop(object sender, DragEventArgs e)
         {
-            importToolStripMenuItem_Click(ImportState.None,(string[])e.Data.GetData(DataFormats.FileDrop));
+            importToolStripMenuItem_Click(ImportState.None, (string[])e.Data.GetData(DataFormats.FileDrop));
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
@@ -1545,7 +1545,7 @@ namespace DataTableConverter
         private void NumPage_ValueChanged(object sender, EventArgs e)
         {
             int page = (int)NumPage.Value;
-            if(page > 0 && page <= MaxPages)
+            if (page > 0 && page <= MaxPages)
             {
                 Page = page;
             }

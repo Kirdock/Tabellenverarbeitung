@@ -1,13 +1,7 @@
 ﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using DataTableConverter.View;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -27,7 +21,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return RemoveEmptyHeaders(new string[] { IdentifySource });
         }
 
-        public ProcAddTableColumns(int ordinal, int id, string name) :base(ordinal, id, name)
+        public ProcAddTableColumns(int ordinal, int id, string name) : base(ordinal, id, name)
         {
 
         }

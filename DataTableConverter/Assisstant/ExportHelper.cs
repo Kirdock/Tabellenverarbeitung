@@ -1,22 +1,20 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
+using DataTableConverter.Extensions;
+using DataTableConverter.View;
+using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Windows.Forms;
-using DataTableConverter.Extensions;
 using System.Threading;
-using DataTableConverter.View;
-using System.Data.SQLite;
-using Microsoft.Office.Interop.Excel;
+using System.Windows.Forms;
 
 namespace DataTableConverter
 {
@@ -27,16 +25,19 @@ namespace DataTableConverter
                                          string lpFileName);
 
         internal static readonly string ProjectName = "Tabellenkonvertierung";
-        internal static string ProjectPath { get
+        internal static string ProjectPath
+        {
+            get
             {
                 return Properties.Settings.Default.SettingPath == string.Empty ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName) : Properties.Settings.Default.SettingPath;
-            } }
-        
-        internal static string ProjectPresets => Path.Combine(ProjectPath,"Vorlagen");
-        internal static string ProjectProcedures => Path.Combine(ProjectPath,"Funktionen.bin");
-        internal static string ProjectTolerance => Path.Combine(ProjectPath,"Toleranzen.bin");
-        internal static string ProjectCases => Path.Combine(ProjectPath,"Fälle.bin");
-        internal static string ProjectWorkflows => Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
+            }
+        }
+
+        internal static string ProjectPresets => Path.Combine(ProjectPath, "Vorlagen");
+        internal static string ProjectProcedures => Path.Combine(ProjectPath, "Funktionen.bin");
+        internal static string ProjectTolerance => Path.Combine(ProjectPath, "Toleranzen.bin");
+        internal static string ProjectCases => Path.Combine(ProjectPath, "Fälle.bin");
+        internal static string ProjectWorkflows => Path.Combine(ProjectPath, "Arbeitsabläufe.bin");
         internal static string WorkflowPath => Path.Combine(ProjectPath, "Arbeitsabläufe");
         internal static string ProcedurePath => Path.Combine(ProjectPath, "Suchen & Ersetzen");
         internal static string ProjectHeaderPresets => Path.Combine(ProjectPath, "Vorlagen Überschriften");
@@ -103,7 +104,7 @@ namespace DataTableConverter
                 }
             }
         }
-        
+
         internal bool SaveProcedures(List<Proc> procedures, Form mainForm)
         {
             bool error = false;
@@ -159,7 +160,7 @@ namespace DataTableConverter
                 try
                 {
                     string filename = RemoveSpecialCharacters(work.Name);
-                    string path = Path.Combine(WorkflowPath, filename+".bin");
+                    string path = Path.Combine(WorkflowPath, filename + ".bin");
                     using (Stream stream = File.Open(path, FileMode.Create))
                     {
                         BinaryFormatter bin = new BinaryFormatter();
@@ -175,7 +176,7 @@ namespace DataTableConverter
             }
             if (!error)
             {
-                foreach(string file in files)
+                foreach (string file in files)
                 {
                     File.Delete(file);
                 }
@@ -302,7 +303,7 @@ namespace DataTableConverter
                 return 0;
             }
 
-            
+
             if (fileName.Length > DbaseMaxFileLength)
             {
                 fileName = fileName.Substring(0, DbaseMaxFileLength);
@@ -403,7 +404,7 @@ namespace DataTableConverter
         internal int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, System.Action updateLoadingBar = null)
         {
             int rowCount = 0;
-            string path = Path.Combine(directory,fileName+ ".csv");
+            string path = Path.Combine(directory, fileName + ".csv");
 
             if (encoding == 0)
             {
@@ -426,7 +427,7 @@ namespace DataTableConverter
                     {
                         using (SQLiteDataReader reader = command.ExecuteReader())
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 for (var i = 0; i < reader.FieldCount - 1; i++)
                                 {
@@ -527,10 +528,10 @@ namespace DataTableConverter
             {
                 workbook?.Close(false, Type.Missing, Type.Missing);
                 excel?.Quit();
-                
+
                 // Release our resources.
-                if(workbook != null) Marshal.ReleaseComObject(workbook);
-                if(workbooks != null) Marshal.ReleaseComObject(workbooks);
+                if (workbook != null) Marshal.ReleaseComObject(workbook);
+                if (workbooks != null) Marshal.ReleaseComObject(workbooks);
                 if (excel != null)
                 {
                     Marshal.ReleaseComObject(excel);
@@ -585,7 +586,7 @@ namespace DataTableConverter
                                                    Type.Missing);
         }
 
-        private void InsertRowsToExcel( Worksheet worksheet, object[,] data, int rowStart, int rowCount, int columnCount)
+        private void InsertRowsToExcel(Worksheet worksheet, object[,] data, int rowStart, int rowCount, int columnCount)
         {
             Range beginWrite = (Range)worksheet.Cells[rowStart, 1];
             Range endWrite = (Range)worksheet.Cells[rowStart + rowCount, columnCount];
@@ -611,19 +612,19 @@ namespace DataTableConverter
             for (int i = 1; i < headers.Length; i++)
             {
                 string header = headers[i].Length > DbaseMaxHeaderLength ? headers[i].Substring(0, DbaseMaxHeaderLength) : headers[i];
-                string headerBefore = headers[i-1].Length > DbaseMaxHeaderLength ? headers[i-1].Substring(0, DbaseMaxHeaderLength) : headers[i-1];
+                string headerBefore = headers[i - 1].Length > DbaseMaxHeaderLength ? headers[i - 1].Substring(0, DbaseMaxHeaderLength) : headers[i - 1];
                 if (header == headerBefore)
                 {
-                    duplicates.Add($"\"{headers[i-1]}\" und \"{headers[i]}\"");
+                    duplicates.Add($"\"{headers[i - 1]}\" und \"{headers[i]}\"");
                 }
             }
 
-            if(duplicates.Count > 0)
+            if (duplicates.Count > 0)
             {
-                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n"+string.Join(" ,\n",duplicates));
+                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n" + string.Join(" ,\n", duplicates));
                 return saved;
             }
-            
+
             string fileName = originalFileName.ToUpper();
             if (fileName.Length > DbaseMaxFileLength)
             {
@@ -639,7 +640,7 @@ namespace DataTableConverter
                 ErrorHelper.LogMessage(ex, mainForm);
                 return saved;
             }
-            string fullpath = Path.Combine(path,fileName+".DBF");
+            string fullpath = Path.Combine(path, fileName + ".DBF");
             string fullPathOriginal = Path.Combine(originalPath, originalFileName + ".DBF");
 
             if (File.Exists(fullpath))
@@ -778,7 +779,7 @@ namespace DataTableConverter
         private int[] MaxLengthOfColumns(System.Data.DataTable dataTable)
         {
             int[] max = new int[dataTable.Columns.Count];
-            for(int i = 0; i < max.Length; i++)
+            for (int i = 0; i < max.Length; i++)
             {
                 max[i] = 1;
             }
@@ -848,7 +849,7 @@ namespace DataTableConverter
                 stopLoadingBar.Invoke();
                 saveFinished.Invoke();
             }).Start();
-            
+
         }
 
         /// <summary>

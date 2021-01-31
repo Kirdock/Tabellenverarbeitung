@@ -1,13 +1,8 @@
-﻿using CheckComboBoxTest;
-using DataTableConverter.Classes;
+﻿using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -22,7 +17,7 @@ namespace DataTableConverter.View
             InitializeComponent();
             Type = type;
             AdjustForm();
-            
+
             cbHeaders.Items.AddRange(aliases.ToArray());
             if (Type == FormulaState.Export)
             {
@@ -70,7 +65,7 @@ namespace DataTableConverter.View
 
         private void txtFormula_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
             {
                 CloseForm();
             }

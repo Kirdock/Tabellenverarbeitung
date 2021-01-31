@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace DataTableConverter.Assisstant.SQL_Functions
 {
     [SQLiteFunction(Name = "CUSTOMSUBSTRING", Arguments = 6, FuncType = FunctionType.Scalar)]
-    class CustomSubstring: SQLiteFunction
+    class CustomSubstring : SQLiteFunction
     {
         public override object Invoke(object[] args)
         {
@@ -18,7 +16,7 @@ namespace DataTableConverter.Assisstant.SQL_Functions
             Func<string, int, int, string> substring = bool.Parse(args[5].ToString()) ? (Func<string, int, int, string>)SubstringReverse : Substring;
             if (!replace)
             {
-                
+
                 if (end == 0)
                 {
                     value = start > value.Length ? string.Empty : substring(value, start - 1, 0);

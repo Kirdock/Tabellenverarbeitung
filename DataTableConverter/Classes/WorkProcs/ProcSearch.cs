@@ -1,10 +1,5 @@
-﻿using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -19,7 +14,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool TotalSearch;
         public string Shortcut;
 
-        public ProcSearch(int ordinal, int id, string name) : base(ordinal, id, name){}
+        public ProcSearch(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         public ProcSearch(string searchText, string header, int from, int to, string newColumn, bool totalSearch)
         {
@@ -43,7 +38,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
             string column = invokeForm.DatabaseHelper.GetColumnName(Header, tableName);
-            if (column != null && From <= To )
+            if (column != null && From <= To)
             {
                 if (!string.IsNullOrWhiteSpace(NewColumn))
                 {
@@ -60,7 +55,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            if(colName == Header)
+            if (colName == Header)
             {
                 Header = string.Empty;
             }
@@ -68,7 +63,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RenameHeaders(string oldName, string newName)
         {
-            if(oldName == Header)
+            if (oldName == Header)
             {
                 Header = newName;
             }

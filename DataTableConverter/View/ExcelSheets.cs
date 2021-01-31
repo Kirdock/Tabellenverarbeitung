@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -23,7 +18,7 @@ namespace DataTableConverter.View
         {
             return cList.CheckedItems.Cast<string>().ToArray();
         }
-        
+
 
         private void btnCheckAll_Click(object sender, EventArgs e)
         {
@@ -37,7 +32,7 @@ namespace DataTableConverter.View
                 cList.SetItemChecked(i, status);
             }
         }
-        
+
         private void btnUncheckAll_Click(object sender, EventArgs e)
         {
             setChecked(false);

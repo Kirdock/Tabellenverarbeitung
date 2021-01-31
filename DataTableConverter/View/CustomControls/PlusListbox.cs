@@ -1,10 +1,5 @@
 ﻿using DataTableConverter.Classes;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using static DataTableConverter.Classes.PlusListboxItem;
@@ -16,12 +11,12 @@ namespace DataTableConverter.View.CustomControls
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
             e.DrawBackground();
-            if (e.Index > -1 && Items != null && e.Index+1 <= Items.Count)
+            if (e.Index > -1 && Items != null && e.Index + 1 <= Items.Count)
             {
                 string text = Items[e.Index].ToString();
                 if ((Items[e.Index] is PlusListboxItem))
                 {
-                    switch((Items[e.Index] as PlusListboxItem).State)
+                    switch ((Items[e.Index] as PlusListboxItem).State)
                     {
                         case RowMergeState.Sum:
                             text += " (Summe)";

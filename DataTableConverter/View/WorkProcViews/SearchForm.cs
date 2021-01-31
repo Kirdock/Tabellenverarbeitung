@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View.WorkProcViews
@@ -35,11 +29,11 @@ namespace DataTableConverter.View.WorkProcViews
         {
             if (!string.IsNullOrWhiteSpace(TxtSearchNewColumn.Text))
             {
-                if(RbFromTo.Checked && NbSearchFrom.Value > NbSearchTo.Value)
+                if (RbFromTo.Checked && NbSearchFrom.Value > NbSearchTo.Value)
                 {
                     MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Startnummer muss kleiner als Endnummer sein!");
                 }
-                else if(RbShortcut.Checked && string.IsNullOrWhiteSpace(TxtShortcut.Text))
+                else if (RbShortcut.Checked && string.IsNullOrWhiteSpace(TxtShortcut.Text))
                 {
                     MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Bitte geben Sie eine Kennung ein.");
                 }

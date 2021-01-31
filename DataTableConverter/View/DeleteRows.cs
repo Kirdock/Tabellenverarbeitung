@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -16,7 +11,7 @@ namespace DataTableConverter.View
         internal string ColumnText, ColumnName;
         internal bool EqualsText => CBEquals.Checked;
 
-        internal DeleteRows(int max, Dictionary<string,string> aliasColumnMapping)
+        internal DeleteRows(int max, Dictionary<string, string> aliasColumnMapping)
         {
             InitializeComponent();
             NbEnd.Maximum = max;
@@ -28,7 +23,7 @@ namespace DataTableConverter.View
 
         private void BtnConfirmMulti_Click(object sender, EventArgs e)
         {
-            if(NbStart.Value > NbEnd.Value)
+            if (NbStart.Value > NbEnd.Value)
             {
                 MessageHandler.MessagesOK(this, MessageBoxIcon.Error, "Die Startposition muss kleiner als die Endposition sein!");
             }

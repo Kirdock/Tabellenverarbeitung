@@ -6,14 +6,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -51,7 +48,7 @@ namespace DataTableConverter.Assisstant
             ProjectProcedures = ExportHelper.ProjectProcedures;
             ProjectTolerances = ExportHelper.ProjectTolerance;
             ProjectCases = ExportHelper.ProjectCases;
-    }
+        }
 
         internal class KeyVal : IEquatable<KeyVal>
         {
@@ -100,7 +97,7 @@ namespace DataTableConverter.Assisstant
 
                     if (settings.Values != null)
                     {
-                        OpenTextFixed(tableName, file, settings.Values, settings.Headers, settings.CodePage,false, progressBar, mainForm);
+                        OpenTextFixed(tableName, file, settings.Values, settings.Headers, settings.CodePage, false, progressBar, mainForm);
                     }
                     else if (settings.Separators.Count > 0)
                     {
@@ -173,9 +170,9 @@ namespace DataTableConverter.Assisstant
         {
 
             List<KeyVal> presets = new List<KeyVal>();
-            foreach(string name in LoadHeaderPresetsByName())
+            foreach (string name in LoadHeaderPresetsByName())
             {
-                presets.Add(new KeyVal(name,0));
+                presets.Add(new KeyVal(name, 0));
             }
             foreach (string name in LoadPresetsByName())
             {
@@ -234,14 +231,14 @@ namespace DataTableConverter.Assisstant
                     .Select(x => x.Split(separators.ToArray(), StringSplitOptions.None));
 
             progressBar?.StartLoadingBar(enumerableArray.Count(), mainForm);
-            foreach(string[] line in enumerableArray)
+            foreach (string[] line in enumerableArray)
             {
                 string[] values = line.Select(ln => ln.Trim()).ToArray();
 
                 while (values.Length > headers.Count)
                 {
                     string colName = "Spalte" + headers.Count;
-                    
+
                     DatabaseHelper.AddColumn(tableName, colName); //have to check if exists
                     //colName = DatabaseHelper.AddColumnsWithAdditionalIfExists()  //adjust it for this case
                     headers.Add(colName);
@@ -279,10 +276,10 @@ namespace DataTableConverter.Assisstant
                 string[] lines = eLines.Skip(skip).ToArray();
                 progressBar?.StartLoadingBar(lines.Length, mainForm);
 
-                foreach(string line in lines)
+                foreach (string line in lines)
                 {
                     string[] values = createRow(line, begin, end);
-                    while(values.Length > newHeaders.Count)
+                    while (values.Length > newHeaders.Count)
                     {
                         string colName = "Spalte" + newHeaders.Count;
                         DatabaseHelper.AddColumn(tableName, colName);
@@ -309,8 +306,8 @@ namespace DataTableConverter.Assisstant
                 int pointer = 0;
                 while (!finish)
                 {
-                    int indexBegin = line.IndexOf(beginText,pointer);
-                    if(indexBegin != -1)
+                    int indexBegin = line.IndexOf(beginText, pointer);
+                    if (indexBegin != -1)
                     {
                         indexBegin += beginLength;
 
@@ -401,18 +398,18 @@ namespace DataTableConverter.Assisstant
                 count = (int)cmd.ExecuteScalar();
                 cmd.Dispose();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ErrorHelper.LogMessage(ex, mainForm, false);
             }
-            
+
             return count;
         }
 
         private int GetDataReaderTablesRowCount(OleDbConnection con, DataTable tables, Form mainForm)
         {
             int count = 0;
-            foreach(DataRow row in tables.Rows)
+            foreach (DataRow row in tables.Rows)
             {
                 if (row["TABLE_TYPE"].ToString() == "TABLE")
                 {
@@ -437,7 +434,7 @@ namespace DataTableConverter.Assisstant
                 progressBar?.StartLoadingBar(GetDataReaderTablesRowCount(con, tables, mainForm), mainForm);
                 bool tableCreated = false;
                 List<string> allColumnNames = new List<string>();
-                
+
                 foreach (DataRow row in tables.Rows)
                 {
                     if (row["TABLE_TYPE"].ToString() == "TABLE")
@@ -450,7 +447,7 @@ namespace DataTableConverter.Assisstant
                             {
                                 List<string> newColumnNames = new List<string>();
                                 string[] columnNames = new string[reader.FieldCount];
-                                for(int i = 0; i < reader.FieldCount; i++)
+                                for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
                                     if (!allColumnNames.Any(col => col.Equals(columnName, StringComparison.OrdinalIgnoreCase)))
@@ -464,9 +461,9 @@ namespace DataTableConverter.Assisstant
                                     DatabaseHelper.CreateTable(newColumnNames, tableName);
                                     tableCreated = true;
                                 }
-                                else if(newColumnNames.Count != 0)
+                                else if (newColumnNames.Count != 0)
                                 {
-                                    foreach(string columnName in newColumnNames)
+                                    foreach (string columnName in newColumnNames)
                                     {
                                         DatabaseHelper.AddColumnFixedAlias(columnName, tableName);
                                     }
@@ -476,7 +473,7 @@ namespace DataTableConverter.Assisstant
                                 while (reader.Read())
                                 {
                                     object[] values = new object[reader.FieldCount];
-                                    for(int i = 0; i < reader.FieldCount; ++i)
+                                    for (int i = 0; i < reader.FieldCount; ++i)
                                     {
                                         values[0] = reader.GetString(i);
                                     }
@@ -554,10 +551,10 @@ namespace DataTableConverter.Assisstant
                 } while (hasPassword);
 
                 string[] selectedSheets = SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray(), mainForm);
-                
+
                 bool fileNameColumn;
                 List<string> headers = new List<string>();
-                if(fileNameColumn = (selectedSheets.Length > 1))
+                if (fileNameColumn = (selectedSheets.Length > 1))
                 {
                     headers.Add(Extensions.DataTableExtensions.FileName);
                 }
@@ -629,14 +626,14 @@ namespace DataTableConverter.Assisstant
 
         private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, ProgressBar progressBar, Form mainForm)
         {
-            
+
             List<string> headers = SetHeaderOfExcel(objSHT, cols);
             DatabaseHelper.CreateTable(headers.ToArray(), tableName);
             Clipboard.Clear();
             objXL.CutCopyMode = 0;
             int rowRange = 50000;
             SQLiteCommand insertCommand = null;
-            for(int i = 2; i <= rows; i++)
+            for (int i = 2; i <= rows; i++)
             {
                 Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[i, 1];
                 int rowCount = i + rowRange;
@@ -675,12 +672,12 @@ namespace DataTableConverter.Assisstant
         {
             int maxLength = content.Length;
             StringBuilder cellBuilder = new StringBuilder();
-            Dictionary<string,string> cells = new Dictionary<string, string>();
-            
+            Dictionary<string, string> cells = new Dictionary<string, string>();
+
             int headerCounter = 0;
             Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
             bool generatedMulti = false;
-            
+
             for (int i = 0; i < maxLength; i++)
             {
                 if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
@@ -696,7 +693,7 @@ namespace DataTableConverter.Assisstant
                     insertCommand = AddContentDataRow(row, fileName, tableName, insertCommand);
 
                     row.Clear();
-                    
+
                     i++;
                     if ((i + 1) < maxLength && content[i + 1] == '\"') //beginning of cell that has text wrappings
                     {
@@ -712,7 +709,7 @@ namespace DataTableConverter.Assisstant
                     {
                         cells.Clear();
                     }
-                    
+
                 }
                 else if (content[i] == '\t') // new column
                 {
@@ -744,7 +741,7 @@ namespace DataTableConverter.Assisstant
             return insertCommand;
         }
 
-        private SQLiteCommand AddContentDataRow(Dictionary<string,string> row, string fileName, string tableName, SQLiteCommand command)
+        private SQLiteCommand AddContentDataRow(Dictionary<string, string> row, string fileName, string tableName, SQLiteCommand command)
         {
             if (row.Values.Any(value => !string.IsNullOrWhiteSpace(value.ToString()))) //Request: delete empty rows
             {
@@ -767,14 +764,14 @@ namespace DataTableConverter.Assisstant
         {
             List<string> headers = new List<string>();
             StringBuilder header = new StringBuilder();
-            for(int i=0; i < content.Length; i++)
+            for (int i = 0; i < content.Length; i++)
             {
-                if(content[i] == '\r' && content[i+1] == '\n')
+                if (content[i] == '\r' && content[i + 1] == '\n')
                 {
                     AddHeaderOfContent(headers, header);
                     break;
                 }
-                else if(content[i] == '\t')
+                else if (content[i] == '\t')
                 {
                     AddHeaderOfContent(headers, header);
                 }
@@ -823,7 +820,7 @@ namespace DataTableConverter.Assisstant
             StringBuilder cell = new StringBuilder();
             bool newLine;
             bool addedColumn = false;
-            for (;i < content.Length; ++i)
+            for (; i < content.Length; ++i)
             {
                 if (EndOfMultiCell(content, i, out bool isNotMultiCell))
                 {
@@ -832,14 +829,14 @@ namespace DataTableConverter.Assisstant
                         i--;
                         cell = new StringBuilder("\"").Append(cell);
                     }
-                    else if(multiCellCount == 0 && cell.Length > 0)
+                    else if (multiCellCount == 0 && cell.Length > 0)
                     {
                         cell = new StringBuilder("\"").Append(cell).Append('\"');
                     }
                     addedColumn |= AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
                     break;
                 }
-                else if((newLine = (content[i] == '\r')) || content[i] == '\n')
+                else if ((newLine = (content[i] == '\r')) || content[i] == '\n')
                 {
                     if (cell.Length != 0)
                     {
@@ -852,7 +849,7 @@ namespace DataTableConverter.Assisstant
                         multiCellCount++;
                     }
                 }
-                else if (content[i] != '\"' || content[i-1] != '\"' || content[i + 1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
+                else if (content[i] != '\"' || content[i - 1] != '\"' || content[i + 1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
                 {
                     cell.Append(content[i]);
                 }
@@ -895,11 +892,11 @@ namespace DataTableConverter.Assisstant
             {
                 DatabaseHelper.CreateTable(header.ToArray(), tableName);
 
-                
+
 
                 StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding));
                 FileInfo info = new FileInfo(path);
-                progressBar?.StartLoadingBar((int) (info.Length/config.Sum()), mainForm);
+                progressBar?.StartLoadingBar((int)(info.Length / config.Sum()), mainForm);
 
                 long rowCount = 0;
                 while (!stream.EndOfStream && (!isPreview || rowCount < 3))
@@ -910,8 +907,8 @@ namespace DataTableConverter.Assisstant
                     for (int i = 0; i < config.Count && !stream.EndOfStream; i++)
                     {
                         char[] body = new char[config[i]];
-                        
-                        for(int index = 0; index < config[i] && stream.Peek() != -1; index++)
+
+                        for (int index = 0; index < config[i] && stream.Peek() != -1; index++)
                         {
                             body[index] = (char)stream.Read();
                         }
@@ -920,7 +917,7 @@ namespace DataTableConverter.Assisstant
                     progressBar?.UpdateLoadingBar(mainForm);
                     DatabaseHelper.InsertRow(row, tableName);
                     rowCount++;
-                    
+
                     int charCode;
                     while ((charCode = stream.Peek()) == '\r' || charCode == '\n')
                     {
@@ -1014,7 +1011,7 @@ namespace DataTableConverter.Assisstant
             {
                 string[] files = ExportHelper.GetWorkflows();
                 bool error = false;
-                foreach(string file in files)
+                foreach (string file in files)
                 {
                     try
                     {
@@ -1055,7 +1052,7 @@ namespace DataTableConverter.Assisstant
         internal Proc LoadProcedure(string path)
         {
             Proc result = null;
-            using(Stream stream = File.Open(path, FileMode.Open))
+            using (Stream stream = File.Open(path, FileMode.Open))
             {
                 BinaryFormatter bin = new BinaryFormatter();
                 result = bin.Deserialize(stream) as Proc;

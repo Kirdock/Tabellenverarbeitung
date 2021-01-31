@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Assisstant.SQL_Functions
 {
     [SQLiteFunction(Name = "GETSPLIT", Arguments = 3, FuncType = FunctionType.Scalar)]
-    class GetSplit: SQLiteFunction
+    class GetSplit : SQLiteFunction
     {
         public override object Invoke(object[] args)
         {

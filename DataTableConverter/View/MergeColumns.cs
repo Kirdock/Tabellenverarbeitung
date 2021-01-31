@@ -1,12 +1,8 @@
 ﻿using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -16,7 +12,9 @@ namespace DataTableConverter.View
         internal string Identifier => CmBHeaders.SelectedValue.ToString();
         internal bool Separator => CBSeparator.Checked;
         private Dictionary<string, string> AliasColumnMapping;
-        internal List<PlusListboxItem> AdditionalColumns { get
+        internal List<PlusListboxItem> AdditionalColumns
+        {
+            get
             {
                 List<PlusListboxItem> result = ClBHeaders.CheckedItems.Cast<PlusListboxItem>().Where(item => item.Value != Identifier).ToList();
                 result.ForEach(item => item.Value = AliasColumnMapping[item.Value]);
@@ -24,7 +22,7 @@ namespace DataTableConverter.View
             }
         }
 
-        internal MergeColumns(Dictionary<string,string> aliasColumnMapping)
+        internal MergeColumns(Dictionary<string, string> aliasColumnMapping)
         {
             InitializeComponent();
             AliasColumnMapping = aliasColumnMapping;
@@ -32,7 +30,7 @@ namespace DataTableConverter.View
             CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
             CmBHeaders.DisplayMember = "key";
             CmBHeaders.ValueMember = "value";
-            
+
             ClBHeaders.Items.AddRange(aliasColumnMapping.Select(pair => new PlusListboxItem(pair.Key)).ToArray());
             CmBHeaders.SelectedIndex = 0;
             ViewHelper.ResizePlusListBox(ClBHeaders);
@@ -45,7 +43,7 @@ namespace DataTableConverter.View
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            if(ClBHeaders.CheckedIndices.Count > 0)
+            if (ClBHeaders.CheckedIndices.Count > 0)
             {
                 DialogResult = DialogResult.OK;
                 Close();

@@ -1,14 +1,9 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
-using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -22,7 +17,7 @@ namespace DataTableConverter.View
         internal string ContinuedNumberName => CbContinuedNumber.Checked ? TxtContinuedNumber.Text : string.Empty;
         private readonly DatabaseHelper DatabaseHelper;
         private readonly string TableName;
-        internal ExportCustom(Dictionary<string,string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName)
+        internal ExportCustom(Dictionary<string, string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName)
         {
             InitializeComponent();
             DatabaseHelper = databaseHelper;
@@ -55,7 +50,7 @@ namespace DataTableConverter.View
                 BtnUncheckAll
             };
 
-            foreach(Control control in controls)
+            foreach (Control control in controls)
             {
                 control.Enabled = enabled;
             }
@@ -69,7 +64,7 @@ namespace DataTableConverter.View
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            if(CbContinuedNumber.Checked && string.IsNullOrWhiteSpace(TxtContinuedNumber.Text))
+            if (CbContinuedNumber.Checked && string.IsNullOrWhiteSpace(TxtContinuedNumber.Text))
             {
                 MessageHandler.MessagesOK(this, MessageBoxIcon.Error, "Bitte geben Sie eine Spaltenbezeichnung für die fortlaufende Nummer ein");
             }
@@ -89,7 +84,7 @@ namespace DataTableConverter.View
         {
             if (CmBFileNames.SelectedIndex > -1)
             {
-                if(CmBFileNames.Items.Count > 1 && this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie wirklich eine andere Spalte verwenden?") == DialogResult.Yes || CmBFileNames.Items.Count == 1)
+                if (CmBFileNames.Items.Count > 1 && this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie wirklich eine andere Spalte verwenden?") == DialogResult.Yes || CmBFileNames.Items.Count == 1)
                 {
                     SelectedItem.Column = cmbColumn.SelectedValue.ToString();
                     SetListValues();
@@ -123,7 +118,7 @@ namespace DataTableConverter.View
 
         private void btnDeleteFile_Click(object sender, EventArgs e)
         {
-            if(CmBFileNames.SelectedIndex != -1)
+            if (CmBFileNames.SelectedIndex != -1)
             {
                 CmBFileNames.Items.RemoveAt(CmBFileNames.SelectedIndex);
                 if (CmBFileNames.Items.Count > 0)
@@ -179,7 +174,7 @@ namespace DataTableConverter.View
             {
                 clbValues.SetItemChecked(i, SelectedItem.Values[clbValues.Items[i].ToString()]);
             }
-            
+
             clbValues.ItemCheck += clbValues_ItemCheck;
 
             SetSumCount();
@@ -218,7 +213,7 @@ namespace DataTableConverter.View
                         SetListValues();
                     }
 
-                    
+
                     SetValues(false, item);
                     CmBFileNames.Items.Add(item);
                     CmBFileNames.SelectedIndex = index;
@@ -241,7 +236,7 @@ namespace DataTableConverter.View
 
         private void BtnRename_Click(object sender, EventArgs e)
         {
-            if(CmBFileNames.SelectedIndex > -1)
+            if (CmBFileNames.SelectedIndex > -1)
             {
                 string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte den Dateinamen eingeben", "Dateiname", SelectedItem.Name);
                 if (!string.IsNullOrWhiteSpace(newText))

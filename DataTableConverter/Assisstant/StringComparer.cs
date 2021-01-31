@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
@@ -44,7 +40,7 @@ namespace DataTableConverter.Assisstant
         }
     }
 
-    class CustomSort: IComparer<CustomSortItem>
+    class CustomSort : IComparer<CustomSortItem>
     {
         private readonly bool Flag = true;
         internal CustomSort()
@@ -68,7 +64,7 @@ namespace DataTableConverter.Assisstant
             {
                 result = y.Index == x.Index && (Flag && y.UpperHalf || !Flag && x.UpperHalf) || y.Index > x.Index ? -1 : 1;
             }
-            
+
             return result;
         }
     }

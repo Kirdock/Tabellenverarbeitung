@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -14,7 +8,8 @@ namespace DataTableConverter.View
     {
         internal string Shortcut => TxtShortcut.Text;
         internal string NewColumn => TxtNewColumn.Text;
-        internal int MinLength  {
+        internal int MinLength
+        {
             get
             {
                 return CBMinLength.Checked ? (int)NumMinLength.Value : -1;
@@ -22,7 +17,7 @@ namespace DataTableConverter.View
         }
         internal string Column => CmBHeaders.SelectedValue.ToString();
 
-        public MaxRowLengthForm(Dictionary<string,string> aliasColumnMapping)
+        public MaxRowLengthForm(Dictionary<string, string> aliasColumnMapping)
         {
             InitializeComponent();
             CBMinLength_CheckedChanged(null, null);
@@ -40,7 +35,7 @@ namespace DataTableConverter.View
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Bitte füllen Sie entweder \"Name der neuen Spalte\" und \"Kürzel\" oder keinen dieser Werte aus");
             }
-            else if((shortcutEmpty || newColumnEmpty) && CBMinLength.Checked)
+            else if ((shortcutEmpty || newColumnEmpty) && CBMinLength.Checked)
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Bitte füllen Sie \"Name der neuen Spalte\" und \"Kürzel\" aus");
             }

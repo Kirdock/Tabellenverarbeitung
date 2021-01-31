@@ -1,14 +1,9 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -41,7 +36,7 @@ namespace DataTableConverter.View
         private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             List<int> selectedRows = ViewHelper.SelectedRows(dgTable);
-            if(selectedRows.Count == 0)
+            if (selectedRows.Count == 0)
             {
                 selectedRows.Add(selectedRow);
             }
@@ -102,7 +97,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    if (this.MessagesOkCancel(MessageBoxIcon.Warning,"Der Spaltenname wird bereits verwendet. Bitte geben Sie einen anderen ein.") == DialogResult.OK)
+                    if (this.MessagesOkCancel(MessageBoxIcon.Warning, "Der Spaltenname wird bereits verwendet. Bitte geben Sie einen anderen ein.") == DialogResult.OK)
                     {
                         spalteHinzufügenToolStripMenuItem_Click(sender, e);
                     }
@@ -123,7 +118,7 @@ namespace DataTableConverter.View
             {
                 selectedRow = dgTable.HitTest(e.X, e.Y).RowIndex;
                 selectedColumn = dgTable.HitTest(e.X, e.Y).ColumnIndex;
-                if(selectedColumn == -1 || selectedRow == -1)
+                if (selectedColumn == -1 || selectedRow == -1)
                 {
                     setSelectedCells(false);
                 }
@@ -140,7 +135,7 @@ namespace DataTableConverter.View
         private void spalteAufteilenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SplitForm form = new SplitForm(getTable()?.HeadersOfDataTable() ?? new object[0]);
-            if(form.ShowDialog(this) == DialogResult.OK)
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
                 DataTable table = getDataView().Table;
                 string splitString = form.getSplitString();
@@ -150,17 +145,17 @@ namespace DataTableConverter.View
 
                 int counter = 0;
 
-                for(int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
+                for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
                 {
                     if (table.Rows[rowIndex][column].ToString() == string.Empty) continue;
 
                     string[] cols = table.Rows[rowIndex][column].ToString().Split(new string[] { splitString }, StringSplitOptions.RemoveEmptyEntries);
-                    while(cols.Length > counter)
+                    while (cols.Length > counter)
                     {
                         counter++;
                         TryAddColumn(table, header, counter);
                     }
-                    for(int i = 0; i <cols.Length; i++)
+                    for (int i = 0; i < cols.Length; i++)
                     {
                         table.Rows[rowIndex][newColumnIndizes + i] = cols[i];
                     }

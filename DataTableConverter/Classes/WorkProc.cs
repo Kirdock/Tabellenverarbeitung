@@ -1,6 +1,4 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Classes.WorkProcs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;

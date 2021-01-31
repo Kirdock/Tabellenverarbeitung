@@ -1,12 +1,6 @@
 ﻿using DataTableConverter.Assisstant;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -19,7 +13,7 @@ namespace DataTableConverter.View
         internal string Table;
         private readonly DatabaseHelper DatabaseHelper;
 
-        internal ExportCount(Dictionary<string,string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName = "main")
+        internal ExportCount(Dictionary<string, string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName = "main")
         {
             InitializeComponent();
             DatabaseHelper = databaseHelper;

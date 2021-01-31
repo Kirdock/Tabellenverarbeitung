@@ -1,11 +1,5 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -18,7 +12,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool Repeat;
         internal static readonly string ClassName = "Nummerierung";
 
-        public ProcNumber(int ordinal, int id, string name) : base(ordinal, id, name){}
+        public ProcNumber(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         public ProcNumber(string newColumn, int start, int end, bool repeat)
         {

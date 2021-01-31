@@ -1,11 +1,5 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -42,7 +36,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            if(Column == colName)
+            if (Column == colName)
             {
                 Column = string.Empty;
             }
@@ -50,7 +44,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RenameHeaders(string oldName, string newName)
         {
-            if(Column == oldName)
+            if (Column == oldName)
             {
                 Column = newName;
             }

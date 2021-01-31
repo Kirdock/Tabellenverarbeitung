@@ -1,14 +1,10 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
-using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View.WorkProcViews
@@ -26,7 +22,7 @@ namespace DataTableConverter.View.WorkProcViews
             InitializeComponent();
             DatabaseHelper = databaseHelper;
             TableName = tableName;
-            SelectedItem = new ExportCustomItem(selectedItem.Name,selectedItem.Column);
+            SelectedItem = new ExportCustomItem(selectedItem.Name, selectedItem.Column);
             this.items = items.Where(item => item != selectedItem).Select(item => new ExportCustomItem(item.Name, item.Column, item.Table.AsEnumerable().Select(row => row[0].ToString()))).Concat(new ExportCustomItem[] { SelectedItem });
             CLBValues.Dict = Items;
             CmBColumns.Items.AddRange(headers);
@@ -39,7 +35,7 @@ namespace DataTableConverter.View.WorkProcViews
         private void LoadHeaders(IEnumerable<string> headers)
         {
             CLBValues.ItemCheck -= CLBValues_ItemCheck;
-            for(int i = 0; i < CLBValues.Items.Count; i++)
+            for (int i = 0; i < CLBValues.Items.Count; i++)
             {
                 CountListboxItem item = CLBValues.Items[i] as CountListboxItem;
                 if (headers.Contains(item.Value))
@@ -81,7 +77,7 @@ namespace DataTableConverter.View.WorkProcViews
         {
             string alias = CmBColumns.SelectedItem.ToString(); //DataSource = AliasColumnMapping? NO, because it is used for a workflow
             Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(DatabaseHelper.GetColumnName(alias, TableName), TableName);
-            
+
             CLBValues.BeginUpdate();
             CLBValues.Items.Clear();
             foreach (string key in pair.Keys)

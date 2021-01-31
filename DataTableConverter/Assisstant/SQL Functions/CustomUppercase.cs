@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Assisstant.SQL_Functions
 {
     [SQLiteFunction(Name = "CUSTOMUPPERCASE", Arguments = 2, FuncType = FunctionType.Scalar)]
-    class CustomUppercase: SQLiteFunction
+    class CustomUppercase : SQLiteFunction
     {
         public override object Invoke(object[] args)
         {

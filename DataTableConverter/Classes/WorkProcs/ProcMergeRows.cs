@@ -1,11 +1,8 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -17,7 +14,8 @@ namespace DataTableConverter.Classes.WorkProcs
         public string Identifier;
         public bool Separator;
 
-        public ProcMergeRows(int ordinal, int id, string name) : base(ordinal, id, name) {
+        public ProcMergeRows(int ordinal, int id, string name) : base(ordinal, id, name)
+        {
             Columns = new DataTable { TableName = "MergeRows" };
             Columns.Columns.Add("Spalte", typeof(string));
             Columns.Columns.Add("Aktion", typeof(PlusListboxItem.RowMergeState));
@@ -53,7 +51,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void RemoveHeader(string colName)
         {
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
-            if(Identifier == colName)
+            if (Identifier == colName)
             {
                 Identifier = string.Empty;
             }

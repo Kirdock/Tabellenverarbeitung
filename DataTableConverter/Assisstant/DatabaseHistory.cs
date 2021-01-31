@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Assisstant
 {
@@ -39,8 +33,8 @@ namespace DataTableConverter.Assisstant
         {
             Connection = new SQLiteConnection($"Data Source={HistoryPath};Version=3;");
             Connection.Open();
-            
-            
+
+
             Transaction = Connection.BeginTransaction();
             Init();
         }
@@ -96,7 +90,7 @@ namespace DataTableConverter.Assisstant
         internal void Log(int pointer, ref int savePoints, string cmd)
         {
             bool status = savePoints > pointer;
-            while(savePoints > pointer)
+            while (savePoints > pointer)
             {
                 DeleteSavePoint(savePoints);
                 savePoints--;
@@ -128,7 +122,7 @@ namespace DataTableConverter.Assisstant
 
         internal void Redo(int savepoint)
         {
-            using(SQLiteCommand command = Connection.CreateCommand())
+            using (SQLiteCommand command = Connection.CreateCommand())
             {
                 int offset = 0;
                 command.CommandText = $"SELECT command from log where spoint = ? order by rowid LIMIT {Properties.Settings.Default.MaxRows} OFFSET ?";
@@ -149,7 +143,7 @@ namespace DataTableConverter.Assisstant
                             ++offset;
                             ++readRows;
                         }
-                        if(readRows < Properties.Settings.Default.MaxRows)
+                        if (readRows < Properties.Settings.Default.MaxRows)
                         {
                             running = false;
                         }

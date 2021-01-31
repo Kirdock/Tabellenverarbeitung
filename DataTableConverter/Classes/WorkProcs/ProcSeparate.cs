@@ -1,14 +1,10 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -19,8 +15,9 @@ namespace DataTableConverter.Classes.WorkProcs
         internal static readonly string ClassName = "Trennen";
         public bool ContinuedColumn;
         public BindingList<ExportSeparate> Files;
-        
-        public ProcSeparate(int ordinal, int id, string name) : base(ordinal, id, name) {
+
+        public ProcSeparate(int ordinal, int id, string name) : base(ordinal, id, name)
+        {
             Files = new BindingList<ExportSeparate>();
         }
 
@@ -68,13 +65,13 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
 
 
-                SQLiteCommand command =  invokeForm.DatabaseHelper.GetDataCommand(tableName, sortingOrder, orderType);
-                using(SQLiteDataReader reader = command.ExecuteReader())
+                SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, sortingOrder, orderType);
+                using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.HasRows)
                     {
                         int columnIndex;
-                        for(columnIndex = 0; columnIndex < reader.FieldCount && reader.GetName(columnIndex) != item.Column; columnIndex++){}
+                        for (columnIndex = 0; columnIndex < reader.FieldCount && reader.GetName(columnIndex) != item.Column; columnIndex++) { }
                         SQLiteCommand tempCommand = null;
                         while (reader.Read())
                         {

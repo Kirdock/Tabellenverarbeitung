@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
 {
     class ErrorHelper
     {
-        private static readonly string path = Path.Combine(ExportHelper.ProjectPath,"Logs.log");
+        private static readonly string path = Path.Combine(ExportHelper.ProjectPath, "Logs.log");
         private static readonly string ErrorMessage = "Es ist ein Fehler aufgetreten!\nBitte kontaktieren Sie Ihren Administrator.";
 
         internal static void LogMessage(Exception exception, Form mainForm, bool showMessage = true)

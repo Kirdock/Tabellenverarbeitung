@@ -1,13 +1,10 @@
 ﻿using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -21,7 +18,7 @@ namespace DataTableConverter.View
         private Dictionary<string, string> AliasColumnMapping;
         internal OrderType OrderType => GetOrderType();
 
-        internal SortForm(Dictionary<string,string> aliasColumnMapping, string orderBefore, OrderType orderType)
+        internal SortForm(Dictionary<string, string> aliasColumnMapping, string orderBefore, OrderType orderType)
         {
             InitializeComponent();
             SetListBoxStyle();

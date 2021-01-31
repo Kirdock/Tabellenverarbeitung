@@ -1,11 +1,8 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -17,11 +14,11 @@ namespace DataTableConverter.Classes.WorkProcs
         public char? Character = null;
         public int Counter = 1;
         public DataTable Conditions;
-        internal enum Side { Left = 0, Right = 1};
+        internal enum Side { Left = 0, Right = 1 };
         internal Side OperationSide = Side.Right;
-        internal enum ConditionColumn : int { Spalte = 0, Wert = 1};
+        internal enum ConditionColumn : int { Spalte = 0, Wert = 1 };
 
-        public ProcPadding(int ordinal, int id, string name) :base(ordinal, id, name)
+        public ProcPadding(int ordinal, int id, string name) : base(ordinal, id, name)
         {
             InitConditions();
         }
@@ -53,7 +50,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
             string[] columns = GetAffectedHeaders();
-            
+
             if (!Character.HasValue)
             {
                 return;
@@ -87,7 +84,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void RemoveHeader(string colName)
         {
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
-            Conditions =Conditions.AsEnumerable().Where(row => row[(int)ConditionColumn.Spalte].ToString() != colName).ToTable(Conditions);
+            Conditions = Conditions.AsEnumerable().Where(row => row[(int)ConditionColumn.Spalte].ToString() != colName).ToTable(Conditions);
         }
     }
 }

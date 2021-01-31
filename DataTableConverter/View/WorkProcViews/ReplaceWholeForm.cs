@@ -1,14 +1,6 @@
-﻿using CheckComboBoxTest;
-using DataTableConverter.Classes;
-using DataTableConverter.Classes.WorkProcs;
+﻿using DataTableConverter.Classes.WorkProcs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -45,7 +37,7 @@ namespace DataTableConverter.View
             dgTable.Columns.Add(cmb);
             dgTable.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].Visible = false;
             ComboBoxIndex = cmb.DisplayIndex = 0;
-            
+
         }
 
         private void CloseForm()

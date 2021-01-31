@@ -1,12 +1,8 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -23,13 +19,13 @@ namespace DataTableConverter.Classes.WorkProcs
             return RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
-        public ProcUser(int ordinal, int id,string name) : base(ordinal, id, name) { }
+        public ProcUser(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         public ProcUser(string[] columns, string header, bool copyOldColumn)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
-            foreach(string col in columns)
+            foreach (string col in columns)
             {
                 Columns.Rows.Add(col);
             }
@@ -50,12 +46,12 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            Columns =  Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
+            Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
         {
-            if(PrepareMultiple(GetHeaders(), invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))
+            if (PrepareMultiple(GetHeaders(), invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))
             {
                 IEnumerable<DataRow> replaces = procedure.Replace.AsEnumerable().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));
                 IEnumerable<DataRow> replaceWithoutEmpty = replaces.Where(replace => replace[0].ToString() != string.Empty && replace[0].ToString() != ContainsDataFormat);

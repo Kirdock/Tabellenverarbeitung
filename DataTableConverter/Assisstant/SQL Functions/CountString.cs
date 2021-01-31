@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
+﻿using System.Data.SQLite;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Assisstant.SQL_Functions
 {
     [SQLiteFunction(Name = "COUNTSTRING", Arguments = 2, FuncType = FunctionType.Scalar)]
-    class CountString: SQLiteFunction
+    class CountString : SQLiteFunction
     {
         public override object Invoke(object[] args)
         {

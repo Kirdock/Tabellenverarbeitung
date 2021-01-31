@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -15,10 +11,10 @@ namespace DataTableConverter.View
         internal DataTable Table { get; set; }
         internal static readonly string IgnoreColumn = "Ignorieren";
         private int ComboBoxIndex;
-        internal SelectDuplicateColumns(string[] caseHeaders, Dictionary<string,string> importTableColumnAliasMapping, bool mustBeAssigned, string heading = null, string firstColumnName = null)
+        internal SelectDuplicateColumns(string[] caseHeaders, Dictionary<string, string> importTableColumnAliasMapping, bool mustBeAssigned, string heading = null, string firstColumnName = null)
         {
             InitializeComponent();
-            if(heading != null)
+            if (heading != null)
             {
                 Text = heading;
             }
@@ -44,7 +40,7 @@ namespace DataTableConverter.View
             DataTable table = new DataTable { TableName = "Duplicates" };
             table.Columns.Add(firstColumnName ?? "Spalte");
             table.Columns.Add("Zuweisung");
-            Dictionary<string,string> newHeadersDict = new Dictionary<string, string>();
+            Dictionary<string, string> newHeadersDict = new Dictionary<string, string>();
             string[] newHeadersArray = new string[0];
             string firstValue;
             bool isDictionary = importTableColumnAliasMapping is Dictionary<string, string>;
@@ -72,7 +68,7 @@ namespace DataTableConverter.View
             {
                 if (mustBeAssigned)
                 {
-                    newHeadersArray = (string[]) importTableColumnAliasMapping;
+                    newHeadersArray = (string[])importTableColumnAliasMapping;
                 }
                 else
                 {
@@ -86,7 +82,7 @@ namespace DataTableConverter.View
                 }
                 firstValue = newHeadersArray[0];
             }
-             
+
 
             dgDuplicate.DataSource = table;
 
@@ -107,13 +103,13 @@ namespace DataTableConverter.View
                     DataSource = newHeadersArray,
                 };
             }
-            
+
             cmb.DataPropertyName = "Zuweisung";
             cmb.HeaderText = "Zuweisung ";
 
             ComboBoxIndex = dgDuplicate.Columns.Count;
             dgDuplicate.Columns.Add(cmb);
-            
+
             foreach (string header in caseHeaders)
             {
                 table.Rows.Add(new object[] { header, firstValue });
@@ -127,7 +123,7 @@ namespace DataTableConverter.View
             setDataTable();
             DataTable tab = getDataSource();
             bool isValid = true;
-            foreach(DataRow row in tab.Rows)
+            foreach (DataRow row in tab.Rows)
             {
                 if (string.IsNullOrWhiteSpace(row.ItemArray[1]?.ToString()))
                 {

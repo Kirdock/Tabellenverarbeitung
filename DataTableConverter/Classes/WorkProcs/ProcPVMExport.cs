@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -28,7 +26,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         private void AddColumns(string[] headers)
         {
-            foreach(string col in headers)
+            foreach (string col in headers)
             {
                 Columns.Rows.Add(col);
             }
@@ -65,10 +63,10 @@ namespace DataTableConverter.Classes.WorkProcs
                     int fileEncoding = invokeForm.FileEncoding == 0 ? FileEncoding : invokeForm.FileEncoding;
                     //saveTable
                     invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, command, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
-                    
-                    if(Properties.Settings.Default.PVMSaveTwice)
+
+                    if (Properties.Settings.Default.PVMSaveTwice)
                     {
-                        
+
                         if ((string.IsNullOrWhiteSpace(SecondFileName) || !Directory.Exists(SecondFileName)))
                         {
                             DialogResult result2 = DialogResult.Cancel;

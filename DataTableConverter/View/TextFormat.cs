@@ -8,7 +8,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -124,7 +123,7 @@ namespace DataTableConverter.View
             rbSeparated.Checked = Properties.Settings.Default.TextSeparated;
             rbFixed.Checked = !Properties.Settings.Default.TextSeparated;
             txtSeparator.Text = Properties.Settings.Default.Separator;
-            if(txtSeparator.Text.Length > 0)
+            if (txtSeparator.Text.Length > 0)
             {
                 Separators = new List<string> { txtSeparator.Text };
             }
@@ -140,7 +139,7 @@ namespace DataTableConverter.View
         private void adjustSettingsDataGrid()
         {
             DataTable table;
-            if(dgvSetting.DataSource == null)
+            if (dgvSetting.DataSource == null)
             {
                 table = new DataTable { TableName = "Setting" };
                 table.Columns.Add("Bezeichnung", typeof(string));
@@ -148,17 +147,18 @@ namespace DataTableConverter.View
             else
             {
                 table = ((DataTable)dgvSetting.DataSource).Copy();
-                for (int count = table.Columns.Count-1; count > 0; count--)
+                for (int count = table.Columns.Count - 1; count > 0; count--)
                 {
                     table.Columns.RemoveAt(count);
                 }
             }
-            
+
             if (cmbVariant.SelectedIndex == 0)
             {
                 table.Columns.Add("Länge", typeof(int));
             }
-            else{
+            else
+            {
                 table.Columns.Add("Von", typeof(int));
                 table.Columns.Add("Bis", typeof(int));
             }
@@ -249,7 +249,7 @@ namespace DataTableConverter.View
             List<string> separator = null;
             object[] headers = GetHeaders();
             bool valid = false;
-            if(rbSep.Checked && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
+            if (rbSep.Checked && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
             {
                 separator = txtSeparator.ReadOnly ? Separators : new List<string> { txtSeparator.Text };
             }
@@ -259,17 +259,17 @@ namespace DataTableConverter.View
             }
             else if (rbBetween.Checked && checkBetweenText())
             {
-                ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked,headers);
+                ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, headers);
                 valid = true;
             }
 
-            if(separator != null)
+            if (separator != null)
             {
                 valid = true;
                 ImportSettings = new ImportSettings(separator, getCodePage(), cbContainsHeaders.Checked, headers);
             }
 
-            if(valid)
+            if (valid)
             {
                 DialogResult = DialogResult.OK;
             }
@@ -305,7 +305,7 @@ namespace DataTableConverter.View
                 int to, from;
                 if (e.ColumnIndex == 1)
                 {
-                    string val = dgvSetting[e.ColumnIndex +1, e.RowIndex].Value?.ToString();
+                    string val = dgvSetting[e.ColumnIndex + 1, e.RowIndex].Value?.ToString();
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         from = int.Parse(currentElement);
@@ -316,7 +316,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    string val = dgvSetting[e.ColumnIndex -1, e.RowIndex].Value?.ToString();
+                    string val = dgvSetting[e.ColumnIndex - 1, e.RowIndex].Value?.ToString();
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         to = int.Parse(currentElement);
@@ -374,7 +374,7 @@ namespace DataTableConverter.View
 
         private void btnLoadPreset_Click(object sender, EventArgs e)
         {
-            if(cmbPresets.SelectedIndex != -1)
+            if (cmbPresets.SelectedIndex != -1)
             {
                 string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.bin");
                 if (File.Exists(path))
@@ -399,7 +399,8 @@ namespace DataTableConverter.View
 
         private void dgvSetting_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
-            if (e.ColumnIndex == 0) {
+            if (e.ColumnIndex == 0)
+            {
                 foreach (DataGridViewRow row in dgvSetting.Rows)
                 {
                     if (row.Cells[0].Value != null && row.Cells[0].Value.Equals(e.FormattedValue) && row.Index != e.RowIndex)
@@ -410,7 +411,7 @@ namespace DataTableConverter.View
                     }
                 }
             }
-            else if(e.ColumnIndex > 0 && cmbVariant.SelectedIndex != 0 && !checkFromToEntered(e))
+            else if (e.ColumnIndex > 0 && cmbVariant.SelectedIndex != 0 && !checkFromToEntered(e))
             {
                 e.Cancel = true;
                 this.MessagesOK(MessageBoxIcon.Warning, "\"Von\" darf \"Bis\"nicht überschreiten!");
@@ -493,7 +494,7 @@ namespace DataTableConverter.View
         private bool tableValid(DataTable table, out string message)
         {
             message = string.Empty;
-            if(table.Rows.Count == 0 || !table.Rows[0].ItemArray[1].ToString().Equals("1"))
+            if (table.Rows.Count == 0 || !table.Rows[0].ItemArray[1].ToString().Equals("1"))
             {
                 return false;
             }
@@ -506,14 +507,14 @@ namespace DataTableConverter.View
                 {
                     int bis1 = int.Parse(table.Rows[i].ItemArray[2].ToString()); //kann nicht null und muss eine Zahl sein, da es vorher schon überprüft wird
                     int von2 = int.Parse(table.Rows[i + 1].ItemArray[1].ToString());
-                    if((bis1+1) != von2)
+                    if ((bis1 + 1) != von2)
                     {
                         status = false;
                         row1 = i + 1;
                         row2 = i + 2;
                         break;
                     }
-                    
+
                 }
                 if (!status)
                 {
@@ -524,7 +525,7 @@ namespace DataTableConverter.View
             {
                 message = "Bitte füllen Sie die Werte \"von\" und \"bis\" aus!";
             }
-            
+
             return status;
         }
 
@@ -536,7 +537,7 @@ namespace DataTableConverter.View
                 ImportHelper.OpenText(TableName, path, new List<string> { "\t" }, getCodePage(), cbContainsHeaders.Checked, (dgvHeaders.DataSource as DataTable)?.ColumnValues(0) ?? new object[0], true, null, this);
                 dgvPreview.DataSource = DatabaseHelper.GetData(TableName);
             }
-            
+
             else if ((txtBegin.ReadOnly = txtEnd.ReadOnly = rbSep.Checked))
             {
                 bool multiSeparator = Separators.Count > 1;
@@ -640,7 +641,7 @@ namespace DataTableConverter.View
                     else
                     {
                         string path = Path.Combine(ExportHelper.ProjectPresets, $"{oldName}.bin");
-                        string newPath = Path.Combine(ExportHelper.ProjectPresets,$"{newName}.bin");
+                        string newPath = Path.Combine(ExportHelper.ProjectPresets, $"{newName}.bin");
 
                         File.Move(path, newPath);
                         LoadPresets();
@@ -702,7 +703,7 @@ namespace DataTableConverter.View
             if (cmbHeaderPresets.SelectedIndex != -1)
             {
                 string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString() + ".bin");
-                if(File.Exists(path))
+                if (File.Exists(path))
                 {
                     TextImportTemplate template = ImportHelper.LoadTextImportTemplate(path);
                     if (template != null)
@@ -737,7 +738,7 @@ namespace DataTableConverter.View
                 DialogResult result = this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie die Vorlage wirklich löschen?");
                 if (result == DialogResult.Yes)
                 {
-                    string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString()+".bin");
+                    string path = Path.Combine(ExportHelper.ProjectHeaderPresets, cmbHeaderPresets.SelectedItem.ToString() + ".bin");
                     if (File.Exists(path))
                     {
                         File.Delete(path);
@@ -805,11 +806,11 @@ namespace DataTableConverter.View
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     Separators = form.Separators;
-                    if((txtSeparator.ReadOnly = Separators.Count > 1))
+                    if ((txtSeparator.ReadOnly = Separators.Count > 1))
                     {
                         txtSeparator.Text = MultiSeparatorText;
                     }
-                    else if(Separators.Count == 1)
+                    else if (Separators.Count == 1)
                     {
                         txtSeparator.Text = Separators.First();
                     }

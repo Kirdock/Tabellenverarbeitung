@@ -1,13 +1,10 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -17,7 +14,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal override string NewColumn => "Duplikat";
 
-        internal ProcDuplicate(int ordinal, int id, string name) : base(ordinal, id,name)
+        internal ProcDuplicate(int ordinal, int id, string name) : base(ordinal, id, name)
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
@@ -75,14 +72,14 @@ namespace DataTableConverter.Classes.WorkProcs
                 string duplicateTableTotal = Guid.NewGuid().ToString();
                 string duplicateTableShort = Guid.NewGuid().ToString();
                 string[] duplicateColumns = new string[] { sourceRowIdName, identifierColumn };
-                
-                foreach(string table in new string[] { duplicateTableShort, duplicateTableTotal })
+
+                foreach (string table in new string[] { duplicateTableShort, duplicateTableTotal })
                 {
                     invokeForm.DatabaseHelper.CreateTable(duplicateColumns, table);
                     invokeForm.DatabaseHelper.CreateIndexOn(table, identifierColumn, null, true);
                 }
                 Dictionary<int, string> updates = new Dictionary<int, string>();
-                
+
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     SQLiteCommand updateCommandTotal = null;
@@ -97,13 +94,13 @@ namespace DataTableConverter.Classes.WorkProcs
                             {
                                 updates.Add(sourceId, duplicateCase.ShortcutTotal);
                             }
-                            
+
                             updates.Add(reader.GetInt16(0), duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
                         }
                         else
                         {
                             updateCommandTotal = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0), identifierTotal }, duplicateTableTotal, updateCommandTotal);
-                            
+
                             string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, tolerances);
                             if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierShort, duplicateTableShort, sourceRowIdName, out int sourceId2))
                             {
@@ -115,7 +112,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             }
                             else
                             {
-                                updateCommandShort = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0),  identifierShort }, duplicateTableShort, updateCommandShort);
+                                updateCommandShort = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0), identifierShort }, duplicateTableShort, updateCommandShort);
                             }
                         }
                     }

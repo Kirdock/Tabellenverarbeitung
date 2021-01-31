@@ -1,13 +1,6 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes.WorkProcs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View.WorkProcViews
@@ -49,11 +42,11 @@ namespace DataTableConverter.View.WorkProcViews
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            if(cbFirstColumn.SelectedItem == cbSecondColumn.SelectedItem)
+            if (cbFirstColumn.SelectedItem == cbSecondColumn.SelectedItem)
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Es kann nicht zwei mal dieselbe Spalte ausgewählt werden!");
             }
-            else if(cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtNewColumn.Text))
+            else if (cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtNewColumn.Text))
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
             }

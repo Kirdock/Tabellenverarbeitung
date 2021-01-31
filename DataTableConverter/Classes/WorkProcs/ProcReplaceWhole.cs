@@ -1,12 +1,9 @@
-﻿using DataTableConverter.Assisstant;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataTableConverter.Extensions;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
@@ -14,9 +11,10 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcReplaceWhole : WorkProc
     {
         internal static readonly string ClassName = "Text ersetzen";
-        internal enum ColumnIndex : int { Column = 0, Value = 1};
+        internal enum ColumnIndex : int { Column = 0, Value = 1 };
 
-        public ProcReplaceWhole(int ordinal, int id, string name) : base(ordinal, id, name) {
+        public ProcReplaceWhole(int ordinal, int id, string name) : base(ordinal, id, name)
+        {
             InitColumns();
         }
 
@@ -58,7 +56,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 if (row.ItemArray[(int)ColumnIndex.Column].ToString() == oldName)
                 {
-                    row.SetField((int) ColumnIndex.Column, newName);
+                    row.SetField((int)ColumnIndex.Column, newName);
                 }
             }
         }

@@ -1,13 +1,7 @@
 ﻿using DataTableConverter.Classes;
 using DataTableConverter.View.WorkProcViews;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -38,7 +32,7 @@ namespace DataTableConverter.View
                 };
                 col.Items.Add(string.Empty);
                 col.Items.AddRange(headers);
-                
+
                 dgTable.Columns[0].Visible = false;
                 dgTable.Columns.Add(col);
 
@@ -59,9 +53,9 @@ namespace DataTableConverter.View
                 {
                     dgTable.Columns[i].DisplayIndex = i;
                 }
-                
+
                 dgTable.Columns[0].DisplayIndex = 8;
-                
+
                 col.DisplayIndex = 0;
                 boxCol.DisplayIndex = 4;
                 boxCol2.DisplayIndex = 7;
@@ -165,7 +159,7 @@ namespace DataTableConverter.View
         {
             if (RBExtended.Checked)
             {
-                if(WindowState != FormWindowState.Maximized)
+                if (WindowState != FormWindowState.Maximized)
                 {
                     Properties.Settings.Default.MergeFormatViewSize = Size;
                 }
@@ -173,12 +167,12 @@ namespace DataTableConverter.View
             }
             else
             {
-                if(WindowState != FormWindowState.Maximized)
+                if (WindowState != FormWindowState.Maximized)
                 {
                     Properties.Settings.Default.MergeFormatViewSizeSimple = Size;
                 }
                 Properties.Settings.Default.MergeFormatViewSimpleMaximized = WindowState == FormWindowState.Maximized;
-                
+
             }
             Properties.Settings.Default.Save();
 

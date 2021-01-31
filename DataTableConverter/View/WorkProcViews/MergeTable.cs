@@ -9,19 +9,20 @@ namespace DataTableConverter.View
     public partial class MergeTable : Form
     {
         private bool SameRowCount;
-        internal IEnumerable<string> SelectedColumns => clbColumns.CheckedItems.Cast<KeyValuePair<string,string>>().Select(x => x.Value);
+        internal IEnumerable<string> SelectedColumns => clbColumns.CheckedItems.Cast<string>().Select(x => ImportAliasColumnMapping[x]);
         internal string OriginalIdentifierColumnName => cmbIdentifierOriginal.SelectedValue.ToString();
         internal string ImportIdentifierColumnName => cmbIdentifierMerge.SelectedValue.ToString();
+        private Dictionary<string, string> ImportAliasColumnMapping;
 
-
-        internal MergeTable(Dictionary<string,string> originalHeaders, Dictionary<string,string> importHeaders, string filename, int sourceCount, int importCount)
+        internal MergeTable(Dictionary<string, string> originalHeaders, Dictionary<string, string> importHeaders, string filename, int sourceCount, int importCount)
         {
             //key: alias, value: columnName
             InitializeComponent();
-            
+
             SetListBoxStyle();
             SetCmbItems(cmbIdentifierOriginal, originalHeaders);
             SetCmbItems(cmbIdentifierMerge, importHeaders);
+            ImportAliasColumnMapping = importHeaders;
             SetListItems(importHeaders);
             lblImportTable.Text = filename;
 
@@ -37,15 +38,12 @@ namespace DataTableConverter.View
             ViewHelper.SetListBoxStyle(clbColumns);
         }
 
-        private void SetListItems(Dictionary<string,string> items)
+        private void SetListItems(Dictionary<string, string> items)
         {
-            ListBox box = clbColumns;
-            box.DataSource = new BindingSource(items, null);
-            box.DisplayMember = "key";
-            box.ValueMember = "value";
+            clbColumns.Items.AddRange(items.Keys.ToArray());
         }
 
-        private void SetCmbItems(ComboBox cmb, Dictionary<string,string> items)
+        private void SetCmbItems(ComboBox cmb, Dictionary<string, string> items)
         {
             cmb.DataSource = new BindingSource(items, null);
             cmb.DisplayMember = "key";
@@ -58,7 +56,7 @@ namespace DataTableConverter.View
             if (!SameRowCount)
             {
                 DialogResult result = this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Die Zeilenanzahl der beiden Tabellen stimmt nicht überein! Trotzdem fortfahren?");
-                if(result != DialogResult.Abort)
+                if (result != DialogResult.Abort)
                 {
                     DialogResult = result;
                 }
@@ -68,7 +66,7 @@ namespace DataTableConverter.View
                 DialogResult = DialogResult.OK;
             }
         }
-        
+
 
         private void BtnSelectAll_Click(object sender, EventArgs e)
         {

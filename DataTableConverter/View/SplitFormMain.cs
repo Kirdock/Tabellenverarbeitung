@@ -25,7 +25,7 @@ namespace DataTableConverter.View
             {
                 MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Bitte geben Sie einen Bezeichnung für die neue Spalte an");
             }
-            else if(TxTSplitText.Text == string.Empty)
+            else if (TxTSplitText.Text == string.Empty)
             {
                 MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Bitte geben Sie an nach welchem Text/Zeichen aufgeteilt werden soll");
             }

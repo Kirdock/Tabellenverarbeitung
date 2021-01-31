@@ -1,11 +1,8 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -21,7 +18,8 @@ namespace DataTableConverter.Classes.WorkProcs
             return AllColumns ? new string[0] : RemoveEmptyHeaders(Columns.AsEnumerable().Select(dr => dr.ItemArray.Length > 0 ? dr.ItemArray[0].ToString() : null));
         }
 
-        public ProcUpLowCase(int ordinal, int id,string name) : base(ordinal, id, name) {
+        public ProcUpLowCase(int ordinal, int id, string name) : base(ordinal, id, name)
+        {
             Option = 0;
         }
 
@@ -29,7 +27,7 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
-            foreach(string col in columns)
+            foreach (string col in columns)
             {
                 Columns.Rows.Add(col);
             }
@@ -58,6 +56,6 @@ namespace DataTableConverter.Classes.WorkProcs
             invokeForm.DatabaseHelper.SetCustomUppercase(GetHeaders(), Option, tableName);
         }
 
-        
+
     }
 }

@@ -1,13 +1,10 @@
-﻿using DataTableConverter.Assisstant;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataTableConverter.Extensions;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
@@ -19,7 +16,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool DeleteDouble;
         public bool AllColumns = true;
 
-        public enum TrimType { Start, End, Both};
+        public enum TrimType { Start, End, Both };
         public TrimType Type;
 
         public ProcTrim()
@@ -96,6 +93,6 @@ namespace DataTableConverter.Classes.WorkProcs
             return regex.Replace(value.Trim(), " ");
         }
 
-        
+
     }
 }

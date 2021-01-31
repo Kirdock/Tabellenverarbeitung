@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace DataTableConverter.Assisstant.SQL_Functions
 {
     [SQLiteFunction(Name = "CUSTOMTRIM", Arguments = 4, FuncType = FunctionType.Scalar)]
-    class CustomTrim: SQLiteFunction
+    class CustomTrim : SQLiteFunction
     {
         public override object Invoke(object[] args)
         {

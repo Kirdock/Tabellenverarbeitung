@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -14,7 +7,7 @@ namespace DataTableConverter.View
     {
         internal string Column => CmBHeaders.SelectedValue.ToString();
 
-        internal SelectHeader(Dictionary<string,string> aliasColumnMapping)
+        internal SelectHeader(Dictionary<string, string> aliasColumnMapping)
         {
             InitializeComponent();
             CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);

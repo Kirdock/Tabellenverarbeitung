@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes
 {
     [Serializable()]
     class TextImportTemplate
     {
-        public enum SelectedSeparatedState { Tab, TabCharacter, Between}
+        public enum SelectedSeparatedState { Tab, TabCharacter, Between }
         public DataTable Table;
         public int Encoding;
         public bool ContainsHeaders;

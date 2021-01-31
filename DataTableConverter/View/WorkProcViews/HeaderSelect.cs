@@ -1,12 +1,8 @@
 ﻿using DataTableConverter.Classes.WorkProcs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View.WorkProcViews
@@ -42,7 +38,7 @@ namespace DataTableConverter.View.WorkProcViews
         private void BtnConfirm_Click(object sender, EventArgs e)
         {
             StringBuilder result = new StringBuilder();
-            if(ClBHeaders.CheckedItems.Count > 0)
+            if (ClBHeaders.CheckedItems.Count > 0)
             {
                 result.Append("[").Append(string.Join("] [", ClBHeaders.CheckedItems.Cast<string>())).Append("]");
             }
