@@ -909,21 +909,6 @@ namespace DataTableConverter.Assisstant
             return headers;
         }
 
-        private DataTable GetSortedHeadersAsDataTable(out SQLiteDataAdapter adapter, string tableName)
-        {
-            DataTable table = new DataTable();
-            adapter = null;
-            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
-            {
-                command.CommandText = $"SELECT * from [{tableName + MetaTableAffix}] order by sortorder";
-                adapter = new SQLiteDataAdapter(command);
-                adapter.Fill(table);
-                SQLiteCommandBuilder builder = new SQLiteCommandBuilder(adapter);
-                adapter.UpdateCommand = builder.GetUpdateCommand();
-            }
-            return table;
-        }
-
         private bool AddColumnIfNotExists(string tableName, string column, string defaultValue = "")
         {
             bool status;
@@ -1047,12 +1032,25 @@ namespace DataTableConverter.Assisstant
         internal void RenameColumns(string importTable, string destinationTable)
         {
             List<string> headers = GetSortedColumnsAsAlias(importTable);
-            DataTable table = GetSortedHeadersAsDataTable(out SQLiteDataAdapter adapter, destinationTable);
-            for (int i = 0; i < table.Rows.Count && i < headers.Count; ++i)
+            Dictionary<int, string> updates = new Dictionary<int, string>();
+            using (SQLiteCommand command = GetConnection(destinationTable).CreateCommand())
             {
-                table.Rows[i]["alias"] = headers[i];
+                command.CommandText = $"SELECT [{IdColumnName}] from [{destinationTable + MetaTableAffix}] where alias is not null order by sortorder";
+                using(SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    int index = 0;
+                    while (reader.Read() && index < headers.Count)
+                    {
+                        updates.Add(reader.GetInt32(0), headers[index]);
+                        index++;
+                    }
+                }
             }
-            adapter?.Update(table);
+            SQLiteCommand updateCommand = null;
+            foreach (KeyValuePair<int, string> pair in updates)
+            {
+                updateCommand = UpdateCell(pair.Value, "alias", pair.Key, destinationTable + MetaTableAffix, true, updateCommand, GetConnection(destinationTable));
+            }
         }
 
         internal void SetSavepoint(bool ignoreMax = false)
@@ -1559,16 +1557,25 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void UpdateCell(string value, string alias, int id, string tableName, bool aliasIsColumnName = false)
+        internal SQLiteCommand UpdateCell(string value, string alias, int id, string tableName, bool aliasIsColumnName = false, SQLiteCommand cmd = null, SQLiteConnection connection = null)
         {
-            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            SQLiteCommand command;
+            if (cmd == null)
             {
+                command = (connection ?? GetConnection(tableName)).CreateCommand();
                 string columnName = aliasIsColumnName ? alias : GetColumnName(alias, tableName);
                 command.CommandText = $"UPDATE [{tableName}] set [{columnName}] = ? where [{IdColumnName}] = ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = value });
                 command.Parameters.Add(new SQLiteParameter() { Value = id });
-                command.ExecuteNonQuery();
             }
+            else
+            {
+                command = cmd;
+                command.Parameters[0].Value = value;
+                command.Parameters[1].Value = id;
+            }
+            command.ExecuteNonQuery();
+            return command;
         }
 
         internal void SetColumnValues(string alias, string newValue, string tableName)
