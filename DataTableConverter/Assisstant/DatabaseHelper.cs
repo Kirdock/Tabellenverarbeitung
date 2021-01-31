@@ -1494,6 +1494,34 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
+        internal void DeleteRowsByIndex(int[] ind, string order, OrderType orderType, string tableName)
+        {
+            HashSet<int> indizes = new HashSet<int>(ind);
+            List<int> deleteRows = new List<int>();
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, -1, true, tableName);
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    int index = 0;
+                    while (reader.Read() && indizes.Count != 0)
+                    {
+                        if (indizes.Contains(index))
+                        {
+                            deleteRows.Add(reader.GetInt32(0));
+                            indizes.Remove(index);
+                        }
+                        index++;
+                    }
+                }
+            }
+            SQLiteCommand deleteCommand = null;
+            foreach (int id in deleteRows)
+            {
+                deleteCommand = DeleteRow(id, tableName, deleteCommand);
+            }
+        }
+
         internal bool Undo()
         {
             bool status;
@@ -1983,16 +2011,14 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal int DeleteRowByMatch(string value, string columnName, bool strictMatch, string tableName)
+        internal void DeleteRowByMatch(string value, string columnName, bool strictMatch, string tableName)
         {
-            int deleteCount;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"DELETE from [{tableName}] where [{columnName}] {(strictMatch ? "=? COLLATE NOCASE" : "like %?%")}";
-                command.Parameters.Add(new SQLiteParameter() { Value = value });
-                deleteCount = Convert.ToInt32(command.ExecuteScalar());
+                command.CommandText = $"DELETE from [{tableName}] where [{columnName}] {(strictMatch ? "=? COLLATE NOCASE" : "like ?")}";
+                command.Parameters.Add(new SQLiteParameter() { Value = $"%{value}%" });
+                command.ExecuteNonQuery();
             }
-            return deleteCount;
         }
 
         internal void EmptyColumnByCondition(string sourceColumn, string destinationColumn, string compareAlias, string tableName)

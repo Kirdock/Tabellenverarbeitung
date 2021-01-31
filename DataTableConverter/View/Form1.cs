@@ -1143,17 +1143,13 @@ namespace DataTableConverter
         {
             int[] rows = ViewHelper.SelectedRowsOfDataGridView(dgTable);
             DeleteRows(rows);
-            SetRowCount(RowCount - rows.Length);
             DatabaseHelper.SetSavepoint();
+            LoadData(false);
         }
 
         private void DeleteRows(int[] rows)
         {
-            foreach (int row in rows.OrderByDescending(index => index))
-            {
-                DatabaseHelper.DeleteRow(int.Parse(dgTable[DatabaseHelper.IdColumnName, row].Value.ToString()), TableName);
-                dgTable.Rows.RemoveAt(row);
-            }
+            DatabaseHelper.DeleteRowsByIndex(rows, GetSorting(), OrderType, TableName);
         }
 
         private void zeileEinfügenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1559,18 +1555,16 @@ namespace DataTableConverter
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
-                    int deleted;
                     if (form.Range == null)
                     {
-                        deleted = DatabaseHelper.DeleteRowByMatch(form.ColumnText, form.ColumnName, form.EqualsText, TableName);
+                        DatabaseHelper.DeleteRowByMatch(form.ColumnText, form.ColumnName, form.EqualsText, TableName);
                     }
                     else
                     {
                         DeleteRows(form.Range);
-                        deleted = form.Range.Length;
                     }
-                    SetRowCount(RowCount - deleted);
                     DatabaseHelper.SetSavepoint();
+                    LoadData(false);
                     StopLoadingBar();
                 }
             }
