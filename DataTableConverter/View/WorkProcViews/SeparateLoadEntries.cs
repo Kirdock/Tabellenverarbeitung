@@ -75,18 +75,22 @@ namespace DataTableConverter.View.WorkProcViews
 
         private void SetCheckedListBox()
         {
-            string alias = CmBColumns.SelectedItem.ToString(); //DataSource = AliasColumnMapping? NO, because it is used for a workflow
-            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(DatabaseHelper.GetColumnName(alias, TableName), TableName);
-
-            CLBValues.BeginUpdate();
-            CLBValues.Items.Clear();
-            foreach (string key in pair.Keys)
+            try
             {
-                CLBValues.Items.Add(new CountListboxItem(0, key));
-            }
-            CLBValues.EndUpdate();
+                string alias = CmBColumns.SelectedItem.ToString(); //DataSource = AliasColumnMapping? NO, because it is used for a workflow
+                Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(DatabaseHelper.GetColumnName(alias, TableName), TableName);
 
-            ViewHelper.ResizeCountListBox(CLBValues);
+                CLBValues.BeginUpdate();
+                CLBValues.Items.Clear();
+                foreach (string key in pair.Keys)
+                {
+                    CLBValues.Items.Add(new CountListboxItem(0, key));
+                }
+                CLBValues.EndUpdate();
+
+                ViewHelper.ResizeCountListBox(CLBValues);
+            }
+            catch { }
         }
 
         private void CmBColumns_SelectedIndexChanged(object sender, EventArgs e)

@@ -32,7 +32,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             PrepareMultiple(GetHeaders(), invokeForm, tableName, out string[] sourceColumns, out _);
 
@@ -62,7 +62,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     int fileEncoding = invokeForm.FileEncoding == 0 ? FileEncoding : invokeForm.FileEncoding;
                     //saveTable
-                    invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, command, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
+                    invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, tableName, command, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
 
                     if (Properties.Settings.Default.PVMSaveTwice)
                     {
@@ -80,13 +80,13 @@ namespace DataTableConverter.Classes.WorkProcs
                             if (result2 == DialogResult.OK)
                             {
                                 path = saveFileDialog1.FileName;
-                                invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, command, UpdateLoadingBar);
+                                invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, tableName, command, UpdateLoadingBar);
                             }
                         }
                         else
                         {
                             path = Path.Combine(SecondFileName, Path.GetFileNameWithoutExtension(path));
-                            invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, command, UpdateLoadingBar);
+                            invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, tableName, command, UpdateLoadingBar);
                         }
                     }
                 }

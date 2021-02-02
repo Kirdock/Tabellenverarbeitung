@@ -45,7 +45,7 @@ namespace DataTableConverter.Classes.WorkProcs
             DuplicateColumns = DuplicateColumns.Where(x => x != colName).ToArray();
         }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             DuplicateColumns = GetHeaders();
             Hashtable hTable = new Hashtable();
@@ -99,12 +99,12 @@ namespace DataTableConverter.Classes.WorkProcs
                         }
                         else
                         {
-                            updateCommandTotal = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0), identifierTotal }, duplicateTableTotal, updateCommandTotal);
+                            updateCommandTotal = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetInt32(0).ToString(), identifierTotal }, duplicateTableTotal, updateCommandTotal);
 
                             string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, tolerances);
                             if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierShort, duplicateTableShort, sourceRowIdName, out int sourceId2))
                             {
-                                if (!updates.ContainsKey(sourceId))
+                                if (!updates.ContainsKey(sourceId2))
                                 {
                                     updates.Add(sourceId2, duplicateCase.ShortcutTotal);
                                 }
@@ -112,7 +112,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             }
                             else
                             {
-                                updateCommandShort = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetString(0), identifierShort }, duplicateTableShort, updateCommandShort);
+                                updateCommandShort = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetInt32(0).ToString(), identifierShort }, duplicateTableShort, updateCommandShort);
                             }
                         }
                     }
@@ -126,7 +126,7 @@ namespace DataTableConverter.Classes.WorkProcs
         private string GetColumnsAsObjectArray(SQLiteDataReader reader, int[] subStringBegin, int[] subStringEnd, List<Tolerance> tolerances)
         {
             StringBuilder res = new StringBuilder();
-            for (int i = 0; i < reader.FieldCount; i++)
+            for (int i = 1; i < reader.FieldCount; i++)
             {
                 #region Set Tolerances
                 StringBuilder result = new StringBuilder(reader.GetString(i).ToLower());
@@ -151,8 +151,8 @@ namespace DataTableConverter.Classes.WorkProcs
                 #region Set Substring
                 if (subStringBegin != null)
                 {
-                    int begin = subStringBegin[i];
-                    int end = subStringEnd[i];
+                    int begin = subStringBegin[i-1];
+                    int end = subStringEnd[i-1];
                     if (begin != 0 && end != 0 && end >= begin)
                     {
                         if (begin - 1 > resultString.Length)

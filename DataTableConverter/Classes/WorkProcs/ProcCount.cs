@@ -15,7 +15,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public ProcCount(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             string columnName = invokeForm.DatabaseHelper.GetColumnName(Column, tableName);
             if (columnName != null)

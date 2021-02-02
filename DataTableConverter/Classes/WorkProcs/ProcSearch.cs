@@ -35,7 +35,7 @@ namespace DataTableConverter.Classes.WorkProcs
             NewColumn = newColumn;
         }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             string column = invokeForm.DatabaseHelper.GetColumnName(Header, tableName);
             if (column != null && From <= To)

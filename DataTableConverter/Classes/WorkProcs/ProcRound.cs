@@ -51,7 +51,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             string[] columns = GetHeaders();
             if (PrepareMultiple(columns, invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))

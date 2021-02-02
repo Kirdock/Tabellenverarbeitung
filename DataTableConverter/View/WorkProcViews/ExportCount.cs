@@ -13,7 +13,7 @@ namespace DataTableConverter.View
         internal string Table;
         private readonly DatabaseHelper DatabaseHelper;
 
-        internal ExportCount(Dictionary<string, string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName = "main")
+        internal ExportCount(Dictionary<string, string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName)
         {
             InitializeComponent();
             DatabaseHelper = databaseHelper;

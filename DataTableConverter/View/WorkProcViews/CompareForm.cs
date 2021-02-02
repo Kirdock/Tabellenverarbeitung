@@ -10,7 +10,7 @@ namespace DataTableConverter.View.WorkProcViews
         internal ProcCompare Procedure;
         private string TableName;
         private readonly DatabaseHelper DatabaseHelper;
-        internal CompareForm(object[] headers, DatabaseHelper databaseHelper, string tableName = "main")
+        internal CompareForm(object[] headers, DatabaseHelper databaseHelper, string tableName)
         {
             InitializeComponent();
             TableName = tableName;

@@ -22,7 +22,7 @@ namespace DataTableConverter.Classes.WorkProcs
         }
 
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             NewColumn = string.IsNullOrEmpty(NewColumn) ? "FTNR" : NewColumn;
             List<string> columnsAliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName);
@@ -92,7 +92,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
 
                     string path = Path.GetDirectoryName(filePath);
-                    invokeForm.ExportHelper.Save(path, tempTable, Path.GetExtension(filePath), invokeForm.FileEncoding, item.Format, sortingOrder, orderType, invokeForm, null, tableName);
+                    invokeForm.ExportHelper.Save(path, tempTable, Path.GetExtension(filePath), invokeForm.FileEncoding, item.Format, sortingOrder, orderType, invokeForm, tableName);
                 }
             }
         }

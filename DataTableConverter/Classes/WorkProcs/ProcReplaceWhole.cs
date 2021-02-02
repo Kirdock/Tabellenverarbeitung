@@ -66,7 +66,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             IEnumerable<DataRow> distinctDataTale = GetFoundRows(invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName));
             invokeForm.DatabaseHelper.ReplaceColumnValues(distinctDataTale, tableName);

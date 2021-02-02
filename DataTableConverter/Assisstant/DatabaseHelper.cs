@@ -1108,7 +1108,7 @@ namespace DataTableConverter.Assisstant
                 command.CommandText = $"SELECT {GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = Properties.Settings.Default.FailAddressValue });
 
-                rowCount = ExportHelper.Save(directory, fileName, null, encoding, Properties.Settings.Default.PVMSaveFormat, order, orderType, invokeForm, command, null, tableName);
+                rowCount = ExportHelper.Save(directory, fileName, null, encoding, Properties.Settings.Default.PVMSaveFormat, order, orderType, invokeForm, tableName, command);
             }
             return rowCount;
         }
@@ -2349,7 +2349,7 @@ namespace DataTableConverter.Assisstant
                 result = command.ExecuteScalar();
                 if (result != null)
                 {
-                    id = (int)result;
+                    id = int.Parse(result.ToString());
                 }
             }
             return result != null;

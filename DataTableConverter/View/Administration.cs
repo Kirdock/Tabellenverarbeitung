@@ -43,7 +43,7 @@ namespace DataTableConverter.View
         private readonly ExportHelper ExportHelper;
         private readonly ImportHelper ImportHelper;
 
-        internal Administration(DatabaseHelper databaseHelper, ExportHelper exportHelper, ImportHelper importHelper, object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, string tableName = "main")
+        internal Administration(DatabaseHelper databaseHelper, ExportHelper exportHelper, ImportHelper importHelper, object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, string tableName)
         {
             InitializeComponent();
             DatabaseHelper = databaseHelper;

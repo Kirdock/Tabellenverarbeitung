@@ -20,7 +20,7 @@ namespace DataTableConverter.Classes.WorkProcs
             NewColumn = newColumn;
         }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             if (!string.IsNullOrWhiteSpace(NewColumn) && !string.IsNullOrWhiteSpace(Column) && SplitText?.Length > 0)
             {

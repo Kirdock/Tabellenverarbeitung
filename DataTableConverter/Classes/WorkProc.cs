@@ -96,6 +96,6 @@ namespace DataTableConverter.Classes
 
         abstract public void RenameHeaders(string oldName, string newName);
         abstract public void RemoveHeader(string colName);
-        abstract public void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main");
+        abstract public void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName);
     }
 }

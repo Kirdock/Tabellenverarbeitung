@@ -21,7 +21,7 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns.Columns.Add("Aktion", typeof(PlusListboxItem.RowMergeState));
         }
 
-        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName = "main")
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             if (!string.IsNullOrWhiteSpace(Identifier))
             {

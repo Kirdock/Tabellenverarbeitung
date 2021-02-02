@@ -48,9 +48,6 @@ namespace DataTableConverter
             }
             set
             {
-                dgTable.RowsAdded -= dgTable_RowsAdded;
-                dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
-                dgTable.RowsAdded += dgTable_RowsAdded;
                 SetPage();
                 LoadData(true, false, true);
             }
@@ -180,20 +177,6 @@ namespace DataTableConverter
         private string GetSorting()
         {
             return SortingOrder;
-        }
-
-        private void EndEdit()
-        {
-            ViewHelper.EndDataGridViewEdit(dgTable);
-        }
-
-        private void ResetPage()
-        {
-            NumPage.ValueChanged -= NumPage_ValueChanged;
-            NumPage.Value = 1;
-            NumPage.ValueChanged += NumPage_ValueChanged;
-            SetPage();
-            dgTable.AllowUserToAddRows = Page == MaxPages;
         }
 
         private void SetWidth()
@@ -510,7 +493,7 @@ namespace DataTableConverter
                             try
                             {
                                 StartLoadingBar();
-                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, GetSorting(), OrderType, this);
+                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, GetSorting(), OrderType, this, TableName);
                                 StopLoadingBar();
                                 DatabaseHelper.SetSavepoint();
                                 LoadData(true);
@@ -590,6 +573,7 @@ namespace DataTableConverter
                 }
                 MaxPages = Math.Ceiling(DatabaseHelper.GetRowCount(TableName) / Properties.Settings.Default.MaxRows);
                 SetPage();
+                CheckAllowToAddRows();
 
                 int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
                 if (!preventLoading)
@@ -633,7 +617,7 @@ namespace DataTableConverter
                         {
                             Thread.CurrentThread.IsBackground = true;
                             string order = GetSorting();
-                            form.Proc.DoWork(ref order, null, null, null, FilePath, contextGlobal, OrderType, this);
+                            form.Proc.DoWork(ref order, null, null, null, FilePath, contextGlobal, OrderType, this, TableName);
                             LoadData(true);
 
                         }
@@ -696,7 +680,7 @@ namespace DataTableConverter
         {
             string newOrder = GetSorting();
 
-            wp.DoWork(ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this);
+            wp.DoWork(ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this, TableName);
 
             SetSorting(newOrder);
         }
@@ -753,7 +737,7 @@ namespace DataTableConverter
         private void Save(string path, SaveFormat format)
         {
             StartLoadingBarCount(RowCount);
-            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(FilePath), FileEncoding, (int)format, GetSorting(), OrderType, this, UpdateLoadingBar) != 0;
+            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(FilePath), FileEncoding, (int)format, GetSorting(), OrderType, this, TableName, UpdateLoadingBar) != 0;
             StopLoadingBar();
             if (saved)
             {
@@ -958,7 +942,13 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal, procedures, workflows, cases, tolerances);
+            string[] aliases = new string[0];
+            try
+            {
+                aliases = DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray();
+            }
+            catch { }
+            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, aliases, contextGlobal, procedures, workflows, cases, tolerances, TableName);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show(this);
         }
@@ -1041,7 +1031,7 @@ namespace DataTableConverter
                 if (formula.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBarCount((Properties.Settings.Default.PVMSaveTwice ? 2 : 1) * RowCount);
-                    new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).DoWork(ref SortingOrder, null, null, null, FilePath, null, OrderType, this);
+                    new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).DoWork(ref SortingOrder, null, null, null, FilePath, null, OrderType, this, TableName);
                     StopLoadingBar();
                     SaveFinished();
                 }
@@ -1055,7 +1045,7 @@ namespace DataTableConverter
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
-                    ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName);
+                    ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName, TableName);
 
                 }
             }
@@ -1080,7 +1070,7 @@ namespace DataTableConverter
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ExportCount export = new ExportCount(DatabaseHelper.GetAliasColumnMapping(TableName), DatabaseHelper))
+            using (ExportCount export = new ExportCount(DatabaseHelper.GetAliasColumnMapping(TableName), DatabaseHelper, TableName))
             {
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1390,7 +1380,7 @@ namespace DataTableConverter
 
         private void spaltenVergleichenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (CompareForm form = new CompareForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), DatabaseHelper))
+            using (CompareForm form = new CompareForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), DatabaseHelper, TableName))
             {
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
@@ -1581,6 +1571,13 @@ namespace DataTableConverter
                     LoadData(true);
                 }
             }
+        }
+
+        private void CheckAllowToAddRows()
+        {
+            dgTable.RowsAdded -= dgTable_RowsAdded;
+            dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
+            dgTable.RowsAdded += dgTable_RowsAdded;
         }
     }
 }

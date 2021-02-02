@@ -248,13 +248,13 @@ namespace DataTableConverter
             return error;
         }
 
-        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, string order, OrderType orderType, Form invokeForm, System.Action updateLoadingBar = null, string tableName = "main", string orderColumnName = null)
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, string order, OrderType orderType, Form invokeForm, string tableName, System.Action updateLoadingBar = null, string orderColumnName = null)
         {
             SQLiteCommand command = orderColumnName == string.Empty ? DatabaseHelper.GetDataCommand(tableName, order, orderType) : DatabaseHelper.GetDataCommand(tableName, order, orderType, orderColumnName);
-            return Save(directory, fileName, oldFileExtension, encoding, format, order, orderType, invokeForm, command, updateLoadingBar, tableName);
+            return Save(directory, fileName, oldFileExtension, encoding, format, order, orderType, invokeForm, tableName, command, updateLoadingBar);
         }
 
-        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, string order, OrderType orderType, Form invokeForm, SQLiteCommand command, System.Action updateLoadingBar = null, string tableName = "main")
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, string order, OrderType orderType, Form invokeForm, string tableName, SQLiteCommand command, System.Action updateLoadingBar = null)
         {
             int rowCount = 0;
             if (command == null)
@@ -821,7 +821,7 @@ namespace DataTableConverter
         /// <param name="mainForm"></param>
         /// <param name="continuedNumberColumn"></param>
         /// <param name="tableName"></param>
-        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, System.Action stopLoadingBar, System.Action saveFinished, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName = "main")
+        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, System.Action stopLoadingBar, System.Action saveFinished, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName)
         {
             new Thread(() =>
             {
@@ -856,7 +856,7 @@ namespace DataTableConverter
 
                     foreach (string[] tableInfo in dict.Values.Distinct())
                     {
-                        Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, item.Format, order, orderType, mainForm, null, tableInfo[0], continuedNumberColumn);
+                        Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, item.Format, order, orderType, mainForm, tableInfo[0], null, continuedNumberColumn);
                     }
                 }
                 stopLoadingBar.Invoke();
