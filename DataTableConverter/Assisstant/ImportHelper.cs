@@ -372,7 +372,7 @@ namespace DataTableConverter.Assisstant
                             object[] values = new object[reader.FieldCount];
                             for (int i = 0; i < reader.FieldCount; ++i)
                             {
-                                values[i] = reader.GetString(i).Replace("\n", string.Empty); //remove new lines in dbase
+                                values[i] = reader.GetValue(i).ToString().Replace("\n", string.Empty); //remove new lines in dbase
                             }
                             DatabaseHelper.InsertRow(columnNames, values, tableName);
                         }
