@@ -48,8 +48,6 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             DuplicateColumns = GetHeaders();
-            Hashtable hTable = new Hashtable();
-            Hashtable totalTable = new Hashtable();
 
             int[] subStringBegin = duplicateCase.getBeginSubstring();
             int[] subStringEnd = duplicateCase.getEndSubstring();
@@ -126,27 +124,27 @@ namespace DataTableConverter.Classes.WorkProcs
         private string GetColumnsAsObjectArray(SQLiteDataReader reader, int[] subStringBegin, int[] subStringEnd, List<Tolerance> tolerances)
         {
             StringBuilder res = new StringBuilder();
+            
             for (int i = 1; i < reader.FieldCount; i++)
             {
                 #region Set Tolerances
-                StringBuilder result = new StringBuilder(reader.GetString(i).ToLower());
+                string result = reader.GetString(i).ToLower();
                 if (tolerances != null)
                 {
                     foreach (Tolerance tol in tolerances)
                     {
-                        List<string> array = new List<string>(tol.getColumnsAsArrayToLower()) { tol.Name }.Distinct().ToList();
-                        string replaceWith = array.Contains(string.Empty) ? string.Empty : tol.Name;
+                        List<string> array = new List<string>(tol.getColumnsAsArrayToLower()).Distinct().ToList();
+                        string replaceWith = array.Contains(string.Empty) ? string.Empty : array.First();
                         array.Remove(string.Empty);
 
                         foreach (string t in array)
                         {
-                            result.Replace(t, replaceWith);
+                            string pattern = @"(?<=^|[\s>])" + System.Text.RegularExpressions.Regex.Escape(t) + @"(?!\w)";
+                            result = System.Text.RegularExpressions.Regex.Replace(result.ToString(), pattern, replaceWith);
                         }
                     }
                 }
                 #endregion
-
-                string resultString = result.ToString();
 
                 #region Set Substring
                 if (subStringBegin != null)
@@ -155,24 +153,24 @@ namespace DataTableConverter.Classes.WorkProcs
                     int end = subStringEnd[i-1];
                     if (begin != 0 && end != 0 && end >= begin)
                     {
-                        if (begin - 1 > resultString.Length)
+                        if (begin - 1 > result.Length)
                         {
-                            resultString = string.Empty;
+                            result = string.Empty;
                         }
                         else
                         {
                             int count = end - begin + 1;
-                            if (begin + count > resultString.Length)
+                            if (begin + count > result.Length)
                             {
-                                count = resultString.Length - begin + 1;
+                                count = result.Length - begin + 1;
                             }
-                            resultString = resultString.Substring(begin - 1, count);
+                            result = result.Substring(begin - 1, count);
                         }
                     }
                 }
                 #endregion
 
-                res.Append("|").Append(resultString);
+                res.Append("|").Append(result);
             }
             return res.ToString();
         }

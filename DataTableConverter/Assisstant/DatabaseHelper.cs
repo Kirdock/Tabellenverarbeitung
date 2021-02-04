@@ -234,7 +234,7 @@ namespace DataTableConverter.Assisstant
             List<string> aliases = new List<string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT alias from [{tableName + MetaTableAffix}] order by sortorder asc";
+                command.CommandText = $"SELECT alias from [{tableName + MetaTableAffix}] where alias is not null order by sortorder asc";
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
