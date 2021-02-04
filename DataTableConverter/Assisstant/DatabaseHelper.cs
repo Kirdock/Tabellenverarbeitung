@@ -812,15 +812,18 @@ namespace DataTableConverter.Assisstant
         internal DataTable GetData(string tableName, int offset = 0)
         {
             DataTable dt = new DataTable();
-            string headerString = string.Join(",", GetSortedHeadersIncludeAsAlias(tableName));
-
-            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            List<string> headers = GetSortedHeadersIncludeAsAlias(tableName);
+            if (headers.Count != 0)
             {
-                command.CommandText = $"SELECT {headerString} FROM [{tableName}] LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}";
-                SQLiteDataAdapter sqlda = new SQLiteDataAdapter(command);
-                sqlda.Fill(dt);
-            }
+                string headerString = string.Join(",", headers);
 
+                using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+                {
+                    command.CommandText = $"SELECT {headerString} FROM [{tableName}] LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}";
+                    SQLiteDataAdapter sqlda = new SQLiteDataAdapter(command);
+                    sqlda.Fill(dt);
+                }
+            }
             return dt;
         }
 

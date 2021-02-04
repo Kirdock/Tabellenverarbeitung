@@ -48,6 +48,17 @@ namespace DataTableConverter.View
             SetFileName(Path.GetFileName(path));
         }
 
+        private void TextFormat_Load(object sender, EventArgs e)
+        {
+            LoadPresets();
+            LoadHeaderPresets();
+            cmbVariant.SelectedIndex = 0;
+            adjustSettingsDataGrid();
+            dgvSetting.CellValueChanged += new DataGridViewCellEventHandler(dgvSetting_CellValueChanged);
+            loadSettings();
+            cmbEncoding.SelectedIndexChanged += (sender2, e2) => cmbEncoding_SelectedIndexChanged(sender2, e2);
+        }
+
         private void SetFileName(string fileName)
         {
             LblFileName.Text = fileName;
@@ -94,21 +105,8 @@ namespace DataTableConverter.View
             }
         }
 
-        private void TextFormat_Load(object sender, EventArgs e)
-        {
-            LoadPresets();
-            LoadHeaderPresets();
-            cmbVariant.SelectedIndex = 0;
-            adjustSettingsDataGrid();
-            dgvSetting.CellValueChanged += new DataGridViewCellEventHandler(dgvSetting_CellValueChanged);
-            loadSettings();
-            radioButton_CheckedChanged(null, null);
-            cmbEncoding.SelectedIndexChanged += (sender2, e2) => cmbEncoding_SelectedIndexChanged(sender2, e2);
-        }
-
         private void cmbEncoding_SelectedIndexChanged(object sender, EventArgs e)
         {
-            radioButton_CheckedChanged(null, null);
             CheckEncoding((int)cmbEncoding.SelectedValue);
         }
 
@@ -127,6 +125,7 @@ namespace DataTableConverter.View
             {
                 Separators = new List<string> { txtSeparator.Text };
             }
+
             txtBegin.Text = Properties.Settings.Default.TextBegin;
             txtEnd.Text = Properties.Settings.Default.TextEnd;
             cbTakeOver.Checked = Properties.Settings.Default.TakeOverAllFiles;
@@ -134,6 +133,7 @@ namespace DataTableConverter.View
             rbTab.Checked = radioSelected == 0;
             rbSep.Checked = radioSelected == 1;
             rbBetween.Checked = radioSelected == 2;
+            radioButton_CheckedChanged(null, null);
         }
 
         private void adjustSettingsDataGrid()
@@ -212,13 +212,13 @@ namespace DataTableConverter.View
         {
             gbFixed.Visible = rbFixed.Checked;
             gbSeparated.Visible = rbSeparated.Checked;
-            if (rbSeparated.Checked)
+            if (!rbSeparated.Checked)
             {
-                radioButton2_CheckedChanged(null, null);
+                dgvSetting_CellValueChanged(null, null);
             }
             else
             {
-                dgvSetting_CellValueChanged(null, null);
+                dgvPreview.DataSource = null;
             }
         }
 
@@ -291,8 +291,11 @@ namespace DataTableConverter.View
             // sync preview
             ViewHelper.EndDataGridViewEdit(dgvSetting);
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            ImportHelper.OpenTextFixed(TableName, path, values, headers, (cmbEncoding.SelectedItem as NewEncodingInfo).CodePage, true, null, this);
-            dgvPreview.DataSource = DatabaseHelper.GetData(TableName);
+            bool created = ImportHelper.OpenTextFixed(TableName, path, values, headers, (cmbEncoding.SelectedItem as NewEncodingInfo).CodePage, true, null, this);
+            if (created)
+            {
+                dgvPreview.DataSource = DatabaseHelper.GetData(TableName);
+            }
         }
 
         private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)
@@ -607,19 +610,6 @@ namespace DataTableConverter.View
             ViewHelper.InsertClipboardToDataGridView((DataGridView)sender, selectedRow, this, dgvSetting_CellValidating, dgvSetting_CellValueChanged);
         }
 
-        private void txtBegin_TextChanged(object sender, EventArgs e)
-        {
-            if (checkBetweenText())
-            {
-                ImportHelper.OpenTextBetween(TableName, path, getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, GetHeaders(), true, null, this);
-                dgvPreview.DataSource = DatabaseHelper.GetData(TableName);
-            }
-            else
-            {
-                dgvPreview.DataSource = null;
-            }
-        }
-
         private bool checkBetweenText()
         {
             return txtBegin.Text.Length > 0 && txtEnd.Text.Length > 0;
@@ -824,6 +814,11 @@ namespace DataTableConverter.View
         private void dgvPreview_ColumnAdded(object sender, DataGridViewColumnEventArgs e)
         {
             e.Column.FillWeight = 10;
+        }
+
+        private void btnSyncPreview_Click(object sender, EventArgs e)
+        {
+            radioButton2_CheckedChanged(null, null);
         }
     }
 

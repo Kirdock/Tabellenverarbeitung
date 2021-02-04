@@ -99,7 +99,7 @@ namespace DataTableConverter.Assisstant
                     {
                         OpenTextFixed(tableName, file, settings.Values, settings.Headers, settings.CodePage, false, progressBar, mainForm);
                     }
-                    else if (settings.Separators.Count > 0)
+                    else if (settings.Separators?.Count > 0)
                     {
                         OpenText(tableName, file, settings.Separators, settings.CodePage, settings.ContainsHeaders, settings.Headers.ToArray(), false, progressBar, mainForm);
                     }
@@ -184,7 +184,6 @@ namespace DataTableConverter.Assisstant
 
         internal void OpenText(string tableName, string path, List<string> separators, int codePage, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
-
             try
             {
                 int skip = 0;
@@ -231,6 +230,7 @@ namespace DataTableConverter.Assisstant
                     .Select(x => x.Split(separators.ToArray(), StringSplitOptions.None));
 
             progressBar?.StartLoadingBar(enumerableArray.Count(), mainForm);
+            SQLiteCommand insertCommand = null;
             foreach (string[] line in enumerableArray)
             {
                 string[] values = line.Select(ln => ln.Trim()).ToArray();
@@ -243,7 +243,7 @@ namespace DataTableConverter.Assisstant
                     //colName = DatabaseHelper.AddColumnsWithAdditionalIfExists()  //adjust it for this case
                     headers.Add(colName);
                 }
-                DatabaseHelper.InsertRow(headers, values, tableName);
+                insertCommand = DatabaseHelper.InsertRow(headers, values, tableName, insertCommand);
                 progressBar?.UpdateLoadingBar(mainForm);
             }
         }
@@ -266,27 +266,30 @@ namespace DataTableConverter.Assisstant
                     newHeaders = headers.Cast<string>().ToList();
                     DatabaseHelper.CreateTable(newHeaders, tableName);
                 }
-
-                IEnumerable<string> eLines = File.ReadLines(path, Encoding.GetEncoding(codePage));
-                if (isPreview)
+                if (newHeaders.Count != 0)
                 {
-                    eLines = eLines.Take(PreviewRows);
-                }
-
-                string[] lines = eLines.Skip(skip).ToArray();
-                progressBar?.StartLoadingBar(lines.Length, mainForm);
-
-                foreach (string line in lines)
-                {
-                    string[] values = createRow(line, begin, end);
-                    while (values.Length > newHeaders.Count)
+                    SQLiteCommand insertCommand = null;
+                    IEnumerable<string> eLines = File.ReadLines(path, Encoding.GetEncoding(codePage));
+                    if (isPreview)
                     {
-                        string colName = "Spalte" + newHeaders.Count;
-                        DatabaseHelper.AddColumn(tableName, colName);
-                        newHeaders.Add(colName);
+                        eLines = eLines.Take(PreviewRows);
                     }
-                    progressBar?.UpdateLoadingBar(mainForm);
-                    DatabaseHelper.InsertRow(newHeaders, values, tableName);
+
+                    string[] lines = eLines.Skip(skip).ToArray();
+                    progressBar?.StartLoadingBar(lines.Length, mainForm);
+
+                    foreach (string line in lines)
+                    {
+                        string[] values = createRow(line, begin, end);
+                        while (values.Length > newHeaders.Count)
+                        {
+                            string colName = "Spalte" + newHeaders.Count;
+                            DatabaseHelper.AddColumn(tableName, colName);
+                            newHeaders.Add(colName);
+                        }
+                        progressBar?.UpdateLoadingBar(mainForm);
+                        insertCommand = DatabaseHelper.InsertRow(values.Length < newHeaders.Count ? newHeaders.Take(values.Length) : newHeaders, values, tableName, insertCommand);
+                    }
                 }
             }
             catch (IOException)
@@ -330,6 +333,56 @@ namespace DataTableConverter.Assisstant
                 }
                 return row.ToArray();
             }
+        }
+
+        internal bool OpenTextFixed(string tableName, string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar, Form mainForm)
+        {
+            if (header == null || config == null || header.Count == 0 || config.Count == 0)
+            {
+                return false;
+            }
+            try
+            {
+                DatabaseHelper.CreateTable(header, tableName);
+                SQLiteCommand insertCommand = null;
+                using (StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding)))
+                {
+                    FileInfo info = new FileInfo(path);
+                    progressBar?.StartLoadingBar((int)(info.Length / config.Sum()), mainForm);
+
+                    long rowCount = 0;
+                    while (!stream.EndOfStream && (!isPreview || rowCount < 3))
+                    {
+                        Dictionary<string, string> row = new Dictionary<string, string>();
+                        //string[] itemArray = new string[header.Count];
+
+                        for (int i = 0; i < config.Count && !stream.EndOfStream; i++)
+                        {
+                            char[] body = new char[config[i]];
+
+                            for (int index = 0; index < config[i] && stream.Peek() != -1; index++)
+                            {
+                                body[index] = (char)stream.Read();
+                            }
+                            row.Add(header[i], new string(body).Trim());
+                        }
+                        progressBar?.UpdateLoadingBar(mainForm);
+                        insertCommand = DatabaseHelper.InsertRow(row, tableName, insertCommand);
+                        rowCount++;
+
+                        int charCode;
+                        while ((charCode = stream.Peek()) == '\r' || charCode == '\n')
+                        {
+                            stream.Read(); //stream.BaseStream.seek(2,SeekOrigin.Current) does not work; \r\n is still being read even if stream.BaseStream.Position is changed
+                        }
+                    }
+                }
+            }
+            catch (IOException)
+            {
+                mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm verwendet und kann nicht geöffnet werden.");
+            }
+            return true;
         }
 
         private int RenameColumn(DataTable dt, string column, int counter)
@@ -378,14 +431,6 @@ namespace DataTableConverter.Assisstant
                         }
                     }
                 }
-            }
-        }
-
-        private void FillDataTableNewRow(DataRowChangeEventArgs e, ProgressBar progressBar, Form mainForm)
-        {
-            if (e.Action == DataRowAction.Add)
-            {
-                progressBar?.UpdateLoadingBar(mainForm);
             }
         }
 
@@ -881,56 +926,6 @@ namespace DataTableConverter.Assisstant
             return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
         }
         #endregion
-
-        internal void OpenTextFixed(string tableName, string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar, Form mainForm)
-        {
-            if (header == null || config == null || header.Count == 0 || config.Count == 0)
-            {
-                return;
-            }
-            try
-            {
-                DatabaseHelper.CreateTable(header.ToArray(), tableName);
-
-
-
-                StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding));
-                FileInfo info = new FileInfo(path);
-                progressBar?.StartLoadingBar((int)(info.Length / config.Sum()), mainForm);
-
-                long rowCount = 0;
-                while (!stream.EndOfStream && (!isPreview || rowCount < 3))
-                {
-                    Dictionary<string, string> row = new Dictionary<string, string>();
-                    //string[] itemArray = new string[header.Count];
-
-                    for (int i = 0; i < config.Count && !stream.EndOfStream; i++)
-                    {
-                        char[] body = new char[config[i]];
-
-                        for (int index = 0; index < config[i] && stream.Peek() != -1; index++)
-                        {
-                            body[index] = (char)stream.Read();
-                        }
-                        row.Add(header[i], new string(body));
-                    }
-                    progressBar?.UpdateLoadingBar(mainForm);
-                    DatabaseHelper.InsertRow(row, tableName);
-                    rowCount++;
-
-                    int charCode;
-                    while ((charCode = stream.Peek()) == '\r' || charCode == '\n')
-                    {
-                        stream.Read(); //stream.BaseStream.seek(2,SeekOrigin.Current) does not work; \r\n is still being read even if stream.BaseStream.Position is changed
-                    }
-                }
-                stream.Close();
-            }
-            catch (IOException)
-            {
-                mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei wird zurzeit von einem anderen Programm verwendet und kann nicht geöffnet werden.");
-            }
-        }
 
         internal List<Proc> LoadProcedures(Form mainForm)
         {

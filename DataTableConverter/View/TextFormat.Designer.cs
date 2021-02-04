@@ -32,6 +32,7 @@
             this.rbSeparated = new System.Windows.Forms.RadioButton();
             this.rbFixed = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.LblCodePageMessage = new System.Windows.Forms.Label();
             this.cbTakeOver = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cmbEncoding = new System.Windows.Forms.ComboBox();
@@ -73,7 +74,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.LblFileName = new System.Windows.Forms.ToolStripStatusLabel();
-            this.LblCodePageMessage = new System.Windows.Forms.Label();
+            this.btnSyncPreview = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
@@ -126,6 +127,17 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Art";
             // 
+            // LblCodePageMessage
+            // 
+            this.LblCodePageMessage.AutoSize = true;
+            this.LblCodePageMessage.ForeColor = System.Drawing.Color.Red;
+            this.LblCodePageMessage.Location = new System.Drawing.Point(12, 80);
+            this.LblCodePageMessage.Name = "LblCodePageMessage";
+            this.LblCodePageMessage.Size = new System.Drawing.Size(287, 13);
+            this.LblCodePageMessage.TabIndex = 5;
+            this.LblCodePageMessage.Text = "Die CodePage entspricht nicht der festgestellten CodePage";
+            this.LblCodePageMessage.Visible = false;
+            // 
             // cbTakeOver
             // 
             this.cbTakeOver.AutoSize = true;
@@ -159,6 +171,7 @@
             this.gbSeparated.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbSeparated.Controls.Add(this.btnSyncPreview);
             this.gbSeparated.Controls.Add(this.BtnEditSeparators);
             this.gbSeparated.Controls.Add(this.btnHeaderRename);
             this.gbSeparated.Controls.Add(this.btnHeaderSave);
@@ -273,7 +286,6 @@
             this.cbContainsHeaders.TabIndex = 10;
             this.cbContainsHeaders.Text = "Überschrift in erster Zeile";
             this.cbContainsHeaders.UseVisualStyleBackColor = true;
-            this.cbContainsHeaders.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // label4
             // 
@@ -290,7 +302,6 @@
             this.txtEnd.Name = "txtEnd";
             this.txtEnd.Size = new System.Drawing.Size(63, 20);
             this.txtEnd.TabIndex = 8;
-            this.txtEnd.TextChanged += new System.EventHandler(this.txtBegin_TextChanged);
             // 
             // label3
             // 
@@ -307,7 +318,6 @@
             this.txtBegin.Name = "txtBegin";
             this.txtBegin.Size = new System.Drawing.Size(63, 20);
             this.txtBegin.TabIndex = 6;
-            this.txtBegin.TextChanged += new System.EventHandler(this.txtBegin_TextChanged);
             // 
             // rbBetween
             // 
@@ -319,7 +329,6 @@
             this.rbBetween.TabStop = true;
             this.rbBetween.Text = "Eingeschlossen in:";
             this.rbBetween.UseVisualStyleBackColor = true;
-            this.rbBetween.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // rbSep
             // 
@@ -332,7 +341,6 @@
             this.rbSep.TabStop = true;
             this.rbSep.Text = "Trennzeichen:";
             this.rbSep.UseVisualStyleBackColor = true;
-            this.rbSep.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // rbTab
             // 
@@ -343,7 +351,6 @@
             this.rbTab.TabIndex = 3;
             this.rbTab.Text = "Tabstopp";
             this.rbTab.UseVisualStyleBackColor = true;
-            this.rbTab.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // btnAcceptSeparate
             // 
@@ -361,7 +368,6 @@
             this.txtSeparator.Name = "txtSeparator";
             this.txtSeparator.Size = new System.Drawing.Size(100, 20);
             this.txtSeparator.TabIndex = 0;
-            this.txtSeparator.TextChanged += new System.EventHandler(this.txtSeparator_TextChanged);
             // 
             // gbFixed
             // 
@@ -560,16 +566,15 @@
             this.LblFileName.Size = new System.Drawing.Size(31, 17);
             this.LblFileName.Text = "Pfad";
             // 
-            // LblCodePageMessage
+            // btnSyncPreview
             // 
-            this.LblCodePageMessage.AutoSize = true;
-            this.LblCodePageMessage.ForeColor = System.Drawing.Color.Red;
-            this.LblCodePageMessage.Location = new System.Drawing.Point(12, 80);
-            this.LblCodePageMessage.Name = "LblCodePageMessage";
-            this.LblCodePageMessage.Size = new System.Drawing.Size(287, 13);
-            this.LblCodePageMessage.TabIndex = 5;
-            this.LblCodePageMessage.Text = "Die CodePage entspricht nicht der festgestellten CodePage";
-            this.LblCodePageMessage.Visible = false;
+            this.btnSyncPreview.Location = new System.Drawing.Point(9, 245);
+            this.btnSyncPreview.Name = "btnSyncPreview";
+            this.btnSyncPreview.Size = new System.Drawing.Size(136, 23);
+            this.btnSyncPreview.TabIndex = 19;
+            this.btnSyncPreview.Text = "Vorschau aktualisieren";
+            this.btnSyncPreview.UseVisualStyleBackColor = true;
+            this.btnSyncPreview.Click += new System.EventHandler(this.btnSyncPreview_Click);
             // 
             // TextFormat
             // 
@@ -653,5 +658,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel LblFileName;
         private System.Windows.Forms.Label LblCodePageMessage;
+        private System.Windows.Forms.Button btnSyncPreview;
     }
 }
