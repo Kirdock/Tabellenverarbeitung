@@ -445,12 +445,13 @@ namespace DataTableConverter.Assisstant
                 using (OleDbCommand command = con.CreateCommand())
                 {
                     command.CommandText = $@"select * from [{ shortPath}]";
+                    SQLiteCommand insertCommand = null;
                     using (OleDbDataReader reader = command.ExecuteReader())
                     {
                         string[] columnNames = new string[reader.FieldCount];
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            columnNames[i] = reader.GetName(i);
+                            columnNames[i] = reader.GetName(i).Trim();
                         }
                         DatabaseHelper.CreateTable(columnNames, tableName);
                         while (reader.Read())
@@ -458,9 +459,10 @@ namespace DataTableConverter.Assisstant
                             object[] values = new object[reader.FieldCount];
                             for (int i = 0; i < reader.FieldCount; ++i)
                             {
-                                values[i] = reader.GetValue(i).ToString().Replace("\n", string.Empty); //remove new lines in dbase
+                                values[i] = reader.GetValue(i).ToString().Replace("\n", string.Empty).Trim(); //remove new lines in dbase
                             }
-                            DatabaseHelper.InsertRow(columnNames, values, tableName);
+                            insertCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, insertCommand);
+                            progressBar?.UpdateLoadingBar(mainForm);
                         }
                     }
                 }
