@@ -283,7 +283,7 @@ namespace DataTableConverter.View
         private void btnAcceptFixed_Click(object sender, EventArgs e)
         {
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            ImportSettings = new ImportSettings(values, headers, getCodePage());
+            ImportSettings = new ImportSettings(values, headers, getCodePage(), CBFixedHasRowBreak.Checked);
         }
 
         private void dgvSetting_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -291,7 +291,7 @@ namespace DataTableConverter.View
             // sync preview
             ViewHelper.EndDataGridViewEdit(dgvSetting);
             getDataGridViewItems(out List<int> values, out List<string> headers);
-            bool created = ImportHelper.OpenTextFixed(TableName, path, values, headers, (cmbEncoding.SelectedItem as NewEncodingInfo).CodePage, true, null, this);
+            bool created = ImportHelper.OpenTextFixed(TableName, path, values, headers, (cmbEncoding.SelectedItem as NewEncodingInfo).CodePage, true, CBFixedHasRowBreak.Checked, null, this);
             if (created)
             {
                 dgvPreview.DataSource = DatabaseHelper.GetData(TableName);
@@ -367,7 +367,8 @@ namespace DataTableConverter.View
                     {
                         Encoding = (int)cmbEncoding.SelectedValue,
                         Table = (dgvSetting.DataSource as DataTable),
-                        Variant = cmbVariant.SelectedIndex
+                        Variant = cmbVariant.SelectedIndex,
+                        HasRowBreak = CBFixedHasRowBreak.Checked
                     };
                     ExportHelper.SaveTextImportTemplate(template, path);
                     LoadPresets();
@@ -379,7 +380,7 @@ namespace DataTableConverter.View
         {
             if (cmbPresets.SelectedIndex != -1)
             {
-                string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem.ToString()}.bin");
+                string path = Path.Combine(ExportHelper.ProjectPresets, $"{cmbPresets.SelectedItem}.bin");
                 if (File.Exists(path))
                 {
                     TextImportTemplate template = ImportHelper.LoadTextImportTemplate(path);
@@ -387,6 +388,9 @@ namespace DataTableConverter.View
                     {
                         cmbVariant.SelectedIndex = template.Variant;
                         cmbEncoding.SelectedValue = template.Encoding;
+                        CBFixedHasRowBreak.CheckedChanged -= CBFixedHasRowBreak_CheckedChanged;
+                        CBFixedHasRowBreak.Checked = template.HasRowBreak;
+                        CBFixedHasRowBreak.CheckedChanged += CBFixedHasRowBreak_CheckedChanged;
 
                         dgvSetting.DataSource = template.Table;
                         SetSortMode();
@@ -819,6 +823,11 @@ namespace DataTableConverter.View
         private void btnSyncPreview_Click(object sender, EventArgs e)
         {
             radioButton2_CheckedChanged(null, null);
+        }
+
+        private void CBFixedHasRowBreak_CheckedChanged(object sender, EventArgs e)
+        {
+            dgvSetting_CellValueChanged(null, null);
         }
     }
 

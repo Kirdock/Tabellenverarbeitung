@@ -28,6 +28,7 @@ namespace DataTableConverter.Classes
         public string EndSeparator;
         public SelectedSeparatedState SelectedSeparated;
         public int Variant;
+        public bool HasRowBreak;
 
         internal TextImportTemplate() { }
     }

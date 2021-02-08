@@ -37,6 +37,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cmbEncoding = new System.Windows.Forms.ComboBox();
             this.gbSeparated = new System.Windows.Forms.GroupBox();
+            this.btnSyncPreview = new System.Windows.Forms.Button();
             this.BtnEditSeparators = new System.Windows.Forms.Button();
             this.btnHeaderRename = new System.Windows.Forms.Button();
             this.btnHeaderSave = new System.Windows.Forms.Button();
@@ -74,7 +75,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.LblFileName = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnSyncPreview = new System.Windows.Forms.Button();
+            this.CBFixedHasRowBreak = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
@@ -197,6 +198,16 @@
             this.gbSeparated.TabStop = false;
             this.gbSeparated.Text = "Getrennt";
             this.gbSeparated.Visible = false;
+            // 
+            // btnSyncPreview
+            // 
+            this.btnSyncPreview.Location = new System.Drawing.Point(9, 245);
+            this.btnSyncPreview.Name = "btnSyncPreview";
+            this.btnSyncPreview.Size = new System.Drawing.Size(136, 23);
+            this.btnSyncPreview.TabIndex = 19;
+            this.btnSyncPreview.Text = "Vorschau aktualisieren";
+            this.btnSyncPreview.UseVisualStyleBackColor = true;
+            this.btnSyncPreview.Click += new System.EventHandler(this.btnSyncPreview_Click);
             // 
             // BtnEditSeparators
             // 
@@ -374,6 +385,7 @@
             this.gbFixed.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbFixed.Controls.Add(this.CBFixedHasRowBreak);
             this.gbFixed.Controls.Add(this.groupBox3);
             this.gbFixed.Controls.Add(this.cmbVariant);
             this.gbFixed.Controls.Add(this.btnAcceptFixed);
@@ -456,7 +468,7 @@
             this.cmbVariant.Items.AddRange(new object[] {
             "Länge",
             "Bereich"});
-            this.cmbVariant.Location = new System.Drawing.Point(103, 19);
+            this.cmbVariant.Location = new System.Drawing.Point(73, 19);
             this.cmbVariant.Name = "cmbVariant";
             this.cmbVariant.Size = new System.Drawing.Size(121, 21);
             this.cmbVariant.TabIndex = 6;
@@ -566,15 +578,16 @@
             this.LblFileName.Size = new System.Drawing.Size(31, 17);
             this.LblFileName.Text = "Pfad";
             // 
-            // btnSyncPreview
+            // CBFixedHasRowBreak
             // 
-            this.btnSyncPreview.Location = new System.Drawing.Point(9, 245);
-            this.btnSyncPreview.Name = "btnSyncPreview";
-            this.btnSyncPreview.Size = new System.Drawing.Size(136, 23);
-            this.btnSyncPreview.TabIndex = 19;
-            this.btnSyncPreview.Text = "Vorschau aktualisieren";
-            this.btnSyncPreview.UseVisualStyleBackColor = true;
-            this.btnSyncPreview.Click += new System.EventHandler(this.btnSyncPreview_Click);
+            this.CBFixedHasRowBreak.AutoSize = true;
+            this.CBFixedHasRowBreak.Location = new System.Drawing.Point(202, 21);
+            this.CBFixedHasRowBreak.Name = "CBFixedHasRowBreak";
+            this.CBFixedHasRowBreak.Size = new System.Drawing.Size(222, 17);
+            this.CBFixedHasRowBreak.TabIndex = 9;
+            this.CBFixedHasRowBreak.Text = "Zeilen sind getrennt durch Zeilenumbruch";
+            this.CBFixedHasRowBreak.UseVisualStyleBackColor = true;
+            this.CBFixedHasRowBreak.CheckedChanged += new System.EventHandler(this.CBFixedHasRowBreak_CheckedChanged);
             // 
             // TextFormat
             // 
@@ -582,8 +595,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 576);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.gbFixed);
+            this.Controls.Add(this.gbSeparated);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.MinimumSize = new System.Drawing.Size(816, 615);
@@ -659,5 +672,6 @@
         private System.Windows.Forms.ToolStripStatusLabel LblFileName;
         private System.Windows.Forms.Label LblCodePageMessage;
         private System.Windows.Forms.Button btnSyncPreview;
+        private System.Windows.Forms.CheckBox CBFixedHasRowBreak;
     }
 }

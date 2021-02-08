@@ -97,7 +97,7 @@ namespace DataTableConverter.Assisstant
 
                     if (settings.Values != null)
                     {
-                        OpenTextFixed(tableName, file, settings.Values, settings.Headers, settings.CodePage, false, progressBar, mainForm);
+                        OpenTextFixed(tableName, file, settings.Values, settings.Headers, settings.CodePage, false, settings.HasRowBreaks, progressBar, mainForm);
                     }
                     else if (settings.Separators?.Count > 0)
                     {
@@ -335,7 +335,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal bool OpenTextFixed(string tableName, string path, List<int> config, List<string> header, int encoding, bool isPreview, ProgressBar progressBar, Form mainForm)
+        internal bool OpenTextFixed(string tableName, string path, List<int> config, List<string> header, int encoding, bool isPreview, bool hasRowBreaks, ProgressBar progressBar, Form mainForm)
         {
             if (header == null || config == null || header.Count == 0 || config.Count == 0)
             {
@@ -345,35 +345,68 @@ namespace DataTableConverter.Assisstant
             {
                 DatabaseHelper.CreateTable(header, tableName);
                 SQLiteCommand insertCommand = null;
-                using (StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding)))
+                if (hasRowBreaks)
                 {
-                    FileInfo info = new FileInfo(path);
-                    progressBar?.StartLoadingBar((int)(info.Length / config.Sum()), mainForm);
-
-                    long rowCount = 0;
-                    while (!stream.EndOfStream && (!isPreview || rowCount < 3))
+                    IEnumerable<string> eLines = File.ReadLines(path, Encoding.GetEncoding(encoding));
+                    if (isPreview)
+                    {
+                        eLines = eLines.Take(3);
+                    }
+                    progressBar?.StartLoadingBar(eLines.Count(), mainForm);
+                    int countBefore = 0;
+                    foreach (string line in eLines)
                     {
                         Dictionary<string, string> row = new Dictionary<string, string>();
                         //string[] itemArray = new string[header.Count];
-
-                        for (int i = 0; i < config.Count && !stream.EndOfStream; i++)
+                        int index = 0;
+                        for (int i = 0; i < config.Count; i++)
                         {
-                            char[] body = new char[config[i]];
-
-                            for (int index = 0; index < config[i] && stream.Peek() != -1; index++)
+                            int length = config[i];
+                            if (index + config[i] > line.Length)
                             {
-                                body[index] = (char)stream.Read();
+                                row.Add(header[i], line.Substring(index, line.Length - index));
+                                i = config.Count;
                             }
-                            row.Add(header[i], new string(body).Trim());
+                            else
+                            {
+                                row.Add(header[i], line.Substring(index, length));
+                                index += config[i];
+                            }
                         }
                         progressBar?.UpdateLoadingBar(mainForm);
-                        insertCommand = DatabaseHelper.InsertRow(row, tableName, insertCommand);
-                        rowCount++;
-
-                        int charCode;
-                        while ((charCode = stream.Peek()) == '\r' || charCode == '\n')
+                        if(row.Count != countBefore)
                         {
-                            stream.Read(); //stream.BaseStream.seek(2,SeekOrigin.Current) does not work; \r\n is still being read even if stream.BaseStream.Position is changed
+                            insertCommand = null;
+                        }
+                        insertCommand = DatabaseHelper.InsertRow(row, tableName, insertCommand);
+                        countBefore = row.Count;
+                    }
+                }
+                else
+                {
+                    using (StreamReader stream = new StreamReader(path, Encoding.GetEncoding(encoding)))
+                    {
+                        FileInfo info = new FileInfo(path);
+                        progressBar?.StartLoadingBar((int)(info.Length / config.Sum()), mainForm);
+
+                        long rowCount = 0;
+                        while (!stream.EndOfStream && (!isPreview || rowCount < 3))
+                        {
+                            Dictionary<string, string> row = new Dictionary<string, string>();
+
+                            for (int i = 0; i < config.Count && !stream.EndOfStream; i++)
+                            {
+                                char[] body = new char[config[i]];
+
+                                for (int index = 0; index < config[i] && stream.Peek() != -1; index++)
+                                {
+                                    body[index] = (char)stream.Read();
+                                }
+                                row.Add(header[i], new string(body).Trim());
+                            }
+                            progressBar?.UpdateLoadingBar(mainForm);
+                            insertCommand = DatabaseHelper.InsertRow(row, tableName, insertCommand);
+                            rowCount++;
                         }
                     }
                 }
@@ -1172,7 +1205,7 @@ namespace DataTableConverter.Assisstant
                 TextImportTemplate template = LoadTextImportTemplate(Path.Combine(ExportHelper.ProjectPresets, $"{settingPreset}.bin"));
                 if (template != null)
                 {
-                    setting = new ImportSettings(template.Table.ColumnValuesAsInt(0).ToList(), template.Table.ColumnValuesAsString(1).ToList(), template.Encoding);
+                    setting = new ImportSettings(template.Table.ColumnValuesAsInt(0).ToList(), template.Table.ColumnValuesAsString(1).ToList(), template.Encoding, template.HasRowBreak);
                 }
             }
             return setting;
