@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -247,11 +248,11 @@ namespace DataTableConverter
 
         private void LoadWorkflows(List<Work> work = null)
         {
-            arbeitsablaufToolStripMenuItem.DropDownItems.Clear();
+            ClearDropDownItems(WorkflowItem19, WorkflowItemAF, WorkflowItemGL, WorkflowItemMQ, WorkflowItemRZ);
 
             workflows = work ?? ImportHelper.LoadWorkflows(this);
 
-            List<Work> workflowsCopy = GetCopyOfWorkflows(workflows);
+            List<Work> workflowsCopy = GetCopyOfWorkflows(workflows); //copy because then the real source will not be modified (e.g. column name change)
 
             for (int i = 0; i < workflowsCopy.Count; i++)
             {
@@ -259,8 +260,42 @@ namespace DataTableConverter
                 string name = workflowsCopy[i].Name.Replace("&", "&&");
                 ToolStripMenuItem item = new ToolStripMenuItem(name);
                 item.Click += (sender, e) => workflow_Click(workflowsCopy[index]);
-                arbeitsablaufToolStripMenuItem.DropDownItems.Add(item);
+                AddWorkflowItem(item);
             }
+        }
+
+        private void ClearDropDownItems(params ToolStripMenuItem[] items)
+        {
+            foreach(ToolStripMenuItem item in items)
+            {
+                item.DropDownItems.Clear();
+            }
+        }
+
+        private void AddWorkflowItem(ToolStripMenuItem newItem)
+        {
+            ToolStripMenuItem item;
+            if (Regex.IsMatch(newItem.Text, "^[1-9]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItem19;
+            }
+            else if(Regex.IsMatch(newItem.Text, "^[A-F]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItemAF;
+            }
+            else if (Regex.IsMatch(newItem.Text, "^[G-L]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItemGL;
+            }
+            else if (Regex.IsMatch(newItem.Text, "^[M-Q]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItemMQ;
+            }
+            else
+            {
+                item = WorkflowItemRZ;
+            }
+            item.DropDownItems.Add(newItem);
         }
 
         private List<Work> GetCopyOfWorkflows(List<Work> work)

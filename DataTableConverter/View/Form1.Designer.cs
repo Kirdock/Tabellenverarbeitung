@@ -99,6 +99,11 @@
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.WorkflowItem19 = new System.Windows.Forms.ToolStripMenuItem();
+            this.WorkflowItemAF = new System.Windows.Forms.ToolStripMenuItem();
+            this.WorkflowItemGL = new System.Windows.Forms.ToolStripMenuItem();
+            this.WorkflowItemMQ = new System.Windows.Forms.ToolStripMenuItem();
+            this.WorkflowItemRZ = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -343,6 +348,12 @@
             // 
             // arbeitsablaufToolStripMenuItem
             // 
+            this.arbeitsablaufToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.WorkflowItem19,
+            this.WorkflowItemAF,
+            this.WorkflowItemGL,
+            this.WorkflowItemMQ,
+            this.WorkflowItemRZ});
             this.arbeitsablaufToolStripMenuItem.Name = "arbeitsablaufToolStripMenuItem";
             this.arbeitsablaufToolStripMenuItem.Size = new System.Drawing.Size(95, 20);
             this.arbeitsablaufToolStripMenuItem.Text = "Arbeitsabläufe";
@@ -387,19 +398,19 @@
             // cSVToolStripMenuItem
             // 
             this.cSVToolStripMenuItem.Name = "cSVToolStripMenuItem";
-            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.cSVToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cSVToolStripMenuItem.Text = "CSV";
             // 
             // dBASEToolStripMenuItem1
             // 
             this.dBASEToolStripMenuItem1.Name = "dBASEToolStripMenuItem1";
-            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
+            this.dBASEToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.dBASEToolStripMenuItem1.Text = "DBASE";
             // 
             // excelToolStripMenuItem1
             // 
             this.excelToolStripMenuItem1.Name = "excelToolStripMenuItem1";
-            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(109, 22);
+            this.excelToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.excelToolStripMenuItem1.Text = "Excel";
             // 
             // benutzerdefiniertesSpeichernToolStripMenuItem1
@@ -414,14 +425,14 @@
             // pVMToolStripMenuItem
             // 
             this.pVMToolStripMenuItem.Name = "pVMToolStripMenuItem";
-            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pVMToolStripMenuItem.Text = "PVM";
             this.pVMToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
             // 
             // trennenToolStripMenuItem
             // 
             this.trennenToolStripMenuItem.Name = "trennenToolStripMenuItem";
-            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.trennenToolStripMenuItem.Text = "Trennen";
             this.trennenToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 
@@ -659,6 +670,36 @@
             this.dgTable.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgTable_KeyDown);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
+            // WorkflowItem19
+            // 
+            this.WorkflowItem19.Name = "WorkflowItem19";
+            this.WorkflowItem19.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItem19.Text = "1-9";
+            // 
+            // WorkflowItemAF
+            // 
+            this.WorkflowItemAF.Name = "WorkflowItemAF";
+            this.WorkflowItemAF.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemAF.Text = "A-F";
+            // 
+            // WorkflowItemGL
+            // 
+            this.WorkflowItemGL.Name = "WorkflowItemGL";
+            this.WorkflowItemGL.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemGL.Text = "G-L";
+            // 
+            // WorkflowItemMQ
+            // 
+            this.WorkflowItemMQ.Name = "WorkflowItemMQ";
+            this.WorkflowItemMQ.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemMQ.Text = "M-Q";
+            // 
+            // WorkflowItemRZ
+            // 
+            this.WorkflowItemRZ.Name = "WorkflowItemRZ";
+            this.WorkflowItemRZ.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemRZ.Text = "R-Z";
+            // 
             // Form1
             // 
             this.AllowDrop = true;
@@ -762,6 +803,11 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown NumPage;
         private System.Windows.Forms.ToolStripMenuItem zeilenLöschenToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem WorkflowItem19;
+        private System.Windows.Forms.ToolStripMenuItem WorkflowItemAF;
+        private System.Windows.Forms.ToolStripMenuItem WorkflowItemGL;
+        private System.Windows.Forms.ToolStripMenuItem WorkflowItemMQ;
+        private System.Windows.Forms.ToolStripMenuItem WorkflowItemRZ;
     }
 }
 
