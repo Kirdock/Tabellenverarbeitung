@@ -558,12 +558,22 @@ namespace DataTableConverter.Assisstant
                     {
                         if (hasPassword = (ex.ErrorCode == -2146827284))
                         {
-                            password = Microsoft.VisualBasic.Interaction.InputBox("Bitte Password eingeben", "Datei durch Passwort geschützt", string.Empty);
+                            password = Microsoft.VisualBasic.Interaction.InputBox("Bitte Passwort eingeben", "Datei durch Passwort geschützt", string.Empty);
                             if (string.IsNullOrWhiteSpace(password))
                             {
                                 return data;
                             }
                         }
+                        else
+                        {
+                            ErrorHelper.LogMessage(ex, mainForm);
+                            return data;
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        ErrorHelper.LogMessage(ex, mainForm);
+                        return data;
                     }
                 } while (hasPassword);
 
