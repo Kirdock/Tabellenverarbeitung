@@ -405,7 +405,12 @@ namespace DataTableConverter.Assisstant
         {
             SQLiteConnection connection = GetConnection(tableName);
             SQLiteCommand command = cmd;
-            if (cmd == null)
+            if(cmd != null  && cmd.Parameters.Count != row.Count)
+            {
+                command.Dispose();
+                command = null;
+            }
+            if (command == null)
             {
                 command = connection.CreateCommand();
                 if (row == null || row.Keys.Count == 0)
@@ -935,7 +940,7 @@ namespace DataTableConverter.Assisstant
             return headerMapping;
         }
 
-        internal void ConcatTable(string newTable, string fileNameBefore, string filename, string destinationTable)
+        internal void ConcatTable(string destinationTable, string newTable, string fileNameBefore, string filename)
         {
             AddColumnIfNotExists(destinationTable, FileNameColumn, fileNameBefore);
             AddColumnIfNotExists(newTable, FileNameColumn, filename);
@@ -950,10 +955,11 @@ namespace DataTableConverter.Assisstant
 
             Dictionary<string, string> destinationHeaders = GetAliasColumnMapping(destinationTable);
             List<string> headerMapping = new List<string>();
-
+            
             foreach (string header in headers)
             {
-                headerMapping.Add(destinationHeaders[header]);
+                string key = destinationHeaders.Keys.First(k => k.Equals(header, StringComparison.OrdinalIgnoreCase)); //should be case insensitive
+                headerMapping.Add(destinationHeaders[key]);
             }
             //map headers of newTable to original column name of originalTable
 
