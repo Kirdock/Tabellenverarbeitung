@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -18,7 +19,7 @@ namespace DataTableConverter.Assisstant
         {
             try
             {
-                File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Today} {text}{Environment.NewLine}");
+                File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Today}; Version:{FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion} {Environment.NewLine}{text}{Environment.NewLine}");
                 if (showMessage)
                 {
                     ShowError(ErrorMessage, mainForm);

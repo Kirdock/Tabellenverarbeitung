@@ -21,7 +21,7 @@ namespace DataTableConverter
     {
         private int selectedRow = 0, selectedColumn = 0;
         private List<Proc> procedures;
-        private List<Work> workflows;
+        private List<Work> Workflows;
         private List<Tolerance> tolerances;
         private List<Case> cases;
         private string SortingOrder = string.Empty;
@@ -226,40 +226,36 @@ namespace DataTableConverter
             }
         }
 
-        private void LoadProcedures(List<Proc> proc = null)
+        private void LoadProcedures(List<Proc> procs = null)
         {
             ersetzenToolStripMenuItem.DropDownItems.Clear();
 
-            procedures = proc ?? ImportHelper.LoadProcedures(this);
+            procedures = procs ?? ImportHelper.LoadProcedures(this);
 
             ToolStripMenuItem tempProcedure = new ToolStripMenuItem("Temporäre Eingabe");
             tempProcedure.Click += TempProcedure_Click;
             ersetzenToolStripMenuItem.DropDownItems.Add(tempProcedure);
             List<Proc> visibleProc = procedures.Where(vproc => !vproc.HideInMainForm).ToList();
-            for (int i = 0; i < visibleProc.Count; i++)
+            foreach(Proc proc in visibleProc)
             {
-                int index = i;
-                string name = visibleProc[i].Name.Replace("&", "&&");
-                ToolStripMenuItem item = new ToolStripMenuItem(name);
-                item.Click += (sender, e) => procedure_Click(visibleProc[index]);
+                ToolStripMenuItem item = new ToolStripMenuItem(proc.Name.Replace("&", "&&"));
+                item.Click += (sender, e) => procedure_Click(proc);
                 ersetzenToolStripMenuItem.DropDownItems.Add(item);
             }
         }
 
-        private void LoadWorkflows(List<Work> work = null)
+        private void LoadWorkflows(List<Work> workflow = null)
         {
             ClearDropDownItems(WorkflowItem19, WorkflowItemAF, WorkflowItemGL, WorkflowItemMQ, WorkflowItemRZ);
 
-            workflows = work ?? ImportHelper.LoadWorkflows(this);
+            Workflows = workflow ?? ImportHelper.LoadWorkflows(this);
 
-            List<Work> workflowsCopy = GetCopyOfWorkflows(workflows); //copy because then the real source will not be modified (e.g. column name change)
+            List<Work> workflowsCopy = GetCopyOfWorkflows(Workflows); //copy because then the real source will not be modified (e.g. column name change)
 
-            for (int i = 0; i < workflowsCopy.Count; i++)
+            foreach(Work work in workflowsCopy)
             {
-                int index = i;
-                string name = workflowsCopy[i].Name.Replace("&", "&&");
-                ToolStripMenuItem item = new ToolStripMenuItem(name);
-                item.Click += (sender, e) => workflow_Click(workflowsCopy[index]);
+                ToolStripMenuItem item = new ToolStripMenuItem(work.Name.Replace("&", "&&"));
+                item.Click += (sender, e) => workflow_Click(work);
                 AddWorkflowItem(item);
             }
         }
@@ -983,7 +979,7 @@ namespace DataTableConverter
                 aliases = DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray();
             }
             catch { }
-            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, aliases, contextGlobal, procedures, workflows, cases, tolerances, TableName);
+            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, aliases, contextGlobal, procedures, Workflows, cases, tolerances, TableName);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show(this);
         }
