@@ -461,6 +461,7 @@ namespace DataTableConverter
         private int ExportExcel(string directory, string fileName, string oldFileExtension, SQLiteCommand command, Form invokeForm, string tableName, System.Action updateLoadingBar)
         {
             int rowCount = 0;
+            int maxRowsPerExecution = 30000;
             Workbooks workbooks = null;
             Workbook workbook = null;
             Microsoft.Office.Interop.Excel.Application excel = null;
@@ -498,21 +499,26 @@ namespace DataTableConverter
                             columnNames[i] = reader.GetName(i);
                         }
                         InsertHeadersToExcel(columnNames, worksheet);
-
-                        object[,] data = new object[maxRows, columnNames.Length];
-
-                        for (; reader.Read(); rowCount++)
+                        InsertRowsSkeleton(worksheet, maxRows, columnNames.Length);
+                        int rowStart = 2; //+2 because index starts at 1 and header is first
+                        while (reader.HasRows)
                         {
-                            object[] row = new object[columnNames.Length];
-                            for (int y = 0; y < columnNames.Length; y++)
+                            int max = rowCount + maxRowsPerExecution > maxRows ? maxRows - rowCount : maxRowsPerExecution;
+                            int newRows;
+                            object[,] data = new object[max, columnNames.Length];
+                            for (newRows = 0; newRows < maxRowsPerExecution && reader.Read(); rowCount++, newRows++)
                             {
-                                data[rowCount, y] = reader.GetString(y);
+                                object[] row = new object[columnNames.Length];
+                                for (int y = 0; y < columnNames.Length; y++)
+                                {
+                                    data[newRows, y] = reader.GetString(y);
+                                }
+                                updateLoadingBar?.Invoke();
                             }
-                            updateLoadingBar?.Invoke();
-                        }
 
-                        InsertRowsSkeleton(worksheet, rowCount, columnNames.Length, rowCount);
-                        InsertRowsToExcel(worksheet, data, 2, rowCount - 1, columnNames.Length); //+2 because index starts at 1 and header is first
+                            InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, columnNames.Length);
+                            rowStart += newRows;
+                        }
                     }
                 }
 
@@ -595,9 +601,9 @@ namespace DataTableConverter
             range.Value2 = data;
         }
 
-        private void InsertRowsSkeleton(Worksheet worksheet, int rowCount, int columnCount, int rowOffset = 0)
+        private void InsertRowsSkeleton(Worksheet worksheet, int rowCount, int columnCount)
         {
-            Range beginWrite = (Range)worksheet.Cells[2 + rowOffset, 1];
+            Range beginWrite = (Range)worksheet.Cells[2, 1];
             Range endWrite = (Range)worksheet.Cells[rowCount, columnCount];
             Range addNewRows = worksheet.Range[beginWrite, endWrite];
             addNewRows.Insert(XlInsertShiftDirection.xlShiftDown, XlInsertFormatOrigin.xlFormatFromLeftOrAbove);
