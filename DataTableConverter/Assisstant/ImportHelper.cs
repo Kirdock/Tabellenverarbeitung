@@ -29,6 +29,7 @@ namespace DataTableConverter.Assisstant
         internal readonly string DbfExt = "*.dbf";
         internal readonly string CsvExt = "*.csv";
         internal readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+        internal static readonly int MaxCellsPerIteration = 50000;
         private readonly DatabaseHelper DatabaseHelper;
         private readonly ExportHelper ExportHelper;
 
@@ -639,8 +640,6 @@ namespace DataTableConverter.Assisstant
                     headers.Add(Extensions.DataTableExtensions.FileName);
                 }
 
-                RemoveTabsInCellsOfExcel(objXL);
-
                 foreach (string sheetName in selectedSheets)
                 {
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
@@ -711,7 +710,7 @@ namespace DataTableConverter.Assisstant
             DatabaseHelper.CreateTable(headers.ToArray(), tableName);
             Clipboard.Clear();
             objXL.CutCopyMode = 0;
-            int rowRange = 50000;
+            int rowRange = MaxCellsPerIteration / cols; // about 50000 cells per iteration
             SQLiteCommand insertCommand = null;
             for (int i = 2; i <= rows; i++)
             {
@@ -719,6 +718,7 @@ namespace DataTableConverter.Assisstant
                 int rowCount = i + rowRange;
                 Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rowCount > rows ? rows : rowCount, cols];
                 Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
+                RemoveTabsInCellsOfExcel(range);
                 range.Copy();
                 IDataObject data = Clipboard.GetDataObject();
                 string content = (string)data.GetData(DataFormats.UnicodeText);
@@ -730,9 +730,9 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private void RemoveTabsInCellsOfExcel(Microsoft.Office.Interop.Excel.Application objXL)
+        private void RemoveTabsInCellsOfExcel(Microsoft.Office.Interop.Excel.Range range)
         {
-            objXL.Cells.Replace(What: "\t", Replacement: string.Empty, LookAt: Microsoft.Office.Interop.Excel.XlLookAt.xlPart,
+            range.Cells.Replace(What: "\t", Replacement: string.Empty, LookAt: Microsoft.Office.Interop.Excel.XlLookAt.xlPart,
                     SearchOrder: Microsoft.Office.Interop.Excel.XlSearchOrder.xlByRows
                     , MatchCase: false, SearchFormat: false, ReplaceFormat: false);
         }

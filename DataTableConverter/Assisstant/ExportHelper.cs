@@ -461,7 +461,6 @@ namespace DataTableConverter
         private int ExportExcel(string directory, string fileName, string oldFileExtension, SQLiteCommand command, Form invokeForm, string tableName, System.Action updateLoadingBar)
         {
             int rowCount = 0;
-            int maxRowsPerExecution = 30000;
             Workbooks workbooks = null;
             Workbook workbook = null;
             Microsoft.Office.Interop.Excel.Application excel = null;
@@ -488,7 +487,7 @@ namespace DataTableConverter
 
                 string[] columnNames = new string[0];
                 int maxRows = DatabaseHelper.GetRowCount(tableName);
-
+                int maxRowsPerExecution = ImportHelper.MaxCellsPerIteration / columnNames.Length; // about 50000 cells per iteration
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.HasRows) //write header
@@ -516,7 +515,15 @@ namespace DataTableConverter
                                 updateLoadingBar?.Invoke();
                             }
 
-                            InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, columnNames.Length);
+                            try
+                            {
+                                InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, columnNames.Length);
+                            }
+                            catch(Exception ex)
+                            {
+                                ErrorHelper.LogMessage($"Error while inserting rows to Excel{Environment.NewLine}rowStart: {rowStart}; count: {newRows - 1}; columnCount: {columnNames.Length}; maxRows: {maxRows}; max: {max}", invokeForm, false);
+                                throw ex;
+                            }
                             rowStart += newRows;
                         }
                     }
