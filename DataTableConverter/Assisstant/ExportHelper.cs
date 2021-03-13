@@ -485,14 +485,14 @@ namespace DataTableConverter
                 excel.Calculation = XlCalculation.xlCalculationManual;
                 worksheet.Name = workSheetName;
 
-                string[] columnNames = new string[0];
                 int maxRows = DatabaseHelper.GetRowCount(tableName);
-                int maxRowsPerExecution = ImportHelper.MaxCellsPerIteration / columnNames.Length; // about 50000 cells per iteration
+                
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.HasRows) //write header
                     {
-                        columnNames = new string[reader.FieldCount];
+                        string[] columnNames = new string[reader.FieldCount];
+                        int maxRowsPerExecution = ImportHelper.MaxCellsPerIteration / reader.FieldCount; // about 50000 cells per iteration
                         for (var i = 0; i < reader.FieldCount; i++)
                         {
                             columnNames[i] = reader.GetName(i);
