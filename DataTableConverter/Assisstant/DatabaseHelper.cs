@@ -1799,7 +1799,7 @@ namespace DataTableConverter.Assisstant
                                     {
                                         string newAlias = appendArray[i] + counter;
 
-                                        if (!aliasColumnMapping.ContainsKey(newAlias))
+                                        if (!aliasColumnMapping.Keys.Any(key => key.Equals(newAlias, StringComparison.OrdinalIgnoreCase)))
                                         {
                                             newColumns.Add(newAlias);
                                             aliasColumnMapping.Add(newAlias, newAlias);
@@ -1861,7 +1861,7 @@ namespace DataTableConverter.Assisstant
                     int id = int.Parse(reader.GetString(0));
                     bool isAlias = reader.GetString(1) == "1";
                     string[] names = reader.GetString(2).Split('\t');
-                    string[] columnNames = isAlias ? names.Select(name => aliasColumnMapping[name]).ToArray() : names;
+                    string[] columnNames = isAlias ? names.Select(name => aliasColumnMapping.Keys.First(key => key.Equals(name, StringComparison.OrdinalIgnoreCase))).ToArray() : names;
                     updateCommand = UpdateRow(id, columnNames, reader.GetString(3).Split('\t'), tableName, updateCommand);
                 }
             }

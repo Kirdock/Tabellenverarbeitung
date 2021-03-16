@@ -1200,22 +1200,25 @@ namespace DataTableConverter
 
         private void dgTable_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (e.RowIndex == -1 && e.ColumnIndex > -1 && AliasColumnMapping != null && AliasColumnMapping.TryGetValue(e.Value.ToString(), out string header))
+            if (e.RowIndex == -1 && e.ColumnIndex > -1 && AliasColumnMapping != null)
             {
-                int count = DictSorting.Keys.ToList().IndexOf(header);
-                SortOrder order = SortOrder.None;
-                if (count >= 0)
+                string header = AliasColumnMapping.Keys.FirstOrDefault(key => key.Equals(e.Value.ToString(), StringComparison.OrdinalIgnoreCase));
+                if (header != null)
                 {
-                    count++;
-                    e.Graphics.FillRectangle(new SolidBrush(e.CellStyle.BackColor), e.CellBounds);
-                    e.Paint(e.ClipBounds, (DataGridViewPaintParts.All & ~DataGridViewPaintParts.Background));
+                    int count = DictSorting.Keys.ToList().IndexOf(header);
+                    SortOrder order = SortOrder.None;
+                    if (count >= 0)
+                    {
+                        count++;
+                        e.Graphics.FillRectangle(new SolidBrush(e.CellStyle.BackColor), e.CellBounds);
+                        e.Paint(e.ClipBounds, (DataGridViewPaintParts.All & ~DataGridViewPaintParts.Background));
 
-                    e.Graphics.DrawString($"{count}", dgTable.DefaultCellStyle.Font, new SolidBrush(Color.Black), e.CellBounds.X + e.CellBounds.Width - 20, e.CellBounds.Y + 5, StringFormat.GenericDefault);
-                    e.Handled = true;
-                    order = DictSorting[header];
+                        e.Graphics.DrawString($"{count}", dgTable.DefaultCellStyle.Font, new SolidBrush(Color.Black), e.CellBounds.X + e.CellBounds.Width - 20, e.CellBounds.Y + 5, StringFormat.GenericDefault);
+                        e.Handled = true;
+                        order = DictSorting[header];
+                    }
+                    dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = order;
                 }
-                dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = order;
-
             }
 
         }

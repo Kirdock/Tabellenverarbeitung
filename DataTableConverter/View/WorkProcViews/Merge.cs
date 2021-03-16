@@ -81,7 +81,7 @@ namespace DataTableConverter.View
 
         private bool IsDuplicate(string text)
         {
-            return Headers.Contains(text);
+            return Headers.Cast<string>().Contains(text, StringComparer.OrdinalIgnoreCase);
         }
 
 

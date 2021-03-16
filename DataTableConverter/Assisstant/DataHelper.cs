@@ -26,13 +26,14 @@ namespace DataTableConverter.Assisstant
             }
             else
             {
-                if (originalTableColumnAliasMapping.ContainsKey(sourceIdentifierColumnName))
+                string res = originalTableColumnAliasMapping.Keys.FirstOrDefault(key => key.Equals(sourceIdentifierColumnName, System.StringComparison.OrdinalIgnoreCase));
+                if (res!= null)
                 {
-                    sourceIdentifierColumnName = originalTableColumnAliasMapping[sourceIdentifierColumnName];
-
-                    if (importTableColumnAliasMapping.ContainsKey(importIdentifierColumnName))
+                    sourceIdentifierColumnName = res;
+                    res = importTableColumnAliasMapping.Keys.FirstOrDefault(key => key.Equals(importIdentifierColumnName, System.StringComparison.OrdinalIgnoreCase));
+                    if (res != null)
                     {
-                        importIdentifierColumnName = importTableColumnAliasMapping[importIdentifierColumnName];
+                        importIdentifierColumnName = res;
 
                         importColumnNames = importTableColumnAliasMapping.Values.Cast<string>().ToArray();
                         result = DialogResult.Yes;
@@ -56,7 +57,7 @@ namespace DataTableConverter.Assisstant
 
             if (result == DialogResult.Yes)
             {
-                importTableColumnAliasMapping.TryGetValue(invalidColumnAlias, out string invalidColumnName);
+                string invalidColumnName = importTableColumnAliasMapping.Keys.FirstOrDefault(key => key.Equals(invalidColumnAlias, System.StringComparison.OrdinalIgnoreCase));
                 importColumnNames = importColumnNames.Where(name => name != importIdentifierColumnName).ToArray();
                 if (invalidColumnName == null || !importColumnNames.Contains(invalidColumnName))
                 {

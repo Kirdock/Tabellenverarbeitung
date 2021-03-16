@@ -60,7 +60,7 @@ namespace DataTableConverter.Classes.WorkProcs
             string regularExpressionPattern = @"\[(.*?)\]";
             Regex re = new Regex(regularExpressionPattern);
 
-            return re.Matches(formula ?? string.Empty).Cast<Match>().Select(col => col.Groups[1].Value);
+            return re.Matches(formula ?? string.Empty).Cast<Match>().Select(col => col.Groups[1].Value.ToLower());
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -115,7 +115,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 //column is columnName now
                 if (destinationColumn != null)
                 {
-                    List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName);
+                    List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).Select(alias => alias.ToLower()).ToList();
                     List<KeyValuePair<int, string>> updates = new List<KeyValuePair<int, string>>();
                     using (System.Data.SQLite.SQLiteDataReader reader = invokeForm.DatabaseHelper.GetDataCommand(tableName, "id").ExecuteReader())
                     {
@@ -123,7 +123,7 @@ namespace DataTableConverter.Classes.WorkProcs
                         {
                             DataRow match = Conditions.AsEnumerable().FirstOrDefault(condition =>
                             {
-                                string alias = condition[(int)ConditionColumn.Spalte]?.ToString();
+                                string alias = condition[(int)ConditionColumn.Spalte]?.ToString().ToLower();
                                 string rowValue;
                                 bool notEmpty = condition[(int)ConditionColumn.NichtLeer] == DBNull.Value ? false : (bool)condition[(int)ConditionColumn.NichtLeer];
                                 return !string.IsNullOrWhiteSpace(alias)
@@ -251,7 +251,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     string value = headersInBrackets[bracketCount].FirstOrDefault(h => tableColumns.Contains(h) && !string.IsNullOrWhiteSpace(row[h]?.ToString())) ?? string.Empty;
                     if (value != string.Empty)
                     {
-                        result.Append(row[value].ToString());
+                        result.Append(row[value]?.ToString());
                     }
                     counter += headersInBrackets[bracketCount].Length;
                     i = formula.IndexOf(')', i);
@@ -357,7 +357,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             for (int i = 0; i < matches.Count; i++)
             {
-                yield return GetHeaderOfFormula(matches[i].Groups[1].Value).ToArray();
+                yield return GetHeaderOfFormula(matches[i].Groups[1].Value.ToLower()).ToArray();
             }
         }
 

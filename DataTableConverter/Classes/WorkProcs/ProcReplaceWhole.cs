@@ -47,7 +47,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         private IEnumerable<DataRow> GetFoundRows(List<string> columns)
         {
-            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr.ItemArray[0].ToString()));
+            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr.ItemArray[0].ToString(), StringComparer.OrdinalIgnoreCase));
         }
 
         public override void RenameHeaders(string oldName, string newName)

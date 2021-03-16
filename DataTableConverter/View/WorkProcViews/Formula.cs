@@ -32,13 +32,26 @@ namespace DataTableConverter.View
 
                 foreach (string header in Properties.Settings.Default.ExportSpec)
                 {
-                    int index = cbHeaders.Items.IndexOf(header);
+                    int index = FindItem(header);
                     if (index != -1)
                     {
                         cbHeaders.SetItemChecked(index, true);
                     }
                 }
             }
+        }
+
+        private int FindItem(string header)
+        {
+            header = header.ToLower();
+            for(int i = 0; i < cbHeaders.Items.Count; i++)
+            {
+                if(header.Equals(cbHeaders.Items[i].ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         internal string[] SelectedHeaders()
@@ -89,7 +102,7 @@ namespace DataTableConverter.View
 
         private bool IsDuplicate(string text)
         {
-            return cbHeaders.Items.Contains(text);
+            return cbHeaders.Items.Cast<string>().Contains(text, StringComparer.OrdinalIgnoreCase);
         }
 
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
