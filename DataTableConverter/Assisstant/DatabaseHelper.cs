@@ -1313,7 +1313,7 @@ namespace DataTableConverter.Assisstant
             columnNames = new string[originalAlias.Length];
             for (int i = 0; i < originalAlias.Length; ++i)
             {
-                result &= AddColumnWithDialog($"{originalAlias[i]}_{alias}", invokeForm, tableName, out string columnName);
+                result &= AddColumnWithDialog(originalAlias.Length == 1 ? alias : $"{originalAlias[i]}_{alias}", invokeForm, tableName, out string columnName);
                 columnNames[i] = columnName;
             }
             return result;

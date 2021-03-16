@@ -724,7 +724,7 @@ namespace DataTableConverter.Assisstant
                 string content = (string)data.GetData(DataFormats.UnicodeText);
                 if (content != null)
                 {
-                    insertCommand = GetDataOfString(content, tableName, fileName, headers, progressBar, mainForm, insertCommand);
+                    insertCommand = GetDataOfString(content.ToCharArray(), tableName, fileName, headers, progressBar, mainForm, insertCommand);
                 }
                 i = rowCount;
             }
@@ -748,7 +748,7 @@ namespace DataTableConverter.Assisstant
             return GetHeadersOfContent(content);
         }
 
-        private SQLiteCommand GetDataOfString(string content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm, SQLiteCommand insertCommand)
+        private SQLiteCommand GetDataOfString(char[] content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm, SQLiteCommand insertCommand)
         {
             int maxLength = content.Length;
             StringBuilder cellBuilder = new StringBuilder();
@@ -779,11 +779,8 @@ namespace DataTableConverter.Assisstant
                     {
                         i++;
                         generatedMulti = true;
-                        bool addedColumns = GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
-                        if (addedColumns)
-                        {
-                            insertCommand = null;
-                        }
+                        GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
+                        insertCommand = null;
                     }
                     else
                     {
@@ -793,7 +790,7 @@ namespace DataTableConverter.Assisstant
                 }
                 else if (content[i] == '\t') // new column
                 {
-                    if (!generatedMulti && cellBuilder.Length > 0)
+                    if (!generatedMulti)
                     {
                         SetContentRowValue(row, headers[headerCounter], cellBuilder);
                     }
@@ -804,11 +801,8 @@ namespace DataTableConverter.Assisstant
                     {
                         i++;
                         generatedMulti = true;
-                        bool addedColumns = GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
-                        if (addedColumns)
-                        {
-                            insertCommand = null;
-                        }
+                        GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
+                        insertCommand = null;
                     }
                 }
                 else
@@ -893,13 +887,12 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        private bool GenerateMultiCell(string content, string tableName, Dictionary<string, string> row, string header, ref int i)
+        private void GenerateMultiCell(char[] content, string tableName, Dictionary<string, string> row, string header, ref int i)
         {
             ++i;
             int multiCellCount = 0;
             StringBuilder cell = new StringBuilder();
             bool newLine;
-            bool addedColumn = false;
             for (; i < content.Length; ++i)
             {
                 if (EndOfMultiCell(content, i, out bool isNotMultiCell))
@@ -913,14 +906,14 @@ namespace DataTableConverter.Assisstant
                     {
                         cell = new StringBuilder("\"").Append(cell).Append('\"');
                     }
-                    addedColumn |= AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
+                    AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
                     break;
                 }
                 else if ((newLine = (content[i] == '\r')) || content[i] == '\n')
                 {
                     if (cell.Length != 0)
                     {
-                        addedColumn |= AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
+                        AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
 
                         if (newLine)
                         {
@@ -934,13 +927,11 @@ namespace DataTableConverter.Assisstant
                     cell.Append(content[i]);
                 }
             }
-            return addedColumn;
         }
 
-        private bool AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, StringBuilder text)
+        private void AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, StringBuilder text)
         {
             string result = text.ToString();
-            bool addedCollumn = false;
             text.Clear();
             if (result != string.Empty)
             {
@@ -948,14 +939,12 @@ namespace DataTableConverter.Assisstant
                 if (!DatabaseHelper.ContainsAlias(tableName, multiHeader))
                 {
                     DatabaseHelper.AddColumn(tableName, multiHeader);
-                    addedCollumn = true;
                 }
                 row.Add(multiHeader, result);
             }
-            return addedCollumn;
         }
 
-        private bool EndOfMultiCell(string content, int i, out bool isNotMultiCell)
+        private bool EndOfMultiCell(char[] content, int i, out bool isNotMultiCell)
         {
             int nextIndex = i + 1;
             return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));

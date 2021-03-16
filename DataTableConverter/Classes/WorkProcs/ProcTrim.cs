@@ -78,7 +78,16 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            invokeForm.DatabaseHelper.Trim(Characters, AllColumns ? null : GetHeaders(), DeleteDouble, Type, tableName);
+            string[] trimHeaders = null;
+            if (!AllColumns)
+            {
+                 string[] headers = GetHeaders();
+                if(headers.Length != 0)
+                {
+                    trimHeaders = headers;
+                }
+            }
+            invokeForm.DatabaseHelper.Trim(Characters, trimHeaders, DeleteDouble, Type, tableName);
         }
 
         /// <summary>
