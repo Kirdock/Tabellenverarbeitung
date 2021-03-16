@@ -184,7 +184,7 @@ namespace DataTableConverter
         {
             if (Properties.Settings.Default.FullWidthImport)
             {
-                foreach (DataGridViewColumn col in dgTable.Columns.Count > 100 && Properties.Settings.Default.NotAdjustColumnOver100 ? dgTable.Columns.Cast<DataGridViewColumn>().Take(100) : dgTable.Columns.Cast<DataGridViewColumn>())
+                foreach (DataGridViewColumn col in dgTable.Columns.Cast<DataGridViewColumn>())
                 {
                     if (ColumnWidths.TryGetValue(col.Name, out int value))
                     {

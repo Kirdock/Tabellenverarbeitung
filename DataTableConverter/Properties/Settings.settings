@@ -158,9 +158,6 @@
     <Setting Name="SeparateSelectable" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="NotAdjustColumnOver100" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="MaxRows" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">15000</Value>
     </Setting>

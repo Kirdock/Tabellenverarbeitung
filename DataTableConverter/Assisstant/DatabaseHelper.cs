@@ -351,8 +351,11 @@ namespace DataTableConverter.Assisstant
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
-
-            File.Delete(TempDatabasePath);
+            try
+            {
+                File.Delete(TempDatabasePath);
+            }
+            catch { }
         }
 
         private void RenameTempDatabase()

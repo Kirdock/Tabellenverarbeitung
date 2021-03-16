@@ -419,20 +419,6 @@ namespace DataTableConverter.Assisstant
             return true;
         }
 
-        private int RenameColumn(DataTable dt, string column, int counter)
-        {
-            try
-            {
-                dt.Columns[column].ColumnName = $"{column}{counter}";
-                return counter;
-            }
-            catch (DuplicateNameException)
-            {
-                counter++;
-                return RenameColumn(dt, column, counter);
-            }
-        }
-
         internal void OpenDBF(string path, ProgressBar progressBar, Form mainForm, string tableName)
         {
             string directory = ToShortPathName(Path.GetDirectoryName(path));
@@ -712,21 +698,32 @@ namespace DataTableConverter.Assisstant
             objXL.CutCopyMode = 0;
             int rowRange = MaxCellsPerIteration / cols; // about 50000 cells per iteration
             SQLiteCommand insertCommand = null;
-            for (int i = 2; i <= rows; i++)
+            int maxAttempts = 5;
+            for (int i = 2; i <= rows; i += rowRange + 1)
             {
                 Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[i, 1];
                 int rowCount = i + rowRange;
-                Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[rowCount > rows ? rows : rowCount, cols];
+                int endRow = rowCount > rows ? rows : rowCount;
+                Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[endRow, cols];
                 Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
                 RemoveTabsInCellsOfExcel(range);
-                range.Copy();
-                IDataObject data = Clipboard.GetDataObject();
-                string content = (string)data.GetData(DataFormats.UnicodeText);
-                if (content != null)
+                string content = string.Empty;
+                int attempts = 0;
+
+                while (content == string.Empty && attempts < maxAttempts)
+                {
+                    range.Copy();
+                    content = (string)Clipboard.GetDataObject().GetData(DataFormats.UnicodeText);
+                    attempts++;
+                }
+                if(attempts == maxAttempts && content == string.Empty)
+                {
+                    ErrorHelper.LogMessage($"Kopieren der Zeilen {i} bis {endRow} {maxAttempts} mal fehlgeschlagen\nZeilen werden übersprungen", mainForm);
+                }
+                else
                 {
                     insertCommand = GetDataOfString(content.ToCharArray(), tableName, fileName, headers, progressBar, mainForm, insertCommand);
                 }
-                i = rowCount;
             }
         }
 
