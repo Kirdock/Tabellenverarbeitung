@@ -195,6 +195,22 @@ namespace DataTableConverter.Assisstant
                     newHeaders = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
                         .SelectMany(x => x.Split(separators.ToArray(), StringSplitOptions.None))
                         .Select(column => (Properties.Settings.Default.ImportHeaderUpperCase ? column.ToUpper() : column).Trim()).ToList();
+                    for(int i = 0; i < newHeaders.Count; ++i)
+                    {
+                        var duplicates = newHeaders.Select((item, index) => new { item, index }).Where(element => element.index != i && element.item.Equals(newHeaders[i], StringComparison.OrdinalIgnoreCase)).ToArray();
+                        for(int y = 0; y < duplicates.Length; ++y)
+                        {
+                            int counter = y + 2;
+                            string newValue;
+                            do
+                            {
+                                newValue = duplicates[y].item + counter;
+                                ++counter;
+                            } while (newHeaders.Contains(newValue));
+
+                            newHeaders[duplicates[y].index] = newValue;
+                        }
+                    }
 
                     DatabaseHelper.CreateTable(newHeaders, tableName);
                 }
