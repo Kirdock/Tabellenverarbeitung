@@ -1202,7 +1202,7 @@ namespace DataTableConverter
         {
             if (e.RowIndex == -1 && e.ColumnIndex > -1 && AliasColumnMapping != null)
             {
-                string header = AliasColumnMapping.Keys.FirstOrDefault(key => key.Equals(e.Value.ToString(), StringComparison.OrdinalIgnoreCase));
+                string header = AliasColumnMapping.FirstOrDefault(pair => pair.Key.Equals(e.Value.ToString(), StringComparison.OrdinalIgnoreCase)).Value;
                 if (header != null)
                 {
                     int count = DictSorting.Keys.ToList().IndexOf(header);

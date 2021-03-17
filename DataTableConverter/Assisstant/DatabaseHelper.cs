@@ -961,8 +961,8 @@ namespace DataTableConverter.Assisstant
             
             foreach (string header in headers)
             {
-                string key = destinationHeaders.Keys.First(k => k.Equals(header, StringComparison.OrdinalIgnoreCase)); //should be case insensitive
-                headerMapping.Add(destinationHeaders[key]);
+                string value = destinationHeaders.First(pair => pair.Key.Equals(header, StringComparison.OrdinalIgnoreCase)).Value; //should be case insensitive
+                headerMapping.Add(value);
             }
             //map headers of newTable to original column name of originalTable
 
@@ -1862,7 +1862,7 @@ namespace DataTableConverter.Assisstant
                     int id = int.Parse(reader.GetString(0));
                     bool isAlias = reader.GetString(1) == "1";
                     string[] names = reader.GetString(2).Split('\t');
-                    string[] columnNames = isAlias ? names.Select(name => aliasColumnMapping.Keys.First(key => key.Equals(name, StringComparison.OrdinalIgnoreCase))).ToArray() : names;
+                    string[] columnNames = isAlias ? names.Select(name => aliasColumnMapping.First(pair => pair.Key.Equals(name, StringComparison.OrdinalIgnoreCase)).Value).ToArray() : names;
                     updateCommand = UpdateRow(id, columnNames, reader.GetString(3).Split('\t'), tableName, updateCommand);
                 }
             }
