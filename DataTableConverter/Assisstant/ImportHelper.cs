@@ -195,9 +195,10 @@ namespace DataTableConverter.Assisstant
                     newHeaders = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
                         .SelectMany(x => x.Split(separators.ToArray(), StringSplitOptions.None))
                         .Select(column => (Properties.Settings.Default.ImportHeaderUpperCase ? column.ToUpper() : column).Trim()).ToList();
-                    for(int i = 0; i < newHeaders.Count; ++i)
+                    var indexItem = newHeaders.Select((item, index) => new { item, index });
+                    for (int i = 0; i < newHeaders.Count; ++i)
                     {
-                        var duplicates = newHeaders.Select((item, index) => new { item, index }).Where(element => element.index != i && element.item.Equals(newHeaders[i], StringComparison.OrdinalIgnoreCase)).ToArray();
+                        var duplicates = indexItem.Where(element => element.index != i && element.item.Equals(newHeaders[i], StringComparison.OrdinalIgnoreCase)).ToArray();
                         for(int y = 0; y < duplicates.Length; ++y)
                         {
                             int counter = y + 2;
@@ -251,16 +252,27 @@ namespace DataTableConverter.Assisstant
             foreach (string[] line in enumerableArray)
             {
                 string[] values = line.Select(ln => ln.Trim()).ToArray();
-
+                bool addedColumns = values.Length > headers.Count;
                 while (values.Length > headers.Count)
                 {
-                    string colName = "Spalte" + headers.Count;
+                    string colName;
+                    int counter = 2;
+                    do
+                    {
+                        colName = "Spalte" + counter;
+                        ++counter;
+                    } while (headers.Contains(colName));
 
-                    DatabaseHelper.AddColumn(tableName, colName); //have to check if exists
-                    //colName = DatabaseHelper.AddColumnsWithAdditionalIfExists()  //adjust it for this case
+                    DatabaseHelper.AddColumn(tableName, colName);
                     headers.Add(colName);
+                    insertCommand = null;
                 }
+
                 insertCommand = DatabaseHelper.InsertRow(headers, values, tableName, insertCommand);
+                if (addedColumns)
+                {
+                    insertCommand = null;
+                }
                 progressBar?.UpdateLoadingBar(mainForm);
             }
         }

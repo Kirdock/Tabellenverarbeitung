@@ -465,11 +465,16 @@ namespace DataTableConverter.Assisstant
         internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, object[] values, string tableName, SQLiteCommand cmd = null)
         {
             string[] headers = eHeaders.ToArray();
-            string headerString = GetHeaderString(headers);
-
+            if(headers.Length > values.Length)
+            {
+                headers = headers.Take(values.Length).ToArray();
+                cmd = null;
+            }
+            
             SQLiteCommand command = cmd;
             if (cmd == null)
             {
+                string headerString = GetHeaderString(headers);
                 command = GetConnection(tableName).CreateCommand();
                 command.CommandText = $"INSERT into [{tableName}] ({headerString}) values ({GetValueString(headers.Length)})";
 
