@@ -1432,7 +1432,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal int[] GetMaxColumnLength(string tableName)
+        internal int[] GetMaxColumnLength(string tableName, bool minOne = true)
         {
             string[] columnNames = GetColumnNames(tableName).ToArray();
             int[] max = new int[columnNames.Length];
@@ -1441,7 +1441,8 @@ namespace DataTableConverter.Assisstant
                 for (int i = 0; i < columnNames.Length; i++)
                 {
                     command.CommandText = $"SELECT max(length([{columnNames[i]}])) from [{tableName}]";
-                    max[i] = Convert.ToInt32(command.ExecuteScalar());
+                    int length = Convert.ToInt32(command.ExecuteScalar());
+                    max[i] = minOne && length == 0 ? 1 : length;
                 }
             }
             return max;

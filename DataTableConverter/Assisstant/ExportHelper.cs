@@ -327,18 +327,25 @@ namespace DataTableConverter
             }
 
             int[] max = DatabaseHelper.GetMaxColumnLength(tableName);
+            for (int i = 0; i < max.Length; i++)
+            {
+                if (max[i] > DbaseMaxCharacterLength)
+                {
+                    max[i] = DbaseMaxCharacterLength;
+                }
+            }
+
             if (max.Sum() <= DbaseMaxRecordCharacterLength)
             {
-                string[] columns = DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray();
                 string query = string.Empty;
                 try
                 {
-                    CreateTable(columns, max, path, fileName, ref query);
+                    CreateTable(headers, max, path, fileName, ref query);
                 }
                 catch (Exception ex)
                 {
                     DeleteDirectory(path);
-                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", columns)}]", invokeForm);
+                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", headers)}]", invokeForm);
                     return 0;
                 }
 
@@ -360,7 +367,7 @@ namespace DataTableConverter
                             for (; reader.Read(); rowCount++)
                             {
                                 StringBuilder builder = new StringBuilder(" ");
-                                for (int i = 0; i < columns.Length; i++)
+                                for (int i = 0; i < headers.Length; i++)
                                 {
                                     string temp = reader.GetString(i);
                                     builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[i]));
@@ -399,6 +406,61 @@ namespace DataTableConverter
                 rowCount = 0;
             }
             return rowCount;
+        }
+
+
+        /// <summary>
+        /// Depth-first recursive delete, with handling for descendant 
+        /// directories open in Windows Explorer.
+        /// </summary>
+        private void DeleteDirectory(string path)
+        {
+            foreach (string directory in Directory.GetDirectories(path))
+            {
+                DeleteDirectory(directory);
+            }
+
+            try
+            {
+                Directory.Delete(path, true);
+            }
+            catch (IOException)
+            {
+                Directory.Delete(path, true);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
+        private void CreateTable(string[] columns, int[] max, string path, string filename, ref string query)
+        {
+            query = CreateQuery(columns, filename, max);
+
+            OleDbConnection con = new OleDbConnection(GetConnection(path));
+            OleDbCommand cmd = new OleDbCommand(query, con);
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+            cmd.Dispose();
+        }
+
+        private string CreateQuery(string[] columns, string filename, int[] max)
+        {
+            StringBuilder csb = new StringBuilder($"create table [{filename}] (");
+            for (int i = 0; i < columns.Length; i++)
+            {
+                csb.Append($"[{columns[i]}] varchar({max[i]}),");
+            }
+
+            csb[csb.Length - 1] = ')';
+            return csb.ToString();
+        }
+
+        private string GetConnection(string path)
+        {
+            return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
         internal int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, System.Action updateLoadingBar = null)
@@ -614,212 +676,6 @@ namespace DataTableConverter
             Range endWrite = (Range)worksheet.Cells[rowCount, columnCount];
             Range addNewRows = worksheet.Range[beginWrite, endWrite];
             addNewRows.Insert(XlInsertShiftDirection.xlShiftDown, XlInsertFormatOrigin.xlFormatFromLeftOrAbove);
-        }
-
-        internal bool ExportDbase(string originalFileName, System.Data.DataTable dataTable, string originalPath, Form mainForm, System.Action updateLoadingBar = null)
-        {
-            bool saved = false;
-
-            List<string> duplicates = new List<string>();
-            string[] headers = dataTable.HeadersOfDataTableAsString().OrderBy(header => header).ToArray();
-            for (int i = 1; i < headers.Length; i++)
-            {
-                string header = headers[i].Length > DbaseMaxHeaderLength ? headers[i].Substring(0, DbaseMaxHeaderLength) : headers[i];
-                string headerBefore = headers[i - 1].Length > DbaseMaxHeaderLength ? headers[i - 1].Substring(0, DbaseMaxHeaderLength) : headers[i - 1];
-                if (header == headerBefore)
-                {
-                    duplicates.Add($"\"{headers[i - 1]}\" und \"{headers[i]}\"");
-                }
-            }
-
-            if (duplicates.Count > 0)
-            {
-                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n" + string.Join(" ,\n", duplicates));
-                return saved;
-            }
-
-            string fileName = originalFileName.ToUpper();
-            if (fileName.Length > DbaseMaxFileLength)
-            {
-                fileName = fileName.Substring(0, DbaseMaxFileLength);
-            }
-            string path = Path.Combine(originalPath, "temp");
-            try
-            {
-                Directory.CreateDirectory(path);
-            }
-            catch (Exception ex)
-            {
-                ErrorHelper.LogMessage(ex, mainForm);
-                return saved;
-            }
-            string fullpath = Path.Combine(path, fileName + ".DBF");
-            string fullPathOriginal = Path.Combine(originalPath, originalFileName + ".DBF");
-
-            if (File.Exists(fullpath))
-            {
-                File.Delete(fullpath);
-            }
-
-
-            int[] max = MaxLengthOfColumns(dataTable);
-            if (max.Sum() <= DbaseMaxRecordCharacterLength)
-            {
-                string query = string.Empty;
-                try
-                {
-                    CreateTable(dataTable, max, path, fileName, ref query);
-                }
-                catch (Exception ex)
-                {
-                    DeleteDirectory(path);
-                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", dataTable.HeadersOfDataTableAsString())}]", mainForm);
-                    return saved;
-                }
-
-                try
-                {
-                    #region Adjust Header. Update number of records
-
-                    FileStream stream = new FileStream(fullpath, FileMode.Open);
-                    byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
-                    byte[] bytes = new byte[1] { 0x1A };
-
-                    stream.Position = 4;
-                    stream.Write(records, 0, records.Length);
-
-                    stream.Position = stream.Length - 1;
-
-                    if (stream.ReadByte() == bytes[0])
-                    {
-                        stream.Position--;
-                    }
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        StringBuilder builder = new StringBuilder(" ");
-
-                        for (int y = 0; y < dataTable.Columns.Count; y++)
-                        {
-                            string temp = y >= row.ItemArray.Length ? string.Empty : row[y].ToString();
-                            builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[y]));
-                        }
-                        stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
-                        updateLoadingBar?.Invoke();
-                    }
-
-                    stream.Write(bytes, 0, bytes.Length);
-                    stream.Close();
-                    if (File.Exists(fullPathOriginal))
-                    {
-                        File.Delete(fullPathOriginal);
-                    }
-                    File.Move(fullpath, fullPathOriginal);
-                    saved = true;
-                    #endregion
-                }
-                catch (Exception ex)
-                {
-                    ErrorHelper.LogMessage(ex, mainForm);
-                }
-                finally
-                {
-                    DeleteDirectory(path);
-                }
-            }
-            else
-            {
-                DeleteDirectory(path);
-                mainForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
-            }
-            return saved;
-        }
-
-        /// <summary>
-        /// Depth-first recursive delete, with handling for descendant 
-        /// directories open in Windows Explorer.
-        /// </summary>
-        private void DeleteDirectory(string path)
-        {
-            foreach (string directory in Directory.GetDirectories(path))
-            {
-                DeleteDirectory(directory);
-            }
-
-            try
-            {
-                Directory.Delete(path, true);
-            }
-            catch (IOException)
-            {
-                Directory.Delete(path, true);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                Directory.Delete(path, true);
-            }
-        }
-
-        private void CreateTable(System.Data.DataTable table, int[] max, string path, string filename, ref string query)
-        {
-            CreateTable(table.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray(), max, path, filename, ref query);
-        }
-
-        private void CreateTable(string[] columns, int[] max, string path, string filename, ref string query)
-        {
-            query = CreateQuery(columns, filename, max);
-
-            OleDbConnection con = new OleDbConnection(GetConnection(path));
-            OleDbCommand cmd = new OleDbCommand(query, con);
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
-            cmd.Dispose();
-        }
-
-        private string CreateQuery(string[] columns, string filename, int[] max)
-        {
-            StringBuilder csb = new StringBuilder($"create table [{filename}] (");
-            for (int i = 0; i < columns.Length; i++)
-            {
-                csb.Append($"[{columns[i]}] varchar({max[i]}),");
-            }
-
-            csb[csb.Length - 1] = ')';
-            return csb.ToString();
-        }
-
-        private int[] MaxLengthOfColumns(System.Data.DataTable dataTable)
-        {
-            int[] max = new int[dataTable.Columns.Count];
-            for (int i = 0; i < max.Length; i++)
-            {
-                max[i] = 1;
-            }
-            foreach (DataRow row in dataTable.Rows)
-            {
-                for (int i = 0; i < row.ItemArray.Length; i++)
-                {
-                    int length = row.ItemArray[i].ToString().Length;
-                    if (length > max[i])
-                    {
-                        max[i] = length;
-                    }
-                }
-            }
-            for (int i = 0; i < max.Length; i++)
-            {
-                if (max[i] > DbaseMaxCharacterLength)
-                {
-                    max[i] = DbaseMaxCharacterLength;
-                }
-            }
-            return max;
-        }
-
-        private string GetConnection(string path)
-        {
-            return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
 
