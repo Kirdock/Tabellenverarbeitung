@@ -735,16 +735,16 @@ namespace DataTableConverter.Assisstant
                 Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[endRow, cols];
                 Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
                 RemoveTabsInCellsOfExcel(range);
-                string content = string.Empty;
+                string content = null;
                 int attempts = 0;
 
-                while (content == string.Empty && attempts < maxAttempts)
+                while (string.IsNullOrEmpty(content) && attempts < maxAttempts)
                 {
                     range.Copy();
                     content = (string)Clipboard.GetDataObject().GetData(DataFormats.UnicodeText);
                     attempts++;
                 }
-                if(attempts == maxAttempts && content == string.Empty)
+                if(attempts == maxAttempts && string.IsNullOrEmpty(content))
                 {
                     ErrorHelper.LogMessage($"Kopieren der Zeilen {i} bis {endRow} {maxAttempts} mal fehlgeschlagen\nZeilen werden übersprungen", mainForm);
                 }

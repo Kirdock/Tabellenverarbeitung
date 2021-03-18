@@ -873,8 +873,14 @@ namespace DataTableConverter.Assisstant
 
             if (orderType == OrderType.Reverse && order != string.Empty)
             {
-                int half = GetRowCount(tableName) / 2;
-                selectString += $"{headerString}{(headerString == string.Empty ? "" : ",")} ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] {whereStatement} ORDER BY case when rnumber > {half}  then(rnumber - ({half}-0.5)) when rnumber <= {half} then rnumber end, rnumber COLLATE NATURALSORT"; //append ASC or DESC
+                int rowCount = GetRowCount(tableName);
+                if(rowCount % 2 == 1)
+                {
+                    InsertRow(tableName);
+                    rowCount++;
+                }
+                int half = rowCount / 2;
+                selectString += $"{headerString}{(headerString == string.Empty && !includeId ? "" : ",")} ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] {whereStatement} ORDER BY case when rnumber > {half}  then(rnumber - ({half}-0.5)) when rnumber <= {half} then rnumber end, rnumber COLLATE NATURALSORT"; //append ASC or DESC
             }
             else if (orderType == OrderType.Windows && order != string.Empty)
             {
