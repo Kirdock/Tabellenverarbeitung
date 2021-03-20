@@ -690,48 +690,41 @@ namespace DataTableConverter
         /// <param name="mainForm"></param>
         /// <param name="continuedNumberColumn"></param>
         /// <param name="tableName"></param>
-        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, System.Action stopLoadingBar, System.Action saveFinished, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName)
+        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName)
         {
-            new Thread(() =>
+            foreach (ExportCustomItem item in items)
             {
+                Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
 
-                foreach (ExportCustomItem item in items)
+                if (item.CheckedAllValues)
                 {
-                    Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
-
-                    if (item.CheckedAllValues)
-                    {
-                        foreach (string value in item.AllValues)
-                        {
-                            string newTable = Guid.NewGuid().ToString();
-                            DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
-                            dict.Add(value, new string[] { newTable, $"{item.Name}_{value}" });
-                        }
-                    }
-                    else
+                    foreach (string value in item.AllValues)
                     {
                         string newTable = Guid.NewGuid().ToString();
                         DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
-                        foreach (string value in item.SelectedValues)
-                        {
-                            if (!dict.ContainsKey(value))
-                            {
-                                dict.Add(value, new string[] { newTable, item.Name });
-                            }
-                        }
-                    }
-
-                    DatabaseHelper.SplitTableOnRowValue(dict, item.Column, tableName);
-
-                    foreach (string[] tableInfo in dict.Values.Distinct())
-                    {
-                        Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, item.Format, order, orderType, mainForm, tableInfo[0], null, continuedNumberColumn);
+                        dict.Add(value, new string[] { newTable, $"{item.Name}_{value}" });
                     }
                 }
-                stopLoadingBar.Invoke();
-                saveFinished.Invoke();
-            }).Start();
+                else
+                {
+                    string newTable = Guid.NewGuid().ToString();
+                    DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
+                    foreach (string value in item.SelectedValues)
+                    {
+                        if (!dict.ContainsKey(value))
+                        {
+                            dict.Add(value, new string[] { newTable, item.Name });
+                        }
+                    }
+                }
 
+                DatabaseHelper.SplitTableOnRowValue(dict, item.Column, tableName);
+
+                foreach (string[] tableInfo in dict.Values.Distinct())
+                {
+                    Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, item.Format, order, orderType, mainForm, tableInfo[0], null, continuedNumberColumn);
+                }
+            }
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace DataTableConverter.Classes.WorkProcs
     [Serializable()]
     internal class ProcDuplicate : WorkProc
     {
-        internal override string NewColumn => "Duplikat";
+        public override string NewColumn => "Duplikat";
 
         internal ProcDuplicate(int ordinal, int id, string name) : base(ordinal, id, name)
         {

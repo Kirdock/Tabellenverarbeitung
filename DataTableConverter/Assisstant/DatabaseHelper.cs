@@ -1748,7 +1748,7 @@ namespace DataTableConverter.Assisstant
                     if (reader.Read())
                     {
                         int rowCount = 1;
-                        #region Init
+#region Init
                         int id = reader.GetInt32(0);
                         string nameBefore = reader.GetString(1);
                         int counter = 1;
@@ -1764,7 +1764,7 @@ namespace DataTableConverter.Assisstant
                             sumResults[i] = result;
                         }
 
-                        #endregion
+#endregion
 
                         while (reader.Read())
                         {
@@ -1787,7 +1787,7 @@ namespace DataTableConverter.Assisstant
                                     insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
                                 }
 
-                                #region InitNew
+#region InitNew
                                 id = reader.GetInt32(0); //newId
 
                                 for (int i = 0; i < sumColumns.Length; ++i)
@@ -1800,7 +1800,7 @@ namespace DataTableConverter.Assisstant
 
                                 counter = 1;
                                 count = 1;
-                                #endregion
+#endregion
                             }
                             else
                             {
@@ -2337,9 +2337,10 @@ namespace DataTableConverter.Assisstant
                 StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] SET ");
                 foreach (string column in destinationColumns)
                 {
-                    builder.Append($"[{column}]=?");
+                    builder.Append($"[{column}]=?,");
                     command.Parameters.Add(new SQLiteParameter());
                 }
+                builder.Remove(builder.Length - 1, 1);
                 builder.Append($" WHERE [{IdColumnName}]=?");
                 command.Parameters.Add(new SQLiteParameter());
                 command.CommandText = builder.ToString();

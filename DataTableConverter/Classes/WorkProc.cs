@@ -10,12 +10,12 @@ namespace DataTableConverter.Classes
     abstract class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>
     {
         public int ProcedureId { get; set; }
-        internal DataTable Columns { get; set; }
-        internal string[] DuplicateColumns { get; set; }
-        internal int Ordinal { get; set; }
-        virtual internal string NewColumn { get; set; }
+        public DataTable Columns { get; set; }
+        public string[] DuplicateColumns { get; set; }
+        public int Ordinal { get; set; }
+        virtual public string NewColumn { get; set; }
         public string Name { get; set; }
-        internal bool CopyOldColumn { get; set; }
+        public bool CopyOldColumn { get; set; }
         internal WorkProc() { }
 
         internal WorkProc(int ordinal, int id, string name)

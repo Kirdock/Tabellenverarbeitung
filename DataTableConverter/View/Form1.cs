@@ -616,7 +616,6 @@ namespace DataTableConverter
                     dgTable.DataSource = table;
                     dgTable.Columns[0].Visible = false;
                     dgTable.RowsAdded += dgTable_RowsAdded;
-
                     SetRowCount(DatabaseHelper.GetRowCount(TableName));
                 }
                 RestoreDataGridSortMode();
@@ -960,10 +959,8 @@ namespace DataTableConverter
                 string newId = DatabaseHelper.InsertRow(TableName);
                 DatabaseHelper.SetSavepoint();
                 dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value = newId; //CellValueChanged triggered?
-
+                SetRowCount(RowCount + 1);
             }
-
-            SetRowCount(RowCount + 1);
         }
 
         private void tabellenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1076,8 +1073,14 @@ namespace DataTableConverter
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
-                    ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName, TableName);
-
+                    Thread thread = new Thread(() =>
+                    {
+                        ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName, TableName);
+                        StopLoadingBar();
+                        SaveFinished();
+                    });
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
                 }
             }
         }
@@ -1095,7 +1098,8 @@ namespace DataTableConverter
             pgbLoading.BeginInvoke(new MethodInvoker(() =>
             {
                 pgbLoading.Style = ProgressBarStyle.Blocks;
-                pgbLoading.Maximum = pgbLoading.Value = 0;
+                pgbLoading.Maximum = 1;
+                pgbLoading.Value = 0;
             }));
         }
 
@@ -1392,7 +1396,7 @@ namespace DataTableConverter
             if (oldHeight != Properties.Settings.Default.RowHeight)
             {
                 ColumnWidths.Clear();
-                LoadData(true, false);
+                LoadData(true, true);
             }
         }
 
