@@ -939,7 +939,7 @@ namespace DataTableConverter.View
         private void SetUserControls(WorkProc selectedProc)
         {
             ProcUser proc = selectedProc as ProcUser;
-            lblOriginalNameText.Text = proc.IsSystem ? proc.Procedure.Name : GetProcedureName(selectedProc.ProcedureId);
+            lblOriginalNameText.Text = (proc.IsSystem ? ProcUser.ClassName : GetProcedureName(selectedProc.ProcedureId)).Replace("&", "&&");
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             BtnProcUserOpen.Visible = proc.IsSystem;
             SetDataSource(dgvColumns, selectedProc.Columns);
@@ -2270,7 +2270,7 @@ namespace DataTableConverter.View
                     {
                         work.Name = Path.GetFileNameWithoutExtension(file);
                         List<ProcDuplicate> cases = work.Procedures.OfType<ProcDuplicate>().ToList();
-                        List<ProcUser> procs = work.Procedures.OfType<ProcUser>().ToList();
+                        List<ProcUser> procs = work.Procedures.OfType<ProcUser>().Where(proc => !proc.IsSystem).ToList();
 
                         if (Properties.Settings.Default.ImportWorkflowAuto)
                         {

@@ -51,6 +51,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
+            procedure = IsSystem ? Procedure : procedure;
             if (PrepareMultiple(GetHeaders(), invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))
             {
                 IEnumerable<DataRow> replaces = procedure.Replace.AsEnumerable().Where(row => !string.IsNullOrEmpty(row[0]?.ToString()) || !string.IsNullOrEmpty(row[1]?.ToString()));

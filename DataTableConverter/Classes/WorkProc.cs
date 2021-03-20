@@ -55,19 +55,27 @@ namespace DataTableConverter.Classes
 
         protected bool PrepareMultiple(string[] columns, Form1 invokeForm, string tableName, out string[] sourceColumns, out string[] destinationColumns)
         {
-            sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
+            if (columns.Length != 0)
+            {
+                sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
 
-            if (CopyOldColumn)
-            {
-                destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
-            }
-            else if (!string.IsNullOrWhiteSpace(NewColumn))
-            {
-                invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
+                if (CopyOldColumn)
+                {
+                    destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
+                }
+                else if (!string.IsNullOrWhiteSpace(NewColumn))
+                {
+                    invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
+                }
+                else
+                {
+                    destinationColumns = sourceColumns;
+                }
             }
             else
             {
-                destinationColumns = sourceColumns;
+                sourceColumns = new string[0];
+                destinationColumns = null;
             }
             return destinationColumns != null;
         }
