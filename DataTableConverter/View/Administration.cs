@@ -2236,7 +2236,6 @@ namespace DataTableConverter.View
                 selectedItem.SaveRemaining = CbSeparateSaveRemaining.Checked = false;
             }
 
-
             SetSeparateEnabled();
         }
 

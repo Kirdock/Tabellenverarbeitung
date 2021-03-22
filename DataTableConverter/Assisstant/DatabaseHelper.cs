@@ -876,7 +876,10 @@ namespace DataTableConverter.Assisstant
                 int rowCount = GetRowCount(tableName);
                 if(rowCount % 2 == 1)
                 {
-                    InsertRow(tableName);
+                    Match match = new Regex(@"\[(.*?)\]").Matches(order).Cast<Match>().FirstOrDefault();
+                    string column = match?.Value.Substring(1, match.Value.Length - 2);
+                    Dictionary<string, string> row = string.IsNullOrEmpty(column) ? null : new Dictionary<string, string>() { { column, 0.ToString() } };
+                    InsertRow(tableName, row);
                     rowCount++;
                 }
                 int half = rowCount / 2;
