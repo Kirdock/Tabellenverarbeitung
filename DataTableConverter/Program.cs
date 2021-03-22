@@ -14,7 +14,7 @@ namespace DataTableConverter
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1(null, args.FirstOrDefault()));
+            Application.Run(new Form1(path: args.FirstOrDefault()));
         }
 
 

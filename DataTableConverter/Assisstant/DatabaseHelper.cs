@@ -45,16 +45,15 @@ namespace DataTableConverter.Assisstant
         //Warning: Selection of "rowid" is equal to selecting primary key
         //Problem with DataTables to edit data: if there is a change in a row, the update statement contains all columns of the row, not only the changed ones
 
-        internal DatabaseHelper(string databaseName = null)
+        internal DatabaseHelper(string databaseName, bool createMain)
         {
-            bool createMainDatabase = databaseName == null;
-            databaseName = (databaseName ?? "Database");
+            databaseName = databaseName ?? "Database";
 
             DatabaseHistory = new DatabaseHistory(this, DatabaseDirectory, databaseName);
 
             DatabasePath = Path.Combine(DatabaseDirectory, databaseName + ".sqlite");
             TempDatabasePath = Path.Combine(DatabaseDirectory, databaseName + "_temp.sqlite");
-            Init(createMainDatabase);
+            Init(createMain);
         }
 
         private void Init(bool createMainDatabase)
@@ -1963,7 +1962,6 @@ namespace DataTableConverter.Assisstant
                 {
                     id = int.Parse(result);
                     command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName);
-                    Transaction.Commit();
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         for (; reader.Read() && reader.GetInt32(0) != id; ++index) { }

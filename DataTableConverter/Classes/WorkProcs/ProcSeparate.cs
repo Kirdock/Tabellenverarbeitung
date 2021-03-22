@@ -44,6 +44,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 else if (item.SaveRemaining)
                 {
                     string newTable = item.Name;
+                    invokeForm.DatabaseHelper.CreateTable(columnsAliases, newTable);
                     foreach (string value in invokeForm.DatabaseHelper.GroupCountOfColumn(columnName, tableName).Keys.Where(key => !Files.Any(file => file.Column == columnName && file.Values.Contains(key))))
                     {
                         if (!dict.ContainsKey(value))
@@ -55,6 +56,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 else
                 {
                     string newTable = item.Name;
+                    invokeForm.DatabaseHelper.CreateTable(columnsAliases, newTable);
                     foreach (string value in item.Values)
                     {
                         if (!dict.ContainsKey(value))

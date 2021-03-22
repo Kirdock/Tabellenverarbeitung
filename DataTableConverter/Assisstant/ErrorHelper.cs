@@ -12,7 +12,14 @@ namespace DataTableConverter.Assisstant
 
         internal static void LogMessage(Exception exception, Form mainForm, bool showMessage = true)
         {
-            LogMessage(exception.ToString(), mainForm, showMessage);
+            if (exception is FileNotFoundException path)
+            {
+                ShowError($"Die Datei {path.FileName} kann nicht gefunden werden", mainForm);
+            }
+            else
+            {
+                LogMessage(exception.ToString(), mainForm, showMessage);
+            }
         }
 
         internal static void LogMessage(string text, Form mainForm, bool showMessage = true)

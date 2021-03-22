@@ -308,22 +308,22 @@ namespace DataTableConverter
             {
                 fileName = fileName.Substring(0, DbaseMaxFileLength);
             }
-            string path = Path.Combine(Path.GetDirectoryName(directory), "temp");
+            string tempDirectoryPath = Path.Combine(Path.GetDirectoryName(directory), "temp");
             try
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(tempDirectoryPath);
             }
             catch (Exception ex)
             {
                 ErrorHelper.LogMessage(ex, invokeForm);
                 return 0;
             }
-            string fullpath = Path.Combine(path, fileName + ".DBF");
+            string fullPathTemp = Path.Combine(tempDirectoryPath, fileName + ".DBF");
             string fullPathOriginal = Path.Combine(directory, fileName + ".DBF");
 
-            if (File.Exists(fullpath))
+            if (File.Exists(fullPathTemp))
             {
-                File.Delete(fullpath);
+                File.Delete(fullPathTemp);
             }
 
             int[] max = DatabaseHelper.GetMaxColumnLength(tableName);
@@ -340,68 +340,76 @@ namespace DataTableConverter
                 string query = string.Empty;
                 try
                 {
-                    CreateTable(headers, max, path, fileName, ref query);
-                }
-                catch (Exception ex)
-                {
-                    DeleteDirectory(path);
-                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", headers)}]", invokeForm);
-                    return 0;
-                }
-
-                try
-                {
-                    #region Adjust Header. Update number of records
-                    using (FileStream stream = new FileStream(fullpath, FileMode.Open))
+                    CreateTable(headers, max, tempDirectoryPath, fileName, ref query);
+                    if (File.Exists(fullPathTemp))
                     {
-                        byte[] bytes = new byte[1] { 0x1A };
-                        stream.Position = stream.Length - 1;
-
-                        if (stream.ReadByte() == bytes[0])
+                        #region Adjust Header. Update number of records
+                        using (FileStream stream = new FileStream(fullPathTemp, FileMode.OpenOrCreate))
                         {
-                            stream.Position--;
-                        }
+                            byte[] bytes = new byte[1] { 0x1A };
+                            stream.Position = stream.Length - 1;
 
-                        using (SQLiteDataReader reader = command.ExecuteReader())
-                        {
-                            for (; reader.Read(); rowCount++)
+                            if (stream.ReadByte() == bytes[0])
                             {
-                                StringBuilder builder = new StringBuilder(" ");
-                                for (int i = 0; i < headers.Length; i++)
-                                {
-                                    string temp = reader.GetString(i);
-                                    builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[i]));
-                                }
-                                stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                                stream.Position--;
                             }
+
+                            using (SQLiteDataReader reader = command.ExecuteReader())
+                            {
+                                for (; reader.Read(); rowCount++)
+                                {
+                                    StringBuilder builder = new StringBuilder(" ");
+                                    for (int i = 0; i < headers.Length; i++)
+                                    {
+                                        string temp = reader.GetValue(i).ToString();
+                                        builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[i]));
+                                    }
+                                    stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                                }
+                            }
+
+                            stream.Write(bytes, 0, bytes.Length);
+
+                            byte[] records = BitConverter.GetBytes(rowCount);
+                            stream.Position = 4;
+                            stream.Write(records, 0, records.Length);
+                            #endregion
                         }
-
-                        stream.Write(bytes, 0, bytes.Length);
-
-                        byte[] records = BitConverter.GetBytes(rowCount);
-                        stream.Position = 4;
-                        stream.Write(records, 0, records.Length);
-                        #endregion
+                        if (File.Exists(fullPathOriginal))
+                        {
+                            File.Delete(fullPathOriginal);
+                        }
+                        try
+                        {
+                            File.Move(fullPathTemp, fullPathOriginal);
+                        }
+                        catch (FileNotFoundException ex)
+                        {
+                            MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
+                        }
                     }
-                    if (File.Exists(fullPathOriginal))
+                    else
                     {
-                        File.Delete(fullPathOriginal);
+                        MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
                     }
-                    File.Move(fullpath, fullPathOriginal);
+                    
                 }
                 catch (Exception ex)
                 {
-                    ErrorHelper.LogMessage(ex, invokeForm);
-                    rowCount = 0;
+                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {tempDirectoryPath}; fileName: {fileName}; headers:[{string.Join("; ", headers)}]", invokeForm);
+                    return 0;
                 }
                 finally
                 {
-                    DeleteDirectory(path);
+                    if (File.Exists(tempDirectoryPath))
+                    {
+                        DeleteDirectory(tempDirectoryPath);
+                    }
                 }
             }
             else
             {
-                DeleteDirectory(path);
+                DeleteDirectory(tempDirectoryPath);
                 invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
                 rowCount = 0;
             }
@@ -436,14 +444,15 @@ namespace DataTableConverter
 
         private void CreateTable(string[] columns, int[] max, string path, string filename, ref string query)
         {
-            query = CreateQuery(columns, filename, max);
-
-            OleDbConnection con = new OleDbConnection(GetConnection(path));
-            OleDbCommand cmd = new OleDbCommand(query, con);
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
-            cmd.Dispose();
+            using (OleDbConnection con = new OleDbConnection(GetConnection(path)))
+            {
+                con.Open();
+                using (OleDbCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = CreateQuery(columns, filename, max);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         private string CreateQuery(string[] columns, string filename, int[] max)
@@ -572,7 +581,7 @@ namespace DataTableConverter
                                 object[] row = new object[columnNames.Length];
                                 for (int y = 0; y < columnNames.Length; y++)
                                 {
-                                    data[newRows, y] = reader.GetString(y);
+                                    data[newRows, y] = reader.GetValue(y).ToString();
                                 }
                                 updateLoadingBar?.Invoke();
                             }

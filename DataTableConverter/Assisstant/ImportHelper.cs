@@ -450,37 +450,45 @@ namespace DataTableConverter.Assisstant
         internal void OpenDBF(string path, ProgressBar progressBar, Form mainForm, string tableName)
         {
             string directory = ToShortPathName(Path.GetDirectoryName(path));
-            string shortPath = GetShortFileName(path);
-            string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={directory};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
-            using (OleDbConnection con = new OleDbConnection(constr))
+            string shortFileName = GetShortFileName(path);
+            string shortPath = Path.Combine(directory, shortFileName);
+            if (File.Exists(shortPath))
             {
-                con.Open();
-                progressBar?.StartLoadingBar(GetDataReaderRowCount(con, shortPath, mainForm), mainForm);
-
-                using (OleDbCommand command = con.CreateCommand())
+                string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={directory};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
+                using (OleDbConnection con = new OleDbConnection(constr))
                 {
-                    command.CommandText = $@"select * from [{ shortPath}]";
-                    SQLiteCommand insertCommand = null;
-                    using (OleDbDataReader reader = command.ExecuteReader())
+                    con.Open();
+                    progressBar?.StartLoadingBar(GetDataReaderRowCount(con, shortFileName, mainForm), mainForm);
+
+                    using (OleDbCommand command = con.CreateCommand())
                     {
-                        string[] columnNames = new string[reader.FieldCount];
-                        for (int i = 0; i < reader.FieldCount; i++)
+                        command.CommandText = $"select * from [{shortFileName}]";
+                        SQLiteCommand insertCommand = null;
+                        using (OleDbDataReader reader = command.ExecuteReader())
                         {
-                            columnNames[i] = reader.GetName(i).Trim();
-                        }
-                        DatabaseHelper.CreateTable(columnNames, tableName);
-                        while (reader.Read())
-                        {
-                            object[] values = new object[reader.FieldCount];
-                            for (int i = 0; i < reader.FieldCount; ++i)
+                            string[] columnNames = new string[reader.FieldCount];
+                            for (int i = 0; i < reader.FieldCount; i++)
                             {
-                                values[i] = reader.GetValue(i).ToString().Replace("\n", string.Empty).Trim(); //remove new lines in dbase
+                                columnNames[i] = reader.GetName(i).Trim();
                             }
-                            insertCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, insertCommand);
-                            progressBar?.UpdateLoadingBar(mainForm);
+                            DatabaseHelper.CreateTable(columnNames, tableName);
+                            while (reader.Read())
+                            {
+                                object[] values = new object[reader.FieldCount];
+                                for (int i = 0; i < reader.FieldCount; ++i)
+                                {
+                                    values[i] = reader.GetValue(i).ToString().Replace("\n", string.Empty).Trim(); //remove new lines in dbase
+                                }
+                                insertCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, insertCommand);
+                                progressBar?.UpdateLoadingBar(mainForm);
+                            }
                         }
                     }
                 }
+            }
+            else
+            {
+                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Error, $"Die Datei {shortPath} konnte nicht gefunden werden");
             }
         }
 

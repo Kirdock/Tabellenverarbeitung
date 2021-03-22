@@ -40,6 +40,7 @@ namespace DataTableConverter
         internal readonly DatabaseHelper DatabaseHelper;
         internal readonly ExportHelper ExportHelper;
         internal readonly ImportHelper ImportHelper;
+        private static HashSet<string> FormInstances = new HashSet<string>();
         private enum SaveFormat { CSV, DBASE, EXCEL };
         private decimal Page
         {
@@ -70,8 +71,15 @@ namespace DataTableConverter
 
         internal Form1(string databaseName = null, string path = null)
         {
+            bool isExistingDatabase = databaseName != null;
+            if(FormInstances.Contains(databaseName))
+            {
+                databaseName = Guid.NewGuid().ToString();
+            }
+            FormInstances.Add(databaseName);
+
             InitializeComponent();
-            DatabaseHelper = new DatabaseHelper(databaseName);
+            DatabaseHelper = new DatabaseHelper(databaseName, !isExistingDatabase);
             ExportHelper = new ExportHelper(DatabaseHelper);
             DatabaseHelper.ExportHelper = ExportHelper;
             ImportHelper = new ImportHelper(ExportHelper, DatabaseHelper);
@@ -91,7 +99,7 @@ namespace DataTableConverter
 
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
-            if (databaseName != null)
+            if (isExistingDatabase)
             {
                 LoadData(true, false, true);
                 SetMenuEnabled(true);
