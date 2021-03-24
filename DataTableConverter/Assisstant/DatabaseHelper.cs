@@ -565,7 +565,7 @@ namespace DataTableConverter.Assisstant
                     counter++;
                 }
                 command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] set alias = ? where alias = ?";
-                command.Parameters.Add(new SQLiteParameter() { Value = to });
+                command.Parameters.Add(new SQLiteParameter() { Value = newAlias });
                 command.Parameters.Add(new SQLiteParameter() { Value = from });
                 command.ExecuteNonQuery();
             }

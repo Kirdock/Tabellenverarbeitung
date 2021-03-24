@@ -838,8 +838,8 @@ namespace DataTableConverter
 
                 if (oldText != newText)
                 {
-                    DatabaseHelper.RenameAlias(oldText, newText, TableName);
-                    dgTable.Columns[selectedColumn].HeaderText = newText;
+                    string newAlias = DatabaseHelper.RenameAlias(oldText, newText, TableName);
+                    dgTable.Columns[selectedColumn].HeaderText = newAlias;
                     DatabaseHelper.SetSavepoint();
                 }
             }
