@@ -1323,7 +1323,7 @@ namespace DataTableConverter.Assisstant
         /// <param name="tableName"></param>
         /// <param name="columnNames"></param>
         /// <returns>Status if all columns were created</returns>
-        internal bool AddColumnsWithDialog(string alias, string[] originalAlias, Form invokeForm, string tableName, out string[] columnNames)
+        internal void AddColumnsWithDialog(string alias, string[] originalAlias, Form invokeForm, string tableName, out string[] columnNames)
         {
             bool result = true;
             columnNames = new string[originalAlias.Length];
@@ -1332,7 +1332,10 @@ namespace DataTableConverter.Assisstant
                 result &= AddColumnWithDialog(originalAlias.Length == 1 ? alias : $"{originalAlias[i]}_{alias}", invokeForm, tableName, out string columnName);
                 columnNames[i] = columnName;
             }
-            return result;
+            if(!result)
+            {
+                columnNames = null;
+            }
         }
 
         internal void InsertDataPerColumnValue(string columnName, OrderType orderType, int limit, string sourceTable, string destinationTable)
