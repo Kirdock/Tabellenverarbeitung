@@ -572,6 +572,7 @@ namespace DataTableConverter
 
                     default:
                         ResetValidRowLabel();
+                        SetSorting(string.Empty);
                         DatabaseHelper.ReplaceTable(tableName, TableName);
                         BeginInvoke(new MethodInvoker(() =>
                         {

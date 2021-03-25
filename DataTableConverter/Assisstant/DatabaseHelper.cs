@@ -882,7 +882,7 @@ namespace DataTableConverter.Assisstant
                     rowCount++;
                 }
                 int half = rowCount / 2;
-                selectString += $"{headerString}{(headerString == string.Empty && !includeId ? "" : ",")} ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] {whereStatement} ORDER BY case when rnumber > {half}  then(rnumber - ({half}-0.5)) when rnumber <= {half} then rnumber end, rnumber COLLATE NATURALSORT"; //append ASC or DESC
+                selectString += $"{headerString}{(headerString == string.Empty && !includeId ? "" : ",")} ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] {whereStatement} ORDER BY case when rnumber > {half}  then(rnumber - {half}-0.5) when rnumber <= {half} then rnumber end, rnumber COLLATE NATURALSORT"; //append ASC or DESC
             }
             else if (orderType == OrderType.Windows && order != string.Empty)
             {
@@ -1464,7 +1464,7 @@ namespace DataTableConverter.Assisstant
             return max;
         }
 
-        internal void DictionaryToDataTable(Dictionary<string, int> dict, string columnName, bool showFromTo, string tableName, int sourceRowCount)
+        internal void DictionaryToTable(Dictionary<string, int> dict, string columnName, bool showFromTo, string tableName, int sourceRowCount)
         {
             SQLiteCommand command = null;
             if (showFromTo)

@@ -752,7 +752,7 @@ namespace DataTableConverter
             if (count == 0)
             {
                 Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName, tableName);
-                DatabaseHelper.DictionaryToDataTable(pair, columnName, showFromTo, newTable, DatabaseHelper.GetRowCount(tableName));
+                DatabaseHelper.DictionaryToTable(pair, columnName, showFromTo, newTable, DatabaseHelper.GetRowCount(tableName));
             }
             else
             {
