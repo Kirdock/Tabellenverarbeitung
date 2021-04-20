@@ -1,6 +1,7 @@
 ﻿using DataTableConverter.Classes.WorkProcs;
 using System;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -25,6 +26,7 @@ namespace DataTableConverter.View
         {
             Table = new DataTable();
             ProcReplaceWhole.SetColumns(Table);
+            Table.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].DefaultValue = headers.First();
 
             dgTable.DataSource = Table;
 

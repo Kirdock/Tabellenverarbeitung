@@ -77,7 +77,7 @@ namespace DataTableConverter.Classes.WorkProcs
                         SQLiteCommand tempCommand = null;
                         while (reader.Read())
                         {
-                            if (dict.TryGetValue(reader.GetString(columnIndex), out string tempTable))
+                            if (dict.TryGetValue(reader.GetValue(columnIndex).ToString(), out string tempTable))
                             {
                                 tempCommand = invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, tempCommand);
                             }

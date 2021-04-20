@@ -578,7 +578,7 @@ namespace DataTableConverter.Assisstant
                                     object[] values = new object[reader.FieldCount];
                                     for (int i = 0; i < reader.FieldCount; ++i)
                                     {
-                                        values[0] = reader.GetString(i);
+                                        values[0] = reader.GetValue(i).ToString();
                                     }
                                     liteCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, liteCommand);
                                     progressBar?.UpdateLoadingBar(mainForm);

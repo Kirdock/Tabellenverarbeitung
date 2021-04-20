@@ -129,7 +129,7 @@ namespace DataTableConverter.Classes.WorkProcs
                                 return !string.IsNullOrWhiteSpace(alias)
                                     &&
                                     (
-                                        ((rowValue = reader.GetString(aliases.IndexOf(alias) + 1/*+1 because id is first and it's not included in aliases*/)) == condition[(int)ConditionColumn.Wert].ToString() && !notEmpty)
+                                        ((rowValue = reader.GetValue(aliases.IndexOf(alias) + 1).ToString()) == condition[(int)ConditionColumn.Wert].ToString() && !notEmpty)
                                         ||
                                         (
                                             notEmpty
@@ -141,7 +141,7 @@ namespace DataTableConverter.Classes.WorkProcs
                             Dictionary<string, string> aliasValueMapping = new Dictionary<string, string>();
                             for (int i = 1; i < reader.FieldCount; i++)
                             {
-                                aliasValueMapping.Add(aliases[i - 1], reader.GetString(i));
+                                aliasValueMapping.Add(aliases[i - 1], reader.GetValue(i).ToString());
                             }
                             MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
                             string result = format.IsStringFormat() ? GetFormat(aliasValueMapping, format.Formula, aliases, invokeForm) : GetFormat(aliasValueMapping, format, aliases);

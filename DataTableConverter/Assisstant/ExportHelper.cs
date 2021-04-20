@@ -403,13 +403,13 @@ namespace DataTableConverter
                 {
                     if (File.Exists(tempDirectoryPath))
                     {
-                        DeleteDirectory(tempDirectoryPath);
+                        DeleteDirectory(tempDirectoryPath, invokeForm);
                     }
                 }
             }
             else
             {
-                DeleteDirectory(tempDirectoryPath);
+                DeleteDirectory(tempDirectoryPath, invokeForm);
                 invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
                 rowCount = 0;
             }
@@ -421,11 +421,11 @@ namespace DataTableConverter
         /// Depth-first recursive delete, with handling for descendant 
         /// directories open in Windows Explorer.
         /// </summary>
-        private void DeleteDirectory(string path)
+        private void DeleteDirectory(string path, Form mainForm)
         {
             foreach (string directory in Directory.GetDirectories(path))
             {
-                DeleteDirectory(directory);
+                DeleteDirectory(directory, mainForm);
             }
 
             try
@@ -439,6 +439,10 @@ namespace DataTableConverter
             catch (UnauthorizedAccessException)
             {
                 Directory.Delete(path, true);
+            }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage(ex, mainForm, true);
             }
         }
 
@@ -513,10 +517,10 @@ namespace DataTableConverter
 
                                     for (int i = 0; i < reader.FieldCount - 1; i++)
                                     {
-                                        writer.Write(reader.GetString(i));
+                                        writer.Write(reader.GetValue(i).ToString());
                                         writer.Write(CSVSeparator);
                                     }
-                                    writer.Write(reader.GetString(reader.FieldCount - 1));
+                                    writer.Write(reader.GetValue(reader.FieldCount - 1).ToString());
                                     writer.Write(writer.NewLine);
                                     updateLoadingBar?.Invoke();
                                 }
@@ -525,7 +529,6 @@ namespace DataTableConverter
                     }
                 }
             }
-            command.Dispose();
             return rowCount;
         }
 
@@ -600,7 +603,6 @@ namespace DataTableConverter
                     }
                 }
 
-                command.Dispose();
                 SaveExcelFile(directory, fileName, oldFileExtension, workbook, invokeForm);
             }
             catch (Exception ex)
@@ -682,7 +684,7 @@ namespace DataTableConverter
         private void InsertRowsSkeleton(Worksheet worksheet, int rowCount, int columnCount)
         {
             Range beginWrite = (Range)worksheet.Cells[2, 1];
-            Range endWrite = (Range)worksheet.Cells[rowCount, columnCount];
+            Range endWrite = (Range)worksheet.Cells[rowCount + 2, columnCount];
             Range addNewRows = worksheet.Range[beginWrite, endWrite];
             addNewRows.Insert(XlInsertShiftDirection.xlShiftDown, XlInsertFormatOrigin.xlFormatFromLeftOrAbove);
         }
@@ -699,16 +701,18 @@ namespace DataTableConverter
         /// <param name="mainForm"></param>
         /// <param name="continuedNumberColumn"></param>
         /// <param name="tableName"></param>
-        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName)
+        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName, Action<string> setStatus)
         {
             foreach (ExportCustomItem item in items)
             {
                 Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
+                string fileExtension = GetFileExtension(item.Format);
 
                 if (item.CheckedAllValues)
                 {
                     foreach (string value in item.AllValues)
                     {
+                        setStatus($"Die Datei {item.Name}_{value}.{fileExtension} wird vorbereitet");
                         string newTable = Guid.NewGuid().ToString();
                         DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
                         dict.Add(value, new string[] { newTable, $"{item.Name}_{value}" });
@@ -720,6 +724,7 @@ namespace DataTableConverter
                     DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
                     foreach (string value in item.SelectedValues)
                     {
+                        setStatus($"Die Datei {item.Name}.{fileExtension} wird vorbereitet");
                         if (!dict.ContainsKey(value))
                         {
                             dict.Add(value, new string[] { newTable, item.Name });
@@ -727,13 +732,33 @@ namespace DataTableConverter
                     }
                 }
 
+                setStatus($"Die Datei wird vorbereitet");
                 DatabaseHelper.SplitTableOnRowValue(dict, item.Column, tableName);
 
                 foreach (string[] tableInfo in dict.Values.Distinct())
                 {
+                    setStatus($"Die Datei {tableInfo[1]}.{fileExtension} wird gespeichert");
                     Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, item.Format, order, orderType, mainForm, tableInfo[0], null, continuedNumberColumn);
                 }
             }
+        }
+
+        private string GetFileExtension(int format)
+        {
+            string result;
+            switch(format)
+            {
+                case 0:
+                    result = "csv";
+                    break;
+                case 1:
+                    result = "DBASE";
+                    break;
+                default:
+                    result = "xlsx";
+                    break;
+            }
+            return result;
         }
 
         /// <summary>

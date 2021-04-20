@@ -238,7 +238,7 @@ namespace DataTableConverter.Assisstant
                 {
                     while (reader.Read())
                     {
-                        aliases.Add(reader.GetString(0));
+                        aliases.Add(reader.GetValue(0).ToString());
                     }
                 }
             }
@@ -497,7 +497,6 @@ namespace DataTableConverter.Assisstant
         internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, SQLiteDataReader reader, string tableName, SQLiteCommand cmd = null, SQLiteConnection connection = null)
         {
             string[] headers = eHeaders.ToArray();
-            string headerString = GetHeaderString(headers);
 
             SQLiteCommand command = cmd;
             if (cmd == null)
@@ -508,7 +507,7 @@ namespace DataTableConverter.Assisstant
             {
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
-                    command.Parameters[i].Value = reader.GetString(i);
+                    command.Parameters[i].Value = reader.GetValue(i).ToString();
                 }
             }
             command.ExecuteNonQuery();
@@ -525,7 +524,7 @@ namespace DataTableConverter.Assisstant
 
             for (int i = 0; i < reader.FieldCount; i++)
             {
-                command.Parameters.Add(new SQLiteParameter() { Value = reader.GetString(i) });
+                command.Parameters.Add(new SQLiteParameter() { Value = reader.GetValue(i).ToString() });
             }
             return command;
         }
@@ -781,7 +780,7 @@ namespace DataTableConverter.Assisstant
                                 destinationCommand.Parameters[0].Value = sortOrder;
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
-                                    destinationCommand.Parameters[i + 1].Value = reader.GetString(i);
+                                    destinationCommand.Parameters[i + 1].Value = reader.GetValue(i).ToString();
                                 }
                                 destinationCommand.ExecuteNonQuery();
                                 sortOrder++;
@@ -914,7 +913,7 @@ namespace DataTableConverter.Assisstant
                 {
                     while (reader.Read())
                     {
-                        headers.Add($"[{reader.GetString(0)}] AS [{reader.GetString(1)}]");
+                        headers.Add($"[{reader.GetValue(0).ToString()}] AS [{reader.GetValue(1).ToString()}]");
                     }
                 }
             }
@@ -949,7 +948,7 @@ namespace DataTableConverter.Assisstant
                 {
                     while (reader.Read())
                     {
-                        headerMapping.Add(reader.GetString(0), reader.GetString(1));
+                        headerMapping.Add(reader.GetValue(0).ToString(), reader.GetValue(1).ToString());
                     }
                 }
             }
@@ -1230,7 +1229,7 @@ namespace DataTableConverter.Assisstant
                     int i = 0;
                     while (reader.Read())
                     {
-                        columnNames[i] = reader.GetString(0);
+                        columnNames[i] = reader.GetValue(0).ToString();
                         ++i;
                     }
                 }
@@ -1248,7 +1247,7 @@ namespace DataTableConverter.Assisstant
                 {
                     while (reader.Read())
                     {
-                        columnNames.Add(reader.GetString(0));
+                        columnNames.Add(reader.GetValue(0).ToString());
                     }
                 }
             }
@@ -1365,7 +1364,7 @@ namespace DataTableConverter.Assisstant
                             {
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
-                                    insertCommand.Parameters[i].Value = reader.GetString(i);
+                                    insertCommand.Parameters[i].Value = reader.GetValue(i).ToString();
                                 }
                                 insertCommand.ExecuteNonQuery();
                             }
@@ -1385,7 +1384,7 @@ namespace DataTableConverter.Assisstant
                 {
                     while (reader.Read())
                     {
-                        list.Add(reader.GetString(0));
+                        list.Add(reader.GetValue(0).ToString());
                     }
                 }
             }
@@ -1402,7 +1401,7 @@ namespace DataTableConverter.Assisstant
                 {
                     while (reader.Read())
                     {
-                        dict.Add(reader.GetString(0), reader.GetInt32(1));
+                        dict.Add(reader.GetValue(0).ToString(), reader.GetInt32(1));
                     }
                 }
             }
@@ -1438,7 +1437,7 @@ namespace DataTableConverter.Assisstant
                             {
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
-                                    insertCommand.Parameters[i].Value = reader.GetString(i);
+                                    insertCommand.Parameters[i].Value = reader.GetValue(i).ToString();
                                 }
                                 insertCommand.ExecuteNonQuery();
                             }
@@ -1653,7 +1652,7 @@ namespace DataTableConverter.Assisstant
                     while (reader.Read())
                     {
                         rowCount++;
-                        string value = reader.GetString(1);
+                        string value = reader.GetValue(1).ToString();
                         int checkSum = ChecksumEAN9(value);
                         if (checkSum == -1 && askAgain)
                         {
@@ -1755,7 +1754,7 @@ namespace DataTableConverter.Assisstant
                         int rowCount = 1;
 #region Init
                         int id = reader.GetInt32(0);
-                        string nameBefore = reader.GetString(1);
+                        string nameBefore = reader.GetValue(1).ToString();
                         int counter = 1;
                         decimal[] sumResults = new decimal[sumColumns.Length];
 
@@ -1765,7 +1764,7 @@ namespace DataTableConverter.Assisstant
 
                         for (int i = 0; i < sumColumns.Length; ++i)
                         {
-                            decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
+                            decimal.TryParse(reader.GetValue(i + sumOffset).ToString(), out decimal result);
                             sumResults[i] = result;
                         }
 
@@ -1775,7 +1774,7 @@ namespace DataTableConverter.Assisstant
                         {
                             rowCount++;
 
-                            string name = reader.GetString(1);
+                            string name = reader.GetValue(1).ToString();
                             if (name != nameBefore)
                             {
                                 //save values of before
@@ -1797,7 +1796,7 @@ namespace DataTableConverter.Assisstant
 
                                 for (int i = 0; i < sumColumns.Length; ++i)
                                 {
-                                    decimal.TryParse(reader.GetString(i + sumOffset), out decimal result);
+                                    decimal.TryParse(reader.GetValue(i + sumOffset).ToString(), out decimal result);
                                     sumResults[i] = result;
                                 }
 
@@ -1822,14 +1821,14 @@ namespace DataTableConverter.Assisstant
                                             aliasColumnMapping.Add(newAlias, newAlias);
                                         }
 
-                                        newRowValues.Add(newAlias, reader.GetString(i + offset));
+                                        newRowValues.Add(newAlias, reader.GetValue(i + offset).ToString());
                                     }
 
                                     counter++;
                                 }
                                 for (int i = 0; i < sumColumns.Length; ++i)
                                 {
-                                    if (decimal.TryParse(reader.GetString(i + sumOffset), out decimal result))
+                                    if (decimal.TryParse(reader.GetValue(i + sumOffset).ToString(), out decimal result))
                                     {
                                         sumResults[i] += result;
                                     }
@@ -1875,11 +1874,11 @@ namespace DataTableConverter.Assisstant
                     //1 = type (isAlias, 0 or 1) if name is alias or column
                     //2 = column/alias names
                     //3 = values
-                    int id = int.Parse(reader.GetString(0));
-                    bool isAlias = reader.GetString(1) == "1";
-                    string[] names = reader.GetString(2).Split('\t');
+                    int id = int.Parse(reader.GetValue(0).ToString());
+                    bool isAlias = reader.GetValue(1).ToString() == "1";
+                    string[] names = reader.GetValue(2).ToString().Split('\t');
                     string[] columnNames = isAlias ? names.Select(name => aliasColumnMapping.First(pair => pair.Key.Equals(name, StringComparison.OrdinalIgnoreCase)).Value).ToArray() : names;
-                    updateCommand = UpdateRow(id, columnNames, reader.GetString(3).Split('\t'), tableName, updateCommand);
+                    updateCommand = UpdateRow(id, columnNames, reader.GetValue(3).ToString().Split('\t'), tableName, updateCommand);
                 }
             }
             Delete(newTableName);
@@ -1993,7 +1992,7 @@ namespace DataTableConverter.Assisstant
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName, $"where [{GetColumnName(alias, tableName)}] {(strictMatch ? "= ? COLLATE NOCASE" : "like ?")}");
-                command.Parameters.Add(new SQLiteParameter() { Value = $"%{value}%" });
+                command.Parameters.Add(new SQLiteParameter() { Value = strictMatch ? value : $"%{value}%" });
                 string id = command.ExecuteScalar()?.ToString();
                 if (id != null)
                 {
@@ -2013,7 +2012,7 @@ namespace DataTableConverter.Assisstant
         private string GetLengthCalcString(string tableName)
         {
             List<string> columnNames = GetColumnNames(tableName);
-            return "length(" + string.Join(")+(", columnNames) + ")";
+            return "length([" + string.Join("])+length([", columnNames) + "])";
         }
 
         internal void UpdateRowsWithMinCharacters(string columnName, int minLength, string value, string destinationColumn, string tableName)
@@ -2201,7 +2200,7 @@ namespace DataTableConverter.Assisstant
                                     counter++;
                                 }
                             }
-                            else if (search.Invoke(reader.GetString(1), searchText))
+                            else if (search.Invoke(reader.GetValue(1).ToString(), searchText))
                             {
                                 updates.Add(new KeyValuePair<int, string>(reader.GetInt32(0), counter.ToString()));
                                 found = true;
@@ -2232,9 +2231,9 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"UPDATE [{tableName}] set [{sourceColumn}] = ? where [{destinationColumn}] {(totalSearch ? "= ?" : "like %?%")}";
+                command.CommandText = $"UPDATE [{tableName}] set [{sourceColumn}] = ? where [{destinationColumn}] {(totalSearch ? "= ?" : "like ?")}";
                 command.Parameters.Add(new SQLiteParameter() { Value = shortcut });
-                command.Parameters.Add(new SQLiteParameter() { Value = searchText });
+                command.Parameters.Add(new SQLiteParameter() { Value = totalSearch ? searchText : $"%{searchText}%"});
                 command.ExecuteNonQuery();
             }
         }
@@ -2277,7 +2276,7 @@ namespace DataTableConverter.Assisstant
                         {
 
                             string index = destinationColumns[i];
-                            string value = reader.GetString(i + 1);
+                            string value = reader.GetValue(i + 1).ToString();
                             string result = value;
                             bool changed = false;
 

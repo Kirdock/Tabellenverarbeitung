@@ -1082,16 +1082,42 @@ namespace DataTableConverter
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
+                    SetStatusLabelVisibility(true);
                     Thread thread = new Thread(() =>
                     {
-                        ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName, TableName);
-                        StopLoadingBar();
+                        try
+                        {
+                            ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName, TableName, UpdateStatusLabel);
+                            StopLoadingBar();
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex, this, true);
+                        }
+                        SetStatusLabelVisibility(false);
+                        UpdateStatusLabel(string.Empty);
                         SaveFinished();
                     });
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.Start();
                 }
             }
+        }
+
+        private void SetStatusLabelVisibility(bool status)
+        {
+            statusStrip1.BeginInvoke(new MethodInvoker(() =>
+            {
+                LblStatus.Visible = status;
+            }));
+        }
+
+        private void UpdateStatusLabel(string fileName)
+        {
+            statusStrip1.BeginInvoke(new MethodInvoker(() =>
+            {
+                LblStatus.Text = fileName;
+            }));
         }
 
         private void StartLoadingBar()
@@ -1503,7 +1529,7 @@ namespace DataTableConverter
             decimal maxRecords = Properties.Settings.Default.MaxRows;
             decimal desiredPage = Math.Ceiling((index + 1) / maxRecords);
             decimal newIndex = index;
-            while (newIndex > maxRecords)
+            while (newIndex >= maxRecords)
             {
                 newIndex -= maxRecords;
             }
@@ -1544,7 +1570,14 @@ namespace DataTableConverter
         private void SearchAndSelect(string searchText, string alias, bool totalSearch)
         {
             int index = DatabaseHelper.SearchValue(searchText, alias, totalSearch, GetSorting(), OrderType, TableName);
-            SelectDataGridViewRow(index);
+            if (index == -1)
+            {
+                MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, $"Der Suchtext \"{searchText}\" konnte nicht gefunden werden");
+            }
+            else
+            {
+                SelectDataGridViewRow(index);
+            }
         }
 
         private void Form1_DragDrop(object sender, DragEventArgs e)

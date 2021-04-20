@@ -139,7 +139,7 @@ namespace DataTableConverter.Assisstant
                         int readRows = 0;
                         while (reader.Read())
                         {
-                            DatabaseHelper.ExecuteCommand(reader.GetString(0), DatabaseHelper.DefaultTable);
+                            DatabaseHelper.ExecuteCommand(reader.GetValue(0).ToString(), DatabaseHelper.DefaultTable);
                             ++offset;
                             ++readRows;
                         }

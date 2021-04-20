@@ -92,8 +92,11 @@ namespace DataTableConverter.Classes.WorkProcs
                             {
                                 updates.Add(sourceId, duplicateCase.ShortcutTotal);
                             }
-
-                            updates.Add(reader.GetInt16(0), duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
+                            int id = reader.GetInt16(0);
+                            if (!updates.ContainsKey(id))
+                            {
+                                updates.Add(id, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
+                            }
                         }
                         else
                         {
@@ -106,7 +109,11 @@ namespace DataTableConverter.Classes.WorkProcs
                                 {
                                     updates.Add(sourceId2, duplicateCase.ShortcutTotal);
                                 }
-                                updates.Add(reader.GetInt16(0), duplicateCase.Shortcut + duplicateCase.Shortcut);
+                                int id = reader.GetInt16(0);
+                                if (!updates.ContainsKey(id))
+                                {
+                                    updates.Add(id, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                                }
                             }
                             else
                             {
