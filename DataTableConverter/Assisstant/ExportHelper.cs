@@ -399,19 +399,19 @@ namespace DataTableConverter
                     ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {tempDirectoryPath}; fileName: {fileName}; headers:[{string.Join("; ", headers)}]", invokeForm);
                     return 0;
                 }
-                finally
-                {
-                    if (File.Exists(tempDirectoryPath))
-                    {
-                        DeleteDirectory(tempDirectoryPath, invokeForm);
-                    }
-                }
             }
             else
             {
-                DeleteDirectory(tempDirectoryPath, invokeForm);
                 invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
                 rowCount = 0;
+            }
+            if (File.Exists(tempDirectoryPath))
+            {
+                DeleteDirectory(tempDirectoryPath, invokeForm);
+            }
+            else
+            {
+                invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Der temporär angelegte Ordner kann nicht wieder gelöscht werden, da er nicht gefunden werden kann");
             }
             return rowCount;
         }
@@ -423,6 +423,7 @@ namespace DataTableConverter
         /// </summary>
         private void DeleteDirectory(string path, Form mainForm)
         {
+
             foreach (string directory in Directory.GetDirectories(path))
             {
                 DeleteDirectory(directory, mainForm);

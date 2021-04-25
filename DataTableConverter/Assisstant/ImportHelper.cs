@@ -248,10 +248,11 @@ namespace DataTableConverter.Assisstant
                     .Select(x => x.Split(separators.ToArray(), StringSplitOptions.None));
 
             progressBar?.StartLoadingBar(enumerableArray.Count(), mainForm);
+            Func<string, string> trimOperation = GetTrimOperation();
             SQLiteCommand insertCommand = null;
             foreach (string[] line in enumerableArray)
             {
-                string[] values = line.Select(ln => ln.Trim()).ToArray();
+                string[] values = line.Select(ln => trimOperation(ln)).ToArray();
                 bool addedColumns = values.Length > headers.Count;
                 while (values.Length > headers.Count)
                 {
@@ -279,6 +280,7 @@ namespace DataTableConverter.Assisstant
 
         internal void OpenTextBetween(string tableName, string path, int codePage, string begin, string end, bool containsHeaders, object[] headers, bool isPreview, ProgressBar progressBar, Form mainForm)
         {
+            Func<string, string> trimOperation = GetTrimOperation();
             try
             {
                 int skip = 0;
@@ -346,7 +348,7 @@ namespace DataTableConverter.Assisstant
                         int indexEnd = line.IndexOf(endText, indexBegin);
                         if (indexEnd != -1)
                         {
-                            row.Add(line.Substring(indexBegin, indexEnd - indexBegin).Trim());
+                            row.Add(trimOperation(line.Substring(indexBegin, indexEnd - indexBegin)));
                             pointer = indexEnd + endLength;
                         }
                         else
@@ -373,6 +375,7 @@ namespace DataTableConverter.Assisstant
             try
             {
                 DatabaseHelper.CreateTable(header, tableName);
+                Func<string, string> trimOperation = GetTrimOperation();
                 SQLiteCommand insertCommand = null;
                 if (hasRowBreaks)
                 {
@@ -386,19 +389,18 @@ namespace DataTableConverter.Assisstant
                     foreach (string line in eLines)
                     {
                         Dictionary<string, string> row = new Dictionary<string, string>();
-                        //string[] itemArray = new string[header.Count];
                         int index = 0;
                         for (int i = 0; i < config.Count; i++)
                         {
                             int length = config[i];
                             if (index + config[i] > line.Length)
                             {
-                                row.Add(header[i], line.Substring(index, line.Length - index));
+                                row.Add(header[i], trimOperation(line.Substring(index, line.Length - index)));
                                 i = config.Count;
                             }
                             else
                             {
-                                row.Add(header[i], line.Substring(index, length));
+                                row.Add(header[i], trimOperation(line.Substring(index, length)));
                                 index += config[i];
                             }
                         }
@@ -431,7 +433,7 @@ namespace DataTableConverter.Assisstant
                                 {
                                     body[index] = (char)stream.Read();
                                 }
-                                row.Add(header[i], new string(body).Trim());
+                                row.Add(header[i], trimOperation(new string(body)));
                             }
                             progressBar?.UpdateLoadingBar(mainForm);
                             insertCommand = DatabaseHelper.InsertRow(row, tableName, insertCommand);
@@ -526,6 +528,7 @@ namespace DataTableConverter.Assisstant
         internal string OpenMSAccess(string path, ProgressBar progressBar, Form mainForm, ref string tableName)
         {
             tableName = Guid.NewGuid().ToString();
+            Func<string, string> trimOperation = GetTrimOperation();
             try
             {
                 OleDbConnection con = new OleDbConnection
@@ -578,7 +581,7 @@ namespace DataTableConverter.Assisstant
                                     object[] values = new object[reader.FieldCount];
                                     for (int i = 0; i < reader.FieldCount; ++i)
                                     {
-                                        values[0] = reader.GetValue(i).ToString();
+                                        values[0] = trimOperation(reader.GetValue(i).ToString());
                                     }
                                     liteCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, liteCommand);
                                     progressBar?.UpdateLoadingBar(mainForm);
@@ -598,15 +601,9 @@ namespace DataTableConverter.Assisstant
             return tableName;
         }
 
-        private void CheckDataTableColumnHeader(DataTable table)
+        private Func<string, string> GetTrimOperation()
         {
-            if (Properties.Settings.Default.ImportHeaderUpperCase)
-            {
-                foreach (DataColumn col in table.Columns)
-                {
-                    col.ColumnName = col.ColumnName.ToUpper();
-                }
-            }
+            return Properties.Settings.Default.TrimImport ? (Func<string, string>)(value => value.Trim()) : value => value;
         }
 
         #region Excel Import
@@ -614,6 +611,7 @@ namespace DataTableConverter.Assisstant
         {
             Microsoft.Office.Interop.Excel.Application objXL = null;
             Microsoft.Office.Interop.Excel.Workbook objWB = null;
+            Func<string, string> trimOperation = GetTrimOperation();
             string clipboardBefore = string.Empty;
             try
             {
@@ -681,7 +679,7 @@ namespace DataTableConverter.Assisstant
 
                     progressBar?.StartLoadingBar(rows, mainForm);
                     UnhideRowsAndColumns(objSHT);
-                    RangeToDataTable(objSHT, objXL, rows, cols, tableName, fileNameColumn ? Path.GetFileName(path) + "; " + sheetName : null, progressBar, mainForm);
+                    RangeToDataTable(objSHT, objXL, rows, cols, tableName, fileNameColumn ? Path.GetFileName(path) + "; " + sheetName : null, trimOperation, progressBar, mainForm);
                     Marshal.ReleaseComObject(objSHT);
                 }
             }
@@ -725,7 +723,7 @@ namespace DataTableConverter.Assisstant
             objSHT.Rows.EntireRow.Hidden = false;
         }
 
-        private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, ProgressBar progressBar, Form mainForm)
+        private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, Func<string,string> trimOperation, ProgressBar progressBar, Form mainForm)
         {
 
             List<string> headers = SetHeaderOfExcel(objSHT, cols);
@@ -758,7 +756,7 @@ namespace DataTableConverter.Assisstant
                 }
                 else
                 {
-                    insertCommand = GetDataOfString(content.ToCharArray(), tableName, fileName, headers, progressBar, mainForm, insertCommand);
+                    insertCommand = GetDataOfString(content.ToCharArray(), tableName, fileName, headers, progressBar, mainForm, insertCommand, trimOperation);
                 }
             }
         }
@@ -781,7 +779,7 @@ namespace DataTableConverter.Assisstant
             return GetHeadersOfContent(content);
         }
 
-        private SQLiteCommand GetDataOfString(char[] content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm, SQLiteCommand insertCommand)
+        private SQLiteCommand GetDataOfString(char[] content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm, SQLiteCommand insertCommand, Func<string, string> trimOperation)
         {
             int maxLength = content.Length;
             StringBuilder cellBuilder = new StringBuilder();
@@ -798,7 +796,7 @@ namespace DataTableConverter.Assisstant
                     progressBar?.UpdateLoadingBar(mainForm);
                     if (!generatedMulti)
                     {
-                        SetContentRowValue(row, headers[headerCounter], cellBuilder);
+                        SetContentRowValue(row, headers[headerCounter], cellBuilder, trimOperation);
                     }
                     generatedMulti = false;
                     headerCounter = 0;
@@ -825,7 +823,7 @@ namespace DataTableConverter.Assisstant
                 {
                     if (!generatedMulti)
                     {
-                        SetContentRowValue(row, headers[headerCounter], cellBuilder);
+                        SetContentRowValue(row, headers[headerCounter], cellBuilder, trimOperation);
                     }
                     generatedMulti = false;
                     headerCounter++;
@@ -843,7 +841,7 @@ namespace DataTableConverter.Assisstant
                     cellBuilder.Append(content[i]);
                 }
             }
-            SetContentRowValue(row, headers[headerCounter], cellBuilder);
+            SetContentRowValue(row, headers[headerCounter], cellBuilder, trimOperation);
             AddContentDataRow(row, tableName, fileName, insertCommand);
             return insertCommand;
         }
@@ -861,9 +859,9 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
-        private void SetContentRowValue(Dictionary<string, string> row, string column, StringBuilder builder)
+        private void SetContentRowValue(Dictionary<string, string> row, string column, StringBuilder builder, Func<string, string> trimOperation)
         {
-            row.Add(column, builder.ToString());
+            row.Add(column, trimOperation(builder.ToString()));
             builder.Clear();
         }
 

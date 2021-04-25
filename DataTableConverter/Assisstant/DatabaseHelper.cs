@@ -293,9 +293,12 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter("$column"));
                 command.Parameters.Add(new SQLiteParameter("$alias"));
 
+                Func<string, string> operation = Properties.Settings.Default.ImportHeaderUpperCase ? (Func<string, string>)(value => value.ToUpper()) : value => value;
+
                 foreach (string columnName in columnNames)
                 {
-                    command.Parameters[0].Value = command.Parameters[1].Value = columnName;
+                    command.Parameters[0].Value = columnName;
+                    command.Parameters[1].Value = operation(columnName);
                     command.ExecuteNonQuery();
                 }
             }
