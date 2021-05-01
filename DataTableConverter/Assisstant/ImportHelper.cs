@@ -264,7 +264,7 @@ namespace DataTableConverter.Assisstant
                         ++counter;
                     } while (headers.Contains(colName));
 
-                    DatabaseHelper.AddColumn(tableName, colName);
+                    colName = DatabaseHelper.AddColumn(tableName, colName);
                     headers.Add(colName);
                     insertCommand = null;
                 }
@@ -315,7 +315,7 @@ namespace DataTableConverter.Assisstant
                         while (values.Length > newHeaders.Count)
                         {
                             string colName = "Spalte" + newHeaders.Count;
-                            DatabaseHelper.AddColumn(tableName, colName);
+                            colName = DatabaseHelper.AddColumn(tableName, colName);
                             newHeaders.Add(colName);
                         }
                         progressBar?.UpdateLoadingBar(mainForm);
@@ -983,7 +983,7 @@ namespace DataTableConverter.Assisstant
                 string multiHeader = count == 0 ? header : header + count;
                 if (!DatabaseHelper.ContainsAlias(tableName, multiHeader))
                 {
-                    DatabaseHelper.AddColumn(tableName, multiHeader);
+                    multiHeader = DatabaseHelper.AddColumn(tableName, multiHeader);
                 }
                 row.Add(multiHeader, result);
             }

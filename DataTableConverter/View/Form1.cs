@@ -555,7 +555,7 @@ namespace DataTableConverter
                         break;
 
                     case ImportState.Append:
-                        DatabaseHelper.ConcatTable(tableName, Path.GetFileName(FilePath), filename, TableName);
+                        DatabaseHelper.ConcatTable(TableName, tableName, Path.GetFileName(FilePath), filename);
                         break;
 
                     case ImportState.Header:
@@ -796,7 +796,6 @@ namespace DataTableConverter
                 }
                 else
                 {
-                    dgTable.Columns.Add(newColumn, newColumn);
                     DatabaseHelper.AddColumnFixedAlias(newColumn, TableName);
                     DatabaseHelper.SetSavepoint();
                     LoadData();
@@ -1503,7 +1502,7 @@ namespace DataTableConverter
 
                             if (minLength != -1)
                             {
-                                DatabaseHelper.UpdateRowsWithMinCharacters(newColumn, minLength, shortcut, newColumn, TableName);
+                                DatabaseHelper.UpdateRowsWithMinCharacters(columnName, minLength, shortcut, newColumn, TableName);
                             }
                             else
                             {

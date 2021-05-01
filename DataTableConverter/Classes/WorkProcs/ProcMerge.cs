@@ -60,7 +60,7 @@ namespace DataTableConverter.Classes.WorkProcs
             string regularExpressionPattern = @"\[(.*?)\]";
             Regex re = new Regex(regularExpressionPattern);
 
-            return re.Matches(formula ?? string.Empty).Cast<Match>().Select(col => col.Groups[1].Value.ToLower());
+            return re.Matches(formula ?? string.Empty).Cast<Match>().Select(col => col.Groups[1].Value);
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -115,7 +115,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 //column is columnName now
                 if (destinationColumn != null)
                 {
-                    List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).Select(alias => alias.ToLower()).ToList();
+                    List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).Select(alias => alias).ToList();
                     List<KeyValuePair<int, string>> updates = new List<KeyValuePair<int, string>>();
                     using (System.Data.SQLite.SQLiteDataReader reader = invokeForm.DatabaseHelper.GetDataCommand(tableName, "id").ExecuteReader())
                     {

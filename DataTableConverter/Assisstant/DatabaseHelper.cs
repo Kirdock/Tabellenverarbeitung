@@ -551,9 +551,11 @@ namespace DataTableConverter.Assisstant
             return tableName == DefaultTable ? Connection : TempConnection;
         }
 
-        internal void AddColumn(string tableName, string column, string defaultValue = "")
+        internal string AddColumn(string tableName, string column, string defaultValue = "")
         {
-            AddColumnWithAlias(column, column, tableName, defaultValue);
+            string columnName = GetValidColumnName(column, tableName);
+            AddColumnWithAlias(columnName, column, tableName, defaultValue);
+            return columnName;
         }
 
         internal string RenameAlias(string from, string to, string tableName)
@@ -714,13 +716,19 @@ namespace DataTableConverter.Assisstant
         /// /// <returns>Column name of created column</returns>
         internal string AddColumnFixedAlias(string alias, string tableName, string defaultValue = "", IEnumerable<string> columnNames = null)
         {
+            string columnName = GetValidColumnName(alias, tableName, columnNames);
+            AddColumnWithAlias(columnName, alias, tableName, defaultValue);
+            return columnName;
+        }
+
+        private string GetValidColumnName(string alias, string tableName, IEnumerable<string> columnNames = null)
+        {
             columnNames = columnNames ?? GetColumnNames(tableName, true);
             string columnName = alias;
             for (int counter = 1; columnNames.Any(col => col.Equals(columnName, StringComparison.OrdinalIgnoreCase)); ++counter)
             {
                 columnName = alias + counter;
             }
-            AddColumnWithAlias(columnName, alias, tableName, defaultValue);
             return columnName;
         }
 
@@ -941,12 +949,12 @@ namespace DataTableConverter.Assisstant
             return headers;
         }
 
-        private bool AddColumnIfNotExists(string tableName, string column, string defaultValue = "")
+        private bool AddColumnIfNotExists(string tableName, ref string column, string defaultValue = "")
         {
             bool status;
             if (!(status = ContainsAlias(tableName, column)))
             {
-                AddColumn(tableName, column, defaultValue);
+                column = AddColumn(tableName, column, defaultValue);
             }
             return status;
         }
@@ -978,17 +986,18 @@ namespace DataTableConverter.Assisstant
 
         internal void ConcatTable(string destinationTable, string newTable, string fileNameBefore, string filename)
         {
-            AddColumnIfNotExists(destinationTable, FileNameColumn, fileNameBefore);
-            AddColumnIfNotExists(newTable, FileNameColumn, filename);
-            List<string> headers = GetSortedColumnsAsAlias(newTable);
-            string newTableHeaderString = GetHeaderString(headers);
+            string fileNameColumn = FileNameColumn;
+            AddColumnIfNotExists(destinationTable, ref fileNameColumn, fileNameBefore);
+            AddColumnIfNotExists(newTable, ref fileNameColumn, filename);
+            string[] headers = GetSortedColumnsAsAlias(newTable).ToArray();
             SQLiteConnection destinationConnection = GetConnection(destinationTable);
 
-            foreach (string header in headers)
+            for(int i = 0; i < headers.Length; ++i)
             {
-                AddColumnIfNotExists(destinationTable, header);
+                AddColumnIfNotExists(destinationTable, ref headers[i]);
             }
 
+            string newTableHeaderString = GetHeaderString(headers);
             Dictionary<string, string> destinationHeaders = GetAliasColumnMapping(destinationTable);
             List<string> headerMapping = new List<string>();
             
@@ -1033,8 +1042,19 @@ namespace DataTableConverter.Assisstant
                     }
                 }
             }
-
+            MoveColumnToIndex(GetColumnCountWithNull(destinationTable)-1, fileNameColumn, destinationTable);
             Delete(newTable);
+        }
+
+        private int GetColumnCountWithNull(string tableName)
+        {
+            int columnCount = 0;
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"SELECT count(*) from [{tableName + MetaTableAffix}]";
+                columnCount = Convert.ToInt32(command.ExecuteScalar());
+            }
+            return columnCount;
         }
 
         internal int GetRowCount(string tableName)
