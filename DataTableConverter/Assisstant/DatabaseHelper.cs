@@ -60,6 +60,7 @@ namespace DataTableConverter.Assisstant
         {
             Reset();
             SortOrderColumnName = IdColumnName == "rowid" ? SortOrderColumnName : IdColumnName;
+            SQLiteFunction.RegisterFunction(typeof(SQLiteSensitive)); // COLLATE CASESENSITIVE
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
             SQLiteFunction.RegisterFunction(typeof(Round)); //ROUND2(myValue, type, decimalCount)
@@ -456,7 +457,7 @@ namespace DataTableConverter.Assisstant
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = $"UPDATE [{tableName}] SET [{IdColumnName}] = - ([{IdColumnName}] + 1) WHERE [{IdColumnName}] >= ?;" //everything greater and equal than the given id is increased by one (it is set to negative to prevent duplicate IDs)
-                                    + $" UPDATE [{tableName}] SET [{IdColumnName}] = - [{IdColumnName}] WHERE [{IdColumnName}] < 0"; //After everything is set set negative to positive
+                                    + $"UPDATE [{tableName}] SET [{IdColumnName}] = - [{IdColumnName}] WHERE [{IdColumnName}] < 0"; //After everything is set set negative to positive
                 command.Parameters.Add(new SQLiteParameter() { Value = id });
 
                 command.ExecuteNonQuery();
@@ -587,10 +588,12 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal string AddColumnAt(int index, string alias, string tableName)
+        internal string AddColumnAtStart(string alias, string tableName)
         {
             string columnName = AddColumnFixedAlias(alias, tableName);
-            MoveColumnToIndex(index, columnName, tableName);
+
+            MoveColumnToIndex(0, columnName, tableName);
+
             return columnName;
         }
 
@@ -598,36 +601,51 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                index = index + 1; //ID begins at 1
-                command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET sortorder = -(sortorder)";
+                List<KeyValuePair<int, int>> updates = new List<KeyValuePair<int, int>>();
+                int rangeStart;
+                int rangeStop;
+                int add;
+                index++; //ID begins at 1
+
+                //get old sortorder
+                command.CommandText = $"SELECT sortorder from [{tableName + MetaTableAffix}] WHERE column = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = columnName });
+                int oldIndex = Convert.ToInt32(command.ExecuteScalar());
+                command.Parameters.Clear();
+
+                if (oldIndex < index)
+                {
+                    rangeStart = oldIndex;
+                    rangeStop = index;
+                    add = -1;
+                }
+                else
+                {
+                    rangeStart = index;
+                    rangeStop = oldIndex;
+                    add = 1;
+                }
+
+                //multiply everything that is affected by -1 (needed because of constraint)
+                command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET sortorder = -(sortorder) where sortorder between ? and ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = rangeStart });
+                command.Parameters.Add(new SQLiteParameter() { Value = rangeStop });
                 command.ExecuteNonQuery();
+                command.Parameters.Clear();
+
+                //move the column to the right index
                 command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET sortorder = ? where column = ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = index });
                 command.Parameters.Add(new SQLiteParameter() { Value = columnName });
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
-                int counter = 2;
-                List<KeyValuePair<int, int>> updates = new List<KeyValuePair<int, int>>();
-                command.CommandText = $"SELECT sortorder from [{tableName + MetaTableAffix}]";
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        updates.Add(new KeyValuePair<int, int>(reader.GetInt32(0), counter));
-                        counter++;
-                    }
-                }
-
-                command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET sortorder = ? where sortorder = ?";
-                command.Parameters.Add(new SQLiteParameter());
-                command.Parameters.Add(new SQLiteParameter());
-                foreach (KeyValuePair<int, int> pair in updates)
-                {
-                    command.Parameters[0].Value = pair.Key;
-                    command.Parameters[1].Value = pair.Value;
-                    command.ExecuteNonQuery();
-                }
+                //add or substract 1 and revert the multiplication of -1
+                command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET sortorder = (-sortorder) + ? where sortorder between ? and ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = add });
+                command.Parameters.Add(new SQLiteParameter() { Value = -rangeStop });
+                command.Parameters.Add(new SQLiteParameter() { Value = -rangeStart });
+                command.ExecuteNonQuery();
             }
         }
 
@@ -641,7 +659,7 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Clear();
                 command.CommandText = $"INSERT INTO [{tableName + MetaTableAffix}] (column, alias) values ($column, $alias)";
                 command.Parameters.Add(new SQLiteParameter("$column", columnName));
-                command.Parameters.Add(new SQLiteParameter("$alias", alias));
+                command.Parameters.Add(new SQLiteParameter("$alias", Properties.Settings.Default.ImportHeaderUpperCase ? alias.ToUpper() : alias));
                 command.ExecuteNonQuery();
             }
         }
@@ -1204,7 +1222,7 @@ namespace DataTableConverter.Assisstant
             string columnName = string.Empty;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where alias = $alias";
+                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where alias = $alias COLLATE NOCASE";
                 command.Parameters.Add(new SQLiteParameter("$alias", alias));
                 columnName = command.ExecuteScalar()?.ToString();
             }
@@ -1382,7 +1400,7 @@ namespace DataTableConverter.Assisstant
             List<string> list = new List<string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = GetSortedSelectString($"[{columnName}]", $"[{columnName}] asc", orderType, -1, 0, false, tableName, $"group by [{columnName}]");
+                command.CommandText = GetSortedSelectString($"[{columnName}]", $"[{columnName}] asc", orderType, -1, 0, false, tableName, $"group by [{columnName}] COLLATE CASESENSITIVE");
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -1399,7 +1417,7 @@ namespace DataTableConverter.Assisstant
             Dictionary<string, int> dict = new Dictionary<string, int>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT [{columnName}], count(*) from [{tableName}] group by [{columnName}] order by [{columnName}]";
+                command.CommandText = $"SELECT [{columnName}], count(*) from [{tableName}] group by [{columnName}] COLLATE CASESENSITIVE order by [{columnName}]";
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -2375,7 +2393,7 @@ namespace DataTableConverter.Assisstant
             id = 0;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT [{idColumn}] from [{tableName}] where [{column}] = ?";
+                command.CommandText = $"SELECT [{idColumn}] from [{tableName}] where [{column}] = ? COLLATE CASESENSITIVE";
                 command.Parameters.Add(new SQLiteParameter() { Value = value });
                 result = command.ExecuteScalar();
                 if (result != null)

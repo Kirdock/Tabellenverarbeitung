@@ -89,7 +89,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     if (ContinuedColumn)
                     {
-                        string destinationColumn = invokeForm.DatabaseHelper.AddColumnAt(0, NewColumn, tempTable);
+                        string destinationColumn = invokeForm.DatabaseHelper.AddColumnAtStart(NewColumn, tempTable);
                         invokeForm.DatabaseHelper.Enumerate(destinationColumn, -1, -1, false, sortingOrder, orderType, tempTable);
                     }
 

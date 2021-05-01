@@ -652,17 +652,18 @@ namespace DataTableConverter.Assisstant
                 } while (hasPassword);
 
                 string[] selectedSheets = SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray(), mainForm);
-
-                bool fileNameColumn;
                 List<string> headers = new List<string>();
-                if (fileNameColumn = (selectedSheets.Length > 1))
+                if (selectedSheets.Length > 1)
                 {
                     headers.Add(Extensions.DataTableExtensions.FileName);
                 }
 
+                DatabaseHelper.CreateTable(headers.ToArray(), tableName);
+
                 foreach (string sheetName in selectedSheets)
                 {
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
+                    
                     if (objSHT.AutoFilter != null)
                     {
                         objSHT.AutoFilter.ShowAllData();
@@ -677,10 +678,26 @@ namespace DataTableConverter.Assisstant
                         continue;
                     }
 
+                    List<string> newHeaders = SetHeaderOfExcel(objSHT, cols);
+
+                    foreach(string header in newHeaders)
+                    {
+                        if (!headers.Contains(header, System.StringComparer.OrdinalIgnoreCase))
+                        {
+                            headers.Add(header);
+                            DatabaseHelper.AddColumn(tableName, header);
+                        }
+                    }
+
                     progressBar?.StartLoadingBar(rows, mainForm);
                     UnhideRowsAndColumns(objSHT);
-                    RangeToDataTable(objSHT, objXL, rows, cols, tableName, fileNameColumn ? Path.GetFileName(path) + "; " + sheetName : null, trimOperation, progressBar, mainForm);
+                    
+                    RangeToDataTable(objSHT, objXL, rows, cols, tableName, selectedSheets.Length != 1 ? Path.GetFileName(path) + "; " + sheetName : null, newHeaders, trimOperation, progressBar, mainForm);
                     Marshal.ReleaseComObject(objSHT);
+                }
+                if (selectedSheets.Length > 1)
+                {
+                    DatabaseHelper.MoveColumnToIndex(headers.Count - 1, headers.First(), tableName);
                 }
             }
             catch (Exception ex)
@@ -723,11 +740,8 @@ namespace DataTableConverter.Assisstant
             objSHT.Rows.EntireRow.Hidden = false;
         }
 
-        private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, Func<string,string> trimOperation, ProgressBar progressBar, Form mainForm)
+        private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, List<string> newHeaders, Func<string,string> trimOperation, ProgressBar progressBar, Form mainForm)
         {
-
-            List<string> headers = SetHeaderOfExcel(objSHT, cols);
-            DatabaseHelper.CreateTable(headers.ToArray(), tableName);
             Clipboard.Clear();
             objXL.CutCopyMode = 0;
             int rowRange = MaxCellsPerIteration / cols; // about 50000 cells per iteration
@@ -756,7 +770,7 @@ namespace DataTableConverter.Assisstant
                 }
                 else
                 {
-                    insertCommand = GetDataOfString(content.ToCharArray(), tableName, fileName, headers, progressBar, mainForm, insertCommand, trimOperation);
+                    insertCommand = GetDataOfString(content.ToCharArray(), tableName, fileName, newHeaders, progressBar, mainForm, insertCommand, trimOperation);
                 }
             }
         }

@@ -984,6 +984,7 @@ namespace DataTableConverter.View
         private void SetDuplicateControls(WorkProc selectedProc)
         {
             Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
+            gbDefDuplicate.Visible = !myCase.ApplyAll;
             lblOriginalNameText.Text = myCase.Name;
             DataTable temp = myCase.Columns.Copy();
             DataTable table = new DataTable { TableName = "WorkDuplicates" };
@@ -1535,6 +1536,8 @@ namespace DataTableConverter.View
                 txtCaseName.SetText(selectedCase.Name);
                 txtShortcut.SetText(selectedCase.Shortcut);
                 txtShortcutTotal.SetText(selectedCase.ShortcutTotal);
+                CBCaseCheckAll.Checked = selectedCase.ApplyAll;
+                dgCaseColumns.Enabled = !CBCaseCheckAll.Checked;
                 SetDataSource(dgCaseColumns, selectedCase.Columns);
                 if (ViewHelper != null)
                 {
@@ -2686,6 +2689,15 @@ namespace DataTableConverter.View
         private void TxtSeparateContinuedNumber_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSeparate).NewColumn = TxtSeparateContinuedNumber.Text;
+        }
+
+        private void CBCaseCheckAll_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lbCases.SelectedIndex != -1)
+            {
+                ((Case)lbCases.SelectedItem).ApplyAll = CBCaseCheckAll.Checked;
+                dgCaseColumns.Enabled = !CBCaseCheckAll.Checked;
+            }
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

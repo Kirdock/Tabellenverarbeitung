@@ -61,6 +61,10 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     files.AddRange(dialog.FileNames);
                 }
+                else
+                {
+                    return;
+                }
                 dialog.Dispose();
             }
             else
@@ -69,7 +73,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             Dictionary<string, ImportSettings> dict = new Dictionary<string, ImportSettings>();
             ImportSettings setting = invokeForm.ImportHelper.GenerateSettingsThroughPreset(PresetType, SettingPreset);
-            string importTables = null;
+            string importTable = null;
             int fileEncoding = 0;
 
             foreach (string file in files)
@@ -85,16 +89,19 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 string newTable = invokeForm.ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
 
-                if (importTables == null)
+                if (importTable == null)
                 {
-                    importTables = newTable;
+                    importTable = newTable;
                 }
                 else
                 {
-                    invokeForm.DatabaseHelper.ConcatTable(newTable, Path.GetFileName(path), Path.GetFileName(file), importTables);
+                    invokeForm.DatabaseHelper.ConcatTable(importTable, newTable, Path.GetFileName(path), Path.GetFileName(file));
                 }
             }
-            DataHelper.StartMerge(importTables, fileEncoding == 0 ? FileEncoding : fileEncoding, filePath, IdentifySource, IdentifyAppend, invalidColumnAlias, sortingOrder, orderType, invokeForm, tableName);
+            if (importTable != null)
+            {
+                DataHelper.StartMerge(importTable, fileEncoding == 0 ? FileEncoding : fileEncoding, filePath, IdentifySource, IdentifyAppend, invalidColumnAlias, sortingOrder, orderType, invokeForm, tableName);
+            }
         }
 
         internal static bool CheckFile(string filePath, ref string path)

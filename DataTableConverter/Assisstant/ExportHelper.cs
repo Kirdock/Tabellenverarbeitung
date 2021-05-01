@@ -405,7 +405,7 @@ namespace DataTableConverter
                 invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
                 rowCount = 0;
             }
-            if (File.Exists(tempDirectoryPath))
+            if (Directory.Exists(tempDirectoryPath))
             {
                 DeleteDirectory(tempDirectoryPath, invokeForm);
             }

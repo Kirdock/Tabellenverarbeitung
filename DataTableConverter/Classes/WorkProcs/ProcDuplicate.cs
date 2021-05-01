@@ -49,8 +49,8 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             DuplicateColumns = GetHeaders();
 
-            int[] subStringBegin = duplicateCase.getBeginSubstring();
-            int[] subStringEnd = duplicateCase.getEndSubstring();
+            int[] subStringBegin = duplicateCase.ApplyAll ? new int[0] : duplicateCase.getBeginSubstring();
+            int[] subStringEnd = duplicateCase.ApplyAll ? new int[0] : duplicateCase.getEndSubstring();
 
             //we could calculate an identifier and save it into another table (make it with an index but not primary key)
             //first iteration => save identifier and rowId into another table
@@ -64,7 +64,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             if (column != null)
             {
-                SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, DuplicateColumns);
+                SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, duplicateCase.ApplyAll ? invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray() :  DuplicateColumns);
                 string sourceRowIdName = "sourceid";
                 string identifierColumn = "identifier";
                 string duplicateTableTotal = Guid.NewGuid().ToString();
