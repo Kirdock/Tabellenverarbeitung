@@ -100,7 +100,7 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             if (importTable != null)
             {
-                DataHelper.StartMerge(importTable, fileEncoding == 0 ? FileEncoding : fileEncoding, filePath, IdentifySource, IdentifyAppend, invalidColumnAlias, sortingOrder, orderType, invokeForm, tableName);
+                DataHelper.StartMerge(importTable, fileEncoding == 0 ? FileEncoding : fileEncoding, filePath, IdentifySource, IdentifyAppend, invalidColumnAlias, invokeForm, tableName);
             }
         }
 
