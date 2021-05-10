@@ -603,7 +603,6 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                List<KeyValuePair<int, int>> updates = new List<KeyValuePair<int, int>>();
                 int rangeStart;
                 int rangeStop;
                 int add;
@@ -647,6 +646,38 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter() { Value = add });
                 command.Parameters.Add(new SQLiteParameter() { Value = -rangeStop });
                 command.Parameters.Add(new SQLiteParameter() { Value = -rangeStart });
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal void SwitchAliasIndex(string aliasName1, string aliasName2, string tableName)
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                //get old sortorder
+                command.CommandText = $"SELECT sortorder from [{tableName + MetaTableAffix}] WHERE alias = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = aliasName1 });
+                int index1 = Convert.ToInt32(command.ExecuteScalar());
+
+                command.Parameters[0].Value = aliasName2;
+                int index2 = Convert.ToInt32(command.ExecuteScalar());
+                command.Parameters.Clear();
+
+                //multiply everything that is affected by -1 (needed because of constraint)
+                command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET sortorder = -(sortorder) where sortorder = ? or sortorder = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = index1 });
+                command.Parameters.Add(new SQLiteParameter() { Value = index2 });
+                command.ExecuteNonQuery();
+                command.Parameters.Clear();
+
+                //move the column to the right index
+                command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET sortorder = ? where sortorder = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = index2 });
+                command.Parameters.Add(new SQLiteParameter() { Value = -index1 });
+                command.ExecuteNonQuery();
+
+                command.Parameters[0].Value = index1;
+                command.Parameters[1].Value = -index2;
                 command.ExecuteNonQuery();
             }
         }
@@ -1318,7 +1349,9 @@ namespace DataTableConverter.Assisstant
         {
             for (int i = 0; i < aliases.Length; ++i)
             {
-                aliases[i] = CopyColumn(aliases[i], tableName);
+                string newAlias = CopyColumn(aliases[i], tableName);
+                SwitchAliasIndex(aliases[i], newAlias, tableName);
+                aliases[i] = newAlias;
             }
             return aliases;
         }
