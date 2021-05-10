@@ -809,13 +809,13 @@ namespace DataTableConverter.Assisstant
         /// <param name="destinationTableColumnAliasMapping"></param>
         /// <param name="importTableColumnAliasMapping"></param>
         /// <param name="destinationTable"></param>
-        internal bool PVMImport(string importTable, string[] importColumnNames, string destinationIdentifierColumn, string importIdentifierColumn, string destinationTable, Form1 invokeForm = null)
+        internal bool PVMImport(string importTable, string[] importColumnNames, string destinationIdentifierColumn, string importIdentifierColumn, string destinationTable, Form1 invokeForm, out string sortOrderColumn)
         {
             bool abort;
             if (!(abort = CreateIndexOn(destinationTable, destinationIdentifierColumn, invokeForm)))
             {
                 AddColumnsWithAdditionalIfExists(importColumnNames.Where(col => col != importIdentifierColumn), string.Empty, out string[] destinationColumnNames, destinationTable);
-                string sortOrderColumn = AddColumnWithAdditionalIfExists("Importiersortierung", destinationTable);
+                sortOrderColumn = AddColumnWithAdditionalIfExists("Importiersortierung", destinationTable);
                 //int rowCount = GetRowCount(importTable);
                 int sortOrder = 0;
                 using (SQLiteCommand destinationCommand = GetConnection(destinationTable).CreateCommand())
@@ -848,6 +848,10 @@ namespace DataTableConverter.Assisstant
                         }
                     }
                 }
+            }
+            else
+            {
+                sortOrderColumn = null;
             }
             Delete(importTable);
             //remove index on destinationTable? (destinationColumn + IndexAffix)
@@ -1427,7 +1431,7 @@ namespace DataTableConverter.Assisstant
                     {
                         insertCommand.Parameters.Add(new SQLiteParameter());
                     }
-                    command.CommandText = GetSortedSelectString(headerString, $"[{columnName}] asc", orderType, limit, 0, false, sourceTable, $"where [{columnName}] = ?");
+                    command.CommandText = GetSortedSelectString(headerString, GenerateOrderAsc(columnName), orderType, limit, 0, false, sourceTable, $"where [{columnName}] = ?");
                     command.Parameters.Add(new SQLiteParameter());
                     foreach (string column in groupColumn)
                     {
@@ -1448,12 +1452,18 @@ namespace DataTableConverter.Assisstant
             }
 
         }
+
+        internal static string GenerateOrderAsc(string columnName)
+        {
+            return $"[{columnName}] asc";
+        }
+        
         internal List<string> GroupColumn(string columnName, OrderType orderType, string tableName)
         {
             List<string> list = new List<string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = GetSortedSelectString($"[{columnName}]", $"[{columnName}] asc", orderType, -1, 0, false, tableName, $"group by [{columnName}] COLLATE CASESENSITIVE");
+                command.CommandText = GetSortedSelectString($"[{columnName}]", GenerateOrderAsc(columnName), orderType, -1, 0, false, tableName, $"group by [{columnName}] COLLATE CASESENSITIVE");
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -1813,7 +1823,7 @@ namespace DataTableConverter.Assisstant
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 string headerString = GetHeaderString(new string[] { columnName }.Concat(appendArray).Concat(sumColumns));
-                command.CommandText = GetSortedSelectString(headerString, $"[{columnName}] ASC", OrderType.Windows, -1, -1, true, tableName);
+                command.CommandText = GetSortedSelectString(headerString, GenerateOrderAsc(columnName), OrderType.Windows, -1, -1, true, tableName);
 
 
                 int offset = 2; //ofset till the values of "headerString"

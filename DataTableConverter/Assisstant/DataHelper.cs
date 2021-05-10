@@ -9,7 +9,7 @@ namespace DataTableConverter.Assisstant
     class DataHelper
     {
 
-        internal static int StartMerge(string importTable, int encoding, string filePath, string sourceIdentifierColumnName, string importIdentifierColumnName, string invalidColumnAlias, string order, Classes.OrderType orderType, Form1 invokeForm, string tableName)
+        internal static int StartMerge(string importTable, int encoding, string filePath, string sourceIdentifierColumnName, string importIdentifierColumnName, string invalidColumnAlias, Form1 invokeForm, string tableName)
         {
             string[] importColumnNames = new string[0];
             string filename = System.IO.Path.GetFileNameWithoutExtension(filePath);
@@ -73,13 +73,13 @@ namespace DataTableConverter.Assisstant
                     }
                 }
 
-                bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm);
+                bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm, out string orderColumn);
 
                 if (abort) return 0;
 
                 if (Properties.Settings.Default.SplitPVM)
                 {
-                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, order, orderType, tableName);
+                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, DatabaseHelper.GenerateOrderAsc(orderColumn), Classes.OrderType.Windows, tableName);
                 }
                 invokeForm.DatabaseHelper.DeleteInvalidRows(tableName, invalidColumnName);
             }

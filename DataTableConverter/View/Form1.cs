@@ -532,7 +532,7 @@ namespace DataTableConverter
                             try
                             {
                                 StartLoadingBar();
-                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, GetSorting(), OrderType, this, TableName);
+                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, this, TableName);
                                 StopLoadingBar();
                                 DatabaseHelper.SetSavepoint();
                                 LoadData(true);
