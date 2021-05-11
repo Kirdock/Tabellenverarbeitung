@@ -59,7 +59,7 @@ namespace DataTableConverter.Assisstant
         private void Init(bool createMainDatabase)
         {
             Reset();
-            SortOrderColumnName = IdColumnName == "rowid" ? SortOrderColumnName : IdColumnName;
+            SortOrderColumnName = IdColumnName == "rowid" ? IdColumnName : SortOrderColumnName;
             SQLiteFunction.RegisterFunction(typeof(SQLiteSensitive)); // COLLATE CASESENSITIVE
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
@@ -590,6 +590,16 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        internal void DeleteColumn(string columnName, string tableName)
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName + MetaTableAffix}] SET alias = null where column = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = columnName });
+                command.ExecuteNonQuery();
+            }
+        }
+
         internal string AddColumnAtStart(string alias, string tableName)
         {
             string columnName = AddColumnFixedAlias(alias, tableName);
@@ -682,11 +692,42 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        internal void ApplyOrder(string columnName, string tableName)
+        {
+            using (SQLiteCommand command = GetDataCommandWithOrder(tableName, GenerateOrderAsc(columnName), OrderType.Windows))
+            {
+                Dictionary<int, int> updates = new Dictionary<int, int>();
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    for (int i = 1; reader.Read(); ++i)
+                    {
+                        int val = -reader.GetInt32(0);
+                        updates.Add(val, i);
+                    }
+                }
+                command.Parameters.Clear();
+
+                command.CommandText = $"UPDATE [{tableName}] SET [{IdColumnName}] = -([{IdColumnName}])";
+                command.ExecuteNonQuery();
+
+                command.CommandText = $"UPDATE [{tableName}] SET [{IdColumnName}] = ? where [{IdColumnName}] = ?";
+                command.Parameters.Add(new SQLiteParameter());
+                command.Parameters.Add(new SQLiteParameter());
+
+                foreach (KeyValuePair<int, int> pair in updates)
+                {
+                    command.Parameters[1].Value = pair.Key;
+                    command.Parameters[0].Value = pair.Value;
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
         private void AddColumnWithAlias(string columnName, string alias, string tableName, string defaultValue)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"ALTER TABLE [{tableName}] ADD COLUMN [{columnName}] varchar(255) NOT NULL DEFAULT [{defaultValue}]";
+                command.CommandText = $"ALTER TABLE [{tableName}] ADD COLUMN [{columnName}] varchar(255) NOT NULL DEFAULT [{defaultValue}] COLLATE NATURALSORT";
                 command.ExecuteNonQuery();
 
                 command.Parameters.Clear();
@@ -814,14 +855,12 @@ namespace DataTableConverter.Assisstant
             bool abort;
             if (!(abort = CreateIndexOn(destinationTable, destinationIdentifierColumn, invokeForm)))
             {
-                AddColumnsWithAdditionalIfExists(importColumnNames.Where(col => col != importIdentifierColumn), string.Empty, out string[] destinationColumnNames, destinationTable);
+                AddColumnsWithAdditionalIfExists(importColumnNames, string.Empty, out string[] destinationColumnNames, destinationTable);
                 sortOrderColumn = AddColumnWithAdditionalIfExists("Importiersortierung", destinationTable);
                 //int rowCount = GetRowCount(importTable);
                 int sortOrder = 0;
                 using (SQLiteCommand destinationCommand = GetConnection(destinationTable).CreateCommand())
                 {
-                    string headerString = GetHeaderString(destinationColumnNames);
-                    
                     destinationCommand.CommandText = $"UPDATE [{destinationTable}] SET [{string.Join("]=?,[",new string[] { sortOrderColumn }.Concat(destinationColumnNames))}] =? where [{destinationIdentifierColumn}] = ?";
 
                     for (int i = 0; i < destinationColumnNames.Length + 2; i++) //+2 because of sortOrder and where statement
@@ -927,10 +966,10 @@ namespace DataTableConverter.Assisstant
 
         private string GetSortedSelectString(string headerString, string order, OrderType orderType, int limit, int offset, bool includeId, string tableName, string whereStatement = "", string idAlias = null)
         {
-            string selectString = "SELECT ";
+            StringBuilder selectString = new StringBuilder("SELECT ");
             if (includeId)
             {
-                selectString += $"{IdColumnName} AS [{idAlias ?? IdColumnName}] {(headerString == string.Empty ? "" : ",")}";
+                selectString.Append($"{IdColumnName} AS [{idAlias ?? IdColumnName}] {(headerString == string.Empty ? "" : ",")}");
             }
 
             if (orderType == OrderType.Reverse && order != string.Empty)
@@ -945,21 +984,21 @@ namespace DataTableConverter.Assisstant
                     rowCount++;
                 }
                 int half = rowCount / 2;
-                selectString += $"{headerString}{(headerString == string.Empty && !includeId ? "" : ",")} ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] {whereStatement} ORDER BY case when rnumber > {half}  then(rnumber - {half}-0.5) when rnumber <= {half} then rnumber end, rnumber COLLATE NATURALSORT"; //append ASC or DESC
+                selectString.Append($"{headerString}{(headerString == string.Empty && !includeId ? "" : ",")} ROW_NUMBER() OVER(ORDER BY {order}) as rnumber from [{tableName}] {whereStatement} ORDER BY case when rnumber > {half}  then(rnumber - {half}-0.5) when rnumber <= {half} then rnumber end, rnumber COLLATE NATURALSORT"); //append ASC or DESC
             }
             else if (orderType == OrderType.Windows && order != string.Empty)
             {
-                selectString += $"{headerString} FROM [{tableName}] {whereStatement} ORDER BY {order}";
+                selectString.Append($"{headerString} FROM [{tableName}] {whereStatement} ORDER BY {order}");
             }
             else
             {
-                selectString += $"{headerString} FROM [{tableName}] {whereStatement} ORDER BY {SortOrderColumnName}";
+                selectString.Append($"{headerString} FROM [{tableName}] {whereStatement} ORDER BY {SortOrderColumnName}");
             }
             if (limit != -1)
             {
-                selectString += $" LIMIT {limit} OFFSET {offset}";
+                selectString.Append($" LIMIT {limit} OFFSET {offset}");
             }
-            return selectString;
+            return selectString.ToString();
         }
 
         private string GetSelectString(string headerString, bool includeId, string tableName)
@@ -1117,22 +1156,31 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        /// <summary>
+        /// Renames the columns to the ones specified in the importTable. Additional 
+        /// </summary>
+        /// <param name="importTable"></param>
+        /// <param name="destinationTable"></param>
         internal void RenameColumns(string importTable, string destinationTable)
         {
-            List<string> headers = GetSortedColumnsAsAlias(importTable);
+            string[] headers = GetSortedColumnsAsAlias(importTable).ToArray();
             Dictionary<int, string> updates = new Dictionary<int, string>();
+            int index;
             using (SQLiteCommand command = GetConnection(destinationTable).CreateCommand())
             {
                 command.CommandText = $"SELECT [{IdColumnName}] from [{destinationTable + MetaTableAffix}] where alias is not null order by sortorder";
                 using(SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    int index = 0;
-                    while (reader.Read() && index < headers.Count)
+                    for (index = 0; reader.Read() && index < headers.Length; ++index)
                     {
                         updates.Add(reader.GetInt32(0), headers[index]);
-                        index++;
                     }
                 }
+            }
+
+            for (; index < headers.Length; ++index)
+            {
+                AddColumn(destinationTable, headers[index]);
             }
             SQLiteCommand updateCommand = null;
             foreach (KeyValuePair<int, string> pair in updates)
@@ -1247,6 +1295,15 @@ namespace DataTableConverter.Assisstant
             SQLiteCommand command = GetConnection(tableName).CreateCommand();
 
             command.CommandText = $"SELECT rowid, {GetHeaderString(GetColumnNames(aliases, tableName))} from [{tableName}]";
+
+            return command;
+        }
+
+        internal SQLiteCommand GetDataCommandWithOrder(string tableName, string order, OrderType orderType)
+        {
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
+
+            command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, -1, true, tableName, string.Empty, IdColumnName);
 
             return command;
         }
@@ -1457,7 +1514,7 @@ namespace DataTableConverter.Assisstant
         {
             return $"[{columnName}] asc";
         }
-        
+
         internal List<string> GroupColumn(string columnName, OrderType orderType, string tableName)
         {
             List<string> list = new List<string>();

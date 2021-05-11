@@ -58,7 +58,6 @@ namespace DataTableConverter.Assisstant
             if (result == DialogResult.Yes)
             {
                 string invalidColumnName = importTableColumnAliasMapping.FirstOrDefault(pair => pair.Key.Equals(invalidColumnAlias, System.StringComparison.OrdinalIgnoreCase)).Value;
-                importColumnNames = importColumnNames.Where(name => name != importIdentifierColumnName).ToArray();
                 if (invalidColumnName == null || !importColumnNames.Contains(invalidColumnName))
                 {
                     SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnAlias }, importTableColumnAliasMapping, true);
@@ -77,9 +76,12 @@ namespace DataTableConverter.Assisstant
 
                 if (abort) return 0;
 
+                invokeForm.DatabaseHelper.ApplyOrder(orderColumn, tableName);
+                invokeForm.DatabaseHelper.DeleteColumn(orderColumn, tableName);
+
                 if (Properties.Settings.Default.SplitPVM)
                 {
-                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, DatabaseHelper.GenerateOrderAsc(orderColumn), Classes.OrderType.Windows, tableName);
+                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, string.Empty, Classes.OrderType.Windows, tableName);
                 }
                 invokeForm.DatabaseHelper.DeleteInvalidRows(tableName, invalidColumnName);
             }

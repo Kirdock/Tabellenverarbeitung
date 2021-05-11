@@ -556,18 +556,14 @@ namespace DataTableConverter
 
                     case ImportState.Append:
                         DatabaseHelper.ConcatTable(TableName, tableName, Path.GetFileName(FilePath), filename);
+                        DatabaseHelper.SetSavepoint();
+                        LoadData(true);
                         break;
 
                     case ImportState.Header:
                         DatabaseHelper.RenameColumns(tableName, TableName);
-                        List<string> newHeaders = DatabaseHelper.GetSortedColumnsAsAlias(tableName);
-                        dgTable.BeginInvoke(new MethodInvoker(() =>
-                        {
-                            for (int i = 0; i < newHeaders.Count && i < dgTable.ColumnCount; ++i)
-                            {
-                                dgTable.Columns[i].Name = newHeaders[i];
-                            }
-                        }));
+                        DatabaseHelper.SetSavepoint();
+                        LoadData(true);
                         break;
 
                     default:
@@ -578,10 +574,9 @@ namespace DataTableConverter
                         {
                             SetMenuEnabled(true);
                         }));
+                        LoadData(true);
                         break;
                 }
-                DatabaseHelper.SetSavepoint();
-                LoadData(true);
 
             }
             StopLoadingBar();
