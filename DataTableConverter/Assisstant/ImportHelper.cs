@@ -707,8 +707,15 @@ namespace DataTableConverter.Assisstant
             int headerCounter = 0;
             DataRow row = table.NewRow();
             bool generatedMulti = false;
-            
-            for (int i = 0; i < maxLength; i++)
+            int i = 0;
+            if (content[i] == '\"') //beginning of cell that has text wrappings
+            {
+                generatedMulti = true;
+                GenerateMultiCell(content, table, row, headers[headerCounter], ref i);
+                i++;
+            }
+
+            for (; i < maxLength; i++)
             {
                 if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
                 {
