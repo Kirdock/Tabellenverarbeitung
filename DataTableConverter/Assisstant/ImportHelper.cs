@@ -13,6 +13,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace DataTableConverter.Assisstant
 {
@@ -32,6 +34,9 @@ namespace DataTableConverter.Assisstant
         internal static readonly int MaxCellsPerIteration = 50000;
         private readonly DatabaseHelper DatabaseHelper;
         private readonly ExportHelper ExportHelper;
+        private static readonly XNamespace ExcelNamespace = "urn:schemas-microsoft-com:office:spreadsheet";
+        private static readonly XName RowExcelNamespace = ExcelNamespace + "Row";
+        private static readonly XName CellExcelNamespace = ExcelNamespace + "Cell";
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         private static extern int GetShortPathName(
@@ -194,7 +199,7 @@ namespace DataTableConverter.Assisstant
                     skip = 1;
                     newHeaders = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
                         .SelectMany(x => x.Split(separators.ToArray(), StringSplitOptions.None))
-                        .Select(column => (Properties.Settings.Default.ImportHeaderUpperCase ? column.ToUpper() : column).Trim()).ToList();
+                        .Select(column => DatabaseHelper.ImportOperation()(column).Trim()).ToList();
                     var indexItem = newHeaders.Select((item, index) => new { item, index });
                     for (int i = 0; i < newHeaders.Count; ++i)
                     {
@@ -289,7 +294,7 @@ namespace DataTableConverter.Assisstant
                 {
                     skip = 1;
                     string headerLine = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1).ToArray()[0].ToString();
-                    newHeaders = createRow(headerLine, begin, end).Select(field => (Properties.Settings.Default.ImportHeaderUpperCase ? field.ToUpper() : field).Trim()).ToList();
+                    newHeaders = createRow(headerLine, begin, end).Select(field => DatabaseHelper.ImportOperation()(field).Trim()).ToList();
                     DatabaseHelper.CreateTable(newHeaders, tableName);
                 }
                 else
@@ -754,32 +759,24 @@ namespace DataTableConverter.Assisstant
                 int endRow = rowCount > rows ? rows : rowCount;
                 Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[endRow, cols];
                 Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
-                RemoveTabsInCellsOfExcel(range);
-                string content = null;
                 int attempts = 0;
+                object content = null;
 
-                while (string.IsNullOrEmpty(content) && attempts < maxAttempts)
+                while (content == null && attempts < maxAttempts)
                 {
                     range.Copy();
-                    content = (string)Clipboard.GetDataObject().GetData(DataFormats.UnicodeText);
+                    content = Clipboard.GetDataObject().GetData("XML Spreadsheet");
                     attempts++;
                 }
-                if(attempts == maxAttempts && string.IsNullOrEmpty(content))
+                if(attempts == maxAttempts && content == null)
                 {
                     ErrorHelper.LogMessage($"Kopieren der Zeilen {i} bis {endRow} {maxAttempts} mal fehlgeschlagen\nZeilen werden übersprungen", mainForm);
                 }
                 else
                 {
-                    insertCommand = GetDataOfString(content.ToCharArray(), tableName, fileName, newHeaders, progressBar, mainForm, insertCommand, trimOperation);
+                    insertCommand = ClipboardToDatabase((MemoryStream)content, newHeaders.ToArray(), fileName, tableName, progressBar, mainForm, insertCommand);
                 }
             }
-        }
-
-        private void RemoveTabsInCellsOfExcel(Microsoft.Office.Interop.Excel.Range range)
-        {
-            range.Cells.Replace(What: "\t", Replacement: string.Empty, LookAt: Microsoft.Office.Interop.Excel.XlLookAt.xlPart,
-                    SearchOrder: Microsoft.Office.Interop.Excel.XlSearchOrder.xlByRows
-                    , MatchCase: false, SearchFormat: false, ReplaceFormat: false);
         }
 
         private List<string> SetHeaderOfExcel(Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols)
@@ -793,77 +790,51 @@ namespace DataTableConverter.Assisstant
             return GetHeadersOfContent(content);
         }
 
-        private SQLiteCommand GetDataOfString(char[] content, string tableName, string fileName, List<string> headers, ProgressBar progressBar, Form mainForm, SQLiteCommand insertCommand, Func<string, string> trimOperation)
+        public static XDocument ForwardToXDocument(XmlDocument xmlDocument)
         {
-            int maxLength = content.Length;
-            StringBuilder cellBuilder = new StringBuilder();
-            Dictionary<string, string> cells = new Dictionary<string, string>();
-
-            int headerCounter = 0;
-            Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
-            bool generatedMulti = false;
-            int i = 0;
-            if (content[i] == '\"') //beginning of cell that has text wrappings
+            using (XmlNodeReader xmlNodeReader = new XmlNodeReader(xmlDocument))
             {
-                generatedMulti = true;
-                GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
-                insertCommand = null;
-                i++;
+                xmlNodeReader.MoveToContent();
+                return XDocument.Load(xmlNodeReader);
             }
-            for (; i < maxLength; i++)
+        }
+
+        private SQLiteCommand ClipboardToDatabase(MemoryStream content, string[] headers, string fileName, string tableName, ProgressBar progressBar, Form invokeForm, SQLiteCommand insertCommand)
+        {
+            StreamReader streamReader = new StreamReader(content);
+            streamReader.BaseStream.SetLength(streamReader.BaseStream.Length - 1);
+
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(streamReader.ReadToEnd());
+            
+            List<XElement> linqRows = ForwardToXDocument(xmlDocument).Descendants(RowExcelNamespace).ToList();
+
+            foreach (XElement rowElement in linqRows)
             {
-                if (content[i] == '\r' && (i + 1) < maxLength && content[i + 1] == '\n') // new row
+                int index = 0;
+                Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
+                foreach (XElement cell in rowElement.Descendants(CellExcelNamespace))
                 {
-                    progressBar?.UpdateLoadingBar(mainForm);
-                    if (!generatedMulti)
+                    string val = cell.Value.Replace("\t", string.Empty); // remove tabs
+                    string[] multiCells = val.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (multiCells.Length > 1)
                     {
-                        SetContentRowValue(row, headers[headerCounter], cellBuilder, trimOperation);
-                    }
-                    generatedMulti = false;
-                    headerCounter = 0;
-
-                    insertCommand = AddContentDataRow(row, fileName, tableName, insertCommand);
-
-                    row.Clear();
-
-                    i++;
-                    if ((i + 1) < maxLength && content[i + 1] == '\"') //beginning of cell that has text wrappings
-                    {
-                        i++;
-                        generatedMulti = true;
-                        GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
+                        for(int i = 0; i < multiCells.Length; ++i)
+                        {
+                            AddMultiCellColumn(headers[index], i, tableName, row, multiCells[i]);
+                        }
                         insertCommand = null;
                     }
                     else
                     {
-                        cells.Clear();
+                        row.Add(headers[index], val);
                     }
-
+                    index++;
                 }
-                else if (content[i] == '\t') // new column
-                {
-                    if (!generatedMulti)
-                    {
-                        SetContentRowValue(row, headers[headerCounter], cellBuilder, trimOperation);
-                    }
-                    generatedMulti = false;
-                    headerCounter++;
-
-                    if ((i + 1) < maxLength && content[i + 1] == '\"') //beginning of cell that has text wrappings
-                    {
-                        i++;
-                        generatedMulti = true;
-                        GenerateMultiCell(content, tableName, row, headers[headerCounter], ref i);
-                        insertCommand = null;
-                    }
-                }
-                else
-                {
-                    cellBuilder.Append(content[i]);
-                }
-            }
-            SetContentRowValue(row, headers[headerCounter], cellBuilder, trimOperation);
-            AddContentDataRow(row, tableName, fileName, insertCommand);
+                insertCommand = AddContentDataRow(row, fileName, tableName, insertCommand);
+                progressBar?.UpdateLoadingBar(invokeForm);
+            };
             return insertCommand;
         }
 
@@ -939,67 +910,22 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        private void GenerateMultiCell(char[] content, string tableName, Dictionary<string, string> row, string header, ref int i)
+        private void AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, string result)
         {
-            ++i;
-            int multiCellCount = 0;
-            StringBuilder cell = new StringBuilder();
-            bool newLine;
-            for (; i < content.Length; ++i)
+            string multiHeader = count == 0 ? header : header + count;
+            string latestHeader = multiHeader;
+            if(count != 0)
             {
-                if (EndOfMultiCell(content, i, out bool isNotMultiCell))
-                {
-                    if (isNotMultiCell)
-                    {
-                        i--;
-                        cell = new StringBuilder("\"").Append(cell);
-                    }
-                    else if (multiCellCount == 0 && cell.Length > 0)
-                    {
-                        cell = new StringBuilder("\"").Append(cell).Append('\"');
-                    }
-                    AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
-                    break;
-                }
-                else if ((newLine = (content[i] == '\r')) || content[i] == '\n')
-                {
-                    if (cell.Length != 0)
-                    {
-                        AddMultiCellColumn(header, multiCellCount, tableName, row, cell);
-
-                        if (newLine)
-                        {
-                            ++i;
-                        }
-                        multiCellCount++;
-                    }
-                }
-                else if (content[i] != '\"' || content[i - 1] != '\"' || content[i + 1] == '\"') //when there is a " in a multiCell, then Excel writes \"\"
-                {
-                    cell.Append(content[i]);
-                }
+                int countBefore = count - 1;
+                latestHeader = header + (countBefore == 0 ? string.Empty : countBefore.ToString());
             }
-        }
 
-        private void AddMultiCellColumn(string header, int count, string tableName, Dictionary<string, string> row, StringBuilder text)
-        {
-            string result = text.ToString();
-            text.Clear();
-            if (result != string.Empty)
+            if (!DatabaseHelper.ContainsAlias(tableName, multiHeader))
             {
-                string multiHeader = count == 0 ? header : header + count;
-                if (!DatabaseHelper.ContainsAlias(tableName, multiHeader))
-                {
-                    multiHeader = DatabaseHelper.AddColumn(tableName, multiHeader);
-                }
-                row.Add(multiHeader, result);
+                multiHeader = DatabaseHelper.AddColumn(tableName, multiHeader);
+                DatabaseHelper.MoveColumnToIndex(latestHeader, multiHeader, tableName);
             }
-        }
-
-        private bool EndOfMultiCell(char[] content, int i, out bool isNotMultiCell)
-        {
-            int nextIndex = i + 1;
-            return (isNotMultiCell = content[i] == '\t') || content[i] == '\"' && (nextIndex == content.Length || (nextIndex < content.Length && (content[nextIndex] == '\r' || content[nextIndex] == '\t')));
+            row.Add(multiHeader, result);
         }
         #endregion
 

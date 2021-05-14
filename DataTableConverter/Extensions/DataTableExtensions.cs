@@ -12,7 +12,7 @@ namespace DataTableConverter.Extensions
         {
             get
             {
-                return Properties.Settings.Default.ImportHeaderUpperCase ? fileName.ToUpper() : fileName;
+                return Assisstant.DatabaseHelper.ImportOperation()(fileName);
             }
         }
 

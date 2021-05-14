@@ -1489,8 +1489,8 @@ namespace DataTableConverter
                     StartLoadingBar();
                     Thread thread = new Thread(() =>
                     {
-                        int id = DatabaseHelper.GetRowWithMaxCharacters(GetSorting(), OrderType, out int index, TableName);
 
+                        int index = -1;
                         if (shortcut != string.Empty && newColumn != string.Empty)
                         {
                             newColumn = DatabaseHelper.AddColumnWithAdditionalIfExists(newColumn, TableName);
@@ -1501,12 +1501,13 @@ namespace DataTableConverter
                             }
                             else
                             {
+                                int id = DatabaseHelper.GetRowWithMaxCharacters(GetSorting(), OrderType, out index, TableName);
                                 DatabaseHelper.UpdateCell(shortcut, newColumn, id, TableName, true);
                             }
                             DatabaseHelper.SetSavepoint();
                             LoadData(true);
                         }
-                        if (minLength != -1)
+                        if (index != -1)
                         {
                             SelectDataGridViewRow(index);
                         }

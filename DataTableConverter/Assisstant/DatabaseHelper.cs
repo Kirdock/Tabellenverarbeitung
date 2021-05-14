@@ -294,7 +294,7 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter("$column"));
                 command.Parameters.Add(new SQLiteParameter("$alias"));
 
-                Func<string, string> operation = Properties.Settings.Default.ImportHeaderUpperCase ? (Func<string, string>)(value => value.ToUpper()) : value => value;
+                Func<string, string> operation = ImportOperation();
 
                 foreach (string columnName in columnNames)
                 {
@@ -303,6 +303,11 @@ namespace DataTableConverter.Assisstant
                     command.ExecuteNonQuery();
                 }
             }
+        }
+
+        internal static Func<string,string> ImportOperation()
+        {
+            return Properties.Settings.Default.ImportHeaderUpperCase ? (Func<string, string>)(value => value.Replace("-","[EXCEPTION]").ToUpper().Replace("[EXCEPTION]","-") /*exception for this character*/) : value => value;
         }
 
         internal void ReplaceTable(string newTable, string oldTable)
@@ -609,6 +614,11 @@ namespace DataTableConverter.Assisstant
             return columnName;
         }
 
+        internal void MoveColumnToIndex(string aliasName, string columnName, string tableName)
+        {
+            MoveColumnToIndex(GetAliasIndex(aliasName, tableName), columnName, tableName);
+        }
+
         internal void MoveColumnToIndex(int index, string columnName, string tableName)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -660,16 +670,28 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void SwitchAliasIndex(string aliasName1, string aliasName2, string tableName)
+        internal int GetAliasIndex(string aliasName, string tableName)
+        {
+            int index = 0;
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"SELECT sortorder from [{tableName + MetaTableAffix}] WHERE alias = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = aliasName });
+                index = Convert.ToInt32(command.ExecuteScalar());
+            }
+            return index;
+        }
+
+        internal void SwitcColumnIndex(string columnName1, string columnName2, string tableName)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 //get old sortorder
-                command.CommandText = $"SELECT sortorder from [{tableName + MetaTableAffix}] WHERE alias = ?";
-                command.Parameters.Add(new SQLiteParameter() { Value = aliasName1 });
+                command.CommandText = $"SELECT sortorder from [{tableName + MetaTableAffix}] WHERE column = ?";
+                command.Parameters.Add(new SQLiteParameter() { Value = columnName1 });
                 int index1 = Convert.ToInt32(command.ExecuteScalar());
 
-                command.Parameters[0].Value = aliasName2;
+                command.Parameters[0].Value = columnName2;
                 int index2 = Convert.ToInt32(command.ExecuteScalar());
                 command.Parameters.Clear();
 
@@ -733,7 +755,7 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Clear();
                 command.CommandText = $"INSERT INTO [{tableName + MetaTableAffix}] (column, alias) values ($column, $alias)";
                 command.Parameters.Add(new SQLiteParameter("$column", columnName));
-                command.Parameters.Add(new SQLiteParameter("$alias", Properties.Settings.Default.ImportHeaderUpperCase ? alias.ToUpper() : alias));
+                command.Parameters.Add(new SQLiteParameter("$alias", ImportOperation()(alias)));
                 command.ExecuteNonQuery();
             }
         }
@@ -1410,9 +1432,10 @@ namespace DataTableConverter.Assisstant
         {
             for (int i = 0; i < aliases.Length; ++i)
             {
-                string newAlias = CopyColumn(aliases[i], tableName);
-                SwitchAliasIndex(aliases[i], newAlias, tableName);
-                aliases[i] = newAlias;
+                string oldColumnName = GetColumnName(aliases[i], tableName);
+                string column = CopyColumn(aliases[i], tableName);
+                SwitcColumnIndex(oldColumnName, column, tableName);
+                aliases[i] = column;
             }
             return aliases;
         }
@@ -1629,7 +1652,7 @@ namespace DataTableConverter.Assisstant
                     command = InsertRow(columns, new object[] { item.Key, item.Value.ToString() }, tableName, command);
                 }
             }
-            InsertRow(new string[] { columnName }, new object[] { sourceRowCount.ToString() }, tableName, command);
+            InsertRow(new string[] { columnName, "Anzahl" }, new object[] {"Gesamt", sourceRowCount.ToString() }, tableName, command);
         }
 
         internal SQLiteCommand DeleteRow(int id, string tableName, SQLiteCommand cmd = null)
@@ -2160,9 +2183,10 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"UPDATE [{tableName}] set [{destinationColumn}] = ? where length({columnName}) >= ?";
+                command.CommandText = $"UPDATE [{tableName}] set [{destinationColumn}] = ? where length([{columnName}]) >= ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = value });
                 command.Parameters.Add(new SQLiteParameter() { Value = minLength });
+                command.ExecuteNonQuery();
             }
         }
 
@@ -2372,7 +2396,7 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"UPDATE [{tableName}] set [{sourceColumn}] = ? where [{destinationColumn}] {(totalSearch ? "= ?" : "like ?")}";
+                command.CommandText = $"UPDATE [{tableName}] set [{destinationColumn}] = ? where [{sourceColumn}] {(totalSearch ? "= ?" : "like ?")}";
                 command.Parameters.Add(new SQLiteParameter() { Value = shortcut });
                 command.Parameters.Add(new SQLiteParameter() { Value = totalSearch ? searchText : $"%{searchText}%"});
                 command.ExecuteNonQuery();
