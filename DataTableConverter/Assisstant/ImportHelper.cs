@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Classes;
+using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.Extensions;
 using DataTableConverter.View;
 using System;
@@ -610,7 +611,7 @@ namespace DataTableConverter.Assisstant
 
         private Func<string, string> GetTrimOperation()
         {
-            return Properties.Settings.Default.TrimImport ? (Func<string, string>)(value => value.Trim()) : value => value;
+            return Properties.Settings.Default.TrimImport ? (Func<string, string>)(value => ProcTrim.Trim(value)) : value => value;
         }
 
         #region Excel Import
@@ -714,8 +715,8 @@ namespace DataTableConverter.Assisstant
                     }
 
                     progressBar?.StartLoadingBar(rows, mainForm);
-                    UnhideRowsAndColumns(objSHT);
-                    
+                    objSHT.Rows.EntireRow.Hidden = false;
+
                     RangeToDataTable(objSHT, objXL, rows, cols, tableName, selectedSheets.Length != 1 ? Path.GetFileName(path) + "; " + sheetName : null, newHeaders, trimOperation, progressBar, mainForm);
                     Marshal.ReleaseComObject(objSHT);
                 }
@@ -758,12 +759,6 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private void UnhideRowsAndColumns(Microsoft.Office.Interop.Excel.Worksheet objSHT)
-        {
-            objSHT.Columns.EntireColumn.Hidden = false;
-            objSHT.Rows.EntireRow.Hidden = false;
-        }
-
         private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, List<string> newHeaders, Func<string,string> trimOperation, ProgressBar progressBar, Form mainForm)
         {
             Clipboard.Clear();
@@ -793,7 +788,7 @@ namespace DataTableConverter.Assisstant
                 }
                 else
                 {
-                    insertCommand = ClipboardToDatabase((MemoryStream)content, newHeaders.ToArray(), fileName, tableName, progressBar, mainForm, insertCommand);
+                    insertCommand = ClipboardToDatabase((MemoryStream)content, newHeaders.ToArray(), fileName, tableName, progressBar, mainForm, insertCommand, trimOperation);
                 }
             }
         }
@@ -818,7 +813,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private SQLiteCommand ClipboardToDatabase(MemoryStream content, string[] headers, string fileName, string tableName, ProgressBar progressBar, Form invokeForm, SQLiteCommand insertCommand)
+        private SQLiteCommand ClipboardToDatabase(MemoryStream content, string[] headers, string fileName, string tableName, ProgressBar progressBar, Form invokeForm, SQLiteCommand insertCommand, Func<string, string> trimOperation)
         {
             StreamReader streamReader = new StreamReader(content);
             streamReader.BaseStream.SetLength(streamReader.BaseStream.Length - 1);
@@ -834,7 +829,7 @@ namespace DataTableConverter.Assisstant
                 Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
                 foreach (XElement cell in rowElement.Descendants(CellExcelNamespace))
                 {
-                    string val = cell.Value.Replace("\t", string.Empty); // remove tabs
+                    string val = trimOperation(cell.Value.Replace("\t", string.Empty)); // remove tabs
                     string[] multiCells = val.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
                     if (multiCells.Length > 1)
