@@ -104,6 +104,8 @@
             this.lblPage = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
+            this.LblWorkProc = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LblWorkProcStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
@@ -555,7 +557,9 @@
             this.StatusLabel,
             this.ValidRowsText,
             this.ValidRowsLabel,
-            this.LblStatus});
+            this.LblStatus,
+            this.LblWorkProc,
+            this.LblWorkProcStatus});
             this.statusStrip1.Location = new System.Drawing.Point(0, 445);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1056, 24);
@@ -688,6 +692,19 @@
             0});
             this.NumPage.ValueChanged += new System.EventHandler(this.NumPage_ValueChanged);
             // 
+            // LblWorkProc
+            // 
+            this.LblWorkProc.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.LblWorkProc.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.LblWorkProc.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.LblWorkProc.Name = "LblWorkProc";
+            this.LblWorkProc.Size = new System.Drawing.Size(4, 19);
+            // 
+            // LblWorkProcStatus
+            // 
+            this.LblWorkProcStatus.Name = "LblWorkProcStatus";
+            this.LblWorkProcStatus.Size = new System.Drawing.Size(0, 19);
+            // 
             // dgTable
             // 
             this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -727,6 +744,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Konvertierung";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.menuStrip1.ResumeLayout(false);
@@ -818,6 +836,8 @@
         private System.Windows.Forms.ToolStripMenuItem WorkflowItemMQ;
         private System.Windows.Forms.ToolStripMenuItem WorkflowItemRZ;
         private System.Windows.Forms.ToolStripStatusLabel LblStatus;
+        private System.Windows.Forms.ToolStripStatusLabel LblWorkProc;
+        private System.Windows.Forms.ToolStripStatusLabel LblWorkProcStatus;
     }
 }
 

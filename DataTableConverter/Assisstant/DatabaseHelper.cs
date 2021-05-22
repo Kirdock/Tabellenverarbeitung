@@ -337,7 +337,11 @@ namespace DataTableConverter.Assisstant
 
         private void CommitTemp()
         {
-            TempTransaction.Commit();
+            try
+            {
+                TempTransaction.Commit();
+            }
+            catch { }
         }
 
         private void Reset()
@@ -563,6 +567,13 @@ namespace DataTableConverter.Assisstant
             return columnName;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="tableName"></param>
+        /// <returns>(adjusted) alias</returns>
         internal string RenameAlias(string from, string to, string tableName)
         {
             string newAlias = to;
@@ -682,7 +693,7 @@ namespace DataTableConverter.Assisstant
             return index;
         }
 
-        internal void SwitcColumnIndex(string columnName1, string columnName2, string tableName)
+        internal void SwitchColumnIndex(string columnName1, string columnName2, string tableName)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
@@ -1418,8 +1429,11 @@ namespace DataTableConverter.Assisstant
         internal string CopyColumn(string alias, string tableName)
         {
             //pre condition alias exists
+            string oldColumnName = GetColumnName(alias, tableName);
             RenameAlias(alias, alias + Properties.Settings.Default.OldAffix, tableName);
-            return AddColumnWithAdditionalIfExists(alias, tableName);
+            string columnName = AddColumnWithAdditionalIfExists(alias, tableName);
+            SwitchColumnIndex(oldColumnName, columnName, tableName);
+            return columnName;
         }
 
         /// <summary>
@@ -1432,10 +1446,7 @@ namespace DataTableConverter.Assisstant
         {
             for (int i = 0; i < aliases.Length; ++i)
             {
-                string oldColumnName = GetColumnName(aliases[i], tableName);
-                string column = CopyColumn(aliases[i], tableName);
-                SwitcColumnIndex(oldColumnName, column, tableName);
-                aliases[i] = column;
+                aliases[i] = CopyColumn(aliases[i], tableName);
             }
             return aliases;
         }
@@ -1455,11 +1466,7 @@ namespace DataTableConverter.Assisstant
             if (columnName != null)
             {
                 inserted = MessageHandler.MessagesYesNo(invokeForm, MessageBoxIcon.Warning, $"Es gibt bereits eine Spalte mit der Bezeichnung \"{alias}\".\nSpalte überschreiben?") == DialogResult.Yes;
-                if (inserted) //if yes override everything with empty
-                {
-                    SetColumnValues(alias, string.Empty, tableName);
-                }
-                else
+                if(!inserted)
                 {
                     columnName = null;
                 }
@@ -1883,7 +1890,7 @@ namespace DataTableConverter.Assisstant
         {
             //additionalColumns[...].Value is the columnName
             Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(tableName);
-            string separatorText = separator ? "#,0.###" : string.Empty;
+            string separatorText = separator ? "N2" : string.Empty;
 
             string[] sumColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Sum).Select(item => item.Value).ToArray();
             string[] countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count).Select(item => item.Value).ToArray();
@@ -2195,7 +2202,7 @@ namespace DataTableConverter.Assisstant
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = $"DELETE from [{tableName}] where [{columnName}] {(strictMatch ? "=? COLLATE NOCASE" : "like ?")}";
-                command.Parameters.Add(new SQLiteParameter() { Value = $"%{value}%" });
+                command.Parameters.Add(new SQLiteParameter() { Value = strictMatch ? value : $"%{value}%" });
                 command.ExecuteNonQuery();
             }
         }

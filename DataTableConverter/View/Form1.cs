@@ -3,6 +3,7 @@ using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.View;
 using DataTableConverter.View.WorkProcViews;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -99,6 +100,7 @@ namespace DataTableConverter
 
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
+            
             if (isExistingDatabase)
             {
                 LoadData(true, false, true);
@@ -107,6 +109,31 @@ namespace DataTableConverter
             else if (path != null)
             {
                 importToolStripMenuItem_Click(ImportState.None, new string[] { path });
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            if (!Properties.Settings.Default.LongPathEnabled)
+            {
+                try
+                {
+                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem"))
+                    {
+                        if (key?.GetValue("LongPathsEnabled")?.ToString() != "1")
+                        {
+                            DialogResult result = this.MessagesYesNo(MessageBoxIcon.Warning, "Lange Pfade werden nicht unterstützt.\nBitte führen Sie die Datei \"LongPath.reg\" aus.\nSoll diese Nachricht zukünftig ausgeblendet werden?");
+                            if (result == DialogResult.Yes)
+                            {
+                                Properties.Settings.Default.LongPathEnabled = true;
+                            }
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex, this, false);
+                }
             }
         }
 
@@ -436,9 +463,32 @@ namespace DataTableConverter
                 StopLoadingBar();
                 this.MessagesOK(MessageBoxIcon.Information, "Arbeitsablauf ausgeführt!");
                 finished?.Invoke();
+                ClearWorkflowStatus();
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
+        }
+
+        private void ClearWorkflowStatus()
+        {
+            SetWorkflowStatus(string.Empty);
+            SetWorkflowText(string.Empty);
+        }
+
+        internal void SetWorkflowStatus(string status)
+        {
+            statusStrip1.BeginInvoke(new MethodInvoker(() =>
+            {
+                LblWorkProcStatus.Text = status;
+            }));
+        }
+
+        internal void SetWorkflowText(string text)
+        {
+            statusStrip1.BeginInvoke(new MethodInvoker(() =>
+            {
+                LblWorkProc.Text = text;
+            }));
         }
 
         private int GetProcedureThroughId(int id)
@@ -464,12 +514,13 @@ namespace DataTableConverter
                     string newTable = null;
                     string fileNameBefore = Path.GetFileName(filenames[0]);
                     int fileEncoding = 0;
+                    string password = string.Empty;
                     foreach (string file in filenames)
                     {
                         try
                         {
                             string filename = Path.GetFileName(file);
-                            string tableName = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding);
+                            string tableName = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding, ref password);
 
                             if (tableName != null)
                             {
@@ -570,6 +621,7 @@ namespace DataTableConverter
                         ResetValidRowLabel();
                         SetSorting(string.Empty);
                         DatabaseHelper.ReplaceTable(tableName, TableName);
+                        DatabaseHelper.SetSavepoint();
                         BeginInvoke(new MethodInvoker(() =>
                         {
                             SetMenuEnabled(true);
@@ -702,6 +754,7 @@ namespace DataTableConverter
                                 ErrorHelper.LogMessage(ex, this);
                             }
                             StopLoadingBar();
+                            ClearWorkflowStatus();
                         });
                         thread.SetApartmentState(ApartmentState.STA);
                         thread.Start();

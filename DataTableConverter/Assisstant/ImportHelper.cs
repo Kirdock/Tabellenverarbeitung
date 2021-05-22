@@ -77,7 +77,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal string ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar, Form mainForm, ref int fileEncoding, ImportSettings settings = null)
+        internal string ImportFile(string file, bool multipleFiles, Dictionary<string, ImportSettings> fileImportSettings, ContextMenuStrip ctxRow, ProgressBar progressBar, Form mainForm, ref int fileEncoding, ref string password, ImportSettings settings = null)
         {
             string filename = Path.GetFileName(file);
             string extension = Path.GetExtension(file).ToLower();
@@ -93,7 +93,7 @@ namespace DataTableConverter.Assisstant
             }
             else if (extension != string.Empty && ExcelExt.Contains(extension))
             {
-                OpenExcel(file, progressBar, mainForm, tableName);
+                OpenExcel(file, progressBar, mainForm, tableName, ref password);
             }
             else
             {
@@ -130,7 +130,7 @@ namespace DataTableConverter.Assisstant
                             fileImportSettings.Add(extension, form.ImportSettings);
                         }
                         fileEncoding = form.ImportSettings.CodePage;
-                        return ImportFile(file, multipleFiles, fileImportSettings, ctxRow, progressBar, mainForm, ref fileEncoding, form.ImportSettings);
+                        return ImportFile(file, multipleFiles, fileImportSettings, ctxRow, progressBar, mainForm, ref fileEncoding, ref password, form.ImportSettings);
                     }
                     else
                     {
@@ -154,7 +154,9 @@ namespace DataTableConverter.Assisstant
                             + $"|Excel-Dateien (*.xl*)|{ExcelExt}"
                             + "|Alle Dateien (*.*)|*.*",
                 RestoreDirectory = true,
-                Multiselect = multiselect
+                Multiselect = multiselect,
+                CheckFileExists = false,
+                CheckPathExists = false
             };
         }
 
@@ -612,7 +614,7 @@ namespace DataTableConverter.Assisstant
         }
 
         #region Excel Import
-        internal void OpenExcel(string path, ProgressBar progressBar, Form mainForm, string tableName)
+        internal void OpenExcel(string path, ProgressBar progressBar, Form mainForm, string tableName, ref string password)
         {
             Microsoft.Office.Interop.Excel.Application objXL = null;
             Microsoft.Office.Interop.Excel.Workbook objWB = null;
@@ -635,7 +637,6 @@ namespace DataTableConverter.Assisstant
                     DisplayAlerts = false
                 };
                 bool hasPassword = false;
-                string password = string.Empty;
                 do
                 {
                     try
@@ -656,7 +657,9 @@ namespace DataTableConverter.Assisstant
                     }
                 } while (hasPassword);
 
-                string[] selectedSheets = SelectExcelSheets(objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray(), mainForm);
+                string[] sheets = objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray();
+                int[] selectedSheetsIndizes = SelectItems(sheets, mainForm);
+                string[] selectedSheets = selectedSheetsIndizes.Select(index => sheets[index]).ToArray();
                 List<string> headers = new List<string>();
                 if (selectedSheets.Length > 1)
                 {
@@ -668,19 +671,35 @@ namespace DataTableConverter.Assisstant
                 foreach (string sheetName in selectedSheets)
                 {
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
-                    
-                    if (objSHT.AutoFilter != null)
-                    {
-                        objSHT.AutoFilter.ShowAllData();
-                    }
+
                     int rows = objSHT.UsedRange.Rows.Count;
                     int cols = objSHT.Cells.Find("*", System.Reflection.Missing.Value,
                                                    System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                                                    Microsoft.Office.Interop.Excel.XlSearchOrder.xlByColumns, Microsoft.Office.Interop.Excel.XlSearchDirection.xlPrevious,
                                                    false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Column;
+                    
                     if (cols == 0)
                     {
                         continue;
+                    }
+
+                    List<KeyVal> hiddenColumns = new List<KeyVal>();
+                    for (int i = 1; i <= cols; i++)
+                    {
+                        Microsoft.Office.Interop.Excel.Range cell = objSHT.Rows.Cells[1, i];
+                        if (cell.EntireColumn.Hidden)
+                        {
+                            hiddenColumns.Add(new KeyVal(cell.Value2, i));
+                        }
+                    }
+
+                    if (hiddenColumns.Count != 0)
+                    {
+                        int[] selectedIndizes = SelectItems(hiddenColumns.Select(col => col.Key).ToArray(), mainForm, "Welche ausgeblendeten Spalten sollen eingeblendet werden?");
+                        foreach (int i in selectedIndizes)
+                        {
+                            ((Microsoft.Office.Interop.Excel.Range)objSHT.Rows.Cells[1, hiddenColumns[i].Val]).EntireColumn.Hidden = false;
+                        }
                     }
 
                     List<string> newHeaders = SetHeaderOfExcel(objSHT, cols);
@@ -1120,26 +1139,27 @@ namespace DataTableConverter.Assisstant
             return data;
         }
 
-        private string[] SelectExcelSheets(string[] sheets, Form mainForm)
+        private int[] SelectItems(string[] sheets, Form mainForm, string headerText = null)
         {
-            string[] checkedSheets = new string[0];
+            int[] checkedSheets = new int[0];
             if (sheets.Length == 1)
             {
-                return sheets;
+                return new int[] { 0 };
             }
             else
             {
-                ExcelSheets form = new ExcelSheets(sheets);
-                DialogResult result = DialogResult.Cancel;
-                mainForm.Invoke(new MethodInvoker(() =>
+                using (ExcelSheets form = new ExcelSheets(sheets, headerText))
                 {
-                    result = form.ShowDialog(mainForm);
-                }));
-                if (result == DialogResult.OK)
-                {
-                    checkedSheets = form.GetSheets();
+                    DialogResult result = DialogResult.Cancel;
+                    mainForm.Invoke(new MethodInvoker(() =>
+                    {
+                        result = form.ShowDialog(mainForm);
+                    }));
+                    if (result == DialogResult.OK)
+                    {
+                        checkedSheets = form.GetSheets();
+                    }
                 }
-                form.Dispose();
                 return checkedSheets;
             }
         }

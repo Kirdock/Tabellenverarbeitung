@@ -167,5 +167,8 @@
     <Setting Name="EditShortcut" Type="System.Windows.Forms.Keys" Scope="User">
       <Value Profile="(Default)">Strg+Alt+LButton</Value>
     </Setting>
+    <Setting Name="LongPathEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

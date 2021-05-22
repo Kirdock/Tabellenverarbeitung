@@ -681,5 +681,17 @@ namespace DataTableConverter.Properties {
                 this["EditShortcut"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LongPathEnabled {
+            get {
+                return ((bool)(this["LongPathEnabled"]));
+            }
+            set {
+                this["LongPathEnabled"] = value;
+            }
+        }
     }
 }

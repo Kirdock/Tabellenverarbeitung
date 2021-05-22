@@ -40,7 +40,7 @@
             this.button1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.button1.Location = new System.Drawing.Point(0, 250);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(275, 23);
+            this.button1.Size = new System.Drawing.Size(554, 23);
             this.button1.TabIndex = 1;
             this.button1.Text = "Bestätigen";
             this.button1.UseVisualStyleBackColor = true;
@@ -55,7 +55,7 @@
             this.cList.HorizontalScrollbar = true;
             this.cList.Location = new System.Drawing.Point(0, 25);
             this.cList.Name = "cList";
-            this.cList.Size = new System.Drawing.Size(275, 214);
+            this.cList.Size = new System.Drawing.Size(554, 214);
             this.cList.TabIndex = 2;
             // 
             // btnCheckAll
@@ -70,7 +70,7 @@
             // 
             // btnUncheckAll
             // 
-            this.btnUncheckAll.Location = new System.Drawing.Point(138, 1);
+            this.btnUncheckAll.Location = new System.Drawing.Point(126, 1);
             this.btnUncheckAll.Name = "btnUncheckAll";
             this.btnUncheckAll.Size = new System.Drawing.Size(137, 23);
             this.btnUncheckAll.TabIndex = 4;
@@ -82,7 +82,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(275, 273);
+            this.ClientSize = new System.Drawing.Size(554, 273);
             this.Controls.Add(this.btnUncheckAll);
             this.Controls.Add(this.btnCheckAll);
             this.Controls.Add(this.cList);

@@ -75,6 +75,7 @@ namespace DataTableConverter.Classes.WorkProcs
             ImportSettings setting = invokeForm.ImportHelper.GenerateSettingsThroughPreset(PresetType, SettingPreset);
             string importTable = null;
             int fileEncoding = 0;
+            string password = string.Empty;
 
             foreach (string file in files)
             {
@@ -87,7 +88,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     fileEncoding = setting.CodePage;
                 }
 
-                string newTable = invokeForm.ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding); //load file
+                string newTable = invokeForm.ImportHelper.ImportFile(file, true, dict, ctxRow, null, invokeForm, ref fileEncoding, ref password); //load file
 
                 if (importTable == null)
                 {
