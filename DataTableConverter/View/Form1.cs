@@ -221,7 +221,7 @@ namespace DataTableConverter
             {
                 foreach (DataGridViewColumn col in dgTable.Columns.Cast<DataGridViewColumn>())
                 {
-                    if (ColumnWidths.TryGetValue(col.Name, out int value))
+                    if (ColumnWidths.TryGetValue(col.HeaderText, out int value))
                     {
                         col.Width = value;
                     }
@@ -235,7 +235,7 @@ namespace DataTableConverter
 
         private void SetOptimalColumnWidth(DataGridViewColumn col)
         {
-            string result = (dgTable.DataSource as DataTable)?.AsEnumerable().Select(row => row[col.Name].ToString()).Concat(new string[] { col.Name }).Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
+            string result = (dgTable.DataSource as DataTable)?.AsEnumerable().Select(row => row[col.Name].ToString()).Concat(new string[] { col.HeaderText }).Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
             col.Width = TextRenderer.MeasureText(result, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
 
             AddColumnWidth(col);
@@ -251,13 +251,13 @@ namespace DataTableConverter
 
         private void AddColumnWidth(DataGridViewColumn col)
         {
-            if (!ColumnWidths.ContainsKey(col.Name))
+            if (!ColumnWidths.ContainsKey(col.HeaderText))
             {
-                ColumnWidths.Add(col.Name, col.Width);
+                ColumnWidths.Add(col.HeaderText, col.Width);
             }
             else
             {
-                ColumnWidths[col.Name] = col.Width;
+                ColumnWidths[col.HeaderText] = col.Width;
             }
         }
 
@@ -1001,9 +1001,9 @@ namespace DataTableConverter
                 DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
                 if (width > col.Width)
                 {
-                    ColumnWidths[col.Name] = col.Width = width;
+                    ColumnWidths[col.HeaderText] = col.Width = width;
                 }
-                DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].Name, id, TableName);
+                DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].HeaderText, id, TableName);
                 DatabaseHelper.SetSavepoint();
             }
         }
@@ -1226,7 +1226,7 @@ namespace DataTableConverter
                 {
                     bool asc = col.HeaderCell.SortGlyphDirection == SortOrder.Ascending;
 
-                    SetSorting($"[{DatabaseHelper.GetColumnName(col.Name, TableName)}] COLLATE NATURALSORT {(asc ? "DESC" : "ASC")}");
+                    SetSorting($"[{DatabaseHelper.GetColumnName(col.HeaderText, TableName)}] COLLATE NATURALSORT {(asc ? "DESC" : "ASC")}");
                 }
                 LoadData(true);
             }

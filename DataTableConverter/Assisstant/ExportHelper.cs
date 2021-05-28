@@ -266,7 +266,7 @@ namespace DataTableConverter
             {
                 //CSV
                 case 0:
-                    rowCount = ExportCsv(directory, fileName, encoding, command, invokeForm, updateLoadingBar);
+                    rowCount = ExportCsv(directory, fileName, encoding, command, invokeForm, tableName, updateLoadingBar);
                     break;
 
                 //Dbase
@@ -286,7 +286,7 @@ namespace DataTableConverter
         {
             int rowCount = 0;
             List<string> duplicates = new List<string>();
-            string[] headers = DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray();
+            string[] headers = DatabaseHelper.GetAliases(tableName).ToArray();
             for (int i = 1; i < headers.Length; i++)
             {
                 string header = headers[i].Length > DbaseMaxHeaderLength ? headers[i].Substring(0, DbaseMaxHeaderLength) : headers[i];
@@ -477,7 +477,7 @@ namespace DataTableConverter
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
-        internal int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, System.Action updateLoadingBar = null)
+        internal int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, string tableName, System.Action updateLoadingBar = null)
         {
             int rowCount = 0;
             string path = Path.Combine(directory, fileName + ".csv");
@@ -507,10 +507,10 @@ namespace DataTableConverter
                             {
                                 for (var i = 0; i < reader.FieldCount - 1; i++)
                                 {
-                                    writer.Write(reader.GetName(i));
+                                    writer.Write(DatabaseHelper.GetAliasName(reader.GetName(i), tableName));
                                     writer.Write(CSVSeparator);
                                 }
-                                writer.Write(reader.GetName(reader.FieldCount - 1));
+                                writer.Write(DatabaseHelper.GetAliasName(reader.GetName(reader.FieldCount - 1), tableName));
                                 writer.Write(writer.NewLine);
 
                                 for (; reader.Read(); rowCount++)
@@ -566,24 +566,24 @@ namespace DataTableConverter
                 {
                     if (reader.HasRows) //write header
                     {
-                        string[] columnNames = new string[reader.FieldCount];
+                        string[] aliases = new string[reader.FieldCount];
                         int maxRowsPerExecution = ImportHelper.MaxCellsPerIteration / reader.FieldCount; // about 50000 cells per iteration
                         for (var i = 0; i < reader.FieldCount; i++)
                         {
-                            columnNames[i] = reader.GetName(i);
+                            aliases[i] = DatabaseHelper.GetAliasName(reader.GetName(i), tableName);
                         }
-                        InsertHeadersToExcel(columnNames, worksheet);
-                        InsertRowsSkeleton(worksheet, maxRows, columnNames.Length);
+                        InsertHeadersToExcel(aliases, worksheet);
+                        InsertRowsSkeleton(worksheet, maxRows, aliases.Length);
                         int rowStart = 2; //+2 because index starts at 1 and header is first
                         while (reader.HasRows)
                         {
                             int max = rowCount + maxRowsPerExecution > maxRows ? maxRows - rowCount : maxRowsPerExecution;
                             int newRows;
-                            object[,] data = new object[max, columnNames.Length];
+                            object[,] data = new object[max, aliases.Length];
                             for (newRows = 0; newRows < maxRowsPerExecution && reader.Read(); rowCount++, newRows++)
                             {
-                                object[] row = new object[columnNames.Length];
-                                for (int y = 0; y < columnNames.Length; y++)
+                                object[] row = new object[aliases.Length];
+                                for (int y = 0; y < aliases.Length; y++)
                                 {
                                     data[newRows, y] = reader.GetValue(y).ToString();
                                 }
@@ -592,11 +592,11 @@ namespace DataTableConverter
 
                             try
                             {
-                                InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, columnNames.Length);
+                                InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, aliases.Length);
                             }
                             catch(Exception ex)
                             {
-                                ErrorHelper.LogMessage($"Error while inserting rows to Excel{Environment.NewLine}rowStart: {rowStart}; count: {newRows - 1}; columnCount: {columnNames.Length}; maxRows: {maxRows}; max: {max}", invokeForm, false);
+                                ErrorHelper.LogMessage($"Error while inserting rows to Excel{Environment.NewLine}rowStart: {rowStart}; count: {newRows - 1}; columnCount: {aliases.Length}; maxRows: {maxRows}; max: {max}", invokeForm, false);
                                 throw ex;
                             }
                             rowStart += newRows;

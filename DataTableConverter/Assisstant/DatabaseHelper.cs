@@ -1362,7 +1362,24 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private string GetAliasName(string columnName, string tableName)
+        internal List<string> GetAliases(string tableName, bool includeDeleted = false)
+        {
+            List<string> columnNames = new List<string>();
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"SELECT alias from [{tableName + MetaTableAffix}] {(includeDeleted ? string.Empty : "where alias is not null")} order by sortorder";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        columnNames.Add(reader.GetValue(0).ToString());
+                    }
+                }
+            }
+            return columnNames;
+        }
+
+        internal string GetAliasName(string columnName, string tableName)
         {
             string alias;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -1909,8 +1926,8 @@ namespace DataTableConverter.Assisstant
         {
             //additionalColumns[...].Value is the columnName
             Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(tableName);
-            string separatorText = separator ? "N2" : string.Empty;
-
+            string separatorText = separator ? "N2" : "F2";
+            System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.CreateSpecificCulture("de-DE");
             string[] sumColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Sum).Select(item => item.Value).ToArray();
             string[] countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count).Select(item => item.Value).ToArray();
             string[] appendArray = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Nothing).Select(item => item.Value).ToArray();
@@ -1978,7 +1995,7 @@ namespace DataTableConverter.Assisstant
                                 if (containsSumColumns || containsCountColumns)
                                 {
                                     //sumResults and count
-                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
+                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
                                 }
 
 #region InitNew
@@ -2036,7 +2053,7 @@ namespace DataTableConverter.Assisstant
                         if (containsSumColumns || containsCountColumns)
                         {
                             //sumResults and count
-                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
+                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
                         }
                     }
                 }
