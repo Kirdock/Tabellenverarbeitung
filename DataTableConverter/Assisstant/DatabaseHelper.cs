@@ -1362,6 +1362,18 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        private string GetAliasName(string columnName, string tableName)
+        {
+            string alias;
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"SELECT alias from [{tableName + MetaTableAffix}] where column = $column COLLATE NOCASE";
+                command.Parameters.Add(new SQLiteParameter("$column", columnName));
+                alias = command.ExecuteScalar()?.ToString();
+            }
+            return alias;
+        }
+
         internal string GetColumnName(string alias, string tableName)
         {
             string columnName = string.Empty;
@@ -1430,10 +1442,17 @@ namespace DataTableConverter.Assisstant
         {
             //pre condition alias exists
             string oldColumnName = GetColumnName(alias, tableName);
-            RenameAlias(alias, alias + Properties.Settings.Default.OldAffix, tableName);
-            string columnName = AddColumnWithAdditionalIfExists(alias, tableName);
-            SwitchColumnIndex(oldColumnName, columnName, tableName);
-            return columnName;
+            alias = GetAliasName(oldColumnName, tableName); //real alias name (right case)
+
+            string columnName = AddColumnWithAdditionalIfExists(alias + Properties.Settings.Default.OldAffix, tableName);
+
+            using(SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName}] SET [{columnName}] = [{oldColumnName}]";
+                command.ExecuteNonQuery();
+            }
+
+            return oldColumnName;
         }
 
         /// <summary>

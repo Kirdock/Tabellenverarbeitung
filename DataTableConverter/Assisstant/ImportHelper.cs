@@ -39,12 +39,12 @@ namespace DataTableConverter.Assisstant
         private static readonly XName RowExcelNamespace = ExcelNamespace + "Row";
         private static readonly XName CellExcelNamespace = ExcelNamespace + "Cell";
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        [DllImport("kernel32.dll", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto)]
         private static extern int GetShortPathName(
             [MarshalAs(UnmanagedType.LPTStr)]
-        string path,
+                string path,
             [MarshalAs(UnmanagedType.LPTStr)]
-        StringBuilder shortPath,
+                StringBuilder shortPath,
             int shortPathLength);
 
         internal ImportHelper(ExportHelper exportHelper, DatabaseHelper databaseHelper)
@@ -487,7 +487,7 @@ namespace DataTableConverter.Assisstant
                                 object[] values = new object[reader.FieldCount];
                                 for (int i = 0; i < reader.FieldCount; ++i)
                                 {
-                                    values[i] = reader.GetValue(i).ToString().Replace("\n", string.Empty).Trim(); //remove new lines in dbase
+                                    values[i] = ProcTrim.Trim(reader.GetValue(i).ToString().Replace("\n", string.Empty)); //remove new lines in dbase
                                 }
                                 insertCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, insertCommand);
                                 progressBar?.UpdateLoadingBar(mainForm);
