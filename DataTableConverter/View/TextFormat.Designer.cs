@@ -57,6 +57,7 @@
             this.btnAcceptSeparate = new System.Windows.Forms.Button();
             this.txtSeparator = new System.Windows.Forms.TextBox();
             this.gbFixed = new System.Windows.Forms.GroupBox();
+            this.CBFixedHasRowBreak = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.BtnRenamePreset = new System.Windows.Forms.Button();
             this.cmbPresets = new System.Windows.Forms.ComboBox();
@@ -75,7 +76,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.LblFileName = new System.Windows.Forms.ToolStripStatusLabel();
-            this.CBFixedHasRowBreak = new System.Windows.Forms.CheckBox();
+            this.LblDifferentExtension = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
@@ -115,6 +116,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.LblDifferentExtension);
             this.groupBox1.Controls.Add(this.LblCodePageMessage);
             this.groupBox1.Controls.Add(this.cbTakeOver);
             this.groupBox1.Controls.Add(this.label2);
@@ -398,6 +400,17 @@
             this.gbFixed.TabStop = false;
             this.gbFixed.Text = "Feste Breite";
             // 
+            // CBFixedHasRowBreak
+            // 
+            this.CBFixedHasRowBreak.AutoSize = true;
+            this.CBFixedHasRowBreak.Location = new System.Drawing.Point(202, 21);
+            this.CBFixedHasRowBreak.Name = "CBFixedHasRowBreak";
+            this.CBFixedHasRowBreak.Size = new System.Drawing.Size(222, 17);
+            this.CBFixedHasRowBreak.TabIndex = 9;
+            this.CBFixedHasRowBreak.Text = "Zeilen sind getrennt durch Zeilenumbruch";
+            this.CBFixedHasRowBreak.UseVisualStyleBackColor = true;
+            this.CBFixedHasRowBreak.CheckedChanged += new System.EventHandler(this.CBFixedHasRowBreak_CheckedChanged);
+            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.BtnRenamePreset);
@@ -578,16 +591,17 @@
             this.LblFileName.Size = new System.Drawing.Size(31, 17);
             this.LblFileName.Text = "Pfad";
             // 
-            // CBFixedHasRowBreak
+            // LblDifferentExtension
             // 
-            this.CBFixedHasRowBreak.AutoSize = true;
-            this.CBFixedHasRowBreak.Location = new System.Drawing.Point(202, 21);
-            this.CBFixedHasRowBreak.Name = "CBFixedHasRowBreak";
-            this.CBFixedHasRowBreak.Size = new System.Drawing.Size(222, 17);
-            this.CBFixedHasRowBreak.TabIndex = 9;
-            this.CBFixedHasRowBreak.Text = "Zeilen sind getrennt durch Zeilenumbruch";
-            this.CBFixedHasRowBreak.UseVisualStyleBackColor = true;
-            this.CBFixedHasRowBreak.CheckedChanged += new System.EventHandler(this.CBFixedHasRowBreak_CheckedChanged);
+            this.LblDifferentExtension.AutoSize = true;
+            this.LblDifferentExtension.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblDifferentExtension.ForeColor = System.Drawing.Color.Red;
+            this.LblDifferentExtension.Location = new System.Drawing.Point(192, 9);
+            this.LblDifferentExtension.Name = "LblDifferentExtension";
+            this.LblDifferentExtension.Size = new System.Drawing.Size(453, 17);
+            this.LblDifferentExtension.TabIndex = 6;
+            this.LblDifferentExtension.Text = "Andere Endung erkannt! Bitte geben Sie das Format für diese Datei an";
+            this.LblDifferentExtension.Visible = false;
             // 
             // TextFormat
             // 
@@ -673,5 +687,6 @@
         private System.Windows.Forms.Label LblCodePageMessage;
         private System.Windows.Forms.Button btnSyncPreview;
         private System.Windows.Forms.CheckBox CBFixedHasRowBreak;
+        private System.Windows.Forms.Label LblDifferentExtension;
     }
 }

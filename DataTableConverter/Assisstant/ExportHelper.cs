@@ -383,7 +383,7 @@ namespace DataTableConverter
                         {
                             File.Move(fullPathTemp, fullPathOriginal);
                         }
-                        catch (FileNotFoundException ex)
+                        catch (FileNotFoundException)
                         {
                             MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
                         }

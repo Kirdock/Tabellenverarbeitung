@@ -97,6 +97,8 @@
             this.ValidRowsText = new System.Windows.Forms.ToolStripStatusLabel();
             this.ValidRowsLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.LblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LblWorkProc = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LblWorkProcStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -104,8 +106,6 @@
             this.lblPage = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
-            this.LblWorkProc = new System.Windows.Forms.ToolStripStatusLabel();
-            this.LblWorkProcStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
@@ -620,6 +620,19 @@
             this.LblStatus.Size = new System.Drawing.Size(0, 19);
             this.LblStatus.Visible = false;
             // 
+            // LblWorkProc
+            // 
+            this.LblWorkProc.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.LblWorkProc.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.LblWorkProc.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.LblWorkProc.Name = "LblWorkProc";
+            this.LblWorkProc.Size = new System.Drawing.Size(4, 19);
+            // 
+            // LblWorkProcStatus
+            // 
+            this.LblWorkProcStatus.Name = "LblWorkProcStatus";
+            this.LblWorkProcStatus.Size = new System.Drawing.Size(0, 19);
+            // 
             // contextGlobal
             // 
             this.contextGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -691,19 +704,6 @@
             0,
             0});
             this.NumPage.ValueChanged += new System.EventHandler(this.NumPage_ValueChanged);
-            // 
-            // LblWorkProc
-            // 
-            this.LblWorkProc.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-            this.LblWorkProc.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-            this.LblWorkProc.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.LblWorkProc.Name = "LblWorkProc";
-            this.LblWorkProc.Size = new System.Drawing.Size(4, 19);
-            // 
-            // LblWorkProcStatus
-            // 
-            this.LblWorkProcStatus.Name = "LblWorkProcStatus";
-            this.LblWorkProcStatus.Size = new System.Drawing.Size(0, 19);
             // 
             // dgTable
             // 

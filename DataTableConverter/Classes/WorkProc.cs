@@ -84,7 +84,7 @@ namespace DataTableConverter.Classes
         {
             aliasToColumn = invokeForm.DatabaseHelper.GetColumnName(aliasToColumn, tableName);
             destinationColumn = aliasToColumn;
-            if (CopyOldColumn)
+            if (CopyOldColumn && destinationColumn != null)
             {
                 destinationColumn = invokeForm.DatabaseHelper.CopyColumn(aliasToColumn, tableName);
             }

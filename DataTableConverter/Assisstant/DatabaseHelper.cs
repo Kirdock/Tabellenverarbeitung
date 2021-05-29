@@ -1406,28 +1406,9 @@ namespace DataTableConverter.Assisstant
         internal string[] GetColumnNames(string[] aliases, string tableName)
         {
             string[] columnNames = new string[aliases.Length];
-            aliases = aliases.OrderBy(alias => alias, new NaturalStringComparer()).ToArray();
-            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            for (int i = 0; i < aliases.Length; ++i)
             {
-                StringBuilder builder = new StringBuilder();
-                builder.Append("alias = ?");
-                command.Parameters.Add(new SQLiteParameter() { Value = aliases[0] });
-                for (int i = 1; i < aliases.Length; ++i)
-                {
-                    builder.Append(" or alias = ?");
-                    command.Parameters.Add(new SQLiteParameter() { Value = aliases[i] });
-                }
-                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where {builder} order by alias";
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    int i = 0;
-                    while (reader.Read())
-                    {
-                        columnNames[i] = reader.GetValue(0).ToString();
-                        ++i;
-                    }
-                }
+                columnNames[i] = GetColumnName(aliases[i], tableName);
             }
             return columnNames;
         }
@@ -2020,15 +2001,18 @@ namespace DataTableConverter.Assisstant
                                 {
                                     for (int i = 0; i < appendArray.Length; ++i)
                                     {
-                                        string newAlias = appendArray[i] + counter;
+                                        string value = reader.GetValue(i + offset).ToString();
+                                        if (value != string.Empty) {
+                                            string newAlias = appendArray[i] + counter;
 
-                                        if (!aliasColumnMapping.Keys.Any(key => key.Equals(newAlias, StringComparison.OrdinalIgnoreCase)))
-                                        {
-                                            newColumns.Add(newAlias);
-                                            aliasColumnMapping.Add(newAlias, newAlias);
+                                            if (!aliasColumnMapping.Keys.Any(key => key.Equals(newAlias, StringComparison.OrdinalIgnoreCase)))
+                                            {
+                                                newColumns.Add(newAlias);
+                                                aliasColumnMapping.Add(newAlias, newAlias);
+                                            }
+
+                                            newRowValues.Add(newAlias, value);
                                         }
-
-                                        newRowValues.Add(newAlias, reader.GetValue(i + offset).ToString());
                                     }
 
                                     counter++;

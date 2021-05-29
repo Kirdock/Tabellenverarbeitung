@@ -29,9 +29,10 @@ namespace DataTableConverter.View
         private readonly ImportHelper ImportHelper;
         private readonly ExportHelper ExportHelper;
 
-        internal TextFormat(DatabaseHelper databaseHelper, ImportHelper importHelper, ExportHelper exportHelper, string tableName, string path, bool multipleFiles, ContextMenuStrip ctxRow)
+        internal TextFormat(DatabaseHelper databaseHelper, ImportHelper importHelper, ExportHelper exportHelper, string tableName, string path, bool multipleFiles, ContextMenuStrip ctxRow, bool isDifferentExtention)
         {
             InitializeComponent();
+            LblDifferentExtension.Visible = isDifferentExtention;
             DatabaseHelper = databaseHelper;
             ImportHelper = importHelper;
             ExportHelper = exportHelper;
@@ -113,6 +114,11 @@ namespace DataTableConverter.View
         private void CheckEncoding(int codePage)
         {
             LblCodePageMessage.Visible = DetectedEncoding != codePage;
+        }
+
+        private bool IsDetectedEncoding()
+        {
+            return DetectedEncoding == (int)cmbEncoding.SelectedValue;
         }
 
         private void loadSettings()
@@ -246,32 +252,35 @@ namespace DataTableConverter.View
 
         private void btnAcceptSeparate_Click(object sender, EventArgs e)
         {
-            List<string> separator = null;
-            object[] headers = GetHeaders();
-            bool valid = false;
-            if (rbSep.Checked && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
+            if (EncodingPromptContinue())
             {
-                separator = txtSeparator.ReadOnly ? Separators : new List<string> { txtSeparator.Text };
-            }
-            else if (rbTab.Checked)
-            {
-                separator = new List<string> { "\t" };
-            }
-            else if (rbBetween.Checked && checkBetweenText())
-            {
-                ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, headers);
-                valid = true;
-            }
+                List<string> separator = null;
+                object[] headers = GetHeaders();
+                bool valid = false;
+                if (rbSep.Checked && txtSeparator.Text != null && txtSeparator.Text.Length > 0)
+                {
+                    separator = txtSeparator.ReadOnly ? Separators : new List<string> { txtSeparator.Text };
+                }
+                else if (rbTab.Checked)
+                {
+                    separator = new List<string> { "\t" };
+                }
+                else if (rbBetween.Checked && checkBetweenText())
+                {
+                    ImportSettings = new ImportSettings(getCodePage(), txtBegin.Text, txtEnd.Text, cbContainsHeaders.Checked, headers);
+                    valid = true;
+                }
 
-            if (separator != null)
-            {
-                valid = true;
-                ImportSettings = new ImportSettings(separator, getCodePage(), cbContainsHeaders.Checked, headers);
-            }
+                if (separator != null)
+                {
+                    valid = true;
+                    ImportSettings = new ImportSettings(separator, getCodePage(), cbContainsHeaders.Checked, headers);
+                }
 
-            if (valid)
-            {
-                DialogResult = DialogResult.OK;
+                if (valid)
+                {
+                    DialogResult = DialogResult.OK;
+                }
             }
         }
 
@@ -280,17 +289,30 @@ namespace DataTableConverter.View
             return (dgvHeaders.DataSource as DataTable)?.ColumnValues(0).Where(element => !string.IsNullOrWhiteSpace(element?.ToString())).ToArray() ?? new object[0];
         }
 
+        private bool EncodingPromptContinue()
+        {
+            DialogResult result = DialogResult.Yes;
+            if (!IsDetectedEncoding())
+            {
+                result = MessageHandler.MessagesYesNo(this, MessageBoxIcon.Warning, "Die CodePage entspricht nicht der festgestellten CodePage\nTrotzdem fortfahren?");
+            }
+            return result == DialogResult.Yes;
+        }
+
         private void btnAcceptFixed_Click(object sender, EventArgs e)
         {
-            getDataGridViewItems(out List<int> values, out List<string> headers);
-            ImportSettings = new ImportSettings(values, headers, getCodePage(), CBFixedHasRowBreak.Checked);
+            if (EncodingPromptContinue())
+            {
+                GetDataGridViewItems(out List<int> values, out List<string> headers);
+                ImportSettings = new ImportSettings(values, headers, getCodePage(), CBFixedHasRowBreak.Checked);
+            }
         }
 
         private void dgvSetting_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             // sync preview
             ViewHelper.EndDataGridViewEdit(dgvSetting);
-            getDataGridViewItems(out List<int> values, out List<string> headers);
+            GetDataGridViewItems(out List<int> values, out List<string> headers);
             bool created = ImportHelper.OpenTextFixed(TableName, path, values, headers, (cmbEncoding.SelectedItem as NewEncodingInfo).CodePage, true, CBFixedHasRowBreak.Checked, null, this);
             if (created)
             {
@@ -298,7 +320,7 @@ namespace DataTableConverter.View
             }
         }
 
-        private bool checkFromToEntered(DataGridViewCellValidatingEventArgs e)
+        private bool CheckFromToEntered(DataGridViewCellValidatingEventArgs e)
         {
             bool valid = true;
             string currentElement = e.FormattedValue?.ToString();
@@ -418,7 +440,7 @@ namespace DataTableConverter.View
                     }
                 }
             }
-            else if (e.ColumnIndex > 0 && cmbVariant.SelectedIndex != 0 && !checkFromToEntered(e))
+            else if (e.ColumnIndex > 0 && cmbVariant.SelectedIndex != 0 && !CheckFromToEntered(e))
             {
                 e.Cancel = true;
                 this.MessagesOK(MessageBoxIcon.Warning, "\"Von\" darf \"Bis\"nicht überschreiten!");
@@ -452,7 +474,7 @@ namespace DataTableConverter.View
             ViewHelper.AddNumerationToDataGridView(sender, e, Font);
         }
 
-        private void getDataGridViewItems(out List<int> values, out List<string> headers)
+        private void GetDataGridViewItems(out List<int> values, out List<string> headers)
         {
             values = new List<int>();
             headers = new List<string>();
