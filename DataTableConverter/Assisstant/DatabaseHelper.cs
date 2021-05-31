@@ -251,9 +251,9 @@ namespace DataTableConverter.Assisstant
         /// </summary>
         /// <param name="columnNames"></param>
         /// <param name="tableName"></param>
-        internal void CreateTable(IEnumerable<string> columnNames, string tableName)
+        internal void CreateTable(IEnumerable<string> columnNames, string tableName, bool naturalSort = true)
         {
-            CreateTable(columnNames, tableName, TempConnection);
+            CreateTable(columnNames, tableName, TempConnection, naturalSort);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace DataTableConverter.Assisstant
         /// <param name="columnNames"></param>
         /// <param name="tableName"></param>
         /// <param name="connection"></param>
-        private void CreateTable(IEnumerable<string> columnNames, string tableName, SQLiteConnection connection)
+        private void CreateTable(IEnumerable<string> columnNames, string tableName, SQLiteConnection connection, bool naturalSort = true)
         {
 
             using (SQLiteCommand command = connection.CreateCommand())
@@ -270,7 +270,7 @@ namespace DataTableConverter.Assisstant
                 command.CommandText = $"DROP table if exists [{tableName}]";
                 command.ExecuteNonQuery();
 
-                string colType = "varchar(255) not null default '' COLLATE NATURALSORT";
+                string colType = "varchar(255) not null default '' " + (naturalSort ? "COLLATE NATURALSORT" : "COLLATE NOCASE");
                 command.CommandText = $"CREATE table [{tableName}] ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", columnNames)}] {colType})";
 
                 command.ExecuteNonQuery();
@@ -474,6 +474,19 @@ namespace DataTableConverter.Assisstant
             InsertRow(new Dictionary<string, string>() { { IdColumnName, id } }, tableName);
         }
 
+        internal SQLiteCommand InsertDuplicateCommand(string[] headers, string tableName)
+        {
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
+            string headerString = GetHeaderString(headers);
+            command.CommandText = $"INSERT into [{tableName}] ({headerString}) values ({GetValueString(headers.Length)})";
+
+            for (int i = 0; i < 2; i++)
+            {
+                command.Parameters.Add(new SQLiteParameter());
+            }
+            return command;
+        }
+
         internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, object[] values, string tableName, SQLiteCommand cmd = null)
         {
             string[] headers = eHeaders.ToArray();
@@ -505,6 +518,13 @@ namespace DataTableConverter.Assisstant
                 command.ExecuteNonQuery();
             }
             return cmd;
+        }
+
+        internal void InsertRowDuplicate(string id, string value, SQLiteCommand command)
+        {
+            command.Parameters[0].Value = id;
+            command.Parameters[1].Value = value;
+            command.ExecuteNonQuery();
         }
 
         internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, SQLiteDataReader reader, string tableName, SQLiteCommand cmd = null, SQLiteConnection connection = null)
@@ -2558,21 +2578,26 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
-        internal bool ExistsValueInColumn(string column, string value, string tableName, string idColumn, out int id)
+        internal SQLiteCommand ExistsValueInColumnCommand(string column, string tableName, string idColumn)
         {
-            object result = null;
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
+            command.CommandText = $"SELECT [{idColumn}] from [{tableName}] where [{column}] = ?";
+            command.Parameters.Add(new SQLiteParameter());
+            return command;
+        }
+
+        internal bool ExistsValueInColumn(string value, out int id, SQLiteCommand command)
+        {
             id = 0;
-            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            command.Parameters[0].Value = value;
+
+            bool exists;
+            object result = command.ExecuteScalar();
+            if (exists = (result != null))
             {
-                command.CommandText = $"SELECT [{idColumn}] from [{tableName}] where [{column}] = ? COLLATE CASESENSITIVE";
-                command.Parameters.Add(new SQLiteParameter() { Value = value });
-                result = command.ExecuteScalar();
-                if (result != null)
-                {
-                    id = int.Parse(result.ToString());
-                }
+                id = int.Parse(result.ToString());
             }
-            return result != null;
+            return exists;
         }
     }
 }

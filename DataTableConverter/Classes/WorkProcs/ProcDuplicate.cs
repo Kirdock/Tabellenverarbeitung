@@ -55,8 +55,27 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             DuplicateColumns = GetHeaders();
 
-            int[] subStringBegin = duplicateCase.ApplyAll ? null : duplicateCase.getBeginSubstring();
-            int[] subStringEnd = duplicateCase.ApplyAll ? null : duplicateCase.getEndSubstring();
+            int[] subStringBegin = null;
+            int[] subStringEnd = null;
+            if (!duplicateCase.ApplyAll)
+            {
+                List<int> begin = duplicateCase.getBeginSubstring().ToList();
+                List<int> end = duplicateCase.getEndSubstring().ToList();
+
+                for (int i = 0; i < begin.Count; i++)
+                {
+                    if (begin[i] == 0 || end[i] == 0 || end[i] < begin[i])
+                    {
+                        begin.RemoveAt(i);
+                        end.RemoveAt(i);
+                        i--;
+                    }
+                }
+
+                subStringBegin = begin.ToArray();
+                subStringEnd = end.ToArray();
+            }
+            bool containsShort = subStringBegin?.Length > 0;
 
             //we could calculate an identifier and save it into another table (make it with an index but not primary key)
             //first iteration => save identifier and rowId into another table
@@ -70,7 +89,8 @@ namespace DataTableConverter.Classes.WorkProcs
 
             if (column != null)
             {
-                invokeForm.SetWorkflowText("Duplikate: Bearbeitete Zeilen");
+                invokeForm.SetWorkflowText("Duplikate Abgleich");
+                invokeForm.StartLoadingBarCount(invokeForm.DatabaseHelper.GetRowCount(tableName));
                 string[] aliases = duplicateCase.ApplyAll ? invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray() : DuplicateColumns;
                 SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, aliases);
                 string sourceRowIdName = "sourceid";
@@ -81,23 +101,24 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 foreach (string table in new string[] { duplicateTableShort, duplicateTableTotal })
                 {
-                    invokeForm.DatabaseHelper.CreateTable(duplicateColumns, table);
+                    invokeForm.DatabaseHelper.CreateTable(duplicateColumns, table, false);
                     invokeForm.DatabaseHelper.CreateIndexOn(table, identifierColumn, null, true);
                 }
                 Dictionary<int, string> updates = new Dictionary<int, string>();
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    SQLiteCommand updateCommandTotal = null;
-                    SQLiteCommand updateCommandShort = null;
+                    SQLiteCommand selectCommandTotal = invokeForm.DatabaseHelper.ExistsValueInColumnCommand(identifierColumn, duplicateTableTotal, sourceRowIdName);
+                    SQLiteCommand selectCommandShort = invokeForm.DatabaseHelper.ExistsValueInColumnCommand(identifierColumn, duplicateTableShort, sourceRowIdName);
+                    SQLiteCommand updateCommandTotal = invokeForm.DatabaseHelper.InsertDuplicateCommand(duplicateColumns, duplicateTableTotal);
+                    SQLiteCommand updateCommandShort = invokeForm.DatabaseHelper.InsertDuplicateCommand(duplicateColumns, duplicateTableShort); ;
                     PreparedTolerance[] preparedTolerances = PrepareTolerances(tolerances);
-                    int i = 0;
 
                     while (reader.Read())
                     {
                         string identifierTotal = GetColumnsAsObjectArray(reader, null, null, null);
 
-                        if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierTotal, duplicateTableTotal, sourceRowIdName, out int sourceId))
+                        if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierTotal, out int sourceId, selectCommandTotal))
                         {
                             if (!updates.ContainsKey(sourceId))
                             {
@@ -111,33 +132,36 @@ namespace DataTableConverter.Classes.WorkProcs
                         }
                         else
                         {
-                            updateCommandTotal = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetInt32(0).ToString(), identifierTotal }, duplicateTableTotal, updateCommandTotal);
+                            int id = reader.GetInt16(0);
+                            invokeForm.DatabaseHelper.InsertRowDuplicate(id.ToString(), identifierTotal, updateCommandTotal);
+                            if (containsShort)
+                            {
+                                string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, preparedTolerances);
+                                if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierShort, out int sourceId2, selectCommandShort))
+                                {
+                                    if (!updates.ContainsKey(sourceId2))
+                                    {
+                                        updates.Add(sourceId2, duplicateCase.Shortcut);
+                                    }
 
-                            string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, preparedTolerances);
-                            if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierColumn, identifierShort, duplicateTableShort, sourceRowIdName, out int sourceId2))
-                            {
-                                if (!updates.ContainsKey(sourceId2))
-                                {
-                                    updates.Add(sourceId2, duplicateCase.ShortcutTotal);
+                                    if (!updates.ContainsKey(id))
+                                    {
+                                        updates.Add(id, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                                    }
                                 }
-                                int id = reader.GetInt16(0);
-                                if (!updates.ContainsKey(id))
+                                else
                                 {
-                                    updates.Add(id, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                                    invokeForm.DatabaseHelper.InsertRowDuplicate(id.ToString(), identifierShort, updateCommandShort);
                                 }
-                            }
-                            else
-                            {
-                                updateCommandShort = invokeForm.DatabaseHelper.InsertRow(duplicateColumns, new string[] { reader.GetInt32(0).ToString(), identifierShort }, duplicateTableShort, updateCommandShort);
                             }
                         }
-                        i++;
-                        invokeForm.SetWorkflowStatus(i.ToString());
+                        invokeForm.UpdateLoadingBar();
                     }
                 }
                 invokeForm.DatabaseHelper.UpdateCells(updates.ToArray(), column, tableName);
                 invokeForm.DatabaseHelper.Delete(duplicateTableTotal);
                 invokeForm.DatabaseHelper.Delete(duplicateTableShort);
+                invokeForm.StartLoadingBar();
             }
         }
 
@@ -163,7 +187,7 @@ namespace DataTableConverter.Classes.WorkProcs
             
             for (int i = 1; i < reader.FieldCount; i++)
             {
-                string result = reader.GetValue(i).ToString().ToLower();
+                string result = reader.GetValue(i).ToString();
 
                 #region Set Tolerances
                 if (preparedTolerances != null)
@@ -183,21 +207,18 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     int begin = subStringBegin[i-1];
                     int end = subStringEnd[i-1];
-                    if (begin != 0 && end != 0 && end >= begin)
+                    if (begin - 1 > result.Length)
                     {
-                        if (begin - 1 > result.Length)
+                        result = string.Empty;
+                    }
+                    else
+                    {
+                        int count = end - begin + 1;
+                        if (begin + count > result.Length)
                         {
-                            result = string.Empty;
+                            count = result.Length - begin + 1;
                         }
-                        else
-                        {
-                            int count = end - begin + 1;
-                            if (begin + count > result.Length)
-                            {
-                                count = result.Length - begin + 1;
-                            }
-                            result = result.Substring(begin - 1, count);
-                        }
+                        result = result.Substring(begin - 1, count);
                     }
                 }
                 #endregion

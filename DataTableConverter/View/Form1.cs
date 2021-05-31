@@ -1074,7 +1074,7 @@ namespace DataTableConverter
             }
         }
 
-        private void UpdateLoadingBar()
+        internal void UpdateLoadingBar()
         {
             try
             {
@@ -1092,7 +1092,7 @@ namespace DataTableConverter
             }
         }
 
-        private void StartLoadingBarCount(int length)
+        internal void StartLoadingBarCount(int length)
         {
             pgbLoading.Invoke(new MethodInvoker(() =>
             {
@@ -1167,7 +1167,7 @@ namespace DataTableConverter
             }));
         }
 
-        private void StartLoadingBar()
+        internal void StartLoadingBar()
         {
             pgbLoading.BeginInvoke(new MethodInvoker(() =>
             {
