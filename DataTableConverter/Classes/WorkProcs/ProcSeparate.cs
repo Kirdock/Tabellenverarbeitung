@@ -73,13 +73,22 @@ namespace DataTableConverter.Classes.WorkProcs
                     if (reader.HasRows)
                     {
                         int columnIndex;
-                        for (columnIndex = 0; columnIndex < reader.FieldCount && reader.GetName(columnIndex) != item.Column; columnIndex++) { }
-                        SQLiteCommand tempCommand = null;
+                        for (columnIndex = 0; columnIndex < reader.FieldCount && reader.GetName(columnIndex) != columnName; columnIndex++) { }
+                        Dictionary<string, SQLiteCommand> tempCommands = new Dictionary<string, SQLiteCommand>();
                         while (reader.Read())
                         {
+                            var key = reader.GetValue(columnIndex).ToString();
                             if (dict.TryGetValue(reader.GetValue(columnIndex).ToString(), out string tempTable))
                             {
-                                tempCommand = invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, tempCommand);
+                                if(tempCommands.TryGetValue(tempTable, out SQLiteCommand tempCommand))
+                                {
+                                    invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, tempCommand);
+                                }
+                                else
+                                {
+                                    SQLiteCommand cmd = invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, null);
+                                    tempCommands.Add(tempTable, cmd);
+                                }
                             }
                         }
                     }
@@ -94,7 +103,8 @@ namespace DataTableConverter.Classes.WorkProcs
                     }
 
                     string path = Path.GetDirectoryName(filePath);
-                    invokeForm.ExportHelper.Save(path, tempTable, Path.GetExtension(filePath), invokeForm.FileEncoding, item.Format, sortingOrder, orderType, invokeForm, tableName);
+                    invokeForm.ExportHelper.Save(path, tempTable, Path.GetExtension(filePath), invokeForm.FileEncoding, (SaveFormat)item.Format, sortingOrder, orderType, invokeForm, tempTable);
+                    invokeForm.DatabaseHelper.Delete(tempTable);
                 }
             }
         }

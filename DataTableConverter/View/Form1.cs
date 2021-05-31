@@ -42,7 +42,6 @@ namespace DataTableConverter
         internal readonly ExportHelper ExportHelper;
         internal readonly ImportHelper ImportHelper;
         private static HashSet<string> FormInstances = new HashSet<string>();
-        private enum SaveFormat { CSV, DBASE, EXCEL };
         private decimal Page
         {
             get
@@ -731,7 +730,7 @@ namespace DataTableConverter
 
         private void procedure_Click(Proc procedure)
         {
-            using (Formula formula = new Formula(FormulaState.Procedure, DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
+            using (Formula formula = new Formula(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
                 if (formula.ShowDialog(this) == DialogResult.OK)
                 {
@@ -824,7 +823,7 @@ namespace DataTableConverter
         private void Save(string path, SaveFormat format)
         {
             StartLoadingBarCount(RowCount);
-            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(FilePath), FileEncoding, (int)format, GetSorting(), OrderType, this, TableName, UpdateLoadingBar) != 0;
+            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(FilePath), FileEncoding, format, GetSorting(), OrderType, this, TableName, UpdateLoadingBar) != 0;
             StopLoadingBar();
             if (saved)
             {
@@ -1110,12 +1109,11 @@ namespace DataTableConverter
 
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (Formula formula = new Formula(FormulaState.Export, DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
+            using (PVMExport formula = new PVMExport(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
                 if (formula.ShowDialog(this) == DialogResult.OK)
                 {
-                    StartLoadingBarCount((Properties.Settings.Default.PVMSaveTwice ? 2 : 1) * RowCount);
-                    new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).DoWork(ref SortingOrder, null, null, null, FilePath, null, OrderType, this, TableName);
+                    new ProcPVMExport(formula.SelectedHeaders(), formula.SelectedFormat).DoWork(ref SortingOrder, null, null, null, FilePath, null, OrderType, this, TableName);
                     StopLoadingBar();
                     SaveFinished();
                 }

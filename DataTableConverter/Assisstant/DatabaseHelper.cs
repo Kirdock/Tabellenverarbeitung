@@ -251,9 +251,9 @@ namespace DataTableConverter.Assisstant
         /// </summary>
         /// <param name="columnNames"></param>
         /// <param name="tableName"></param>
-        internal void CreateTable(IEnumerable<string> columnNames, string tableName, bool naturalSort = true)
+        internal void CreateTable(IEnumerable<string> columnNames, string tableName)
         {
-            CreateTable(columnNames, tableName, TempConnection, naturalSort);
+            CreateTable(columnNames, tableName, TempConnection);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace DataTableConverter.Assisstant
         /// <param name="columnNames"></param>
         /// <param name="tableName"></param>
         /// <param name="connection"></param>
-        private void CreateTable(IEnumerable<string> columnNames, string tableName, SQLiteConnection connection, bool naturalSort = true)
+        private void CreateTable(IEnumerable<string> columnNames, string tableName, SQLiteConnection connection)
         {
 
             using (SQLiteCommand command = connection.CreateCommand())
@@ -270,7 +270,7 @@ namespace DataTableConverter.Assisstant
                 command.CommandText = $"DROP table if exists [{tableName}]";
                 command.ExecuteNonQuery();
 
-                string colType = "varchar(255) not null default '' " + (naturalSort ? "COLLATE NATURALSORT" : "COLLATE NOCASE");
+                string colType = "varchar(255) not null default '' COLLATE NATURALSORT";
                 command.CommandText = $"CREATE table [{tableName}] ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", columnNames)}] {colType})";
 
                 command.ExecuteNonQuery();
@@ -497,7 +497,7 @@ namespace DataTableConverter.Assisstant
             }
             
             SQLiteCommand command = cmd;
-            if (cmd == null)
+            if (command == null)
             {
                 string headerString = GetHeaderString(headers);
                 command = GetConnection(tableName).CreateCommand();
@@ -517,24 +517,15 @@ namespace DataTableConverter.Assisstant
                 }
                 command.ExecuteNonQuery();
             }
-            return cmd;
-        }
-
-        internal void InsertRowDuplicate(string id, string value, SQLiteCommand command)
-        {
-            command.Parameters[0].Value = id;
-            command.Parameters[1].Value = value;
-            command.ExecuteNonQuery();
+            return command;
         }
 
         internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, SQLiteDataReader reader, string tableName, SQLiteCommand cmd = null, SQLiteConnection connection = null)
         {
-            string[] headers = eHeaders.ToArray();
-
             SQLiteCommand command = cmd;
             if (cmd == null)
             {
-                command = CreateInsertRowCommand(headers, tableName, reader, connection);
+                command = CreateInsertRowCommand(eHeaders, tableName, reader, connection);
             }
             else
             {
@@ -544,7 +535,7 @@ namespace DataTableConverter.Assisstant
                 }
             }
             command.ExecuteNonQuery();
-            return cmd;
+            return command;
         }
 
         private SQLiteCommand CreateInsertRowCommand(IEnumerable<string> eHeaders, string tableName, SQLiteDataReader reader, SQLiteConnection connection = null)
@@ -1309,7 +1300,7 @@ namespace DataTableConverter.Assisstant
                 command.CommandText = $"SELECT {GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = Properties.Settings.Default.FailAddressValue });
 
-                rowCount = ExportHelper.Save(directory, fileName, null, encoding, Properties.Settings.Default.PVMSaveFormat, order, orderType, invokeForm, tableName, command);
+                rowCount = ExportHelper.Save(directory, fileName, null, encoding, (SaveFormat)Properties.Settings.Default.PVMSaveFormat, order, orderType, invokeForm, tableName, command);
             }
             return rowCount;
         }
@@ -1932,11 +1923,6 @@ namespace DataTableConverter.Assisstant
             string[] sumColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Sum).Select(item => item.Value).ToArray();
             string[] countColumns = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Count).Select(item => item.Value).ToArray();
             string[] appendArray = additionalColumns.Where(item => item.State == PlusListboxItem.RowMergeState.Nothing).Select(item => item.Value).ToArray();
-
-            //maybe easier to save each row in a temp-database and later call ReplaceTable(tableName, newTableName)
-            //NO ==> history gets lost!!
-            //Another way: save update/delete-commands into another table
-
             string newTableName = Guid.NewGuid().ToString();
             string[] tempColumns = new string[] { "id", "isAlias", "columns", "values" };
             CreateTable(tempColumns, newTableName);
@@ -1946,42 +1932,35 @@ namespace DataTableConverter.Assisstant
             List<string> newColumns = new List<string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                string headerString = GetHeaderString(new string[] { columnName }.Concat(appendArray).Concat(sumColumns));
-                command.CommandText = GetSortedSelectString(headerString, GenerateOrderAsc(columnName), OrderType.Windows, -1, -1, true, tableName);
-
-
+                string headerString = GetHeaderString(new string[] { columnName }.Concat(appendArray).Concat(sumColumns).Concat(countColumns));
                 int offset = 2; //ofset till the values of "headerString"
                 int sumOffset = offset + appendArray.Length;
+                int countOffset = sumOffset + sumColumns.Length;
                 bool containsSumColumns = sumColumns.Length != 0;
                 bool containsCountColumns = countColumns.Length != 0;
+                command.CommandText = GetSortedSelectString(headerString, GenerateOrderAsc(columnName), OrderType.Windows, -1, -1, true, tableName);
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
-                        int rowCount = 1;
-#region Init
+                        #region Init
                         int id = reader.GetInt32(0);
                         string nameBefore = reader.GetValue(1).ToString();
                         int counter = 1;
                         decimal[] sumResults = new decimal[sumColumns.Length];
+                        int[] countResults = new int[countColumns.Length];
 
-                        int count = 1;
+                        
                         Dictionary<string, string> newRowValues = new Dictionary<string, string>();
 
+                        InitSumResults(sumResults, sumColumns.Length, sumOffset, reader);
+                        InitCountResults(countResults, countColumns.Length, countOffset, reader);
 
-                        for (int i = 0; i < sumColumns.Length; ++i)
-                        {
-                            decimal.TryParse(reader.GetValue(i + sumOffset).ToString(), out decimal result);
-                            sumResults[i] = result;
-                        }
-
-#endregion
+                        #endregion
 
                         while (reader.Read())
                         {
-                            rowCount++;
-
                             string name = reader.GetValue(1).ToString();
                             if (name != nameBefore)
                             {
@@ -1996,27 +1975,19 @@ namespace DataTableConverter.Assisstant
                                 if (containsSumColumns || containsCountColumns)
                                 {
                                     //sumResults and count
-                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
+                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(countResults.Select(value => value.ToString()))) }, newTableName, insertCommand);
                                 }
 
-#region InitNew
+                                #region InitNew
                                 id = reader.GetInt32(0); //newId
-
-                                for (int i = 0; i < sumColumns.Length; ++i)
-                                {
-                                    decimal.TryParse(reader.GetValue(i + sumOffset).ToString(), out decimal result);
-                                    sumResults[i] = result;
-                                }
-
+                                InitSumResults(sumResults, sumColumns.Length, sumOffset, reader);
+                                InitCountResults(countResults, countColumns.Length, countOffset, reader);
                                 newRowValues.Clear();
-
                                 counter = 1;
-                                count = 1;
-#endregion
+                                #endregion
                             }
                             else
                             {
-                                count++;
                                 if (hasAppend)
                                 {
                                     for (int i = 0; i < appendArray.Length; ++i)
@@ -2045,6 +2016,14 @@ namespace DataTableConverter.Assisstant
                                     }
 
                                 }
+                                for (int i = 0; i < countColumns.Length; ++i)
+                                {
+                                    if (reader.GetValue(i + countOffset).ToString() != string.Empty)
+                                    {
+                                        countResults[i]++;
+                                    }
+
+                                }
                                 deleteRows.Add(reader.GetInt32(0));
                             }
 
@@ -2057,7 +2036,7 @@ namespace DataTableConverter.Assisstant
                         if (containsSumColumns || containsCountColumns)
                         {
                             //sumResults and count
-                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(Enumerable.Repeat(count.ToString(), countColumns.Length))) }, newTableName, insertCommand);
+                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(countColumns.Select(value => value.ToString()))) }, newTableName, insertCommand);
                         }
                     }
                 }
@@ -2093,6 +2072,23 @@ namespace DataTableConverter.Assisstant
                 }
             }
             Delete(newTableName);
+        }
+
+        private void InitSumResults(decimal[] sumResults, int count, int offset, SQLiteDataReader reader)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                decimal.TryParse(reader.GetValue(i + offset).ToString(), out decimal result);
+                sumResults[i] = result;
+            }
+        }
+
+        private void InitCountResults(int[] countResults, int count, int offset, SQLiteDataReader reader)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                countResults[i] = reader.GetValue(i + offset).ToString() == string.Empty ? 0 : 1;
+            }
         }
 
         private SQLiteCommand UpdateRow(int id, string[] columnNames, string[] columnValues, string tableName, SQLiteCommand command = null)
@@ -2578,26 +2574,5 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
-        internal SQLiteCommand ExistsValueInColumnCommand(string column, string tableName, string idColumn)
-        {
-            SQLiteCommand command = GetConnection(tableName).CreateCommand();
-            command.CommandText = $"SELECT [{idColumn}] from [{tableName}] where [{column}] = ?";
-            command.Parameters.Add(new SQLiteParameter());
-            return command;
-        }
-
-        internal bool ExistsValueInColumn(string value, out int id, SQLiteCommand command)
-        {
-            id = 0;
-            command.Parameters[0].Value = value;
-
-            bool exists;
-            object result = command.ExecuteScalar();
-            if (exists = (result != null))
-            {
-                id = int.Parse(result.ToString());
-            }
-            return exists;
-        }
     }
 }

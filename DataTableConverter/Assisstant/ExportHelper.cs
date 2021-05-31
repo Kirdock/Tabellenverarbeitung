@@ -18,6 +18,7 @@ using System.Windows.Forms;
 
 namespace DataTableConverter
 {
+    internal enum SaveFormat { CSV = 0, DBASE = 1, EXCEL = 2};
     class ExportHelper
     {
         [DllImport("gdi32.dll", EntryPoint = "AddFontResourceW", SetLastError = true)]
@@ -248,13 +249,13 @@ namespace DataTableConverter
             return error;
         }
 
-        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, string order, OrderType orderType, Form invokeForm, string tableName, System.Action updateLoadingBar = null, string orderColumnName = null)
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, SaveFormat format, string order, OrderType orderType, Form invokeForm, string tableName, System.Action updateLoadingBar = null, string orderColumnName = null)
         {
             SQLiteCommand command = orderColumnName == string.Empty ? DatabaseHelper.GetDataCommand(tableName, order, orderType) : DatabaseHelper.GetDataCommand(tableName, order, orderType, orderColumnName);
             return Save(directory, fileName, oldFileExtension, encoding, format, order, orderType, invokeForm, tableName, command, updateLoadingBar);
         }
 
-        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, int format, string order, OrderType orderType, Form invokeForm, string tableName, SQLiteCommand command, System.Action updateLoadingBar = null)
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, SaveFormat format, string order, OrderType orderType, Form invokeForm, string tableName, SQLiteCommand command, System.Action updateLoadingBar = null)
         {
             int rowCount = 0;
             if (command == null)
@@ -265,17 +266,17 @@ namespace DataTableConverter
             switch (format)
             {
                 //CSV
-                case 0:
+                case SaveFormat.CSV:
                     rowCount = ExportCsv(directory, fileName, encoding, command, invokeForm, tableName, updateLoadingBar);
                     break;
 
                 //Dbase
-                case 1:
+                case SaveFormat.DBASE:
                     rowCount = ExportDbase(tableName, directory, fileName, command, invokeForm);
                     break;
 
                 //Excel
-                case 2:
+                case SaveFormat.EXCEL:
                     rowCount = ExportExcel(directory, fileName, oldFileExtension, command, invokeForm, tableName, updateLoadingBar);
                     break;
             }
@@ -739,7 +740,7 @@ namespace DataTableConverter
                 foreach (string[] tableInfo in dict.Values.Distinct())
                 {
                     setStatus($"Die Datei {tableInfo[1]}.{fileExtension} wird gespeichert");
-                    Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, item.Format, order, orderType, mainForm, tableInfo[0], null, continuedNumberColumn);
+                    Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, (SaveFormat)item.Format, order, orderType, mainForm, tableInfo[0], null, continuedNumberColumn);
                 }
             }
         }

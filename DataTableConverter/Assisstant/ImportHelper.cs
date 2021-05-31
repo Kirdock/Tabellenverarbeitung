@@ -463,7 +463,7 @@ namespace DataTableConverter.Assisstant
             string directory = ToShortPathName(Path.GetDirectoryName(path));
             string shortFileName = GetShortFileName(path);
             string shortPath = Path.Combine(directory, shortFileName);
-            Func<string, string> trimOperation = DatabaseHelper.ImportOperation();
+            Func<string, string> trimOperation = GetTrimOperation();
             if (File.Exists(shortPath))
             {
                 string constr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={directory};Extended Properties=\"dBASE IV;CharacterSet={Encoding.Default.CodePage};\"";
@@ -685,13 +685,9 @@ namespace DataTableConverter.Assisstant
                         continue;
                     }
 
-                    if (HasHiddenRows(objSHT, rows))
+                    if (Properties.Settings.Default.UnhideRows)
                     {
-                        DialogResult result = MessageHandler.MessagesYesNo(mainForm, MessageBoxIcon.Information, "Dei Datei besitzt ausgeblendete Zeilen\nSollen diese auch verwendet werden?");
-                        if(result == DialogResult.Yes)
-                        {
-                            objSHT.Rows.EntireRow.Hidden = false;
-                        }
+                        objSHT.Rows.EntireRow.Hidden = false;
                     }
 
                     List<KeyVal> hiddenColumns = new List<KeyVal>();
@@ -766,19 +762,6 @@ namespace DataTableConverter.Assisstant
                     thread.Start();
                 }
             }
-        }
-
-        private bool HasHiddenRows(Microsoft.Office.Interop.Excel.Worksheet objSHT, int rows)
-        {
-            for(int i = 1; i <= rows; i++)
-            {
-                Microsoft.Office.Interop.Excel.Range row = objSHT.Cells[i, 1];
-                if (row.EntireRow.Hidden)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, List<string> newHeaders, Func<string,string> trimOperation, ProgressBar progressBar, Form mainForm)

@@ -1077,6 +1077,21 @@ namespace DataTableConverter.View
             SetHeaderPVMExport(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcPVMExport.ClassName;
             ProcPVMExport proc = selectedProc as ProcPVMExport;
+            switch(proc.Format)
+            {
+                case SaveFormat.CSV:
+                    RBPVMCSV.Checked = true;
+                    break;
+
+                case SaveFormat.DBASE:
+                    RBPVMDBASE.Checked = true;
+                    break;
+
+                case SaveFormat.EXCEL:
+                default:
+                    RBPVMExcel.Checked = true;
+                    break;
+            }
             TxtPVMPath.SetText(proc.SecondFileName);
             CmBPVMExportEncodings.SelectedValue = proc.FileEncoding;
             SetDataSource(dgvPVMExport, selectedProc.Columns);
@@ -2698,6 +2713,16 @@ namespace DataTableConverter.View
                 ((Case)lbCases.SelectedItem).ApplyAll = CBCaseCheckAll.Checked;
                 dgCaseColumns.Enabled = !CBCaseCheckAll.Checked;
             }
+        }
+
+        private void PVMSaveFormat_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcPVMExport).Format = GetPVMSaveFormat();
+        }
+
+        private SaveFormat GetPVMSaveFormat()
+        {
+            return RBPVMCSV.Checked ? SaveFormat.CSV : RBPVMDBASE.Checked ? SaveFormat.DBASE : SaveFormat.EXCEL;
         }
 
         private void txtSubstringText_TextChanged(object sender, EventArgs e)

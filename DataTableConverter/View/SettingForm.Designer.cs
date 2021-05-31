@@ -121,6 +121,7 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.CBLoadHiddenRows = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -477,6 +478,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.CBLoadHiddenRows);
             this.tabPage2.Controls.Add(this.TxTShortcut);
             this.tabPage2.Controls.Add(this.label40);
             this.tabPage2.Controls.Add(this.CBTrimImport);
@@ -1097,6 +1099,16 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
+            // CBLoadHiddenRows
+            // 
+            this.CBLoadHiddenRows.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBLoadHiddenRows.Location = new System.Drawing.Point(13, 613);
+            this.CBLoadHiddenRows.Name = "CBLoadHiddenRows";
+            this.CBLoadHiddenRows.Size = new System.Drawing.Size(252, 34);
+            this.CBLoadHiddenRows.TabIndex = 31;
+            this.CBLoadHiddenRows.Text = "Ausgeblendete Zeilen laden";
+            this.CBLoadHiddenRows.UseVisualStyleBackColor = true;
+            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1228,5 +1240,6 @@
         private System.Windows.Forms.CheckBox CBTrimImport;
         private System.Windows.Forms.TextBox TxTShortcut;
         private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.CheckBox CBLoadHiddenRows;
     }
 }

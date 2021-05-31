@@ -693,5 +693,17 @@ namespace DataTableConverter.Properties {
                 this["LongPathEnabled"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UnhideRows {
+            get {
+                return ((bool)(this["UnhideRows"]));
+            }
+            set {
+                this["UnhideRows"] = value;
+            }
+        }
     }
 }

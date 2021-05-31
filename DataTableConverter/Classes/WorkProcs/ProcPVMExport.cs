@@ -13,15 +13,15 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcPVMExport : WorkProc
     {
         internal static readonly string ClassName = "PVM Export";
-        private Action UpdateLoadingBar;
         public string SecondFileName;
         public int FileEncoding = 0;
+        public SaveFormat Format = SaveFormat.CSV;
         public ProcPVMExport(int ordinal, int id, string name) : base(ordinal, id, name) { }
-        public ProcPVMExport(string[] headers, Action updateLoadingBar = null)
+        public ProcPVMExport(string[] headers, SaveFormat format)
         {
-            UpdateLoadingBar = updateLoadingBar;
             SetColumns();
             AddColumns(headers);
+            Format = format;
         }
 
         private void AddColumns(string[] headers)
@@ -46,6 +46,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
+            Action updateLoadingBar = invokeForm.UpdateLoadingBar;
 
             DialogResult result = DialogResult.Cancel;
             if (path == null)
@@ -57,12 +58,13 @@ namespace DataTableConverter.Classes.WorkProcs
             }
             if (path != null || result == DialogResult.OK)
             {
+                invokeForm.StartLoadingBarCount((Properties.Settings.Default.PVMSaveTwice ? 2 : 1) * invokeForm.DatabaseHelper.GetRowCount(tableName));
                 path = path ?? saveFileDialog1.FileName;
                 try
                 {
                     int fileEncoding = invokeForm.FileEncoding == 0 ? FileEncoding : invokeForm.FileEncoding;
                     //saveTable
-                    invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, tableName, command, Properties.Settings.Default.PVMSaveTwice ? UpdateLoadingBar : null);
+                    invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, Format, sortingOrder, orderType, invokeForm, tableName, command, Properties.Settings.Default.PVMSaveTwice ? updateLoadingBar : null);
 
                     if (Properties.Settings.Default.PVMSaveTwice)
                     {
@@ -80,13 +82,13 @@ namespace DataTableConverter.Classes.WorkProcs
                             if (result2 == DialogResult.OK)
                             {
                                 path = saveFileDialog1.FileName;
-                                invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, tableName, command, UpdateLoadingBar);
+                                invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, Format, sortingOrder, orderType, invokeForm, tableName, command, updateLoadingBar);
                             }
                         }
                         else
                         {
                             path = Path.Combine(SecondFileName, Path.GetFileNameWithoutExtension(path));
-                            invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, 0, sortingOrder, orderType, invokeForm, tableName, command, UpdateLoadingBar);
+                            invokeForm.ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(filePath), fileEncoding, Format, sortingOrder, orderType, invokeForm, tableName, command, updateLoadingBar);
                         }
                     }
                 }

@@ -9,60 +9,19 @@ namespace DataTableConverter.View
 {
     public partial class Formula : Form
     {
-        private FormulaState Type;
         internal bool OldColumn => cbOldColumn.Checked;
 
-        internal Formula(FormulaState type, IEnumerable<string> aliases)
+        internal Formula(IEnumerable<string> aliases)
         {
             InitializeComponent();
-            Type = type;
-            AdjustForm();
+            SetNewColumnVisibility();
 
             cbHeaders.Items.AddRange(aliases.ToArray());
-            if (Type == FormulaState.Export)
-            {
-                LoadSetting();
-            }
-        }
-
-        private void LoadSetting()
-        {
-            if (Properties.Settings.Default.ExportSpec != null)
-            {
-
-                foreach (string header in Properties.Settings.Default.ExportSpec)
-                {
-                    int index = FindItem(header);
-                    if (index != -1)
-                    {
-                        cbHeaders.SetItemChecked(index, true);
-                    }
-                }
-            }
-        }
-
-        private int FindItem(string header)
-        {
-            header = header.ToLower();
-            for(int i = 0; i < cbHeaders.Items.Count; i++)
-            {
-                if(header.Equals(cbHeaders.Items[i].ToString(), StringComparison.OrdinalIgnoreCase))
-                {
-                    return i;
-                }
-            }
-            return -1;
         }
 
         internal string[] SelectedHeaders()
         {
             return ViewHelper.GetSelectedHeaders(cbHeaders);
-        }
-
-        private void AdjustForm()
-        {
-            cbNewColumn.Visible = cbOldColumn.Visible = Type == FormulaState.Procedure;
-            SetNewColumnVisibility();
         }
 
         private void SetNewColumnVisibility()
@@ -108,7 +67,7 @@ namespace DataTableConverter.View
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
             SetNewColumnVisibility();
-            cbOldColumn.Visible = !cbNewColumn.Checked && Type == FormulaState.Procedure;
+            cbOldColumn.Visible = !cbNewColumn.Checked;
             if (!cbNewColumn.Checked)
             {
                 txtHeader.Text = string.Empty;
