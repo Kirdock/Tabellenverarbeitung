@@ -47,7 +47,6 @@ namespace DataTableConverter.View
                 dgvMerge.Columns[i].DisplayIndex = i;
             }
 
-            int comboBoxIndex = dgvMerge.Columns.Count;
             dgvMerge.Columns.Add(col);
             dgvMerge.Columns.Add(boxCol);
             dgvMerge.Columns[(int)ProcMerge.ConditionColumn.Spalte].Visible = false;

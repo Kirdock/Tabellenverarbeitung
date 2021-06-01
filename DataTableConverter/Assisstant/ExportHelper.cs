@@ -287,132 +287,140 @@ namespace DataTableConverter
         {
             int rowCount = 0;
             List<string> duplicates = new List<string>();
-            string[] headers = DatabaseHelper.GetAliases(tableName).ToArray();
-            for (int i = 1; i < headers.Length; i++)
+            using (SQLiteDataReader reader = command.ExecuteReader())
             {
-                string header = headers[i].Length > DbaseMaxHeaderLength ? headers[i].Substring(0, DbaseMaxHeaderLength) : headers[i];
-                string headerBefore = headers[i - 1].Length > DbaseMaxHeaderLength ? headers[i - 1].Substring(0, DbaseMaxHeaderLength) : headers[i - 1];
-                if (header == headerBefore)
+                string[] aliases = new string[reader.FieldCount];
+                for (int i = 0; i < reader.FieldCount; i++)
                 {
-                    duplicates.Add($"\"{headers[i - 1]}\" und \"{headers[i]}\"");
+                    aliases[i] = reader.GetName(i);
                 }
-            }
-
-            if (duplicates.Count > 0)
-            {
-                MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n" + string.Join(" ,\n", duplicates));
-                return 0;
-            }
-
-
-            if (fileName.Length > DbaseMaxFileLength)
-            {
-                fileName = fileName.Substring(0, DbaseMaxFileLength);
-            }
-            string tempDirectoryPath = Path.Combine(Path.GetDirectoryName(directory), "temp");
-            try
-            {
-                Directory.CreateDirectory(tempDirectoryPath);
-            }
-            catch (Exception ex)
-            {
-                ErrorHelper.LogMessage(ex, invokeForm);
-                return 0;
-            }
-            string fullPathTemp = Path.Combine(tempDirectoryPath, fileName + ".DBF");
-            string fullPathOriginal = Path.Combine(directory, fileName + ".DBF");
-
-            if (File.Exists(fullPathTemp))
-            {
-                File.Delete(fullPathTemp);
-            }
-
-            int[] max = DatabaseHelper.GetMaxColumnLength(tableName);
-            for (int i = 0; i < max.Length; i++)
-            {
-                if (max[i] > DbaseMaxCharacterLength)
+                string[] sortedHeaders = aliases.OrderBy(h => h, System.StringComparer.OrdinalIgnoreCase).ToArray();
+                for (int i = 1; i < sortedHeaders.Length; i++)
                 {
-                    max[i] = DbaseMaxCharacterLength;
+                    string originalHeader = sortedHeaders[i];
+                    string originalHeaderBefore = sortedHeaders[i - 1];
+                    string header = originalHeader.Length > DbaseMaxHeaderLength ? originalHeader.Substring(0, DbaseMaxHeaderLength) : originalHeader;
+                    string headerBefore = originalHeaderBefore.Length > DbaseMaxHeaderLength ? originalHeaderBefore.Substring(0, DbaseMaxHeaderLength) : originalHeaderBefore;
+                    if (header == headerBefore)
+                    {
+                        duplicates.Add($"\"{originalHeaderBefore}\" und \"{originalHeader}\"");
+                    }
                 }
-            }
 
-            if (max.Sum() <= DbaseMaxRecordCharacterLength)
-            {
-                string query = string.Empty;
+                if (duplicates.Count > 0)
+                {
+                    MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n" + string.Join(" ,\n", duplicates));
+                    return 0;
+                }
+
+
+                if (fileName.Length > DbaseMaxFileLength)
+                {
+                    fileName = fileName.Substring(0, DbaseMaxFileLength);
+                }
+                string tempDirectoryPath = Path.Combine(Path.GetDirectoryName(directory), "temp");
                 try
                 {
-                    CreateTable(headers, max, tempDirectoryPath, fileName, ref query);
-                    if (File.Exists(fullPathTemp))
+                    Directory.CreateDirectory(tempDirectoryPath);
+                }
+                catch (Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex, invokeForm);
+                    return 0;
+                }
+                string fullPathTemp = Path.Combine(tempDirectoryPath, fileName + ".DBF");
+                string fullPathOriginal = Path.Combine(directory, fileName + ".DBF");
+
+                if (File.Exists(fullPathTemp))
+                {
+                    File.Delete(fullPathTemp);
+                }
+
+                int[] max = DatabaseHelper.GetMaxColumnLength(aliases, tableName);
+                for (int i = 0; i < max.Length; i++)
+                {
+                    if (max[i] > DbaseMaxCharacterLength)
                     {
-                        #region Adjust Header. Update number of records
-                        using (FileStream stream = new FileStream(fullPathTemp, FileMode.OpenOrCreate))
+                        max[i] = DbaseMaxCharacterLength;
+                    }
+                }
+
+                if (max.Sum() <= DbaseMaxRecordCharacterLength)
+                {
+                    string query = string.Empty;
+                    try
+                    {
+                        CreateTable(aliases, max, tempDirectoryPath, fileName, ref query);
+                        if (File.Exists(fullPathTemp))
                         {
-                            byte[] bytes = new byte[1] { 0x1A };
-                            stream.Position = stream.Length - 1;
-
-                            if (stream.ReadByte() == bytes[0])
+                            #region Adjust Header. Update number of records
+                            using (FileStream stream = new FileStream(fullPathTemp, FileMode.OpenOrCreate))
                             {
-                                stream.Position--;
-                            }
+                                byte[] bytes = new byte[1] { 0x1A };
+                                stream.Position = stream.Length - 1;
 
-                            using (SQLiteDataReader reader = command.ExecuteReader())
-                            {
+                                if (stream.ReadByte() == bytes[0])
+                                {
+                                    stream.Position--;
+                                }
+
+
                                 for (; reader.Read(); rowCount++)
                                 {
                                     StringBuilder builder = new StringBuilder(" ");
-                                    for (int i = 0; i < headers.Length; i++)
+                                    for (int i = 0; i < aliases.Length; i++)
                                     {
                                         string temp = reader.GetValue(i).ToString();
                                         builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[i]));
                                     }
                                     stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
                                 }
+
+                                stream.Write(bytes, 0, bytes.Length);
+
+                                byte[] records = BitConverter.GetBytes(rowCount);
+                                stream.Position = 4;
+                                stream.Write(records, 0, records.Length);
+                                #endregion
                             }
-
-                            stream.Write(bytes, 0, bytes.Length);
-
-                            byte[] records = BitConverter.GetBytes(rowCount);
-                            stream.Position = 4;
-                            stream.Write(records, 0, records.Length);
-                            #endregion
+                            if (File.Exists(fullPathOriginal))
+                            {
+                                File.Delete(fullPathOriginal);
+                            }
+                            try
+                            {
+                                File.Move(fullPathTemp, fullPathOriginal);
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
+                            }
                         }
-                        if (File.Exists(fullPathOriginal))
-                        {
-                            File.Delete(fullPathOriginal);
-                        }
-                        try
-                        {
-                            File.Move(fullPathTemp, fullPathOriginal);
-                        }
-                        catch (FileNotFoundException)
+                        else
                         {
                             MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
                         }
+
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
+                        ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {tempDirectoryPath}; fileName: {fileName}; headers:[{string.Join("; ", aliases)}]", invokeForm);
+                        return 0;
                     }
-                    
                 }
-                catch (Exception ex)
+                else
                 {
-                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {tempDirectoryPath}; fileName: {fileName}; headers:[{string.Join("; ", headers)}]", invokeForm);
-                    return 0;
+                    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
+                    rowCount = 0;
                 }
-            }
-            else
-            {
-                invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
-                rowCount = 0;
-            }
-            if (Directory.Exists(tempDirectoryPath))
-            {
-                DeleteDirectory(tempDirectoryPath, invokeForm);
-            }
-            else
-            {
-                invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Der temporär angelegte Ordner kann nicht wieder gelöscht werden, da er nicht gefunden werden kann");
+                if (Directory.Exists(tempDirectoryPath))
+                {
+                    DeleteDirectory(tempDirectoryPath, invokeForm);
+                }
+                else
+                {
+                    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Der temporär angelegte Ordner kann nicht wieder gelöscht werden, da er nicht gefunden werden kann");
+                }
             }
             return rowCount;
         }
@@ -508,10 +516,10 @@ namespace DataTableConverter
                             {
                                 for (var i = 0; i < reader.FieldCount - 1; i++)
                                 {
-                                    writer.Write(DatabaseHelper.GetAliasName(reader.GetName(i), tableName));
+                                    writer.Write(reader.GetName(i));
                                     writer.Write(CSVSeparator);
                                 }
-                                writer.Write(DatabaseHelper.GetAliasName(reader.GetName(reader.FieldCount - 1), tableName));
+                                writer.Write(reader.GetName(reader.FieldCount - 1));
                                 writer.Write(writer.NewLine);
 
                                 for (; reader.Read(); rowCount++)
@@ -571,7 +579,7 @@ namespace DataTableConverter
                         int maxRowsPerExecution = ImportHelper.MaxCellsPerIteration / reader.FieldCount; // about 50000 cells per iteration
                         for (var i = 0; i < reader.FieldCount; i++)
                         {
-                            aliases[i] = DatabaseHelper.GetAliasName(reader.GetName(i), tableName);
+                            aliases[i] = reader.GetName(i);
                         }
                         InsertHeadersToExcel(aliases, worksheet);
                         InsertRowsSkeleton(worksheet, maxRows, aliases.Length);

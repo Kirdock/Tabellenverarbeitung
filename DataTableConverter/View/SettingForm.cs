@@ -63,6 +63,7 @@ namespace DataTableConverter.View
             NumMaxRows.Value = Properties.Settings.Default.MaxRows;
             CBTrimImport.Checked = Properties.Settings.Default.TrimImport;
             CBLoadHiddenRows.Checked = Properties.Settings.Default.UnhideRows;
+            CBLoadHiddenColumns.Checked = Properties.Settings.Default.UnhideColumns;
             TxTShortcut.Text = new KeysConverter().ConvertToString(Properties.Settings.Default.EditShortcut);
         }
 
@@ -95,6 +96,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.MaxRows = NumMaxRows.Value;
                 Properties.Settings.Default.TrimImport = CBTrimImport.Checked;
                 Properties.Settings.Default.UnhideRows = CBLoadHiddenRows.Checked;
+                Properties.Settings.Default.UnhideColumns = CBLoadHiddenColumns.Checked;
                 Properties.Settings.Default.Save();
             }
             else

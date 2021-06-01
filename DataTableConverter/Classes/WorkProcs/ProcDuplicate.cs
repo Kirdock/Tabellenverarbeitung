@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
@@ -92,61 +91,80 @@ namespace DataTableConverter.Classes.WorkProcs
                 invokeForm.SetWorkflowText("Duplikate Abgleich");
                 invokeForm.StartLoadingBarCount(invokeForm.DatabaseHelper.GetRowCount(tableName));
                 string[] aliases = duplicateCase.ApplyAll ? invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray() : DuplicateColumns;
-                SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, aliases);
-                Dictionary<int, string> updates = new Dictionary<int, string>();
-                Dictionary<int, int> duplicates = new Dictionary<int, int>();
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                if (aliases.Length != 0)
                 {
-                    PreparedTolerance[] preparedTolerances = PrepareTolerances(tolerances);
+                    string sourceRowIdName = "sourceid";
+                    string identifierColumn = "identifier";
+                    string duplicateTableTotal = Guid.NewGuid().ToString();
+                    string duplicateTableShort = Guid.NewGuid().ToString();
+                    string[] duplicateColumns = new string[] { sourceRowIdName, identifierColumn };
+                    SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, aliases);
+                    Dictionary<int, string> updates = new Dictionary<int, string>();
 
-                    while (reader.Read())
+                    foreach (string table in new string[] { duplicateTableShort, duplicateTableTotal })
                     {
-                        int identifierTotal = GetColumnsAsObjectArray(reader, null, null, null);
-
-                        if (duplicates.TryGetValue(identifierTotal, out int sourceId))
-                        {
-                            int id = reader.GetInt16(0);
-
-                            if (!updates.ContainsKey(sourceId))
-                            {
-                                updates.Add(sourceId, duplicateCase.ShortcutTotal);
-                            }
-                            if (!updates.ContainsKey(id))
-                            {
-                                updates.Add(id, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
-                            }
-                        }
-                        else
-                        {
-                            int id = reader.GetInt16(0);
-                            duplicates.Add(identifierTotal, id);
-                            if (containsShort)
-                            {
-                                int identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, preparedTolerances);
-                                if (duplicates.TryGetValue(identifierShort, out int sourceId2))
-                                {
-                                    if (!updates.ContainsKey(sourceId2))
-                                    {
-                                        updates.Add(sourceId2, duplicateCase.Shortcut);
-                                    }
-
-                                    if (!updates.ContainsKey(id))
-                                    {
-                                        updates.Add(id, duplicateCase.Shortcut + duplicateCase.Shortcut);
-                                    }
-                                }
-                                else
-                                {
-                                    duplicates.Add(identifierShort, id);
-                                }
-                            }
-                        }
-                        invokeForm.UpdateLoadingBar();
+                        invokeForm.DatabaseHelper.CreateTable(duplicateColumns, table, false);
+                        invokeForm.DatabaseHelper.CreateIndexOn(table, identifierColumn, null, true);
                     }
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        PreparedTolerance[] preparedTolerances = PrepareTolerances(tolerances);
+                        SQLiteCommand selectCommandTotal = invokeForm.DatabaseHelper.ExistsValueInColumnCommand(identifierColumn, duplicateTableTotal, sourceRowIdName);
+                        SQLiteCommand selectCommandShort = invokeForm.DatabaseHelper.ExistsValueInColumnCommand(identifierColumn, duplicateTableShort, sourceRowIdName);
+                        SQLiteCommand updateCommandTotal = invokeForm.DatabaseHelper.InsertDuplicateCommand(duplicateColumns, duplicateTableTotal);
+                        SQLiteCommand updateCommandShort = invokeForm.DatabaseHelper.InsertDuplicateCommand(duplicateColumns, duplicateTableShort);
+
+                        while (reader.Read())
+                        {
+                            string identifierTotal = GetColumnsAsObjectArray(reader, null, null, null);
+
+                            if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierTotal, out int sourceId, selectCommandTotal))
+                            {
+                                int id = reader.GetInt16(0);
+
+                                if (!updates.ContainsKey(sourceId))
+                                {
+                                    updates.Add(sourceId, duplicateCase.ShortcutTotal);
+                                }
+                                if (!updates.ContainsKey(id))
+                                {
+                                    updates.Add(id, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
+                                }
+                            }
+                            else
+                            {
+                                int id = reader.GetInt16(0);
+                                invokeForm.DatabaseHelper.InsertRowDuplicate(id.ToString(), identifierTotal, updateCommandTotal);
+                                if (containsShort)
+                                {
+                                    string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, preparedTolerances);
+                                    if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierShort, out int sourceId2, selectCommandShort))
+                                    {
+                                        if (!updates.ContainsKey(sourceId2))
+                                        {
+                                            updates.Add(sourceId2, duplicateCase.Shortcut);
+                                        }
+
+                                        if (!updates.ContainsKey(id))
+                                        {
+                                            updates.Add(id, duplicateCase.Shortcut + duplicateCase.Shortcut);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        invokeForm.DatabaseHelper.InsertRowDuplicate(id.ToString(), identifierShort, updateCommandShort);
+                                    }
+                                }
+                            }
+                            invokeForm.UpdateLoadingBar();
+                        }
+                    }
+                    invokeForm.DatabaseHelper.UpdateCells(updates.ToArray(), column, tableName);
+                    invokeForm.DatabaseHelper.Delete(duplicateTableTotal);
+                    invokeForm.DatabaseHelper.Delete(duplicateTableShort);
+                    invokeForm.StartLoadingBar();
                 }
-                invokeForm.DatabaseHelper.UpdateCells(updates.ToArray(), column, tableName);
-                invokeForm.StartLoadingBar();
             }
         }
 
@@ -166,13 +184,13 @@ namespace DataTableConverter.Classes.WorkProcs
             return preparedTolerances;
         }
 
-        private int GetColumnsAsObjectArray(SQLiteDataReader reader, int[] subStringBegin, int[] subStringEnd, PreparedTolerance[] preparedTolerances)
+        private string GetColumnsAsObjectArray(SQLiteDataReader reader, int[] subStringBegin, int[] subStringEnd, PreparedTolerance[] preparedTolerances)
         {
             StringBuilder res = new StringBuilder();
             
             for (int i = 1; i < reader.FieldCount; i++)
             {
-                string result = reader.GetValue(i).ToString().ToLower();
+                string result = reader.GetValue(i).ToString();
 
                 #region Set Tolerances
                 if (preparedTolerances != null)
@@ -210,7 +228,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 res.Append("|").Append(result);
             }
-            return res.ToString().GetHashCode();
+            return res.ToString();
         }
     }
 }

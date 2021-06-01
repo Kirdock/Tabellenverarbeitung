@@ -115,7 +115,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 //column is columnName now
                 if (destinationColumn != null)
                 {
-                    List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).Select(alias => alias).ToList();
+                    List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).Select(alias => alias.ToLower()).ToList();
                     List<KeyValuePair<int, string>> updates = new List<KeyValuePair<int, string>>();
                     using (System.Data.SQLite.SQLiteDataReader reader = invokeForm.DatabaseHelper.GetDataCommand(tableName, "id").ExecuteReader())
                     {
@@ -161,7 +161,7 @@ namespace DataTableConverter.Classes.WorkProcs
         private string GetFormat(Dictionary<string, string> sourceRow, MergeFormat format, List<string> tableColumns)
         {
             StringBuilder result = new StringBuilder();
-            IEnumerable<string> formatHeaders = format.GetHeaders();
+            IEnumerable<string> formatHeaders = format.GetHeaders().Select(header => header.ToLower());
             Dictionary<string, bool> dict = new Dictionary<string, bool>();
             foreach (string header in formatHeaders)
             {
@@ -175,7 +175,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 if (columnIsEmpty || dict[column])
                 {
                     //could contain columns that are not in the table
-                    IEnumerable<string> emptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.Empty]?.ToString()).Where(header => dict[header]);
+                    IEnumerable<string> emptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.Empty]?.ToString()).Select(header => header.ToLower()).Where(header => dict[header]);
                     bool emptyAllChecked = row[(int)MergeFormat.MergeColumns.EmptyAll] == DBNull.Value ? false : (bool)row[(int)MergeFormat.MergeColumns.EmptyAll];
                     bool emptyFullFilled = emptyHeaderOfRow.Count() == 0 || emptyAllChecked ? emptyHeaderOfRow.All(header =>
                     {
@@ -189,7 +189,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                     if (emptyFullFilled)
                     {
-                        IEnumerable<string> notEmptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.NotEmpty]?.ToString()).Where(header => dict[header]);
+                        IEnumerable<string> notEmptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.NotEmpty]?.ToString()).Select(header => header.ToLower()).Where(header => dict[header]);
                         bool notEmptyAllChecked = row[(int)MergeFormat.MergeColumns.NotEmptyAll] == DBNull.Value ? false : (bool)row[(int)MergeFormat.MergeColumns.NotEmptyAll];
                         bool notEmptyFullFilled = notEmptyHeaderOfRow.Count() == 0 || notEmptyAllChecked ? notEmptyHeaderOfRow.All(header =>
                         {
@@ -228,7 +228,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         private string GetFormat(Dictionary<string, string> row, string formula, List<string> tableColumns, Form mainForm)
         {
-            string[] columns = GetHeaderOfFormula(formula).ToArray();
+            string[] columns = GetHeaderOfFormula(formula).Select(header => header.ToLower()).ToArray();
             Dictionary<FormatIdentifier, bool> emptyAfterHeader = GetEmptyAfterHeaders(columns, row, tableColumns);
             StringBuilder result = new StringBuilder();
             int counter = 0;

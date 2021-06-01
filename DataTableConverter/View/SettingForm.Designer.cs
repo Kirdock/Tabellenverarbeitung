@@ -61,6 +61,7 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.CBLoadHiddenRows = new System.Windows.Forms.CheckBox();
             this.TxTShortcut = new System.Windows.Forms.TextBox();
             this.label40 = new System.Windows.Forms.Label();
             this.CBTrimImport = new System.Windows.Forms.CheckBox();
@@ -121,7 +122,7 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.CBLoadHiddenRows = new System.Windows.Forms.CheckBox();
+            this.CBLoadHiddenColumns = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -478,6 +479,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.CBLoadHiddenColumns);
             this.tabPage2.Controls.Add(this.CBLoadHiddenRows);
             this.tabPage2.Controls.Add(this.TxTShortcut);
             this.tabPage2.Controls.Add(this.label40);
@@ -510,6 +512,16 @@
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // CBLoadHiddenRows
+            // 
+            this.CBLoadHiddenRows.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBLoadHiddenRows.Location = new System.Drawing.Point(13, 613);
+            this.CBLoadHiddenRows.Name = "CBLoadHiddenRows";
+            this.CBLoadHiddenRows.Size = new System.Drawing.Size(252, 34);
+            this.CBLoadHiddenRows.TabIndex = 31;
+            this.CBLoadHiddenRows.Text = "Ausgeblendete Zeilen laden";
+            this.CBLoadHiddenRows.UseVisualStyleBackColor = true;
             // 
             // TxTShortcut
             // 
@@ -1099,15 +1111,15 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // CBLoadHiddenRows
+            // CBLoadHiddenColumns
             // 
-            this.CBLoadHiddenRows.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CBLoadHiddenRows.Location = new System.Drawing.Point(13, 613);
-            this.CBLoadHiddenRows.Name = "CBLoadHiddenRows";
-            this.CBLoadHiddenRows.Size = new System.Drawing.Size(252, 34);
-            this.CBLoadHiddenRows.TabIndex = 31;
-            this.CBLoadHiddenRows.Text = "Ausgeblendete Zeilen laden";
-            this.CBLoadHiddenRows.UseVisualStyleBackColor = true;
+            this.CBLoadHiddenColumns.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBLoadHiddenColumns.Location = new System.Drawing.Point(13, 653);
+            this.CBLoadHiddenColumns.Name = "CBLoadHiddenColumns";
+            this.CBLoadHiddenColumns.Size = new System.Drawing.Size(252, 34);
+            this.CBLoadHiddenColumns.TabIndex = 32;
+            this.CBLoadHiddenColumns.Text = "Ausgeblendete Spalten laden";
+            this.CBLoadHiddenColumns.UseVisualStyleBackColor = true;
             // 
             // SettingForm
             // 
@@ -1241,5 +1253,6 @@
         private System.Windows.Forms.TextBox TxTShortcut;
         private System.Windows.Forms.Label label40;
         private System.Windows.Forms.CheckBox CBLoadHiddenRows;
+        private System.Windows.Forms.CheckBox CBLoadHiddenColumns;
     }
 }

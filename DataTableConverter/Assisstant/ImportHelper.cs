@@ -197,14 +197,14 @@ namespace DataTableConverter.Assisstant
             try
             {
                 int skip = 0;
-                Func<string, string> trimOperation = DatabaseHelper.ImportOperation();
+                Func<string, string> importOperation = DatabaseHelper.ImportOperation();
                 List<string> newHeaders;
                 if (containsHeaders)
                 {
                     skip = 1;
                     newHeaders = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
                         .SelectMany(x => x.Split(separators.ToArray(), StringSplitOptions.None))
-                        .Select(column => trimOperation(column)).ToList();
+                        .Select(column => importOperation(column)).ToList();
                     var indexItem = newHeaders.Select((item, index) => new { item, index });
                     for (int i = 0; i < newHeaders.Count; ++i)
                     {
@@ -237,7 +237,7 @@ namespace DataTableConverter.Assisstant
                     eLines = eLines.Take(PreviewRows);
                 }
 
-                InsertTextIntoDataTable(eLines, tableName, skip, separators, newHeaders, progressBar, mainForm, trimOperation);
+                InsertTextIntoDataTable(eLines, tableName, skip, separators, newHeaders, progressBar, mainForm);
 
                 //File.ReadLines doesn't read all lines, it returns a IEnumerable, and lines are lazy evaluated,
                 //  so just the first line will be loaded two times.
@@ -252,8 +252,9 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        private void InsertTextIntoDataTable(IEnumerable<string> enumerable, string tableName, int skip, List<string> separators, List<string> headers, ProgressBar progressBar, Form mainForm, Func<string, string> trimOperation)
+        private void InsertTextIntoDataTable(IEnumerable<string> enumerable, string tableName, int skip, List<string> separators, List<string> headers, ProgressBar progressBar, Form mainForm)
         {
+            Func<string, string> trimOperation = GetTrimOperation();
             IEnumerable<string[]> enumerableArray = enumerable.Skip(skip)
                     .Select(x => x.Split(separators.ToArray(), StringSplitOptions.None));
 
@@ -489,7 +490,7 @@ namespace DataTableConverter.Assisstant
                                 object[] values = new object[reader.FieldCount];
                                 for (int i = 0; i < reader.FieldCount; ++i)
                                 {
-                                    values[i] = trimOperation(reader.GetValue(i).ToString().Replace("\n", string.Empty).Trim()); //remove new lines in dbase
+                                    values[i] = trimOperation(reader.GetValue(i).ToString().Replace("\n", string.Empty).TrimEnd()); //remove new lines in dbase
                                 }
                                 insertCommand = DatabaseHelper.InsertRow(columnNames, values, tableName, insertCommand);
                                 progressBar?.UpdateLoadingBar(mainForm);
@@ -674,7 +675,11 @@ namespace DataTableConverter.Assisstant
                 foreach (string sheetName in selectedSheets)
                 {
                     Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
-                    int rows = objSHT.UsedRange.Rows.Count;
+                    int rows = objSHT.Rows.Find("*", System.Reflection.Missing.Value,
+                                                   System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                                                   Microsoft.Office.Interop.Excel.XlSearchOrder.xlByRows, Microsoft.Office.Interop.Excel.XlSearchDirection.xlPrevious,
+                                                   false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    //int rows = objSHT.UsedRange.Rows.Count;
                     int cols = objSHT.Cells.Find("*", System.Reflection.Missing.Value,
                                                    System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                                                    Microsoft.Office.Interop.Excel.XlSearchOrder.xlByColumns, Microsoft.Office.Interop.Excel.XlSearchDirection.xlPrevious,
@@ -690,23 +695,9 @@ namespace DataTableConverter.Assisstant
                         objSHT.Rows.EntireRow.Hidden = false;
                     }
 
-                    List<KeyVal> hiddenColumns = new List<KeyVal>();
-                    for (int i = 1; i <= cols; i++)
+                    if (Properties.Settings.Default.UnhideColumns)
                     {
-                        Microsoft.Office.Interop.Excel.Range cell = objSHT.Rows.Cells[1, i];
-                        if (cell.EntireColumn.Hidden)
-                        {
-                            hiddenColumns.Add(new KeyVal(cell.Value2, i));
-                        }
-                    }
-
-                    if (hiddenColumns.Count != 0)
-                    {
-                        int[] selectedIndizes = SelectItems(hiddenColumns.Select(col => col.Key).ToArray(), mainForm, "Welche ausgeblendeten Spalten sollen eingeblendet werden?");
-                        foreach (int i in selectedIndizes)
-                        {
-                            ((Microsoft.Office.Interop.Excel.Range)objSHT.Rows.Cells[1, hiddenColumns[i].Val]).EntireColumn.Hidden = false;
-                        }
+                        objSHT.Columns.EntireColumn.Hidden = false;
                     }
 
                     List<string> newHeaders = SetHeaderOfExcel(objSHT, cols);
@@ -831,7 +822,12 @@ namespace DataTableConverter.Assisstant
             foreach (XElement rowElement in linqRows)
             {
                 int index = 0;
+                
                 Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
+                for (int i = 0; i < headers.Length; ++i)
+                {
+                    row.Add(headers[i], string.Empty);
+                }
                 foreach (XElement cell in rowElement.Descendants(CellExcelNamespace))
                 {
                     // emtpy columns are ignored in rowElement.Descendants, that's why we adjust the index
@@ -855,10 +851,12 @@ namespace DataTableConverter.Assisstant
                     }
                     else
                     {
-                        row.Add(headers[index], val);
+                        row[headers[index]] = val;
+                        
                     }
                     index++;
                 }
+                
                 insertCommand = AddContentDataRow(row, fileName, tableName, insertCommand);
                 progressBar?.UpdateLoadingBar(invokeForm);
             };

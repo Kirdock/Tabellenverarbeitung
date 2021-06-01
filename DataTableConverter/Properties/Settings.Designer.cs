@@ -705,5 +705,17 @@ namespace DataTableConverter.Properties {
                 this["UnhideRows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UnhideColumns {
+            get {
+                return ((bool)(this["UnhideColumns"]));
+            }
+            set {
+                this["UnhideColumns"] = value;
+            }
+        }
     }
 }
