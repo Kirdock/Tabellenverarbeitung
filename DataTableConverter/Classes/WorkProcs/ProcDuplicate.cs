@@ -127,9 +127,18 @@ namespace DataTableConverter.Classes.WorkProcs
                                 {
                                     updates.Add(sourceId, duplicateCase.ShortcutTotal);
                                 }
+                                else
+                                {
+                                    updates[sourceId] = duplicateCase.ShortcutTotal; //override possible short-match
+                                }
+                                
                                 if (!updates.ContainsKey(id))
                                 {
                                     updates.Add(id, duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal);
+                                }
+                                else
+                                {
+                                    updates[id] = duplicateCase.ShortcutTotal + duplicateCase.ShortcutTotal; //override possible short-match
                                 }
                             }
                             else
