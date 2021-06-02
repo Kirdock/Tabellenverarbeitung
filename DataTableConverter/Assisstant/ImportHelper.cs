@@ -700,7 +700,7 @@ namespace DataTableConverter.Assisstant
                         objSHT.Columns.EntireColumn.Hidden = false;
                     }
 
-                    List<string> newHeaders = SetHeaderOfExcel(objSHT, cols);
+                    List<string> newHeaders = SetHeaderOfExcel(objSHT, cols, mainForm);
 
                     foreach(string header in newHeaders)
                     {
@@ -746,7 +746,7 @@ namespace DataTableConverter.Assisstant
                     //idk why but the Clipboard text is not set when I do it immediately
                     Thread thread = new Thread(() =>
                     {
-                        Thread.Sleep(100);
+                        Thread.Sleep(200);
                         Clipboard.SetText(clipboardBefore);
                     });
                     thread.SetApartmentState(ApartmentState.STA);
@@ -761,7 +761,7 @@ namespace DataTableConverter.Assisstant
             objXL.CutCopyMode = 0;
             int rowRange = MaxCellsPerIteration / cols; // about 50000 cells per iteration
             SQLiteCommand insertCommand = null;
-            int maxAttempts = 5;
+            
             for (int i = 2; i <= rows; i += rowRange + 1)
             {
                 Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[i, 1];
@@ -769,35 +769,40 @@ namespace DataTableConverter.Assisstant
                 int endRow = rowCount > rows ? rows : rowCount;
                 Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[endRow, cols];
                 Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
-                int attempts = 0;
-                object content = null;
-
-                while (content == null && attempts < maxAttempts)
-                {
-                    range.Copy();
-                    content = Clipboard.GetDataObject().GetData("XML Spreadsheet");
-                    attempts++;
-                }
-                if(attempts == maxAttempts && content == null)
-                {
-                    ErrorHelper.LogMessage($"Kopieren der Zeilen {i} bis {endRow} {maxAttempts} mal fehlgeschlagen\nZeilen werden übersprungen", mainForm);
-                }
-                else
+                if(TryCopyClipboard(range, i, endRow, mainForm, true, out object content))
                 {
                     insertCommand = ClipboardToDatabase((MemoryStream)content, newHeaders.ToArray(), fileName, tableName, progressBar, mainForm, insertCommand, trimOperation);
                 }
             }
         }
 
-        private List<string> SetHeaderOfExcel(Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols)
+        private bool TryCopyClipboard(Microsoft.Office.Interop.Excel.Range range, int begin, int end, Form mainForm, bool isXml, out object content)
+        {
+            int attempts = 0;
+            int maxAttempts = 5;
+            content = null;
+
+            while (content == null && attempts < maxAttempts)
+            {
+                range.Copy();
+                content = Clipboard.GetDataObject().GetData(isXml ? "XML Spreadsheet": DataFormats.UnicodeText);
+                attempts++;
+            }
+            bool isInvalid = attempts == maxAttempts && content == null;
+            if (isInvalid)
+            {
+                ErrorHelper.LogMessage($"Kopieren der Zeilen {begin} bis {end} {maxAttempts} mal fehlgeschlagen\nZeilen werden übersprungen", mainForm);
+            }
+            return !isInvalid;
+        }
+
+        private List<string> SetHeaderOfExcel(Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols, Form mainForm)
         {
             Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[1, 1];
             Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[1, cols];
             Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
-            range.Copy();
-            IDataObject data = Clipboard.GetDataObject();
-            string content = (string)data.GetData(DataFormats.UnicodeText);
-            return GetHeadersOfContent(content);
+
+            return TryCopyClipboard(range, 1, 1, mainForm, false, out object content) ? GetHeadersOfContent((string)content) : new List<string>() ;
         }
 
         public static XDocument ForwardToXDocument(XmlDocument xmlDocument)
@@ -811,18 +816,12 @@ namespace DataTableConverter.Assisstant
 
         private SQLiteCommand ClipboardToDatabase(MemoryStream content, string[] headers, string fileName, string tableName, ProgressBar progressBar, Form invokeForm, SQLiteCommand insertCommand, Func<string, string> trimOperation)
         {
-            StreamReader streamReader = new StreamReader(content);
-            streamReader.BaseStream.SetLength(streamReader.BaseStream.Length - 1);
-
-            XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml(streamReader.ReadToEnd());
-            
-            List<XElement> linqRows = ForwardToXDocument(xmlDocument).Descendants(RowExcelNamespace).ToList();
+            List<XElement> linqRows = GetRowsOfStream(content);
 
             foreach (XElement rowElement in linqRows)
             {
                 int index = 0;
-                
+
                 Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
                 for (int i = 0; i < headers.Length; ++i)
                 {
@@ -843,7 +842,7 @@ namespace DataTableConverter.Assisstant
 
                     if (multiCells.Length > 1)
                     {
-                        for(int i = 0; i < multiCells.Length; ++i)
+                        for (int i = 0; i < multiCells.Length; ++i)
                         {
                             AddMultiCellColumn(headers[index], i, tableName, row, multiCells[i]);
                         }
@@ -852,15 +851,26 @@ namespace DataTableConverter.Assisstant
                     else
                     {
                         row[headers[index]] = val;
-                        
+
                     }
                     index++;
                 }
-                
+
                 insertCommand = AddContentDataRow(row, fileName, tableName, insertCommand);
                 progressBar?.UpdateLoadingBar(invokeForm);
-            };
+            }
             return insertCommand;
+        }
+
+        private List<XElement> GetRowsOfStream(MemoryStream content)
+        {
+            using (StreamReader streamReader = new StreamReader(content))
+            {
+                streamReader.BaseStream.SetLength(streamReader.BaseStream.Length - 1);
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(streamReader.ReadToEnd());
+                return ForwardToXDocument(xmlDocument).Descendants(RowExcelNamespace).ToList();
+            }
         }
 
         private SQLiteCommand AddContentDataRow(Dictionary<string, string> row, string fileName, string tableName, SQLiteCommand command)

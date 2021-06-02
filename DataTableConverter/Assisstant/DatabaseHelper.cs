@@ -284,13 +284,14 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = (connection ?? GetConnection(tableName)).CreateCommand())
             {
-                command.CommandText = $"DROP table if exists [{tableName + MetaTableAffix}]";
+                string metaTable = tableName + MetaTableAffix;
+                command.CommandText = $"DROP table if exists [{metaTable}]";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE table [{tableName + MetaTableAffix}] (column varchar(255) not null default '' COLLATE NATURALSORT, alias varchar(255) COLLATE NATURALSORT, sortorder INTEGER primary key AUTOINCREMENT)";
+                command.CommandText = $"CREATE table [{metaTable}] (column varchar(255) not null default '' COLLATE NATURALSORT, alias varchar(255) COLLATE NATURALSORT, sortorder INTEGER primary key AUTOINCREMENT)";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"INSERT INTO [{tableName + MetaTableAffix}] (column, alias) values ($column, $alias)";
+                command.CommandText = $"INSERT INTO [{metaTable}] (column, alias) values ($column, $alias)";
                 command.Parameters.Add(new SQLiteParameter("$column"));
                 command.Parameters.Add(new SQLiteParameter("$alias"));
 
@@ -1352,6 +1353,14 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
+        /// <summary>
+        /// returns all rows and columns (AS ALIAS NAME) of a table
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="order"></param>
+        /// <param name="orderType"></param>
+        /// <param name="orderAlias"></param>
+        /// <returns></returns>
         internal SQLiteCommand GetDataCommand(string tableName, string order, OrderType orderType, string orderAlias = null)
         {
             SQLiteCommand command = GetConnection(tableName).CreateCommand();
@@ -1945,38 +1954,23 @@ namespace DataTableConverter.Assisstant
                     if (reader.Read())
                     {
                         #region Init
+                        Dictionary<string, string> newRowValues = new Dictionary<string, string>();
                         int id = reader.GetInt32(0);
                         string nameBefore = reader.GetValue(1).ToString();
                         int counter = 1;
                         decimal[] sumResults = new decimal[sumColumns.Length];
                         int[] countResults = new int[countColumns.Length];
 
-
-                        Dictionary<string, string> newRowValues = new Dictionary<string, string>();
-
                         InitSumResults(sumResults, sumColumns.Length, sumOffset, reader);
                         InitCountResults(countResults, countColumns.Length, countOffset, reader);
-
                         #endregion
-
+                        
                         while (reader.Read())
                         {
                             string name = reader.GetValue(1).ToString();
                             if (name != nameBefore)
                             {
-                                //save values of before
-                                //update where [{IdColumnName}] = ?   (id)
-                                //Combine values with \t
-                                if (newRowValues.Count != 0)
-                                {
-                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "1", string.Join("\t", newRowValues.Keys), string.Join("\t", newRowValues.Values) }, newTableName, insertCommand);
-
-                                }
-                                if (containsSumColumns || containsCountColumns)
-                                {
-                                    //sumResults and count
-                                    insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(countResults.Select(value => value.ToString()))) }, newTableName, insertCommand);
-                                }
+                                InsertValues();
 
                                 #region InitNew
                                 id = reader.GetInt32(0); //newId
@@ -2030,14 +2024,24 @@ namespace DataTableConverter.Assisstant
 
                             nameBefore = name;
                         }
-                        if (newRowValues.Count != 0)
+
+                        InsertValues();
+
+                        void InsertValues()
                         {
-                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "1", string.Join("\t", newRowValues.Keys), string.Join("\t", newRowValues.Values) }, newTableName, insertCommand); //for last row
-                        }
-                        if (containsSumColumns || containsCountColumns)
-                        {
-                            //sumResults and count
-                            insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(countColumns.Select(value => value.ToString()))) }, newTableName, insertCommand);
+                            //save values of before
+                            //update where [{IdColumnName}] = ?   (id)
+                            //Combine values with \t
+                            if (newRowValues.Count != 0)
+                            {
+                                insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "1", string.Join("\t", newRowValues.Keys), string.Join("\t", newRowValues.Values) }, newTableName, insertCommand);
+
+                            }
+                            if (containsSumColumns || containsCountColumns)
+                            {
+                                //sumResults and count
+                                insertCommand = InsertRow(tempColumns, new string[] { id.ToString(), "0", string.Join("\t", sumColumns.Concat(countColumns)), string.Join("\t", sumResults.Select(value => value.ToString(separatorText, culture)).Concat(countResults.Select(value => value.ToString()))) }, newTableName, insertCommand);
+                            }
                         }
                     }
                 }
@@ -2320,7 +2324,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void ReplaceColumnValues(IEnumerable<DataRow> distinctDataTale, string tableName)
+        internal void ReplaceColumnValues(DataRow[] distinctDataTale, string tableName)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {

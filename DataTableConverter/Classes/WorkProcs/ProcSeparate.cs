@@ -30,7 +30,8 @@ namespace DataTableConverter.Classes.WorkProcs
             foreach (ExportSeparate item in Files)
             {
                 Dictionary<string, string> dict = new Dictionary<string, string>();
-                string columnName = invokeForm.DatabaseHelper.GetColumnName(item.Column, tableName);
+                string alias = item.Column;
+                string columnName = invokeForm.DatabaseHelper.GetColumnName(alias, tableName);
 
                 if (item.CheckedAllValues)
                 {
@@ -73,21 +74,24 @@ namespace DataTableConverter.Classes.WorkProcs
                     if (reader.HasRows)
                     {
                         int columnIndex;
-                        for (columnIndex = 0; columnIndex < reader.FieldCount && reader.GetName(columnIndex) != columnName; columnIndex++) { }
-                        Dictionary<string, SQLiteCommand> tempCommands = new Dictionary<string, SQLiteCommand>();
-                        while (reader.Read())
+                        for (columnIndex = 0; columnIndex < reader.FieldCount && reader.GetName(columnIndex) != alias; columnIndex++) { }
+                        if (columnIndex < reader.FieldCount)
                         {
-                            var key = reader.GetValue(columnIndex).ToString();
-                            if (dict.TryGetValue(reader.GetValue(columnIndex).ToString(), out string tempTable))
+                            Dictionary<string, SQLiteCommand> tempCommands = new Dictionary<string, SQLiteCommand>();
+                            while (reader.Read())
                             {
-                                if(tempCommands.TryGetValue(tempTable, out SQLiteCommand tempCommand))
+                                var key = reader.GetValue(columnIndex).ToString();
+                                if (dict.TryGetValue(reader.GetValue(columnIndex).ToString(), out string tempTable))
                                 {
-                                    invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, tempCommand);
-                                }
-                                else
-                                {
-                                    SQLiteCommand cmd = invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, null);
-                                    tempCommands.Add(tempTable, cmd);
+                                    if (tempCommands.TryGetValue(tempTable, out SQLiteCommand tempCommand))
+                                    {
+                                        invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, tempCommand);
+                                    }
+                                    else
+                                    {
+                                        SQLiteCommand cmd = invokeForm.DatabaseHelper.InsertRow(columnsAliases, reader, tempTable, null);
+                                        tempCommands.Add(tempTable, cmd);
+                                    }
                                 }
                             }
                         }

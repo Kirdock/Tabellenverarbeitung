@@ -38,7 +38,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             string alias = Header;
-            if (PrepareSingle(ref alias, invokeForm, tableName, out string destination) && alias != null && From <= To)
+            if (!string.IsNullOrWhiteSpace(NewColumn) && PrepareSingle(ref alias, invokeForm, tableName, out string destination) && alias != null && From <= To)
             {
                 invokeForm.DatabaseHelper.SearchAndShortcut(Header, destination, TotalSearch, SearchText, Shortcut, From, To, sortingOrder, orderType, tableName);
             }

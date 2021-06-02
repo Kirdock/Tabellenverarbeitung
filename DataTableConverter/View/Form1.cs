@@ -464,6 +464,7 @@ namespace DataTableConverter
                 finished?.Invoke();
                 ClearWorkflowStatus();
             });
+            thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
         }
@@ -506,7 +507,6 @@ namespace DataTableConverter
                 ProgressBar loadingBar = pgbLoading;
                 Thread thread = new Thread(() =>
                 {
-                    Thread.CurrentThread.IsBackground = true;
                     bool fileNameSet = state != ImportState.None;
                     bool multipleFiles = filenames.Length > 1;
                     Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
@@ -548,6 +548,7 @@ namespace DataTableConverter
 
                     FinishImport(newTable, state, Path.GetFileName(filenames[0]), fileEncoding);
                 });
+                thread.IsBackground = true;
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
             }
@@ -600,6 +601,7 @@ namespace DataTableConverter
                                 ErrorHelper.LogMessage(ex, this);
                             }
                         });
+                        thread.IsBackground = true;
                         thread.SetApartmentState(ApartmentState.STA);
                         thread.Start();
                         break;
@@ -755,6 +757,7 @@ namespace DataTableConverter
                             StopLoadingBar();
                             ClearWorkflowStatus();
                         });
+                        thread.IsBackground = true;
                         thread.SetApartmentState(ApartmentState.STA);
                         thread.Start();
                     }
@@ -954,6 +957,7 @@ namespace DataTableConverter
             {
                 try
                 {
+                    Thread.CurrentThread.IsBackground = true;
                     if (DatabaseHelper.Undo())
                     {
                         LoadData(true);
@@ -977,6 +981,7 @@ namespace DataTableConverter
             {
                 try
                 {
+                    Thread.CurrentThread.IsBackground = true;
                     if (DatabaseHelper.Redo())
                     {
                         LoadData(true);
@@ -1143,6 +1148,7 @@ namespace DataTableConverter
                         UpdateStatusLabel(string.Empty);
                         SaveFinished();
                     });
+                    thread.IsBackground = true;
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.Start();
                 }
@@ -1200,6 +1206,7 @@ namespace DataTableConverter
                         }));
                         StopLoadingBar();
                     });
+                    thread.IsBackground = true;
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.Start();
                 }
@@ -1367,6 +1374,7 @@ namespace DataTableConverter
                     {
                         try
                         {
+                            Thread.CurrentThread.IsBackground = true;
                             StartLoadingBarCount(RowCount);
                             DatabaseHelper.MergeRows(columnName, additionalColumns, separator, this, UpdateLoadingBar, TableName);
                             DatabaseHelper.SetSavepoint();
@@ -1517,6 +1525,7 @@ namespace DataTableConverter
                     StartLoadingBarCount(RowCount);
                     new Thread(() =>
                     {
+                        Thread.CurrentThread.IsBackground = true;
                         DatabaseHelper.SetCheckSum(column, UpdateLoadingBar, this, TableName);
                         StopLoadingBar();
                         DatabaseHelper.SetSavepoint();
@@ -1564,6 +1573,7 @@ namespace DataTableConverter
                         }
                         StopLoadingBar();
                     });
+                    thread.IsBackground = true;
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.Start();
                 }

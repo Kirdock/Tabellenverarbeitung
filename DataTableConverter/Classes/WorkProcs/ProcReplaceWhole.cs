@@ -42,12 +42,12 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return new string[0];
+            return Columns.AsEnumerable().Select(row => row[(int)ColumnIndex.Column].ToString()).ToArray();
         }
 
         private IEnumerable<DataRow> GetFoundRows(List<string> columns)
         {
-            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr.ItemArray[0].ToString(), StringComparer.OrdinalIgnoreCase));
+            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr[(int)ColumnIndex.Column].ToString(), StringComparer.OrdinalIgnoreCase));
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -63,13 +63,16 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
+            Columns = Columns.AsEnumerable().Where(row => row[(int)ColumnIndex.Column].ToString() != colName).ToTable(Columns);
         }
 
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            IEnumerable<DataRow> distinctDataTale = GetFoundRows(invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName));
-            invokeForm.DatabaseHelper.ReplaceColumnValues(distinctDataTale, tableName);
+            DataRow[] distinctDataTale = GetFoundRows(invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName)).ToArray();
+            if (distinctDataTale.Length != 0)
+            {
+                invokeForm.DatabaseHelper.ReplaceColumnValues(distinctDataTale, tableName);
+            }
         }
     }
 }

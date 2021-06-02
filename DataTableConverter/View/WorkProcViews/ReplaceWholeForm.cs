@@ -45,6 +45,10 @@ namespace DataTableConverter.View
         private void CloseForm()
         {
             ViewHelper.EndDataGridViewEdit(dgTable);
+            if(Table.Rows.Count == 0)
+            {
+                Table.Rows.Add(new object[] { Table.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].DefaultValue });
+            }
             DialogResult = DialogResult.OK;
         }
 

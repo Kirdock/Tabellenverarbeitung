@@ -23,6 +23,7 @@ namespace DataTableConverter.Assisstant
             {
                 new Thread(() =>
                 {
+                    Thread.CurrentThread.IsBackground = true;
                     try
                     {
                         WebRequest request = WebRequest.Create(Tags);
