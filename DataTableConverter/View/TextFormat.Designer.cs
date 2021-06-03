@@ -32,6 +32,7 @@
             this.rbSeparated = new System.Windows.Forms.RadioButton();
             this.rbFixed = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.LblDifferentExtension = new System.Windows.Forms.Label();
             this.LblCodePageMessage = new System.Windows.Forms.Label();
             this.cbTakeOver = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -76,7 +77,6 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.LblFileName = new System.Windows.Forms.ToolStripStatusLabel();
-            this.LblDifferentExtension = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.gbSeparated.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeaders)).BeginInit();
@@ -129,6 +129,18 @@
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Art";
+            // 
+            // LblDifferentExtension
+            // 
+            this.LblDifferentExtension.AutoSize = true;
+            this.LblDifferentExtension.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblDifferentExtension.ForeColor = System.Drawing.Color.Red;
+            this.LblDifferentExtension.Location = new System.Drawing.Point(192, 9);
+            this.LblDifferentExtension.Name = "LblDifferentExtension";
+            this.LblDifferentExtension.Size = new System.Drawing.Size(453, 17);
+            this.LblDifferentExtension.TabIndex = 6;
+            this.LblDifferentExtension.Text = "Andere Endung erkannt! Bitte geben Sie das Format für diese Datei an";
+            this.LblDifferentExtension.Visible = false;
             // 
             // LblCodePageMessage
             // 
@@ -288,6 +300,7 @@
             this.dgvHeaders.Size = new System.Drawing.Size(240, 237);
             this.dgvHeaders.TabIndex = 11;
             this.dgvHeaders.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvHeaders_CellEndEdit);
+            this.dgvHeaders.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvHeaders_CellValidating);
             this.dgvHeaders.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgvHeaders_RowPostPaint);
             // 
             // cbContainsHeaders
@@ -590,18 +603,6 @@
             this.LblFileName.Name = "LblFileName";
             this.LblFileName.Size = new System.Drawing.Size(31, 17);
             this.LblFileName.Text = "Pfad";
-            // 
-            // LblDifferentExtension
-            // 
-            this.LblDifferentExtension.AutoSize = true;
-            this.LblDifferentExtension.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblDifferentExtension.ForeColor = System.Drawing.Color.Red;
-            this.LblDifferentExtension.Location = new System.Drawing.Point(192, 9);
-            this.LblDifferentExtension.Name = "LblDifferentExtension";
-            this.LblDifferentExtension.Size = new System.Drawing.Size(453, 17);
-            this.LblDifferentExtension.TabIndex = 6;
-            this.LblDifferentExtension.Text = "Andere Endung erkannt! Bitte geben Sie das Format für diese Datei an";
-            this.LblDifferentExtension.Visible = false;
             // 
             // TextFormat
             // 

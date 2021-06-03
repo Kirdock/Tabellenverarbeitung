@@ -430,9 +430,10 @@ namespace DataTableConverter.View
         {
             if (e.ColumnIndex == 0)
             {
+                string value = e.FormattedValue.ToString();
                 foreach (DataGridViewRow row in dgvSetting.Rows)
                 {
-                    if (row.Cells[0].Value != null && row.Cells[0].Value.Equals(e.FormattedValue) && row.Index != e.RowIndex)
+                    if (row.Cells[0].Value != null && row.Cells[0].Value.ToString().Equals(value, StringComparison.OrdinalIgnoreCase) && row.Index != e.RowIndex)
                     {
                         e.Cancel = true;
                         this.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Spalte mit dieser Bezeichnung!");
@@ -850,6 +851,20 @@ namespace DataTableConverter.View
         private void CBFixedHasRowBreak_CheckedChanged(object sender, EventArgs e)
         {
             dgvSetting_CellValueChanged(null, null);
+        }
+
+        private void dgvHeaders_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            string value = e.FormattedValue.ToString();
+            foreach (DataGridViewRow row in dgvHeaders.Rows)
+            {
+                if (row.Cells[0].Value != null && row.Cells[0].Value.ToString().Equals(value, StringComparison.OrdinalIgnoreCase) && row.Index != e.RowIndex)
+                {
+                    e.Cancel = true;
+                    this.MessagesOK(MessageBoxIcon.Warning, "Es gibt bereits eine Überschrift mit dieser Bezeichnung!");
+                    break;
+                }
+            }
         }
     }
 
