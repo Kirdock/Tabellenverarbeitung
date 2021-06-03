@@ -78,7 +78,7 @@ namespace DataTableConverter.View.WorkProcViews
             try
             {
                 string alias = CmBColumns.SelectedItem.ToString(); //DataSource = AliasColumnMapping? NO, because it is used for a workflow
-                Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(DatabaseHelper.GetColumnName(alias, TableName), TableName);
+                Dictionary<string, long> pair = DatabaseHelper.GroupCountOfColumn(DatabaseHelper.GetColumnName(alias, TableName), TableName);
 
                 CLBValues.BeginUpdate();
                 CLBValues.Items.Clear();

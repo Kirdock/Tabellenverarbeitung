@@ -99,7 +99,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     string duplicateTableShort = Guid.NewGuid().ToString();
                     string[] duplicateColumns = new string[] { sourceRowIdName, identifierColumn };
                     SQLiteCommand command = invokeForm.DatabaseHelper.GetDataCommand(tableName, aliases);
-                    Dictionary<int, string> updates = new Dictionary<int, string>();
+                    Dictionary<long, string> updates = new Dictionary<long, string>();
 
                     foreach (string table in new string[] { duplicateTableShort, duplicateTableTotal })
                     {
@@ -118,11 +118,10 @@ namespace DataTableConverter.Classes.WorkProcs
                         while (reader.Read())
                         {
                             string identifierTotal = GetColumnsAsObjectArray(reader, null, null, null);
+                            long id = reader.GetInt64(0);
 
                             if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierTotal, out int sourceId, selectCommandTotal))
                             {
-                                int id = reader.GetInt16(0);
-
                                 if (!updates.ContainsKey(sourceId))
                                 {
                                     updates.Add(sourceId, duplicateCase.ShortcutTotal);
@@ -143,7 +142,6 @@ namespace DataTableConverter.Classes.WorkProcs
                             }
                             else
                             {
-                                int id = reader.GetInt16(0);
                                 invokeForm.DatabaseHelper.InsertRowDuplicate(id.ToString(), identifierTotal, updateCommandTotal);
                                 if (containsShort)
                                 {

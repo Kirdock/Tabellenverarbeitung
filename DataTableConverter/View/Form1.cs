@@ -1561,7 +1561,7 @@ namespace DataTableConverter
                             }
                             else
                             {
-                                int id = DatabaseHelper.GetRowWithMaxCharacters(GetSorting(), OrderType, out index, TableName);
+                                long id = DatabaseHelper.GetRowWithMaxCharacters(GetSorting(), OrderType, out index, TableName);
                                 DatabaseHelper.UpdateCell(shortcut, newColumn, id, TableName, true);
                             }
                             DatabaseHelper.SetSavepoint();
@@ -1580,7 +1580,7 @@ namespace DataTableConverter
             }
         }
 
-        private void SelectDataGridViewRow(int index)
+        private void SelectDataGridViewRow(long index)
         {
             decimal maxRecords = Properties.Settings.Default.MaxRows;
             decimal desiredPage = Math.Ceiling((index + 1) / maxRecords);
@@ -1625,7 +1625,7 @@ namespace DataTableConverter
 
         private void SearchAndSelect(string searchText, string alias, bool totalSearch)
         {
-            int index = DatabaseHelper.SearchValue(searchText, alias, totalSearch, GetSorting(), OrderType, TableName);
+            long index = DatabaseHelper.SearchValue(searchText, alias, totalSearch, GetSorting(), OrderType, TableName);
             if (index == -1)
             {
                 MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, $"Der Suchtext \"{searchText}\" konnte nicht gefunden werden");

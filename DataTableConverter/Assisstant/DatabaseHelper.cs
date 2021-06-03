@@ -22,7 +22,6 @@ namespace DataTableConverter.Assisstant
         internal readonly static string DefaultTable = "main";
         private readonly string MetaTableAffix = "_meta";
         internal readonly string IdColumnName = "rowid"; //could be a problem as primary key if VACUUM command is executed
-        private string SortOrderColumnName = "__SORT_ORDER__";
         private readonly string IndexAffix = "_INDEX";
         private int SavePoints, Pointer; //0 => after main Table with data is created
         private SQLiteConnection Connection, TempConnection; //Second file and connection is needed because of Trace
@@ -59,7 +58,6 @@ namespace DataTableConverter.Assisstant
         private void Init(bool createMainDatabase)
         {
             Reset();
-            SortOrderColumnName = IdColumnName == "rowid" ? IdColumnName : SortOrderColumnName;
             SQLiteFunction.RegisterFunction(typeof(SQLiteSensitive)); // COLLATE CASESENSITIVE
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
@@ -271,7 +269,7 @@ namespace DataTableConverter.Assisstant
                 command.ExecuteNonQuery();
 
                 string colType = "varchar(255) not null default '' COLLATE "+ (naturalSort ? "NATURALSORT" : "NOCASE");
-                command.CommandText = $"CREATE table [{tableName}] ({SortOrderColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", columnNames)}] {colType})";
+                command.CommandText = $"CREATE table [{tableName}] ({IdColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", columnNames)}] {colType})";
 
                 command.ExecuteNonQuery();
             };
@@ -741,12 +739,12 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetDataCommandWithOrder(tableName, GenerateOrderAsc(columnName), OrderType.Windows))
             {
-                Dictionary<int, int> updates = new Dictionary<int, int>();
+                Dictionary<long, int> updates = new Dictionary<long, int>();
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     for (int i = 1; reader.Read(); ++i)
                     {
-                        int val = -reader.GetInt32(0);
+                        long val = -reader.GetInt64(0);
                         updates.Add(val, i);
                     }
                 }
@@ -759,7 +757,7 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter());
                 command.Parameters.Add(new SQLiteParameter());
 
-                foreach (KeyValuePair<int, int> pair in updates)
+                foreach (KeyValuePair<long, int> pair in updates)
                 {
                     command.Parameters[1].Value = pair.Key;
                     command.Parameters[0].Value = pair.Value;
@@ -1037,7 +1035,7 @@ namespace DataTableConverter.Assisstant
             }
             else
             {
-                selectString.Append($"{headerString} FROM [{tableName}] {whereStatement} ORDER BY {SortOrderColumnName}");
+                selectString.Append($"{headerString} FROM [{tableName}] {whereStatement} ORDER BY {IdColumnName}");
             }
             if (limit != -1)
             {
@@ -1209,7 +1207,7 @@ namespace DataTableConverter.Assisstant
         internal void RenameColumns(string importTable, string destinationTable)
         {
             string[] headers = GetSortedColumnsAsAlias(importTable).ToArray();
-            Dictionary<int, string> updates = new Dictionary<int, string>();
+            Dictionary<long, string> updates = new Dictionary<long, string>();
             int index;
             using (SQLiteCommand command = GetConnection(destinationTable).CreateCommand())
             {
@@ -1218,7 +1216,7 @@ namespace DataTableConverter.Assisstant
                 {
                     for (index = 0; reader.Read() && index < headers.Length; ++index)
                     {
-                        updates.Add(reader.GetInt32(0), headers[index]);
+                        updates.Add(reader.GetInt64(0), headers[index]);
                     }
                 }
             }
@@ -1228,7 +1226,7 @@ namespace DataTableConverter.Assisstant
                 AddColumn(destinationTable, headers[index]);
             }
             SQLiteCommand updateCommand = null;
-            foreach (KeyValuePair<int, string> pair in updates)
+            foreach (KeyValuePair<long, string> pair in updates)
             {
                 updateCommand = UpdateCell(pair.Value, "alias", pair.Key, destinationTable + MetaTableAffix, true, updateCommand, GetConnection(destinationTable));
             }
@@ -1313,18 +1311,11 @@ namespace DataTableConverter.Assisstant
         /// <returns>Everything of a table if orderAlias is not null, else everything without the id</returns>
         internal SQLiteCommand GetDataCommand(string tableName, string idAlias = null)
         {
-
-            SQLiteCommand command = GetConnection(tableName).CreateCommand();
             Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
-
-            command.CommandText = "SELECT ";
-            if (idAlias != null)
-            {
-                command.CommandText += $"rowid AS [{idAlias}],";
-            }
-
-            command.CommandText += $"{GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}]";
-
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
+            command.CommandText = $"SELECT "
+                                  + (idAlias != null ? $"[{IdColumnName}] AS [{idAlias}]," : string.Empty)
+                                  + $"{GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}]";
             return command;
         }
 
@@ -1338,18 +1329,7 @@ namespace DataTableConverter.Assisstant
         internal SQLiteCommand GetDataCommand(string tableName, string[] aliases)
         {
             SQLiteCommand command = GetConnection(tableName).CreateCommand();
-
-            command.CommandText = $"SELECT rowid, {GetHeaderString(GetColumnNames(aliases, tableName))} from [{tableName}]";
-
-            return command;
-        }
-
-        internal SQLiteCommand GetDataCommandWithOrder(string tableName, string order, OrderType orderType)
-        {
-            SQLiteCommand command = GetConnection(tableName).CreateCommand();
-
-            command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, -1, true, tableName, string.Empty, IdColumnName);
-
+            command.CommandText = $"SELECT [{IdColumnName}], {GetHeaderString(GetColumnNames(aliases, tableName))} from [{tableName}]";
             return command;
         }
 
@@ -1363,11 +1343,16 @@ namespace DataTableConverter.Assisstant
         /// <returns></returns>
         internal SQLiteCommand GetDataCommand(string tableName, string order, OrderType orderType, string orderAlias = null)
         {
-            SQLiteCommand command = GetConnection(tableName).CreateCommand();
             Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
-
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
             command.CommandText = GetSortedSelectString(GetHeaderStringWithAlias(columnAliasMapping), order, orderType, -1, -1, orderAlias != null, tableName, string.Empty, orderAlias);
+            return command;
+        }
 
+        internal SQLiteCommand GetDataCommandWithOrder(string tableName, string order, OrderType orderType)
+        {
+            SQLiteCommand command = GetConnection(tableName).CreateCommand();
+            command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, -1, true, tableName, string.Empty, IdColumnName);
             return command;
         }
 
@@ -1401,26 +1386,22 @@ namespace DataTableConverter.Assisstant
 
         internal string GetAliasName(string columnName, string tableName)
         {
-            string alias;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = $"SELECT alias from [{tableName + MetaTableAffix}] where column = $column COLLATE NOCASE";
                 command.Parameters.Add(new SQLiteParameter("$column", columnName));
-                alias = command.ExecuteScalar()?.ToString();
+                return command.ExecuteScalar()?.ToString();
             }
-            return alias;
         }
 
         internal string GetColumnName(string alias, string tableName)
         {
-            string columnName = string.Empty;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where alias = $alias COLLATE NOCASE";
                 command.Parameters.Add(new SQLiteParameter("$alias", alias));
-                columnName = command.ExecuteScalar()?.ToString();
+                return command.ExecuteScalar()?.ToString();
             }
-            return columnName;
         }
 
         internal string[] GetColumnNames(string[] aliases, string tableName)
@@ -1599,9 +1580,9 @@ namespace DataTableConverter.Assisstant
             return list;
         }
 
-        internal Dictionary<string, int> GroupCountOfColumn(string columnName, string tableName)
+        internal Dictionary<string, long> GroupCountOfColumn(string columnName, string tableName)
         {
-            Dictionary<string, int> dict = new Dictionary<string, int>();
+            Dictionary<string, long> dict = new Dictionary<string, long>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = $"SELECT [{columnName}], count(*) from [{tableName}] group by [{columnName}] COLLATE CASESENSITIVE order by [{columnName}]";
@@ -1609,7 +1590,7 @@ namespace DataTableConverter.Assisstant
                 {
                     while (reader.Read())
                     {
-                        dict.Add(reader.GetValue(0).ToString(), reader.GetInt32(1));
+                        dict.Add(reader.GetValue(0).ToString(), reader.GetInt64(1));
                     }
                 }
             }
@@ -1671,7 +1652,7 @@ namespace DataTableConverter.Assisstant
             return max;
         }
 
-        internal void DictionaryToTable(Dictionary<string, int> dict, string columnName, bool showFromTo, string tableName, int sourceRowCount)
+        internal void DictionaryToTable(Dictionary<string, long> dict, string columnName, bool showFromTo, string tableName, int sourceRowCount)
         {
             SQLiteCommand command = null;
             if (showFromTo)
@@ -1679,10 +1660,10 @@ namespace DataTableConverter.Assisstant
                 string[] columns = new string[] { columnName, "Anzahl", "Von", "Bis" };
                 CreateTable(columns, tableName);
 
-                int count = 1;
-                foreach (KeyValuePair<string, int> item in dict)
+                long count = 1;
+                foreach (KeyValuePair<string, long> item in dict)
                 {
-                    int newCount = count + item.Value;
+                    long newCount = count + item.Value;
                     command = InsertRow(columns, new object[] { item.Key, item.Value.ToString(), count.ToString(), (newCount - 1).ToString() }, tableName, command);
                     count = newCount;
                 }
@@ -1691,7 +1672,7 @@ namespace DataTableConverter.Assisstant
             {
                 string[] columns = new string[] { columnName, "Anzahl" };
                 CreateTable(columns, tableName);
-                foreach (KeyValuePair<string, int> item in dict)
+                foreach (KeyValuePair<string, long> item in dict)
                 {
                     command = InsertRow(columns, new object[] { item.Key, item.Value.ToString() }, tableName, command);
                 }
@@ -1699,7 +1680,7 @@ namespace DataTableConverter.Assisstant
             InsertRow(new string[] { columnName, "Anzahl" }, new object[] { "Gesamt", sourceRowCount.ToString() }, tableName, command);
         }
 
-        internal SQLiteCommand DeleteRow(int id, string tableName, SQLiteCommand cmd = null)
+        internal SQLiteCommand DeleteRow(long id, string tableName, SQLiteCommand cmd = null)
         {
             SQLiteCommand command;
             if (cmd != null)
@@ -1710,7 +1691,7 @@ namespace DataTableConverter.Assisstant
             else
             {
                 command = GetConnection(tableName).CreateCommand();
-                command.CommandText = $"DELETE from [{tableName}] where rowid = ?";
+                command.CommandText = $"DELETE from [{tableName}] where [{IdColumnName}] = ?";
                 command.Parameters.Add(new SQLiteParameter() { Value = id });
             }
             command.ExecuteNonQuery();
@@ -1720,7 +1701,7 @@ namespace DataTableConverter.Assisstant
         internal void DeleteRowsByIndex(int[] ind, string order, OrderType orderType, string tableName)
         {
             HashSet<int> indizes = new HashSet<int>(ind);
-            List<int> deleteRows = new List<int>();
+            List<long> deleteRows = new List<long>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, -1, true, tableName);
@@ -1731,7 +1712,7 @@ namespace DataTableConverter.Assisstant
                     {
                         if (indizes.Contains(index))
                         {
-                            deleteRows.Add(reader.GetInt32(0));
+                            deleteRows.Add(reader.GetInt64(0));
                             indizes.Remove(index);
                         }
                         index++;
@@ -1739,7 +1720,7 @@ namespace DataTableConverter.Assisstant
                 }
             }
             SQLiteCommand deleteCommand = null;
-            foreach (int id in deleteRows)
+            foreach (long id in deleteRows)
             {
                 deleteCommand = DeleteRow(id, tableName, deleteCommand);
             }
@@ -1795,7 +1776,7 @@ namespace DataTableConverter.Assisstant
         /// <param name="updates"></param>
         /// <param name="column"></param>
         /// <param name="tableName"></param>
-        internal void UpdateCells(IEnumerable<KeyValuePair<int, string>> updates, string column, string tableName)
+        internal void UpdateCells(IEnumerable<KeyValuePair<long, string>> updates, string column, string tableName)
         {
             if (updates.Count() != 0)
             {
@@ -1804,7 +1785,7 @@ namespace DataTableConverter.Assisstant
                     command.CommandText = $"UPDATE [{tableName}] set [{column}] = ? where [{IdColumnName}] = ?";
                     command.Parameters.Add(new SQLiteParameter());
                     command.Parameters.Add(new SQLiteParameter());
-                    foreach (KeyValuePair<int, string> pair in updates)
+                    foreach (KeyValuePair<long, string> pair in updates)
                     {
                         command.Parameters[1].Value = pair.Key;
                         command.Parameters[0].Value = pair.Value;
@@ -1814,7 +1795,7 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal SQLiteCommand UpdateCell(string value, string alias, int id, string tableName, bool aliasIsColumnName = false, SQLiteCommand cmd = null, SQLiteConnection connection = null)
+        internal SQLiteCommand UpdateCell(string value, string alias, long id, string tableName, bool aliasIsColumnName = false, SQLiteCommand cmd = null, SQLiteConnection connection = null)
         {
             SQLiteCommand command;
             if (cmd == null)
@@ -1848,7 +1829,7 @@ namespace DataTableConverter.Assisstant
 
         internal void SetCheckSum(string columnName, Action updateLoadingBar, Form invokeForm, string tableName)
         {
-            Dictionary<int, string> updates = new Dictionary<int, string>();
+            Dictionary<long, string> updates = new Dictionary<long, string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 command.CommandText = $"SELECT [{IdColumnName}], [{columnName}] from [{tableName}]";
@@ -1876,7 +1857,7 @@ namespace DataTableConverter.Assisstant
                         }
                         else if (checkSum != -1)
                         {
-                            updates.Add(reader.GetInt32(0), value + checkSum);
+                            updates.Add(reader.GetInt64(0), value + checkSum);
                         }
                         updateLoadingBar();
                     }
@@ -1937,7 +1918,7 @@ namespace DataTableConverter.Assisstant
             CreateTable(tempColumns, newTableName);
             SQLiteCommand insertCommand = null;
             bool hasAppend = appendArray.Length != 0;
-            List<int> deleteRows = new List<int>();
+            List<long> deleteRows = new List<long>();
             List<string> newColumns = new List<string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
@@ -1955,7 +1936,7 @@ namespace DataTableConverter.Assisstant
                     {
                         #region Init
                         Dictionary<string, string> newRowValues = new Dictionary<string, string>();
-                        int id = reader.GetInt32(0);
+                        long id = reader.GetInt64(0);
                         string nameBefore = reader.GetValue(1).ToString();
                         int counter = 1;
                         decimal[] sumResults = new decimal[sumColumns.Length];
@@ -1973,7 +1954,7 @@ namespace DataTableConverter.Assisstant
                                 InsertValues();
 
                                 #region InitNew
-                                id = reader.GetInt32(0); //newId
+                                id = reader.GetInt64(0); //newId
                                 InitSumResults(sumResults, sumColumns.Length, sumOffset, reader);
                                 InitCountResults(countResults, countColumns.Length, countOffset, reader);
                                 newRowValues.Clear();
@@ -2019,7 +2000,7 @@ namespace DataTableConverter.Assisstant
                                     }
 
                                 }
-                                deleteRows.Add(reader.GetInt32(0));
+                                deleteRows.Add(reader.GetInt64(0));
                             }
 
                             nameBefore = name;
@@ -2047,7 +2028,7 @@ namespace DataTableConverter.Assisstant
                 }
             }
             SQLiteCommand deleteCommand = null;
-            foreach (int id in deleteRows)
+            foreach (long id in deleteRows)
             {
                 updateLoadingBar?.Invoke();
                 deleteCommand = DeleteRow(id, tableName, deleteCommand);
@@ -2162,9 +2143,9 @@ namespace DataTableConverter.Assisstant
             return result;
         }
 
-        internal int GetRowWithMaxCharacters(string order, OrderType orderType, out int index, string tableName)
+        internal long GetRowWithMaxCharacters(string order, OrderType orderType, out int index, string tableName)
         {
-            int id = 0;
+            long id = 0;
             index = 0;
 
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -2174,11 +2155,11 @@ namespace DataTableConverter.Assisstant
 
                 if (result != null)
                 {
-                    id = int.Parse(result);
+                    id = long.Parse(result);
                     command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName);
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        for (; reader.Read() && reader.GetInt32(0) != id; ++index) { }
+                        for (; reader.Read() && reader.GetInt64(0) != id; ++index) { }
                     }
                 }
             }
@@ -2196,9 +2177,9 @@ namespace DataTableConverter.Assisstant
         /// <param name="orderType"></param>
         /// <param name="tableName"></param>
         /// <returns>index of the row that matches the value</returns>
-        internal int SearchValue(string value, string alias, bool strictMatch, string order, OrderType orderType, string tableName)
+        internal long SearchValue(string value, string alias, bool strictMatch, string order, OrderType orderType, string tableName)
         {
-            int index = -1;
+            long index = -1;
             //strictMatch == true: column = value NOCASE
             //strictMatch == false: column like %value% //nocase not needed; default of like is case insensitive
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
@@ -2209,12 +2190,12 @@ namespace DataTableConverter.Assisstant
                 if (id != null)
                 {
                     index = 0;
-                    int parseId = int.Parse(id);
+                    long parseId = long.Parse(id);
                     command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName);
                     command.Parameters.Clear();
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        for (; reader.Read() && reader.GetInt32(0) != parseId; ++index) { }
+                        for (; reader.Read() && reader.GetInt64(0) != parseId; ++index) { }
                     }
                 }
             }
@@ -2297,14 +2278,14 @@ namespace DataTableConverter.Assisstant
             {
                 command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, -1, true, tableName);
 
-                List<KeyValuePair<int, string>> updates = new List<KeyValuePair<int, string>>();
+                List<KeyValuePair<long, string>> updates = new List<KeyValuePair<long, string>>();
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     int count = start;
                     bool noEnd = end != 0;
                     while (reader.Read())
                     {
-                        updates.Add(new KeyValuePair<int, string>(reader.GetInt32(0), count.ToString()));
+                        updates.Add(new KeyValuePair<long, string>(reader.GetInt64(0), count.ToString()));
 
                         count++;
                         if (noEnd && count > end)
@@ -2396,7 +2377,7 @@ namespace DataTableConverter.Assisstant
                 {
                     command.CommandText = GetSortedSelectString(GetHeaderString(new string[] { sourceColumn }), order, orderType, -1, -1, true, tableName);
 
-                    List<KeyValuePair<int, string>> updates = new List<KeyValuePair<int, string>>();
+                    List<KeyValuePair<long, string>> updates = new List<KeyValuePair<long, string>>();
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -2409,13 +2390,13 @@ namespace DataTableConverter.Assisstant
                                 }
                                 else
                                 {
-                                    updates.Add(new KeyValuePair<int, string>(reader.GetInt32(0), counter.ToString()));
+                                    updates.Add(new KeyValuePair<long, string>(reader.GetInt64(0), counter.ToString()));
                                     counter++;
                                 }
                             }
                             else if (search.Invoke(reader.GetValue(1).ToString(), searchText))
                             {
-                                updates.Add(new KeyValuePair<int, string>(reader.GetInt32(0), counter.ToString()));
+                                updates.Add(new KeyValuePair<long, string>(reader.GetInt64(0), counter.ToString()));
                                 found = true;
                                 counter++;
                             }
@@ -2478,7 +2459,7 @@ namespace DataTableConverter.Assisstant
             {
                 command.CommandText = GetSelectString(GetHeaderString(sourceColumns), true, tableName);
 
-                List<KeyValuePair<int, string[]>> updates = new List<KeyValuePair<int, string[]>>();
+                List<KeyValuePair<long, string[]>> updates = new List<KeyValuePair<long, string[]>>();
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -2487,7 +2468,6 @@ namespace DataTableConverter.Assisstant
 
                         for (int i = 0; i < sourceColumns.Length; i++)
                         {
-
                             string index = destinationColumns[i];
                             string value = reader.GetValue(i + 1).ToString();
                             string result = value;
@@ -2539,14 +2519,14 @@ namespace DataTableConverter.Assisstant
                             }
                             newValues[i] = !changed && leaveEmpty ? string.Empty : ProcTrim.Trim(result);
                         }
-                        updates.Add(new KeyValuePair<int, string[]>(reader.GetInt32(0), newValues));
+                        updates.Add(new KeyValuePair<long, string[]>(reader.GetInt64(0), newValues));
                     }
                 }
                 UpdateRows(updates, destinationColumns, tableName);
             }
         }
 
-        private void UpdateRows(List<KeyValuePair<int, string[]>> updates, string[] destinationColumns, string tableName)
+        private void UpdateRows(List<KeyValuePair<long, string[]>> updates, string[] destinationColumns, string tableName)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
@@ -2560,7 +2540,7 @@ namespace DataTableConverter.Assisstant
                 builder.Append($" WHERE [{IdColumnName}]=?");
                 command.Parameters.Add(new SQLiteParameter());
                 command.CommandText = builder.ToString();
-                foreach (KeyValuePair<int, string[]> update in updates)
+                foreach (KeyValuePair<long, string[]> update in updates)
                 {
                     for (int i = 0; i < destinationColumns.Length; ++i)
                     {

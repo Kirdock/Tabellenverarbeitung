@@ -102,7 +102,7 @@ namespace DataTableConverter.View
         {
             string columnName = cmbColumn.SelectedValue.ToString();
 
-            Dictionary<string, int> pair = DatabaseHelper.GroupCountOfColumn(columnName, TableName);
+            Dictionary<string, long> pair = DatabaseHelper.GroupCountOfColumn(columnName, TableName);
 
             clbValues.BeginUpdate();
             clbValues.Items.Clear();
@@ -178,7 +178,7 @@ namespace DataTableConverter.View
             SetSumCount();
         }
 
-        private void SetSumCount(int add = 0)
+        private void SetSumCount(long add = 0)
         {
             lblSumCount.Text = (clbValues.CheckedItems.Cast<CountListboxItem>().Sum(item => item.Count) + add).ToString();
         }
