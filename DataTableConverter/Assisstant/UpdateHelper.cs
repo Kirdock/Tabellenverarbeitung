@@ -35,7 +35,7 @@ namespace DataTableConverter.Assisstant
                         System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                         FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
-                        if (version != fvi.FileVersion.Substring(0, version.Length))
+                        if (char.GetNumericValue(version.FirstOrDefault()) < 1 && version != fvi.FileVersion.Substring(0, version.Length))
                         {
                             if (prompt)
                             {
