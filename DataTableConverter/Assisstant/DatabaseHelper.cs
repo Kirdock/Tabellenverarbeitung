@@ -306,7 +306,7 @@ namespace DataTableConverter.Assisstant
 
         internal static Func<string, string> ImportOperation()
         {
-            return Properties.Settings.Default.ImportHeaderUpperCase ? (Func<string, string>)(value => value.Replace("-", "[EXCEPTION]").ToUpper().Replace("[EXCEPTION]", "-") /*exception for this character*/) : value => value;
+            return Properties.Settings.Default.ImportHeaderUpperCase ? (Func<string, string>)(value => value.Replace('-', '\t').ToUpper().Replace('\t', '-') /*exception for this character*/) : value => value;
         }
 
         internal void ReplaceTable(string newTable, string oldTable)

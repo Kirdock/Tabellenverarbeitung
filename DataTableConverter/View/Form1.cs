@@ -462,28 +462,14 @@ namespace DataTableConverter
                 StopLoadingBar();
                 this.MessagesOK(MessageBoxIcon.Information, "Arbeitsablauf ausgeführt!");
                 finished?.Invoke();
-                ClearWorkflowStatus();
+                SetWorkflowText();
             });
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
         }
 
-        private void ClearWorkflowStatus()
-        {
-            SetWorkflowStatus(string.Empty);
-            SetWorkflowText(string.Empty);
-        }
-
-        internal void SetWorkflowStatus(string status)
-        {
-            statusStrip1.BeginInvoke(new MethodInvoker(() =>
-            {
-                LblWorkProcStatus.Text = status;
-            }));
-        }
-
-        internal void SetWorkflowText(string text)
+        internal void SetWorkflowText(string text = "")
         {
             statusStrip1.BeginInvoke(new MethodInvoker(() =>
             {
@@ -705,6 +691,7 @@ namespace DataTableConverter
                             Thread.CurrentThread.IsBackground = true;
                             string order = GetSorting();
                             form.Proc.DoWork(ref order, null, null, null, FilePath, contextGlobal, OrderType, this, TableName);
+                            SetWorkflowText();
                             LoadData(true);
 
                         }
@@ -755,7 +742,7 @@ namespace DataTableConverter
                                 ErrorHelper.LogMessage(ex, this);
                             }
                             StopLoadingBar();
-                            ClearWorkflowStatus();
+                            SetWorkflowText();
                         });
                         thread.IsBackground = true;
                         thread.SetApartmentState(ApartmentState.STA);
@@ -1132,20 +1119,20 @@ namespace DataTableConverter
                 if (export.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
-                    SetStatusLabelVisibility(true);
+                    string continuedNumberName = export.ContinuedNumberName;
+                    IEnumerable<ExportCustomItem> items = export.Items;
                     Thread thread = new Thread(() =>
                     {
                         try
                         {
-                            ExportHelper.ExportTableWithColumnCondition(export.Items, FilePath, FileEncoding, GetSorting(), OrderType, this, export.ContinuedNumberName, TableName, UpdateStatusLabel);
+                            ExportHelper.ExportTableWithColumnCondition(items, FilePath, FileEncoding, GetSorting(), OrderType, this, continuedNumberName, TableName, SetWorkflowText);
                             StopLoadingBar();
                         }
                         catch (Exception ex)
                         {
                             ErrorHelper.LogMessage(ex, this, true);
                         }
-                        SetStatusLabelVisibility(false);
-                        UpdateStatusLabel(string.Empty);
+                        SetWorkflowText();
                         SaveFinished();
                     });
                     thread.IsBackground = true;
@@ -1153,22 +1140,6 @@ namespace DataTableConverter
                     thread.Start();
                 }
             }
-        }
-
-        private void SetStatusLabelVisibility(bool status)
-        {
-            statusStrip1.BeginInvoke(new MethodInvoker(() =>
-            {
-                LblStatus.Visible = status;
-            }));
-        }
-
-        private void UpdateStatusLabel(string fileName)
-        {
-            statusStrip1.BeginInvoke(new MethodInvoker(() =>
-            {
-                LblStatus.Text = fileName;
-            }));
         }
 
         internal void StartLoadingBar()

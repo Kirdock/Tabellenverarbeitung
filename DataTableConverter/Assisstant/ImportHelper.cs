@@ -781,11 +781,16 @@ namespace DataTableConverter.Assisstant
             int attempts = 0;
             int maxAttempts = 5;
             content = null;
+            string format = isXml ? "XML Spreadsheet" : DataFormats.UnicodeText;
 
             while (content == null && attempts < maxAttempts)
             {
                 range.Copy();
-                content = Clipboard.GetDataObject().GetData(isXml ? "XML Spreadsheet": DataFormats.UnicodeText);
+                IDataObject dataObject = Clipboard.GetDataObject();
+                if ((!isXml || dataObject.GetDataPresent(format)) && Clipboard.ContainsText())
+                {
+                    content = dataObject.GetData(format);
+                }
                 attempts++;
             }
             bool isInvalid = attempts == maxAttempts && content == null;

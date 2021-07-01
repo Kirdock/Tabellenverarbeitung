@@ -26,6 +26,19 @@ namespace DataTableConverter.Classes
             }
         }
 
+        internal ExportCustomItem(string name, string column, IEnumerable<string> values, int format, bool checkedAllValues)
+        {
+            Name = name;
+            Column = column;
+            Format = format;
+            Values = new Dictionary<string, bool>();
+            CheckedAllValues = checkedAllValues;
+            foreach (string value in values)
+            {
+                Values.Add(value, true);
+            }
+        }
+
         internal ExportCustomItem(string name, string column)
         {
             Name = name;

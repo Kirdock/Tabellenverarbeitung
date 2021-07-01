@@ -747,8 +747,11 @@ namespace DataTableConverter
 
                 foreach (string[] tableInfo in dict.Values.Distinct())
                 {
-                    setStatus($"Die Datei {tableInfo[1]}.{fileExtension} wird gespeichert");
-                    Save(Path.GetDirectoryName(filePath), tableInfo[1], Path.GetExtension(filePath), codePage, (SaveFormat)item.Format, order, orderType, mainForm, tableInfo[0], null, continuedNumberColumn);
+                    string newTable = tableInfo[0];
+                    string fileName = tableInfo[1];
+                    setStatus($"Die Datei {fileName}.{fileExtension} wird gespeichert");
+                    Save(Path.GetDirectoryName(filePath), fileName, Path.GetExtension(filePath), codePage, (SaveFormat)item.Format, order, orderType, mainForm, newTable, null, continuedNumberColumn);
+                    DatabaseHelper.Delete(newTable);
                 }
             }
         }

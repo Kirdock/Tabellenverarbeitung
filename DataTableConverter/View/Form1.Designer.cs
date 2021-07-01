@@ -96,9 +96,7 @@
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.ValidRowsText = new System.Windows.Forms.ToolStripStatusLabel();
             this.ValidRowsLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.LblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.LblWorkProc = new System.Windows.Forms.ToolStripStatusLabel();
-            this.LblWorkProcStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteRowItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertRowItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -557,9 +555,7 @@
             this.StatusLabel,
             this.ValidRowsText,
             this.ValidRowsLabel,
-            this.LblStatus,
-            this.LblWorkProc,
-            this.LblWorkProcStatus});
+            this.LblWorkProc});
             this.statusStrip1.Location = new System.Drawing.Point(0, 445);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1056, 24);
@@ -613,13 +609,6 @@
             this.ValidRowsLabel.Name = "ValidRowsLabel";
             this.ValidRowsLabel.Size = new System.Drawing.Size(0, 19);
             // 
-            // LblStatus
-            // 
-            this.LblStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.LblStatus.Name = "LblStatus";
-            this.LblStatus.Size = new System.Drawing.Size(0, 19);
-            this.LblStatus.Visible = false;
-            // 
             // LblWorkProc
             // 
             this.LblWorkProc.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
@@ -627,11 +616,6 @@
             this.LblWorkProc.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.LblWorkProc.Name = "LblWorkProc";
             this.LblWorkProc.Size = new System.Drawing.Size(4, 19);
-            // 
-            // LblWorkProcStatus
-            // 
-            this.LblWorkProcStatus.Name = "LblWorkProcStatus";
-            this.LblWorkProcStatus.Size = new System.Drawing.Size(0, 19);
             // 
             // contextGlobal
             // 
@@ -835,9 +819,7 @@
         private System.Windows.Forms.ToolStripMenuItem WorkflowItemGL;
         private System.Windows.Forms.ToolStripMenuItem WorkflowItemMQ;
         private System.Windows.Forms.ToolStripMenuItem WorkflowItemRZ;
-        private System.Windows.Forms.ToolStripStatusLabel LblStatus;
         private System.Windows.Forms.ToolStripStatusLabel LblWorkProc;
-        private System.Windows.Forms.ToolStripStatusLabel LblWorkProcStatus;
     }
 }
 
