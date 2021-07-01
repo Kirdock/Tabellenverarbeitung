@@ -1,11 +1,5 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -18,7 +12,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool Repeat;
         internal static readonly string ClassName = "Nummerierung";
 
-        public ProcNumber(int ordinal, int id, string name) : base(ordinal, id, name){}
+        public ProcNumber(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         public ProcNumber(string newColumn, int start, int end, bool repeat)
         {
@@ -28,29 +22,14 @@ namespace DataTableConverter.Classes.WorkProcs
             Repeat = repeat;
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
-            string column = !string.IsNullOrWhiteSpace(NewColumn) && table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
-            if (column != null)
+            if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                int count = Start;
-                bool noEnd = End != 0;
-                foreach (DataRow row in table.GetSortedTable(sortingOrder,orderType))
+                invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out string column);
+                if (column != null)
                 {
-                    row[column] = count;
-                    count++;
-                    if (noEnd && count > End)
-                    {
-                        if (Repeat)
-                        {
-                            count = Start;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                    invokeForm.DatabaseHelper.Enumerate(column, Start, End, Repeat, sortingOrder, orderType, tableName);
                 }
             }
         }

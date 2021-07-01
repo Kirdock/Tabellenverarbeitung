@@ -8,15 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -41,21 +37,27 @@ namespace DataTableConverter.View
         private Dictionary<Type, Action<WorkProc>> assignControls;
         private MemoryStream ProceduresBefore, WorkflowsBefore, TolerancesBefore, CasesBefore;
         private object[] Headers;
-        private DataTable Table;
         private ContextMenuStrip ContextGlobal;
+        private readonly string TableName;
+        private readonly DatabaseHelper DatabaseHelper;
+        private readonly ExportHelper ExportHelper;
+        private readonly ImportHelper ImportHelper;
 
-        internal Administration(object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, DataTable table)
+        internal Administration(DatabaseHelper databaseHelper, ExportHelper exportHelper, ImportHelper importHelper, object[] headers, ContextMenuStrip ctxRow, List<Proc> procedures, List<Work> workflows, List<Case> cases, List<Tolerance> tolerances, string tableName)
         {
             InitializeComponent();
+            DatabaseHelper = databaseHelper;
+            ExportHelper = exportHelper;
+            ImportHelper = importHelper;
             ContextGlobal = ctxRow;
             SetEncodingCmBs();
-            Table = table;
+            TableName = tableName;
             SetSize();
             AssignGroupBoxToEnum();
             SetHeaders(headers);
             SetOrderList();
             SetListBoxStyle();
-            
+
             CmBRound.SelectedIndex = 0;
             CmBRound.SelectedIndexChanged += CmBRound_SelectedIndexChanged;
             cmbProcedureType.SelectedIndex = 0;
@@ -69,7 +71,7 @@ namespace DataTableConverter.View
             LoadPresets();
 
             ViewHelper = new ViewHelper(ctxRow, lbUsedProcedures_SelectedIndexChanged, Workflows);
-            
+
             GenerateProceduresForWorkflow();
             LoadProceduresWorkflow(false);
             SetGroupBoxVisibility(null);
@@ -285,7 +287,7 @@ namespace DataTableConverter.View
                 lbWorkflows,
                 ltbProcedures
             };
-            foreach(ListBox listBox in listBoxes)
+            foreach (ListBox listBox in listBoxes)
             {
                 ViewHelper.SetListBoxStyle(listBox);
             }
@@ -410,7 +412,7 @@ namespace DataTableConverter.View
             Properties.Settings.Default.splitWorkflowProperties = splitWorkflowProperties.SplitterDistance;
         }
 
-        
+
 
         #region Procedures
 
@@ -498,7 +500,7 @@ namespace DataTableConverter.View
 
         private void SetWorkflowOrdinal(Work work)
         {
-            for(int ordinal = 0; ordinal < work.Procedures.Count; ordinal++)
+            for (int ordinal = 0; ordinal < work.Procedures.Count; ordinal++)
             {
                 work.Procedures[ordinal].Ordinal = ordinal;
             }
@@ -597,7 +599,8 @@ namespace DataTableConverter.View
             {
                 lbProcedures.DataSource = Workflows;
             }
-            else {
+            else
+            {
                 lbProcedures.DataSource = cmbProcedureType.SelectedIndex == 1 ? SystemProc : cmbProcedureType.SelectedIndex == 2 ? DuplicateProc : Procedures;
             }
             lbProcedures.DisplayMember = "Name";
@@ -671,7 +674,7 @@ namespace DataTableConverter.View
             {
                 Work workflow = GetSelectedWorkflow();
                 SetWorkflowProcedures(workflow.Procedures);
-                
+
                 txtWorkflow.SetText(workflow.Name);
                 lbUsedProcedures_SelectedIndexChanged(null, null);
                 SetWorkflowLock(workflow);
@@ -685,7 +688,7 @@ namespace DataTableConverter.View
         private void SetWorkflowLock(Work workflow = null)
         {
             bool enabled = splitWorkflowProcProperties.Enabled = btnDeleteWorkflow.Enabled = !(workflow ?? GetSelectedWorkflow()).Locked;
-            foreach(GroupBox groupBox in gbState.Keys)
+            foreach (GroupBox groupBox in gbState.Keys)
             {
                 groupBox.Enabled = enabled;
             }
@@ -734,7 +737,7 @@ namespace DataTableConverter.View
         private List<Proc> GetProceduresWithId(List<WorkProc> proc)
         {
             List<Proc> procs = new List<Proc>();
-            foreach(WorkProc wp in proc)
+            foreach (WorkProc wp in proc)
             {
                 procs.Add(GetMergeProcedureIndexThroughId(wp.ProcedureId, wp.GetType()));
             }
@@ -749,7 +752,7 @@ namespace DataTableConverter.View
 
         private Proc GetMergeProcedureIndexThroughId(int selectedId, Type type)
         {
-            List <Proc> procs = type == typeof(ProcUser)? Procedures : type == typeof(ProcDuplicate) ? DuplicateProc : SystemProc;
+            List<Proc> procs = type == typeof(ProcUser) ? Procedures : type == typeof(ProcDuplicate) ? DuplicateProc : SystemProc;
             return procs[procs.FindIndex(proc => proc.Id == selectedId)];
         }
 
@@ -758,7 +761,7 @@ namespace DataTableConverter.View
             return ((Work)lbWorkflows.SelectedItem);
         }
 
-        private void SetMergeControls( WorkProc proc)
+        private void SetMergeControls(WorkProc proc)
         {
             ProcMerge selectedProc = proc as ProcMerge;
             txtNewColumnMerge.SetText(selectedProc.NewColumn);
@@ -790,18 +793,18 @@ namespace DataTableConverter.View
         private void dgvMerge_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             //Button clicked
-            if(e.ColumnIndex > -1 && e.RowIndex > -1 && dgvMerge[e.ColumnIndex, e.RowIndex] is DataGridViewButtonCell)
+            if (e.ColumnIndex > -1 && e.RowIndex > -1 && dgvMerge[e.ColumnIndex, e.RowIndex] is DataGridViewButtonCell)
             {
                 ViewHelper.EndDataGridViewEdit(dgvMerge);
                 DataTable table = (dgvMerge.DataSource as DataView).Table;
-                
+
                 var row = (dgvMerge.Rows[e.RowIndex].DataBoundItem as DataRowView).Row;
-                
+
                 if (!(row[(int)ProcMerge.ConditionColumn.Format] is MergeFormat))
                 {
                     row[(int)ProcMerge.ConditionColumn.Format] = new MergeFormat();
                 }
-                
+
                 MergeFormatView view = new MergeFormatView(row[(int)ProcMerge.ConditionColumn.Format] as MergeFormat);
                 view.ShowDialog(this);
                 view.Dispose();
@@ -811,7 +814,7 @@ namespace DataTableConverter.View
 
         private void dgvMerge_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            if (e.ColumnIndex > -1 && e.RowIndex > -1 && dgvMerge[e.ColumnIndex,e.RowIndex] is DataGridViewButtonCell && string.IsNullOrWhiteSpace(e.Value?.ToString()))
+            if (e.ColumnIndex > -1 && e.RowIndex > -1 && dgvMerge[e.ColumnIndex, e.RowIndex] is DataGridViewButtonCell && string.IsNullOrWhiteSpace(e.Value?.ToString()))
             {
                 e.Value = "Format";
             }
@@ -823,7 +826,7 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = ProcPadding.ClassName;
             nbPadCount.Value = proc.Counter;
             txtNewColumnPad.SetText(proc.NewColumn);
-            
+
             bool status = proc.OperationSide == ProcPadding.Side.Left;
             RbLeft.Checked = status;
             RbRight.Checked = !status;
@@ -936,7 +939,7 @@ namespace DataTableConverter.View
         private void SetUserControls(WorkProc selectedProc)
         {
             ProcUser proc = selectedProc as ProcUser;
-            lblOriginalNameText.Text = proc.IsSystem ? proc.Procedure.Name : GetProcedureName(selectedProc.ProcedureId);
+            lblOriginalNameText.Text = (proc.IsSystem ? ProcUser.ClassName : GetProcedureName(selectedProc.ProcedureId)).Replace("&", "&&");
             cbNewColumn.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             BtnProcUserOpen.Visible = proc.IsSystem;
             SetDataSource(dgvColumns, selectedProc.Columns);
@@ -981,6 +984,7 @@ namespace DataTableConverter.View
         private void SetDuplicateControls(WorkProc selectedProc)
         {
             Case myCase = Cases[getCaseIndexThroughId(selectedProc.ProcedureId)];
+            gbDefDuplicate.Visible = !myCase.ApplyAll;
             lblOriginalNameText.Text = myCase.Name;
             DataTable temp = myCase.Columns.Copy();
             DataTable table = new DataTable { TableName = "WorkDuplicates" };
@@ -1073,6 +1077,21 @@ namespace DataTableConverter.View
             SetHeaderPVMExport(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
             lblOriginalNameText.Text = ProcPVMExport.ClassName;
             ProcPVMExport proc = selectedProc as ProcPVMExport;
+            switch(proc.Format)
+            {
+                case SaveFormat.CSV:
+                    RBPVMCSV.Checked = true;
+                    break;
+
+                case SaveFormat.DBASE:
+                    RBPVMDBASE.Checked = true;
+                    break;
+
+                case SaveFormat.EXCEL:
+                default:
+                    RBPVMExcel.Checked = true;
+                    break;
+            }
             TxtPVMPath.SetText(proc.SecondFileName);
             CmBPVMExportEncodings.SelectedValue = proc.FileEncoding;
             SetDataSource(dgvPVMExport, selectedProc.Columns);
@@ -1113,7 +1132,7 @@ namespace DataTableConverter.View
 
             CmBSeparate.DataSource = proc.Files;
             CmBSeparate.DisplayMember = "Name";
-            
+
             if (proc.Files.Count > 0)
             {
                 CmBSeparate.SelectedIndex = 0;
@@ -1133,7 +1152,7 @@ namespace DataTableConverter.View
                 CbSeparateSaveAll
             };
 
-            foreach(Control control in controls)
+            foreach (Control control in controls)
             {
                 control.Enabled = enabled;
             }
@@ -1267,14 +1286,27 @@ namespace DataTableConverter.View
                 if (cmbProcedureType.SelectedIndex == 3)
                 {
                     int index = GetWorkflowIndexThroughId((int)lbProcedures.SelectedValue);
-                    workflow.Procedures.AddRange(WorkflowHelper.CopyProcedures(Workflows[index].Procedures));
+                    workflow.Procedures.AddRange(CopyProcedures(Workflows[index].Procedures));
                 }
                 else
                 {
-                    workflow.Procedures.Add(WorkflowHelper.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
+                    workflow.Procedures.Add(WorkflowFactory.CreateWorkProc(cmbProcedureType.SelectedIndex, (int)lbProcedures.SelectedValue, workflow.Procedures.Count, ((Proc)lbProcedures.SelectedItem).Name));
                 }
 
                 SetWorkflowProcedures(workflow.Procedures);
+            }
+        }
+
+        private List<WorkProc> CopyProcedures(List<WorkProc> proc)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                formatter.Serialize(memoryStream, proc);
+
+                memoryStream.Position = 0;
+
+                return (List<WorkProc>)formatter.Deserialize(memoryStream);
             }
         }
 
@@ -1284,7 +1316,7 @@ namespace DataTableConverter.View
             {
                 Work workflow = GetSelectedWorkflow();
                 workflow.Procedures.RemoveAt(lbUsedProcedures.SelectedIndex);
-                for(int i = lbUsedProcedures.SelectedIndex; i < workflow.Procedures.Count; i++)
+                for (int i = lbUsedProcedures.SelectedIndex; i < workflow.Procedures.Count; i++)
                 {
                     workflow.Procedures[i].Ordinal--;
                 }
@@ -1294,17 +1326,17 @@ namespace DataTableConverter.View
 
         private void btnUp_Click(object sender, EventArgs e)
         {
-            if(lbUsedProcedures.SelectedIndex != -1)
+            if (lbUsedProcedures.SelectedIndex != -1)
             {
                 Work workflow = GetSelectedWorkflow();
                 WorkProc wp = workflow.Procedures[lbUsedProcedures.SelectedIndex];
-                if(wp.Ordinal > 0)
+                if (wp.Ordinal > 0)
                 {
                     workflow.Procedures[lbUsedProcedures.SelectedIndex - 1].Ordinal++;
                     wp.Ordinal--;
                     SortWorkProcList(wp.Ordinal);
                 }
-            }            
+            }
         }
 
         private void btnDown_Click(object sender, EventArgs e)
@@ -1313,7 +1345,7 @@ namespace DataTableConverter.View
             {
                 Work workflow = GetSelectedWorkflow();
                 WorkProc wp = workflow.Procedures[lbUsedProcedures.SelectedIndex];
-                if (wp.Ordinal < workflow.Procedures.Count -1)
+                if (wp.Ordinal < workflow.Procedures.Count - 1)
                 {
                     workflow.Procedures[lbUsedProcedures.SelectedIndex + 1].Ordinal--;
                     wp.Ordinal++;
@@ -1425,7 +1457,7 @@ namespace DataTableConverter.View
 
         private void txtToleranceName_TextChanged(object sender, EventArgs e)
         {
-            if(lbTolerances.SelectedIndex != -1)
+            if (lbTolerances.SelectedIndex != -1)
             {
                 Tolerance selectedTolerance = (Tolerance)lbTolerances.SelectedItem;
                 selectedTolerance.Name = txtToleranceName.Text;
@@ -1519,6 +1551,8 @@ namespace DataTableConverter.View
                 txtCaseName.SetText(selectedCase.Name);
                 txtShortcut.SetText(selectedCase.Shortcut);
                 txtShortcutTotal.SetText(selectedCase.ShortcutTotal);
+                CBCaseCheckAll.Checked = selectedCase.ApplyAll;
+                dgCaseColumns.Enabled = !CBCaseCheckAll.Checked;
                 SetDataSource(dgCaseColumns, selectedCase.Columns);
                 if (ViewHelper != null)
                 {
@@ -1596,8 +1630,24 @@ namespace DataTableConverter.View
         private void dgCaseColumns_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             ViewHelper.EndDataGridViewEdit(dgCaseColumns);
-            WorkflowHelper.AdjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
+            AdjustDuplicateColumns((Case)lbCases.SelectedItem, Workflows);
             lbUsedProcedures_SelectedIndexChanged(null, null);
+        }
+
+        private void AdjustDuplicateColumns(Case selectedItem, List<Work> workflows)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == selectedItem.Id).ToList().ForEach((caseProc) =>
+                {
+                    if (selectedItem.Columns.Rows.Count > caseProc.DuplicateColumns.Length)
+                    {
+                        List<string> temp = caseProc.DuplicateColumns.ToList();
+                        temp.Add(string.Empty);
+                        caseProc.DuplicateColumns = temp.ToArray();
+                    }
+                });
+            }
         }
 
         private void dgColumnDefDuplicate_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -1641,7 +1691,7 @@ namespace DataTableConverter.View
                 bool found = false;
                 for (int i = table.Rows.Count - 1; i >= 0 && !found; i--)
                 {
-                    if(table.Rows[i][0].ToString() == value)
+                    if (table.Rows[i][0].ToString() == value)
                     {
                         table.Rows.RemoveAt(i);
                         found = true;
@@ -1664,7 +1714,7 @@ namespace DataTableConverter.View
                 e.Value = OrderList[0].Key;
             }
         }
-        
+
 
         private void dgOrderColumns_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
@@ -1688,7 +1738,7 @@ namespace DataTableConverter.View
 
         private void cbUpLow_CheckedChanged(object sender, EventArgs e)
         {
-            
+
             ((ProcUpLowCase)GetSelectedWorkProcedure()).AllColumns = cbUpLow.Checked;
             SetUpLowEnabled(!cbUpLow.Checked);
         }
@@ -1899,7 +1949,7 @@ namespace DataTableConverter.View
 
         private void nbSubstringEnd_ValueChanged(object sender, EventArgs e)
         {
-            if(nbSubstringEnd.Value < nbSubstringStart.Value && nbSubstringEnd.Value != 0)
+            if (nbSubstringEnd.Value < nbSubstringStart.Value && nbSubstringEnd.Value != 0)
             {
                 nbSubstringEnd.Value = Convert.ToInt32(nbSubstringEnd.Text) > nbSubstringEnd.Value ? 0 : nbSubstringStart.Value;
             }
@@ -2127,7 +2177,7 @@ namespace DataTableConverter.View
                     int index = selectedProc.Files.Count;
                     ExportSeparate item = new ExportSeparate(newText, string.Empty);
                     ExportSeparate lastItem = selectedProc.Files.LastOrDefault();
-                    if(lastItem != null)
+                    if (lastItem != null)
                     {
                         item.Format = lastItem.Format;
                         item.Column = lastItem.Column;
@@ -2204,7 +2254,6 @@ namespace DataTableConverter.View
                 selectedItem.SaveRemaining = CbSeparateSaveRemaining.Checked = false;
             }
 
-            
             SetSeparateEnabled();
         }
 
@@ -2231,14 +2280,14 @@ namespace DataTableConverter.View
                 int lastId = -1;
                 bool abort = false;
                 List<string> errorOnImport = new List<string>();
-                foreach(string file in dialog.FileNames)
+                foreach (string file in dialog.FileNames)
                 {
                     Work work = ImportHelper.LoadWorkflow(file);
                     if (work != null)
                     {
                         work.Name = Path.GetFileNameWithoutExtension(file);
                         List<ProcDuplicate> cases = work.Procedures.OfType<ProcDuplicate>().ToList();
-                        List<ProcUser> procs = work.Procedures.OfType<ProcUser>().ToList();
+                        List<ProcUser> procs = work.Procedures.OfType<ProcUser>().Where(proc => !proc.IsSystem).ToList();
 
                         if (Properties.Settings.Default.ImportWorkflowAuto)
                         {
@@ -2338,7 +2387,7 @@ namespace DataTableConverter.View
                         errorOnImport.Add(file);
                     }
                 }
-                if(errorOnImport.Count != 0)
+                if (errorOnImport.Count != 0)
                 {
                     MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, $"Folgende Dateien konnten nicht importiert werden, da es sich hier nicht um gültige Arbeitsabläufe handelt:\n{string.Join(", ", errorOnImport)}");
                 }
@@ -2357,7 +2406,7 @@ namespace DataTableConverter.View
             bool valid = foundWork == null;
             if (!valid)
             {
-                CustomMessageBox box = new CustomMessageBox(MessageBoxIcon.Warning,$"Es gibt bereits einen Arbeitsablauf mit dem Namen \"{work.Name}\"", "Überschreiben", "Umbenennen", "Abbrechen");
+                CustomMessageBox box = new CustomMessageBox(MessageBoxIcon.Warning, $"Es gibt bereits einen Arbeitsablauf mit dem Namen \"{work.Name}\"", "Überschreiben", "Umbenennen", "Abbrechen");
                 DialogResult res = box.ShowDialog(this);
                 box.Dispose();
                 if (res == DialogResult.OK)
@@ -2399,17 +2448,17 @@ namespace DataTableConverter.View
 
         private void BtnSeparateLoadEntries_Click(object sender, EventArgs e)
         {
-            if (Table != null)
+            if (TableName != null)
             {
                 ExportSeparate selectedItem = GetSeparateSelectedItem();
-                SeparateLoadEntries form = new SeparateLoadEntries(selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, Table);
+                SeparateLoadEntries form = new SeparateLoadEntries(DatabaseHelper, selectedItem, (GetSelectedWorkProcedure() as ProcSeparate).Files, Headers, TableName);
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     selectedItem.Column = form.SelectedItem.Column;
                     TxtSeparateColumn.SetText(form.SelectedItem.Column);
                     selectedItem.Table.BeginLoadData();
                     selectedItem.Table.Rows.Clear();
-                    foreach(string item in form.SelectedItem.SelectedValues)
+                    foreach (string item in form.SelectedItem.SelectedValues)
                     {
                         selectedItem.Table.Rows.Add(item);
                     }
@@ -2657,6 +2706,25 @@ namespace DataTableConverter.View
             (GetSelectedWorkProcedure() as ProcSeparate).NewColumn = TxtSeparateContinuedNumber.Text;
         }
 
+        private void CBCaseCheckAll_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lbCases.SelectedIndex != -1)
+            {
+                ((Case)lbCases.SelectedItem).ApplyAll = CBCaseCheckAll.Checked;
+                dgCaseColumns.Enabled = !CBCaseCheckAll.Checked;
+            }
+        }
+
+        private void PVMSaveFormat_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcPVMExport).Format = GetPVMSaveFormat();
+        }
+
+        private SaveFormat GetPVMSaveFormat()
+        {
+            return RBPVMCSV.Checked ? SaveFormat.CSV : RBPVMDBASE.Checked ? SaveFormat.DBASE : SaveFormat.EXCEL;
+        }
+
         private void txtSubstringText_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSubstring).ReplaceText = (sender as TextBox).Text;
@@ -2666,7 +2734,7 @@ namespace DataTableConverter.View
         {
             MergeFormat format = (GetSelectedWorkProcedure() as ProcMerge).Format;
             MergeFormatView view = new MergeFormatView(format);
-            if(view.ShowDialog(this) == DialogResult.OK)
+            if (view.ShowDialog(this) == DialogResult.OK)
             {
                 txtFormula.SetText(format.ToString());
             }

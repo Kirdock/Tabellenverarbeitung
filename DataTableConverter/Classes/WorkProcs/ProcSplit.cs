@@ -1,10 +1,5 @@
-﻿using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -16,7 +11,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public string Column;
         public string SplitText;
 
-        public ProcSplit(int ordinal, int id, string name) : base(ordinal, id, name){}
+        public ProcSplit(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         public ProcSplit(string column, string splitText, string newColumn)
         {
@@ -25,30 +20,11 @@ namespace DataTableConverter.Classes.WorkProcs
             NewColumn = newColumn;
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
             if (!string.IsNullOrWhiteSpace(NewColumn) && !string.IsNullOrWhiteSpace(Column) && SplitText?.Length > 0)
             {
-                int counter = 1;
-                List<string> newColumns = new List<string>() { table.TryAddColumn(NewColumn, counter) };
-                foreach (DataRow row in table.Rows)
-                {
-                    string[] result = row[Column].ToString().Split(new string[] { SplitText }, StringSplitOptions.RemoveEmptyEntries);
-                    if (result.Length > 1)
-                    {
-                        while (counter < result.Length)
-                        {
-                            newColumns.Add(table.TryAddColumn(NewColumn, counter));
-                            counter++;
-                        }
-
-                        for (int i = 0; i < result.Length; i++)
-                        {
-                            row[newColumns[i]] = result[i];
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.SplitColumnByString(Column, NewColumn, SplitText, tableName);
             }
         }
 
@@ -59,7 +35,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            if(Column == colName)
+            if (Column == colName)
             {
                 Column = null;
             }
@@ -67,7 +43,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RenameHeaders(string oldName, string newName)
         {
-            if(Column == oldName)
+            if (Column == oldName)
             {
                 Column = newName;
             }

@@ -1,20 +1,17 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
-using DataTableConverter.Extensions;
 using DataTableConverter.View;
 using DataTableConverter.View.WorkProcViews;
+using Microsoft.Win32;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -25,33 +22,36 @@ namespace DataTableConverter
     {
         private int selectedRow = 0, selectedColumn = 0;
         private List<Proc> procedures;
-        private List<Work> workflows;
+        private List<Work> Workflows;
         private List<Tolerance> tolerances;
         private List<Case> cases;
-        private readonly HistoryHelper historyHelper;
-        private string tableValueBefore;
-        private DataTable sourceTable;
-        private string SortingOrder;
-        private Dictionary<string, SortOrder> dictSorting;
-        private int rowBefore; //When a row in DataGridView is changed, then I'm not able to get the value through dgTable[col, row], because the DataGridView was sorted again at this moment
-        private List<string> dictKeys;
+        private string SortingOrder = string.Empty;
+        private Dictionary<string, SortOrder> DictSorting;
+        private Dictionary<string, string> AliasColumnMapping;
         private string FilePath = string.Empty;
         private OrderType OrderType = OrderType.Windows;
         private readonly Dictionary<string, int> ColumnWidths;
         private readonly int ColumnWidthTolerance = 10;
+        private int RowCount = 0;
+        private decimal MaxPages = 0;
         internal int FileEncoding = 0;
-        private decimal MaxPages => Math.Ceiling(((decimal)(sourceTable?.Rows.Count ?? 1) / Properties.Settings.Default.MaxRows));
-        private decimal Page {
-            get {
+        private readonly string TableName = DatabaseHelper.DefaultTable;
+
+        //internal because of workflows; Form1 is passed on; no need for additional parameters DatabaseHelper, ImportHelper, ExportHelper
+        internal readonly DatabaseHelper DatabaseHelper;
+        internal readonly ExportHelper ExportHelper;
+        internal readonly ImportHelper ImportHelper;
+        private static HashSet<string> FormInstances = new HashSet<string>();
+        private decimal Page
+        {
+            get
+            {
                 return NumPage.Value;
             }
             set
             {
-                dgTable.RowsAdded -= dgTable_RowsAdded;
-                dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
-                dgTable.RowsAdded += dgTable_RowsAdded;
                 SetPage();
-                AssignDataSource();
+                LoadData(true, false, true);
             }
         }
         internal int ValidRows
@@ -69,12 +69,22 @@ namespace DataTableConverter
             }
         }
 
-        internal Form1(DataTable table = null, string path = null)
+        internal Form1(string databaseName = null, string path = null)
         {
-            dictSorting = new Dictionary<string, SortOrder>();
-            ColumnWidths = new Dictionary<string, int>();
-            dictKeys = new List<string>();
+            bool isExistingDatabase = databaseName != null;
+            if(FormInstances.Contains(databaseName))
+            {
+                databaseName = Guid.NewGuid().ToString();
+            }
+            FormInstances.Add(databaseName);
+
             InitializeComponent();
+            DatabaseHelper = new DatabaseHelper(databaseName, !isExistingDatabase);
+            ExportHelper = new ExportHelper(DatabaseHelper);
+            DatabaseHelper.ExportHelper = ExportHelper;
+            ImportHelper = new ImportHelper(ExportHelper, DatabaseHelper);
+            DictSorting = new Dictionary<string, SortOrder>();
+            ColumnWidths = new Dictionary<string, int>();
             SetSize();
             ExportHelper.CheckRequired();
             LoadProcedures();
@@ -82,21 +92,47 @@ namespace DataTableConverter
             LoadTolerances();
             LoadCases();
             SetMenuEnabled(false);
-            historyHelper = new HistoryHelper();
             öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click();
-            trimToolStripMenuItem.Click += (sender, e) => trimToolStripMenuItem_Click(sender, e);
-            cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click(sender, e);
+            cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click();
             dBASEToolStripMenuItem1.Click += (sender, e) => dBASEToolStripMenuItem_Click(sender, e);
             excelToolStripMenuItem1.Click += (sender, e) => excelToolStripMenuItem_Click(sender, e);
-            if (table != null)
-            {
-                AddDataSourceNewTable(table);
-            }
+
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
-            if(path != null)
+            
+            if (isExistingDatabase)
+            {
+                LoadData(true, false, true);
+                SetMenuEnabled(true);
+            }
+            else if (path != null)
             {
                 importToolStripMenuItem_Click(ImportState.None, new string[] { path });
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            if (!Properties.Settings.Default.LongPathEnabled)
+            {
+                try
+                {
+                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem"))
+                    {
+                        if (key?.GetValue("LongPathsEnabled")?.ToString() != "1")
+                        {
+                            DialogResult result = this.MessagesYesNo(MessageBoxIcon.Warning, "Lange Pfade werden nicht unterstützt.\nBitte führen Sie die Datei \"LongPath.reg\" aus.\nSoll diese Nachricht zukünftig ausgeblendet werden?");
+                            if (result == DialogResult.Yes)
+                            {
+                                Properties.Settings.Default.LongPathEnabled = true;
+                            }
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex, this, false);
+                }
             }
         }
 
@@ -116,12 +152,12 @@ namespace DataTableConverter
 
         private void SetMenuEnabled(bool status)
         {
-            foreach(ToolStripMenuItem item in new ToolStripMenuItem[] { speichernAlsToolStripMenuItem, benutzerdefiniertesSpeichernToolStripMenuItem1, arbeitsablaufToolStripMenuItem, funktionenToolStripMenuItem, ersetzenToolStripMenuItem, duplikateToolStripMenuItem })
+            foreach (ToolStripMenuItem item in new ToolStripMenuItem[] { speichernAlsToolStripMenuItem, benutzerdefiniertesSpeichernToolStripMenuItem1, arbeitsablaufToolStripMenuItem, funktionenToolStripMenuItem, ersetzenToolStripMenuItem, duplikateToolStripMenuItem })
             {
                 SetSubItemEnabled(status, item);
             }
-            
-            foreach(ToolStripMenuItem item in new ToolStripMenuItem[] { speichernToolStripMenuItem2 , sortierenToolStripMenuItem })
+
+            foreach (ToolStripMenuItem item in new ToolStripMenuItem[] { speichernToolStripMenuItem2, sortierenToolStripMenuItem })
             {
                 item.Enabled = status;
             }
@@ -154,34 +190,14 @@ namespace DataTableConverter
 
         private void SetSorting(string order)
         {
-            SortingOrder = order;
-            dictSorting = ViewHelper.GenerateSortingList(GetSorting());
-            dictKeys = dictSorting.Keys.ToList();
+            if (order != SortingOrder)
+            {
+                SortingOrder = order;
+                DictSorting = ViewHelper.GenerateSortingList(GetSorting());
+                AliasColumnMapping = DatabaseHelper.GetAliasColumnMapping(TableName);
+            }
         }
 
-
-        private void AssignDataSource(DataTable table = null, bool adjustColumnWidth = false)
-        {
-            if (adjustColumnWidth)
-            {
-                ColumnWidths.Clear();
-            }
-            else
-            {
-                SaveWidthOfDataGridViewColumns();
-            }
-            int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
-            OrderType orderType = OrderType;
-            (dgTable.DataSource as DataView)?.Dispose(); //in hope to remove all remaining lazy loading
-            dgTable.DataSource = null; //else some columns (added through History) will be shown at index 0 instead of the right one
-            sourceTable = table ?? sourceTable;
-            int rowCount = sourceTable.Rows.Count;
-            dgTable.DataSource = sourceTable.GetSortedView(SortingOrder, OrderType, (int) Page, delegate { AddDataSourceAddRow(rowCount, orderType); });
-            RestoreDataGridSortMode();
-            SetWidth();
-
-            dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
-        }
 
 
         private void RestoreDataGridSortMode()
@@ -193,80 +209,18 @@ namespace DataTableConverter
             }
         }
 
-        private void AssignDataSourceColumnChange(DataTable table, string column, string newColumn = null)
-        {
-            SetSorting(ViewHelper.AdjustSort(GetSorting(), column, newColumn));
-            
-            AssignDataSource(table);            
-            RestoreDataGridSortMode();
-        }
-
         private string GetSorting()
         {
             return SortingOrder;
-        }
-
-        private DataTable GetDataSource(bool withSort = false)
-        {
-            DataTable table = sourceTable;
-            if (table != null)
-            {
-                int rowCountBefore = table.Rows.Count;
-                EndEdit();
-                table = sourceTable.Copy();
-                if (withSort)
-                {
-                    table = table.GetSortedView(SortingOrder,OrderType,-1).ToTable();
-                }
-
-                while(rowCountBefore < table.Rows.Count)
-                {
-                    table.Rows.RemoveAt(table.Rows.Count - 1);
-                }
-            }
-            table?.AcceptChanges();
-            return table;
-        }
-
-        private void EndEdit()
-        {
-            ViewHelper.EndDataGridViewEdit(dgTable);
-        }
-
-        #region Add History Entry
-
-        private void AddDataSourceValueChange(DataTable tableNew)
-        {
-            List<CellMatrix> oldValues = tableNew.ChangesOfDataTable();
-            historyHelper.AddHistory(new History { State = State.ValueChange, Table = oldValues}, GetSorting());
-            AssignDataSource(tableNew);
-        }
-
-        private void AddDataSourceNewTable(DataTable table)
-        {
-            historyHelper.ResetHistory();
-            SetSorting(string.Empty);
-            AssignDataSource(table, true);
-            SetMenuEnabled(true);
-            ResetPage();
-        }
-
-        private void ResetPage()
-        {
-            NumPage.ValueChanged -= NumPage_ValueChanged;
-            NumPage.Value = 1;
-            NumPage.ValueChanged += NumPage_ValueChanged;
-            SetPage();
-            dgTable.AllowUserToAddRows = Page == MaxPages;
         }
 
         private void SetWidth()
         {
             if (Properties.Settings.Default.FullWidthImport)
             {
-                foreach (DataGridViewColumn col in dgTable.Columns.Count > 100 && Properties.Settings.Default.NotAdjustColumnOver100 ? dgTable.Columns.Cast<DataGridViewColumn>().Take(100) : dgTable.Columns.Cast<DataGridViewColumn>())
+                foreach (DataGridViewColumn col in dgTable.Columns.Cast<DataGridViewColumn>())
                 {
-                    if (ColumnWidths.TryGetValue(col.Name, out int value))
+                    if (ColumnWidths.TryGetValue(col.HeaderText, out int value))
                     {
                         col.Width = value;
                     }
@@ -280,7 +234,7 @@ namespace DataTableConverter
 
         private void SetOptimalColumnWidth(DataGridViewColumn col)
         {
-            string result = sourceTable.AsEnumerable().Select(row => row[col.Name].ToString()).Concat(new string[] { col.Name }).Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
+            string result = (dgTable.DataSource as DataTable)?.AsEnumerable().Select(row => row[col.Name].ToString()).Concat(new string[] { col.HeaderText }).Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
             col.Width = TextRenderer.MeasureText(result, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
 
             AddColumnWidth(col);
@@ -296,100 +250,82 @@ namespace DataTableConverter
 
         private void AddColumnWidth(DataGridViewColumn col)
         {
-            if (!ColumnWidths.ContainsKey(col.Name))
+            if (!ColumnWidths.ContainsKey(col.HeaderText))
             {
-                ColumnWidths.Add(col.Name, col.Width);
+                ColumnWidths.Add(col.HeaderText, col.Width);
             }
             else
             {
-                ColumnWidths[col.Name] = col.Width;
+                ColumnWidths[col.HeaderText] = col.Width;
             }
         }
 
-        private void AddDataSourceAddHistory(List<CellMatrix> newEntry)
-        {
-            historyHelper.AddHistory(new History { State = State.ValueChange, Table = newEntry }, GetSorting());
-        }
-
-        private void AddDataSourceAddColumn(int columnIndex)
-        {
-            historyHelper.AddHistory(new History { State = State.InsertColumn, ColumnIndex = columnIndex }, GetSorting());
-        }
-
-        private void AddDataSourceAddColumnAndRows(int columnIndex, int rowIndex)
-        {
-            historyHelper.AddHistory(new History { State = State.AddColumnsAndRows, ColumnIndex = columnIndex, RowIndex = rowIndex }, GetSorting());
-        }
-
-        private void AddDataSourceAddRow(int rowIndex, OrderType orderType = OrderType.Windows)
-        {
-            historyHelper.AddHistory(new History { State = State.InsertRow, RowIndex = rowIndex, OrderType = orderType }, GetSorting());
-        }
-
-        private void AddDataSourceHeaderChange(int columnIndex, string text)
-        {
-            historyHelper.AddHistory(new History { State = State.HeaderChange, NewText = text, ColumnIndex = columnIndex }, GetSorting());
-        }
-
-        private void AddDataSourceHeadersChange(object[] oldHeader)
-        {
-            object[][] newItem = new object[1][];
-            newItem[0] = oldHeader;
-            historyHelper.AddHistory(new History { State = State.HeadersChange, Row = newItem}, GetSorting());
-        }
-
-        private void AddDataSourceDeleteColumn(DataColumn col, int index, object[] columnValues)
-        {
-            DataColumn[] newItem = new DataColumn[1];
-            newItem[0] = col;
-            object[][] newValues = new object[1][];
-            newValues[0] = columnValues;
-            historyHelper.AddHistory(new History { State = State.DeleteColumn, ColumnIndex = index, Column = newItem, ColumnValues = newValues }, GetSorting());
-        }
-
-        private void AddDataSourceCellChanged(string newText, int columnIndex, int rowIndex)
-        {
-            historyHelper.AddHistory(new History { State = State.CellValueChange, NewText = newText, ColumnIndex = columnIndex, RowIndex = rowIndex }, GetSorting());
-        }
-
-        #endregion
-
-        private void LoadProcedures(List<Proc> proc = null)
+        private void LoadProcedures(List<Proc> procs = null)
         {
             ersetzenToolStripMenuItem.DropDownItems.Clear();
-            
-            procedures = proc ?? ImportHelper.LoadProcedures(this);
+
+            procedures = procs ?? ImportHelper.LoadProcedures(this);
 
             ToolStripMenuItem tempProcedure = new ToolStripMenuItem("Temporäre Eingabe");
             tempProcedure.Click += TempProcedure_Click;
             ersetzenToolStripMenuItem.DropDownItems.Add(tempProcedure);
             List<Proc> visibleProc = procedures.Where(vproc => !vproc.HideInMainForm).ToList();
-            for (int i = 0; i < visibleProc.Count; i++)
+            foreach(Proc proc in visibleProc)
             {
-                int index = i;
-                string name = visibleProc[i].Name.Replace("&", "&&");
-                ToolStripMenuItem item = new ToolStripMenuItem(name);
-                item.Click += (sender, e) => procedure_Click(visibleProc[index]);
+                ToolStripMenuItem item = new ToolStripMenuItem(proc.Name.Replace("&", "&&"));
+                item.Click += (sender, e) => procedure_Click(proc);
                 ersetzenToolStripMenuItem.DropDownItems.Add(item);
-            }   
+            }
         }
 
-        private void LoadWorkflows(List<Work> work = null)
+        private void LoadWorkflows(List<Work> workflow = null)
         {
-            arbeitsablaufToolStripMenuItem.DropDownItems.Clear();
+            ClearDropDownItems(WorkflowItem19, WorkflowItemAF, WorkflowItemGL, WorkflowItemMQ, WorkflowItemRZ);
 
-            workflows = work ?? ImportHelper.LoadWorkflows(this);
+            Workflows = workflow ?? ImportHelper.LoadWorkflows(this);
 
-            List<Work> workflowsCopy = GetCopyOfWorkflows(workflows);
+            List<Work> workflowsCopy = GetCopyOfWorkflows(Workflows); //copy because then the real source will not be modified (e.g. column name change)
 
-            for (int i = 0; i < workflowsCopy.Count; i++)
+            foreach(Work work in workflowsCopy)
             {
-                int index = i;
-                string name = workflowsCopy[i].Name.Replace("&","&&");
-                ToolStripMenuItem item = new ToolStripMenuItem(name);
-                item.Click += (sender, e) => workflow_Click(workflowsCopy[index]);
-                arbeitsablaufToolStripMenuItem.DropDownItems.Add(item);
+                ToolStripMenuItem item = new ToolStripMenuItem(work.Name.Replace("&", "&&"));
+                item.Click += (sender, e) => workflow_Click(work);
+                AddWorkflowItem(item);
             }
+        }
+
+        private void ClearDropDownItems(params ToolStripMenuItem[] items)
+        {
+            foreach(ToolStripMenuItem item in items)
+            {
+                item.DropDownItems.Clear();
+            }
+        }
+
+        private void AddWorkflowItem(ToolStripMenuItem newItem)
+        {
+            ToolStripMenuItem item;
+            if (Regex.IsMatch(newItem.Text, "^[1-9]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItem19;
+            }
+            else if(Regex.IsMatch(newItem.Text, "^[A-F]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItemAF;
+            }
+            else if (Regex.IsMatch(newItem.Text, "^[G-L]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItemGL;
+            }
+            else if (Regex.IsMatch(newItem.Text, "^[M-Q]", RegexOptions.IgnoreCase))
+            {
+                item = WorkflowItemMQ;
+            }
+            else
+            {
+                item = WorkflowItemRZ;
+            }
+            item.DropDownItems.Add(newItem);
         }
 
         private List<Work> GetCopyOfWorkflows(List<Work> work)
@@ -403,7 +339,7 @@ namespace DataTableConverter
 
         private void LoadTolerances(List<Tolerance> tol = null)
         {
-            tolerances = tol ??  ImportHelper.LoadTolerances();
+            tolerances = tol ?? ImportHelper.LoadTolerances();
         }
 
         private void LoadCases(List<Case> cas = null)
@@ -432,9 +368,7 @@ namespace DataTableConverter
         private void workflow_Click(Work workflow, Action finished = null)
         {
             List<NotFoundHeaders> notFound = new List<NotFoundHeaders>();
-            DataTable table = GetDataSource();
-            List<string> headers = new List<string>(table.HeadersOfDataTableAsString());
-            
+            List<string> headers = DatabaseHelper.GetSortedColumnsAsAlias(TableName);
 
             foreach (WorkProc wp in workflow.Procedures)
             {
@@ -450,10 +384,9 @@ namespace DataTableConverter
                     headers.AddRange(wpHeaders.Select(header => header + Properties.Settings.Default.OldAffix));
                 }
 
-                WorkflowHelper.CheckHeaders(headers, notFoundColumns, wpHeaders);
-                
+                notFoundColumns.AddRange(wpHeaders.Where(header => !headers.Contains(header, System.StringComparer.OrdinalIgnoreCase)));
 
-                if(notFoundColumns.Count > 0)
+                if (notFoundColumns.Count > 0)
                 {
                     notFound.Add(new NotFoundHeaders(notFoundColumns, wp));
                 }
@@ -472,81 +405,55 @@ namespace DataTableConverter
                         columns.Add(col);
                     }
                 }
-                SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), table.HeadersOfDataTable(), false);
-                if (form.ShowDialog(this) == DialogResult.OK) {
-                    string[] from = form.Table.AsEnumerable().Select(row => row.ItemArray[0].ToString()).ToArray();
-                    string[] to = form.Table.AsEnumerable().Select(row => row.ItemArray[1].ToString()).ToArray();
-
-                    foreach (NotFoundHeaders nf in notFound)
+                using (SelectDuplicateColumns form = new SelectDuplicateColumns(columns.ToArray(), DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), false))
+                {
+                    if (form.ShowDialog(this) == DialogResult.OK)
                     {
-                        string[] wpHeaders = nf.Wp.GetHeaders();
-                        for (int y = 0; y < wpHeaders.Length; y++)
+                        string[] from = new string[form.Table.Rows.Count];
+                        string[] to = new string[form.Table.Rows.Count];
+                        for (int i = 0; i < form.Table.Rows.Count; ++i)
                         {
-                            for (int i = 0; i < from.Length; i++)
+                            from[i] = form.Table.Rows[i][0].ToString();
+                            to[i] = form.Table.Rows[i][1].ToString();
+                        }
+
+                        foreach (NotFoundHeaders nf in notFound)
+                        {
+                            string[] wpHeaders = nf.Wp.GetHeaders();
+                            for (int y = 0; y < wpHeaders.Length; y++)
                             {
-                                if(to[i] == SelectDuplicateColumns.IgnoreColumn)
+                                for (int i = 0; i < from.Length; i++)
                                 {
-                                    nf.Wp.RemoveHeader(from[i]);
-                                }
-                                else if (wpHeaders[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
-                                {
-                                    nf.Wp.RenameHeaders(from[i], to[i]);
+                                    if (to[i] == SelectDuplicateColumns.IgnoreColumn)
+                                    {
+                                        nf.Wp.RemoveHeader(from[i]);
+                                    }
+                                    else if (wpHeaders[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
+                                    {
+                                        nf.Wp.RenameHeaders(from[i], to[i]);
+                                    }
                                 }
                             }
                         }
+                        ReplaceThroughTemp(workflow.Procedures, finished);
                     }
-                    ReplaceThroughTemp(workflow.Procedures, finished);
                 }
-                form.Dispose();
             }
         }
 
         private void ReplaceThroughTemp(List<WorkProc> temp, Action finished)
         {
-            DataTable table = GetDataSource();
             StartLoadingBar();
             Thread thread = new Thread(() =>
             {
                 try
                 {
-                    table.AcceptChanges();
-                    List<History> history = new List<History>();
                     foreach (WorkProc t in temp)
                     {
-                        if (t.ReplacesTable)
-                        {
-                            history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting()});
-                            
-                            ReplaceProcedure(table, null, t, out int[] newIndices);
-                            history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting()});
-                            if (table.Columns.Contains(Extensions.DataTableExtensions.TempSort))
-                            {
-                                table.Columns.Remove(Extensions.DataTableExtensions.TempSort);
-                            }
-                            table.AcceptChanges();
-                            history.Add(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices, Order = GetSorting() });
-                        }
-                        else
-                        {
-                            ReplaceProcedure(table, null, t, out _);
-                        }
-                        if (t.CommitDelete)
-                        {
-                            history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting() });
-                            if (table.Columns.Contains(Extensions.DataTableExtensions.TempSort))
-                            {
-                                table.Columns.Remove(Extensions.DataTableExtensions.TempSort);
-                            }
-                            table.AcceptChanges();
-                        }
+                        ReplaceProcedure(null, t);
                     }
-                    history.Add(new History { State = State.ValueChange, Table = table.ChangesOfDataTable(), Order = GetSorting() });
-
-                    historyHelper.AddHistory(history.ToArray());
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        AssignDataSource(table);
-                    }));
+                    DatabaseHelper.SetSavepoint();
+                    LoadData(true);
                 }
                 catch (Exception ex)
                 {
@@ -555,9 +462,19 @@ namespace DataTableConverter
                 StopLoadingBar();
                 this.MessagesOK(MessageBoxIcon.Information, "Arbeitsablauf ausgeführt!");
                 finished?.Invoke();
+                SetWorkflowText();
             });
+            thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
+        }
+
+        internal void SetWorkflowText(string text = "")
+        {
+            statusStrip1.BeginInvoke(new MethodInvoker(() =>
+            {
+                LblWorkProc.Text = text;
+            }));
         }
 
         private int GetProcedureThroughId(int id)
@@ -568,37 +485,38 @@ namespace DataTableConverter
         private void importToolStripMenuItem_Click(ImportState state = ImportState.None, string[] openFiles = null)
         {
             OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state != ImportState.Header);
-            DataTable oldTable = GetDataSource();
             string mergePath = string.Empty;
-            bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath,ref mergePath);
+            bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath, ref mergePath);
             if (openFiles != null || validMerge || dialog.ShowDialog(this) == DialogResult.OK)
             {
                 string[] filenames = openFiles ?? (validMerge ? new string[1] { mergePath } : dialog.FileNames);
                 ProgressBar loadingBar = pgbLoading;
                 Thread thread = new Thread(() =>
                 {
-                    Thread.CurrentThread.IsBackground = true;
                     bool fileNameSet = state != ImportState.None;
                     bool multipleFiles = filenames.Length > 1;
                     Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
-                    DataTable newTable = null;
+                    string newTable = null;
                     string fileNameBefore = Path.GetFileName(filenames[0]);
                     int fileEncoding = 0;
+                    string password = string.Empty;
                     foreach (string file in filenames)
                     {
                         try
                         {
                             string filename = Path.GetFileName(file);
-                            DataTable table = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding);
-                            if (table != null)
+                            string tableName = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding, ref password);
+
+                            if (tableName != null)
                             {
+
                                 if (newTable != null)
                                 {
-                                    newTable.ConcatTable(table, fileNameBefore, filename);
+                                    DatabaseHelper.ConcatTable(newTable, tableName, fileNameBefore, filename);
                                 }
                                 else
                                 {
-                                    newTable = table;
+                                    newTable = tableName;
                                 }
                                 fileNameBefore = filename;
                                 if (!fileNameSet)
@@ -613,8 +531,10 @@ namespace DataTableConverter
                             ErrorHelper.LogMessage(ex, this);
                         }
                     }
-                    FinishImport(newTable, state, oldTable, Path.GetFileName(filenames[0]), fileEncoding);
+
+                    FinishImport(newTable, state, Path.GetFileName(filenames[0]), fileEncoding);
                 });
+                thread.IsBackground = true;
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
             }
@@ -633,165 +553,126 @@ namespace DataTableConverter
             {
                 lblFilename.Text = Path.GetFileName(path);
             }));
-            
+
             FilePath = path;
         }
 
-        private void FinishImport(DataTable table, ImportState state, DataTable oldTable, string filename, int encoding)
+        private void FinishImport(string tableName, ImportState state, string filename, int encoding)
         {
-            if(table != null) {
+            if (tableName != null)
+            {
                 switch (state)
                 {
                     case ImportState.Merge:
-                        StartMerge(table, oldTable, filename, encoding);
+                        Thread thread = new Thread(() =>
+                        {
+                            try
+                            {
+                                StartLoadingBar();
+                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, this, TableName);
+                                StopLoadingBar();
+                                DatabaseHelper.SetSavepoint();
+                                LoadData(true);
+
+                                if (count != 0)
+                                {
+                                    Invoke(new MethodInvoker(() =>
+                                    {
+                                        ValidRows = count;
+                                    }));
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ErrorHelper.LogMessage(ex, this);
+                            }
+                        });
+                        thread.IsBackground = true;
+                        thread.SetApartmentState(ApartmentState.STA);
+                        thread.Start();
                         break;
 
                     case ImportState.Append:
-                        dgTable.BeginInvoke(new MethodInvoker(() => { MergeTables(table, filename); }));
+                        DatabaseHelper.ConcatTable(TableName, tableName, Path.GetFileName(FilePath), filename);
+                        DatabaseHelper.SetSavepoint();
+                        LoadData(true);
                         break;
 
                     case ImportState.Header:
-                        object[] headers = oldTable.HeadersOfDataTable();
-                        oldTable.OverrideHeaders(table);
-                        dgTable.BeginInvoke(new MethodInvoker(() => { AssignDataSource(oldTable); }));
-                        AddDataSourceHeadersChange(headers);
+                        DatabaseHelper.RenameColumns(tableName, TableName);
+                        DatabaseHelper.SetSavepoint();
+                        LoadData(true);
                         break;
 
                     default:
                         ResetValidRowLabel();
-                        dgTable.BeginInvoke(new MethodInvoker(() => { AddDataSourceNewTable(table); }));
-                        lblRows.GetCurrentParent().BeginInvoke(new MethodInvoker(() => { SetRowCount(); }));
+                        SetSorting(string.Empty);
+                        DatabaseHelper.ReplaceTable(tableName, TableName);
+                        DatabaseHelper.SetSavepoint();
+                        BeginInvoke(new MethodInvoker(() =>
+                        {
+                            SetMenuEnabled(true);
+                        }));
+                        LoadData(true);
                         break;
                 }
+
             }
             StopLoadingBar();
         }
 
-        private void StartMerge(DataTable importTable, DataTable sourceTable, string filename, int encoding)
+        private void LoadData(bool readjustColumnWidth = true, bool preventLoading = false, bool withoutInvoke = false)
         {
-            string[] importColumns = new string[0];
-            int sourceMergeIndex = -1;
-            int importMergeIndex = -1;
-            DialogResult result = DialogResult.No;
-
-            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.PVMIdentifier))
+            if (withoutInvoke)
             {
-                result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
+                load();
             }
             else
             {
-                if ((sourceMergeIndex = sourceTable.Columns.IndexOf(Properties.Settings.Default.PVMIdentifier)) > -1)
+                dgTable.Invoke(new MethodInvoker(() =>
                 {
-                    if ((importMergeIndex = importTable.Columns.IndexOf(Properties.Settings.Default.PVMIdentifier)) > -1)
-                    {
-                        importColumns = importTable.HeadersOfDataTableAsString();
-                        result = DialogResult.Yes;
-                        if (sourceTable.Rows.Count != importTable.Rows.Count)
-                        {
-                            result = this.MessagesYesNo(MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({sourceTable.Rows.Count} zu {importTable.Rows.Count})!\nTrotzdem fortfahren?");
-                        }
-                    }
-                    else
-                    {
-                        this.MessagesOK(MessageBoxIcon.Warning, $"Die zu importierende Tabelle \"{filename}\" hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                        result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
-                    }
+                    load();
+                }));
+            }
+
+            void load()
+            {
+                if (readjustColumnWidth)
+                {
+                    ColumnWidths.Clear();
                 }
                 else
                 {
-                    this.MessagesOK(MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {Properties.Settings.Default.PVMIdentifier}");
-                    result = ShowMergeForm(ref importColumns, ref sourceMergeIndex, ref importMergeIndex, sourceTable, importTable, filename, this);
+                    SaveWidthOfDataGridViewColumns();
                 }
-            }
-            
-            if (result == DialogResult.Yes)
-            {
-                Thread thread = new Thread(() =>
+                MaxPages = Math.Ceiling(DatabaseHelper.GetRowCount(TableName) / Properties.Settings.Default.MaxRows);
+                SetPage();
+                CheckAllowToAddRows();
+
+                int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
+                if (!preventLoading)
                 {
-                    try {
-                        string invalidColumnName = Properties.Settings.Default.InvalidColumnName;
-                        if (!importTable.Columns.Contains(invalidColumnName))
-                        {
-                            SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnName }, importTable.HeadersOfDataTable(), true);
-                            DialogResult res = DialogResult.Cancel;
-                            Invoke(new MethodInvoker(() =>
-                            {
-                                res = f.ShowDialog(this);
-                            }));
-                            if (res == DialogResult.OK)
-                            {
-                                invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
-                            }
-                        }
+                    DataTable table = DatabaseHelper.GetData(SortingOrder, OrderType, (int)((Page - 1) * Properties.Settings.Default.MaxRows), TableName);
 
-                        sourceTable.AddColumnsOfDataTable(importTable, importColumns, sourceMergeIndex, importMergeIndex, out int[] newIndices, this, pgbLoading);
-                        int count = 0;
-                        if (Properties.Settings.Default.SplitPVM)
-                        {
-                            count = sourceTable.SplitDataTable(FilePath, this, encoding, invalidColumnName);
-                        }
-                        foreach (DataRow row in sourceTable.AsEnumerable().Where(row => row.RowState != DataRowState.Deleted && row[invalidColumnName].ToString() == Properties.Settings.Default.FailAddressValue))
-                        {
-                            row.Delete();
-                        }
+                    dgTable.RowsAdded -= dgTable_RowsAdded;
+                    dgTable.DataSource = null; //else readded columns are at the wrong index
+                    dgTable.DataSource = table;
+                    dgTable.Columns[0].Visible = false;
+                    dgTable.RowsAdded += dgTable_RowsAdded;
+                    SetRowCount(DatabaseHelper.GetRowCount(TableName));
+                }
+                RestoreDataGridSortMode();
+                SetWidth();
 
-
-                        History[] history = new History[2];
-                        history[0] = new History { State = State.ValueChange, Table = sourceTable.ChangesOfDataTable(), Order= GetSorting() };
-
-                        sourceTable.Columns.Remove(Extensions.DataTableExtensions.TempSort);
-                        dgTable.Invoke(new MethodInvoker(()=> {
-                            AssignDataSource(sourceTable);
-                        }));
-
-                        history[1] = new History { State = State.OrderIndexChange, NewOrderIndices = newIndices, Order = GetSorting()};
-                        historyHelper.AddHistory(history);
-                        pgbLoading.Invoke(new MethodInvoker(() => { pgbLoading.Value = pgbLoading.Maximum = 0; }));
-
-                        if (count != 0)
-                        {
-                            Invoke(new MethodInvoker(() =>
-                            {
-                                ValidRows = count;
-                            }));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorHelper.LogMessage(ex, this);
-                    }
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
+                dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
             }
         }
 
-        internal static DialogResult ShowMergeForm(ref string[] importColumns, ref int sourceMergeIndex, ref int importMergeIndex, DataTable sourceTable, DataTable importTable, string filename, Form invokeForm)
-        {
-            MergeTable form = new MergeTable(sourceTable.HeadersOfDataTable(), importTable.HeadersOfDataTable(), filename, sourceTable.Rows.Count, importTable.Rows.Count);
-            bool result;
-            DialogResult res = DialogResult.Cancel;
-            invokeForm.Invoke(new MethodInvoker(() =>
-            {
-                res = form.ShowDialog(invokeForm);
-            }));
-            if (result = ( res == DialogResult.Yes))
-            {
-                importColumns = form.getSelectedColumns();
-                sourceMergeIndex = form.getSelectedOriginal();
-                importMergeIndex = form.getSelectedMerge();
-            }
-            form.Dispose();
-            return result ? DialogResult.Yes : DialogResult.No;
-        }
 
-        private void SetRowCount()
-        {
-            SetRowCount(sourceTable?.Rows.Count ?? 0);
-        }
 
         private void SetRowCount(int count)
         {
+            RowCount = count;
             lblRows.Text = count.ToString();
         }
 
@@ -799,23 +680,20 @@ namespace DataTableConverter
         {
             if (dgTable.DataSource != null)
             {
-                TrimForm form = new TrimForm(sourceTable.HeadersOfDataTableAsString());
-                if(form.ShowDialog(this) == DialogResult.OK)
+                TrimForm form = new TrimForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName));
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     StartLoadingBar();
-                    DataTable table = GetDataSource();
                     new Thread(() =>
                     {
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
                             string order = GetSorting();
-                            form.Proc.DoWork(table, ref order, null, null, null, FilePath, contextGlobal, OrderType, this, out int[] newIndices);
-                            dgTable.Invoke(new MethodInvoker(() =>
-                            {
-                                AddDataSourceValueChange(table);
-                            }));
-                            
+                            form.Proc.DoWork(ref order, null, null, null, FilePath, contextGlobal, OrderType, this, TableName);
+                            SetWorkflowText();
+                            LoadData(true);
+
                         }
                         catch (Exception ex)
                         {
@@ -831,9 +709,9 @@ namespace DataTableConverter
         private void TempProcedure_Click(object sender, EventArgs e)
         {
             ProcedureForm form = new ProcedureForm(contextGlobal);
-            if(form.ShowDialog(this) == DialogResult.OK)
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
-                Proc proc = new Proc(form.Table,form.CheckTotal, form.CheckWord, form.LeaveEmpty);
+                Proc proc = new Proc(form.Table, form.CheckTotal, form.CheckWord, form.LeaveEmpty);
                 procedure_Click(proc);
             }
             form.Dispose();
@@ -841,48 +719,45 @@ namespace DataTableConverter
 
         private void procedure_Click(Proc procedure)
         {
-            Formula formula = new Formula(FormulaState.Procedure, sourceTable.HeadersOfDataTable());
-            if (formula.ShowDialog(this) == DialogResult.OK)
+            using (Formula formula = new Formula(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
-                string[] columns = formula.SelectedHeaders();
-
-                if (columns.Length > 0)
+                if (formula.ShowDialog(this) == DialogResult.OK)
                 {
-                    ProcUser user = new ProcUser(columns, formula.HeaderName(), formula.OldColumn);
+                    string[] columns = formula.SelectedHeaders();
 
-                    DataTable newTable = GetDataSource();
-                    Thread thread = new Thread(() =>
+                    if (columns.Length > 0)
                     {
-                        try
+                        ProcUser user = new ProcUser(columns, formula.HeaderName(), formula.OldColumn);
+                        StartLoadingBar();
+                        Thread thread = new Thread(() =>
                         {
-                            ReplaceProcedure(newTable, procedure, user, out int[] newIndices);
-                            if (newIndices.Length == 0)
+                            try
                             {
-                                dgTable.Invoke(new MethodInvoker(() => { AddDataSourceValueChange(newTable); }));
+                                ReplaceProcedure(procedure, user);
+                                DatabaseHelper.SetSavepoint();
+                                LoadData(true);
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                historyHelper.AddHistory(new History { State = State.OrderIndexChange, NewOrderIndices = newIndices }, GetSorting());
-                                dgTable.Invoke(new MethodInvoker(() => { AssignDataSource(newTable); }));
+                                ErrorHelper.LogMessage(ex, this);
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorHelper.LogMessage(ex, this);
-                        }
-                    });
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.Start();
+                            StopLoadingBar();
+                            SetWorkflowText();
+                        });
+                        thread.IsBackground = true;
+                        thread.SetApartmentState(ApartmentState.STA);
+                        thread.Start();
+                    }
                 }
             }
-            formula.Dispose();
         }
 
-        private void ReplaceProcedure(DataTable table, Proc procedure, WorkProc wp, out int[] newOrderIndices)
+        private void ReplaceProcedure(Proc procedure, WorkProc wp)
         {
             string newOrder = GetSorting();
-            wp.DoWork(table, ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this, out int[] newIndices);
-            newOrderIndices = newIndices;
+
+            wp.DoWork(ref newOrder, GetCaseThroughId(wp.ProcedureId), tolerances, procedure ?? GetProcedure(wp.ProcedureId), FilePath, contextGlobal, OrderType, this, TableName);
+
             SetSorting(newOrder);
         }
 
@@ -890,7 +765,8 @@ namespace DataTableConverter
         {
             Proc proc = null;
             int index = GetProcedureThroughId(id);
-            if (index != -1) {
+            if (index != -1)
+            {
                 proc = procedures[index];
             }
             return proc;
@@ -917,22 +793,31 @@ namespace DataTableConverter
                 {
                     path = path ?? saveFileDialog1.FileName;
                     StartLoadingBar();
-                    DataTable table = GetDataSource(true);
                     new Thread(() =>
                     {
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportExcel(table, Path.GetDirectoryName(path),path, this);
-                            StopLoadingBar();
-                            SaveFinished();
+                            Save(path, SaveFormat.EXCEL);
                         }
                         catch (Exception ex)
                         {
                             ErrorHelper.LogMessage(ex, this);
                         }
+                        StopLoadingBar();
                     }).Start();
                 }
+            }
+        }
+
+        private void Save(string path, SaveFormat format)
+        {
+            StartLoadingBarCount(RowCount);
+            bool saved = ExportHelper.Save(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), Path.GetExtension(FilePath), FileEncoding, format, GetSorting(), OrderType, this, TableName, UpdateLoadingBar) != 0;
+            StopLoadingBar();
+            if (saved)
+            {
+                SaveFinished();
             }
         }
 
@@ -941,11 +826,17 @@ namespace DataTableConverter
             string newColumn = Microsoft.VisualBasic.Interaction.InputBox("Bitte Spaltennamen eingeben", "Spalte hinzufügen", string.Empty);
             if (!string.IsNullOrWhiteSpace(newColumn))
             {
-                DataTable data = GetDataSource();
-                data.Columns.Add(new DataColumn(newColumn));
-                AddDataSourceAddColumn(data.Columns.Count-1);
-                AssignDataSource(data);
-                SetRowCount();
+                if (dgTable.Columns.Cast<DataGridViewColumn>().Any(col => col.HeaderText.Equals(newColumn, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Der Name der Spalte ist bereits vergeben");
+                    spalteHinzufügenToolStripMenuItem_Click(sender, e);
+                }
+                else
+                {
+                    DatabaseHelper.AddColumnFixedAlias(newColumn, TableName);
+                    DatabaseHelper.SetSavepoint();
+                    LoadData();
+                }
             }
         }
 
@@ -953,11 +844,11 @@ namespace DataTableConverter
         {
             if (e.Button == MouseButtons.Right)
             {
-                selectedRow =  dgTable.HitTest(e.X, e.Y).RowIndex;
+                selectedRow = dgTable.HitTest(e.X, e.Y).RowIndex;
                 selectedColumn = dgTable.HitTest(e.X, e.Y).ColumnIndex;
-                if(selectedColumn > -1 && selectedRow > -1 && !dgTable[selectedColumn, selectedRow].Selected)
+                if (selectedColumn > -1 && selectedRow > -1 && !dgTable[selectedColumn, selectedRow].Selected)
                 {
-                    foreach(DataGridViewCell cell in dgTable.SelectedCells)
+                    foreach (DataGridViewCell cell in dgTable.SelectedCells)
                     {
                         cell.Selected = false;
                     }
@@ -968,7 +859,7 @@ namespace DataTableConverter
                 {
                     ctxHeader.Show(dgTable, new Point(e.X, e.Y));
                 }
-                else if(selectedColumn >= 0)
+                else if (selectedColumn >= 0)
                 {
                     ctxBody.Show(dgTable, new Point(e.X, e.Y));
                 }
@@ -982,34 +873,31 @@ namespace DataTableConverter
             {
                 string oldText = dgTable.Columns[selectedColumn].HeaderText;
 
-                DataTable table = GetDataSource();
-                table.Columns[selectedColumn].ColumnName = newText;
-                
-                AddDataSourceHeaderChange(selectedColumn, oldText);
-                
-                AssignDataSourceColumnChange(table, oldText, newText);
+                if (oldText != newText)
+                {
+                    string newAlias = DatabaseHelper.RenameAlias(oldText, newText, TableName);
+                    dgTable.Columns[selectedColumn].HeaderText = newAlias;
+                    DatabaseHelper.SetSavepoint();
+                }
             }
         }
 
         private void spalteLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable table = GetDataSource();
-            DataColumn col = table.Columns[selectedColumn];
-            
-            
-            AddDataSourceDeleteColumn(col, selectedColumn, table.ColumnValues(selectedColumn));
-            table.Columns.RemoveAt(selectedColumn);
-            AssignDataSourceColumnChange(table, col.ColumnName);
-            SetRowCount();
+            DatabaseHelper.DeleteColumnThroughAlias(dgTable.Columns[selectedColumn].HeaderText, TableName);
+            dgTable.Columns.RemoveAt(selectedColumn);
+            DatabaseHelper.SetSavepoint();
         }
 
 
         private void zeilenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Merge formula = new Merge(sourceTable.HeadersOfDataTable(), contextGlobal);
-            if (formula.ShowDialog(this) == DialogResult.OK)
+            using (Merge formula = new Merge(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal))
             {
-                StartSingleWorkflow(formula.Proc);
+                if (formula.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(formula.Proc);
+                }
             }
         }
 
@@ -1027,19 +915,12 @@ namespace DataTableConverter
                 if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
                 {
                     path = path ?? saveFileDialog1.FileName;
-                    DataTable table = GetDataSource(true);
-                    StartLoadingBarCount(table.Rows.Count);
                     new Thread(() =>
                     {
                         try
                         {
                             Thread.CurrentThread.IsBackground = true;
-                            bool saved = ExportHelper.ExportDbase(Path.GetFileNameWithoutExtension(path), table, Path.GetDirectoryName(path), this, UpdateLoadingBar);
-                            StopLoadingBar();
-                            if (saved)
-                            {
-                                SaveFinished();
-                            }
+                            Save(path, SaveFormat.DBASE);
                         }
                         catch (Exception ex)
                         {
@@ -1057,17 +938,17 @@ namespace DataTableConverter
 
         private void rückgängigToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable oldTable = GetDataSource();
             StartLoadingBar();
 
             new Thread(() =>
             {
-                try {
-                    DataTable newTable = historyHelper.GoBack(oldTable, GetSorting());
-                    dgTable.Invoke(new MethodInvoker(() =>
+                try
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    if (DatabaseHelper.Undo())
                     {
-                        TakeOverHistory(newTable, historyHelper.OrderString);
-                    }));
+                        LoadData(true);
+                    }
                     StopLoadingBar();
                 }
                 catch (Exception ex)
@@ -1075,31 +956,23 @@ namespace DataTableConverter
                     ErrorHelper.LogMessage(ex, this);
                 }
             }).Start();
-            
-            
-        }
 
-        private void TakeOverHistory(DataTable table, string orderString)
-        {
-            SetSorting(orderString);
-            AssignDataSource(table, true);
-            SetRowCount();
+
         }
 
         private void wiederholenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable oldTable = GetDataSource();
             StartLoadingBar();
 
             new Thread(() =>
             {
                 try
                 {
-                    DataTable newTable = historyHelper.Repeat(GetDataSource(), GetSorting());
-                    dgTable.Invoke(new MethodInvoker(() =>
+                    Thread.CurrentThread.IsBackground = true;
+                    if (DatabaseHelper.Redo())
                     {
-                        TakeOverHistory(newTable, historyHelper.OrderString);
-                    }));
+                        LoadData(true);
+                    }
                     StopLoadingBar();
                 }
                 catch (Exception ex)
@@ -1111,49 +984,30 @@ namespace DataTableConverter
 
         private void dgTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            int width = TextRenderer.MeasureText(dgTable[e.ColumnIndex, e.RowIndex].Value.ToString(), dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
-            DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
-            if (width > col.Width)
+            if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
-                ColumnWidths[col.Name] = col.Width = width;
+                string value = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
+                int id = int.Parse(dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString());
+                int width = TextRenderer.MeasureText(value, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
+                DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
+                if (width > col.Width)
+                {
+                    ColumnWidths[col.HeaderText] = col.Width = width;
+                }
+                DatabaseHelper.UpdateCell(value, dgTable.Columns[e.ColumnIndex].HeaderText, id, TableName);
+                DatabaseHelper.SetSavepoint();
             }
-            AssignDataSource();
-            AddDataSourceCellChanged(tableValueBefore, e.ColumnIndex, rowBefore);
-        }
-
-        private void dgTable_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
-        {
-            tableValueBefore = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
-            rowBefore = e.RowIndex >= 0 && (RealRowCount()-1) < sourceTable.Rows.Count ? GetDataTableRowIndexOfDataGridView(e.RowIndex) : e.RowIndex >= 0 ? e.RowIndex : 0;
-        }
-
-        private decimal RealRowCount()
-        {
-            return dgTable.Rows.Count + (NumPage.Value - 1) * Properties.Settings.Default.MaxRows;
         }
 
         private void dgTable_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
-            if (RealRowCount() -1 > sourceTable.Rows.Count)
+            if (dgTable.AllowUserToAddRows && e.RowIndex >= RowCount)
             {
-                var cell = dgTable.SelectedCells[0];
-                var rowIndex = cell.RowIndex;
-                var columnIndex = cell.ColumnIndex;
-                AddDataSourceAddRow(sourceTable.Rows.Count, OrderType);
-                //EndEdit();
-
-                dgTable.BeginInvoke(new MethodInvoker(() =>
-                {
-                    EndEdit();
-                    AssignDataSource();
-                    cell = dgTable[columnIndex, rowIndex];
-                    cell.Selected = true;
-                    dgTable.CurrentCell = dgTable[columnIndex, rowIndex];
-                    dgTable.BeginEdit(false);
-                }));
-
+                string newId = DatabaseHelper.InsertRow(TableName);
+                DatabaseHelper.SetSavepoint();
+                dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value = newId; //CellValueChanged triggered?
+                SetRowCount(RowCount + 1);
             }
-            SetRowCount();
         }
 
         private void tabellenZusammenfügenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1163,7 +1017,13 @@ namespace DataTableConverter
 
         private void verwaltungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Administration form = new Administration(sourceTable?.HeadersOfDataTable() ?? new object[0], contextGlobal, procedures,workflows,cases,tolerances, sourceTable);
+            string[] aliases = new string[0];
+            try
+            {
+                aliases = DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray();
+            }
+            catch { }
+            Administration form = new Administration(DatabaseHelper, ExportHelper, ImportHelper, aliases, contextGlobal, procedures, Workflows, cases, tolerances, TableName);
             form.FormClosed += new FormClosedEventHandler(administrationFormClosed);
             form.Show(this);
         }
@@ -1175,67 +1035,63 @@ namespace DataTableConverter
             LoadWorkflows(admin.Workflows);
             LoadTolerances(admin.Tolerances);
             LoadCases(admin.Cases);
-            SetMenuEnabled(sourceTable != null);
+            SetMenuEnabled(dgTable.DataSource != null);
         }
 
-        private void cSVToolStripMenuItem_Click(object sender, EventArgs e, DataTable dt = null, string path = null)
+        private void cSVToolStripMenuItem_Click(string path = null)
         {
-            if (dgTable.DataSource != null)
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog
             {
-                DataTable table = dt ?? GetDataSource(true);
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog
+                Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
+            if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
+            {
+                path = path ?? saveFileDialog1.FileName;
+                new Thread(() =>
                 {
-                    Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
-                    FilterIndex = 1,
-                    RestoreDirectory = true
-                };
-                
-                if (path != null || saveFileDialog1.ShowDialog(this) == DialogResult.OK)
-                {
-                    path = path ?? saveFileDialog1.FileName;
-                    StartLoadingBarCount(table.Rows.Count);
-                    new Thread(() =>
+                    try
                     {
-                        try
-                        {
-                            Thread.CurrentThread.IsBackground = true;
-                            ExportHelper.ExportCsv(table, Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path), FileEncoding, this, UpdateLoadingBar);
-                            StopLoadingBar();
-                            SaveFinished();
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorHelper.LogMessage(ex, this);
-                        }
-                    }).Start();
-                }
+                        Thread.CurrentThread.IsBackground = true;
+                        Save(path, SaveFormat.CSV);
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorHelper.LogMessage(ex, this);
+                    }
+                }).Start();
             }
         }
 
-        private void UpdateLoadingBar()
+        internal void UpdateLoadingBar()
         {
             try
             {
-                pgbLoading.Invoke(new MethodInvoker(() =>
+                if (pgbLoading.Value < pgbLoading.Maximum)
                 {
-                    if (pgbLoading.Value < pgbLoading.Maximum)
+                    pgbLoading.Invoke(new MethodInvoker(() =>
                     {
                         pgbLoading.Value++;
-                    }
-                }));
+                    }));
+                }
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} Maximum:{pgbLoading.Maximum}; Minimum:{pgbLoading.Minimum} Value:{pgbLoading.Value}",this, false);
+                ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} Maximum:{pgbLoading.Maximum}; Minimum:{pgbLoading.Minimum} Value:{pgbLoading.Value}", this, false);
             }
         }
 
-        private void StartLoadingBarCount(int length)
+        internal void StartLoadingBarCount(int length)
         {
-            pgbLoading.Style = ProgressBarStyle.Continuous;
-            pgbLoading.Maximum = length;
-            pgbLoading.Minimum = 0;
-            pgbLoading.Value = 0;
+            pgbLoading.Invoke(new MethodInvoker(() =>
+            {
+                pgbLoading.Style = ProgressBarStyle.Continuous;
+                pgbLoading.Maximum = length;
+                pgbLoading.Minimum = 0;
+                pgbLoading.Value = 0;
+            }));
         }
 
         private void SaveFinished()
@@ -1245,29 +1101,48 @@ namespace DataTableConverter
 
         private void postwurfToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Formula formula = new Formula(FormulaState.Export, sourceTable.HeadersOfDataTable());
-            if(formula.ShowDialog(this) == DialogResult.OK)
+            using (PVMExport formula = new PVMExport(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
-                StartLoadingBarCount(Properties.Settings.Default.PVMSaveTwice ? sourceTable.Rows.Count * 2 : sourceTable.Rows.Count);
-                new ProcPVMExport(formula.SelectedHeaders(), UpdateLoadingBar).DoWork(sourceTable,ref SortingOrder, null,null,null,FilePath,null,OrderType, this, out int[] newIndices);
-                StopLoadingBar();
-                SaveFinished();
+                if (formula.ShowDialog(this) == DialogResult.OK)
+                {
+                    new ProcPVMExport(formula.SelectedHeaders(), formula.SelectedFormat).DoWork(ref SortingOrder, null, null, null, FilePath, null, OrderType, this, TableName);
+                    StopLoadingBar();
+                    SaveFinished();
+                }
             }
-            formula.Dispose();
         }
 
         private void nachWertInSpalteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCustom export = new ExportCustom(sourceTable.HeadersOfDataTable(), sourceTable);
-            if(export.ShowDialog(this) == DialogResult.OK)
+            using (ExportCustom export = new ExportCustom(DatabaseHelper.GetAliasColumnMapping(TableName), DatabaseHelper, TableName))
             {
-                StartLoadingBar();
-                ExportHelper.ExportTableWithColumnCondition(GetDataSource(true), export.Items, FilePath, StopLoadingBar, SaveFinished, FileEncoding, this, export.ContinuedNumberName);
+                if (export.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartLoadingBar();
+                    string continuedNumberName = export.ContinuedNumberName;
+                    IEnumerable<ExportCustomItem> items = export.Items;
+                    Thread thread = new Thread(() =>
+                    {
+                        try
+                        {
+                            ExportHelper.ExportTableWithColumnCondition(items, FilePath, FileEncoding, GetSorting(), OrderType, this, continuedNumberName, TableName, SetWorkflowText);
+                            StopLoadingBar();
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex, this, true);
+                        }
+                        SetWorkflowText();
+                        SaveFinished();
+                    });
+                    thread.IsBackground = true;
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                }
             }
-            export.Dispose();
         }
 
-        private void StartLoadingBar()
+        internal void StartLoadingBar()
         {
             pgbLoading.BeginInvoke(new MethodInvoker(() =>
             {
@@ -1280,30 +1155,33 @@ namespace DataTableConverter
             pgbLoading.BeginInvoke(new MethodInvoker(() =>
             {
                 pgbLoading.Style = ProgressBarStyle.Blocks;
-                pgbLoading.Maximum = pgbLoading.Value = 0;
+                pgbLoading.Maximum = 1;
+                pgbLoading.Value = 0;
             }));
         }
 
         private void zählenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportCount export = new ExportCount(sourceTable.HeadersOfDataTable(), sourceTable);
-            
-            if(export.ShowDialog(this) == DialogResult.OK)
+            using (ExportCount export = new ExportCount(DatabaseHelper.GetAliasColumnMapping(TableName), DatabaseHelper, TableName))
             {
-                StartLoadingBar();
-                Thread thread = new Thread(() =>
+                if (export.ShowDialog(this) == DialogResult.OK)
                 {
-                    DataTable newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, GetDataSource(), OrderType);
-                    BeginInvoke(new MethodInvoker(() =>
+                    StartLoadingBar();
+                    Thread thread = new Thread(() =>
                     {
-                        new Form1(newTable).Show(this);
-                    }));
-                    StopLoadingBar();
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
+                        string newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, OrderType, TableName);
+                        BeginInvoke(new MethodInvoker(() =>
+                        {
+                            DatabaseHelper.CopyToNewDatabaseFile(newTable);
+                            new Form1(newTable).Show(this);
+                        }));
+                        StopLoadingBar();
+                    });
+                    thread.IsBackground = true;
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                }
             }
-            export.Dispose();
         }
 
 
@@ -1324,9 +1202,9 @@ namespace DataTableConverter
                 {
                     bool asc = col.HeaderCell.SortGlyphDirection == SortOrder.Ascending;
 
-                    SetSorting($"[{col.Name}] {(asc ? "DESC" : "ASC")}");
-                    AssignDataSource();
+                    SetSorting($"[{DatabaseHelper.GetColumnName(col.HeaderText, TableName)}] COLLATE NATURALSORT {(asc ? "DESC" : "ASC")}");
                 }
+                LoadData(true);
             }
         }
 
@@ -1342,66 +1220,39 @@ namespace DataTableConverter
         private void ResetSort()
         {
             SetSorting(string.Empty);
-            AssignDataSource();
         }
 
         private void zeileLöschenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DeleteRows(ViewHelper.SelectedRowsOfDataGridView(dgTable));
+            int[] rows = ViewHelper.SelectedRowsOfDataGridView(dgTable);
+            DeleteRows(rows);
+            DatabaseHelper.SetSavepoint();
+            LoadData(false);
         }
 
         private void DeleteRows(int[] rows)
         {
-            List<CellMatrix> newHistoryEntry = new List<CellMatrix>();
-            DataTable table = sourceTable;
-            foreach (int row in rows.OrderByDescending(index => index))
-            {
-                DataRow oldRow = ((DataRowView)dgTable.Rows[row].DataBoundItem).Row;
-                int tableIndex = table.Rows.IndexOf(oldRow);
-
-                object[][] oldContent = new object[1][];
-                oldContent[0] = oldRow.ItemArray.Clone() as object[];
-
-
-                newHistoryEntry.Add(new CellMatrix(new History { State = State.DeleteRow, Row = oldContent, RowIndex = tableIndex }));
-
-                table.Rows.RemoveAt(tableIndex);
-            }
-            AddDataSourceAddHistory(newHistoryEntry);
-            SetRowCount();
+            DatabaseHelper.DeleteRowsByIndex(rows, GetSorting(), OrderType, TableName);
         }
 
         private void zeileEinfügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable table = GetDataSource();
-            DataRow row = table.NewRow();
-            int tableRowIndex = string.IsNullOrEmpty(SortingOrder) ? GetDataTableRowIndexOfDataGridView(selectedRow) : table.Rows.Count;
-            table.Rows.InsertAt(row, tableRowIndex);
-            AssignDataSource(table);
+            if (string.IsNullOrEmpty(GetSorting()))
+            {
+                MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, "Es kann keine Zeile hinzugefügt werden während eine Sortierung aktiv ist");
+            }
+            else
+            {
+                DatabaseHelper.InsertRowAt(dgTable[0, selectedRow].Value.ToString(), TableName);
+                DatabaseHelper.SetSavepoint();
+                LoadData(false);
+            }
 
-            AddDataSourceAddRow(tableRowIndex);
         }
 
         private void tabelleHinzufügenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             importToolStripMenuItem_Click(ImportState.Append);
-        }
-
-        private void MergeTables(DataTable table, string filename)
-        {
-            DataTable originalTable = GetDataSource();
-            int ColumnIndexNew = originalTable.Columns.Count;
-            int RowIndexNew = originalTable.Rows.Count;
-            originalTable.ConcatTable(table, Path.GetFileName(FilePath), filename);
-
-            AssignDataSource(originalTable);
-            AddDataSourceAddColumnAndRows(ColumnIndexNew, RowIndexNew);
-        }
-
-        private int GetDataTableRowIndexOfDataGridView(int rowIndex)
-        {
-            DataRow oldRow = ((DataRowView)dgTable.Rows[rowIndex].DataBoundItem).Row;
-            return sourceTable.Rows.IndexOf(oldRow);
         }
 
         private void überschriftenEinlesenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1411,40 +1262,48 @@ namespace DataTableConverter
 
         private void dgTable_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (e.RowIndex == -1 && e.ColumnIndex > -1)
+            if (e.RowIndex == -1 && e.ColumnIndex > -1 && AliasColumnMapping != null)
             {
-                string header = e.Value.ToString();
-                var count = dictKeys.IndexOf(header);
-                SortOrder order = SortOrder.None;
-                if (count >= 0)
+                string header = AliasColumnMapping.FirstOrDefault(pair => pair.Key.Equals(e.Value.ToString(), StringComparison.OrdinalIgnoreCase)).Value;
+                if (header != null)
                 {
-                    count++;
-                    e.Graphics.FillRectangle(new SolidBrush(e.CellStyle.BackColor), e.CellBounds);
-                    e.Paint(e.ClipBounds, (DataGridViewPaintParts.All & ~DataGridViewPaintParts.Background));
-                    
-                    e.Graphics.DrawString($"{count}", dgTable.DefaultCellStyle.Font, new SolidBrush(Color.Black), e.CellBounds.X + e.CellBounds.Width-20, e.CellBounds.Y + 5, StringFormat.GenericDefault);
-                    e.Handled = true;
-                    order = dictSorting[header];
+                    int count = DictSorting.Keys.ToList().IndexOf(header);
+                    SortOrder order = SortOrder.None;
+                    if (count >= 0)
+                    {
+                        count++;
+                        e.Graphics.FillRectangle(new SolidBrush(e.CellStyle.BackColor), e.CellBounds);
+                        e.Paint(e.ClipBounds, (DataGridViewPaintParts.All & ~DataGridViewPaintParts.Background));
+
+                        e.Graphics.DrawString($"{count}", dgTable.DefaultCellStyle.Font, new SolidBrush(Color.Black), e.CellBounds.X + e.CellBounds.Width - 20, e.CellBounds.Y + 5, StringFormat.GenericDefault);
+                        e.Handled = true;
+                        order = DictSorting[header];
+                    }
+                    dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = order;
                 }
-                dgTable.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = order;
             }
 
         }
 
         private void großKleinschreibungToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UpLowCaseForm form = new UpLowCaseForm(sourceTable.HeadersOfDataTable());
-            if (form.ShowDialog(this) == DialogResult.OK) {
-                StartSingleWorkflow(form.Procedure);
+            using (UpLowCaseForm form = new UpLowCaseForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
+            {
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Procedure);
+                }
             }
         }
 
         private void rundenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RoundForm form = new RoundForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (RoundForm form = new RoundForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
-                StartSingleWorkflow(form.Procedure);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Procedure);
+                }
             }
         }
 
@@ -1463,7 +1322,7 @@ namespace DataTableConverter
             }
             else
             {
-                cSVToolStripMenuItem_Click(null, null, null, FileName);
+                cSVToolStripMenuItem_Click(FileName);
             }
         }
 
@@ -1474,73 +1333,72 @@ namespace DataTableConverter
 
         private void zeilenZusammenfügenToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            DataTable table = GetDataSource();
-            
-            MergeColumns form = new MergeColumns(table.HeadersOfDataTable());
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (MergeColumns form = new MergeColumns(DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
-                string identifier = form.Identifier;
-                int identifierIndex = form.IdentifierIndex;
-                bool separator = form.Separator;
-                List<PlusListboxItem> additionalColumns = form.AdditionalColumns;
-
-                new Thread(() =>
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
-                    try
-                    {
-                        string tempSortName = table.MergeRows(identifier, additionalColumns, separator, pgbLoading, this);
+                    string columnName = form.Identifier;
+                    bool separator = form.Separator;
+                    List<PlusListboxItem> additionalColumns = form.AdditionalColumns;
 
-                        dgTable.Invoke(new MethodInvoker(() =>
+                    new Thread(() =>
+                    {
+                        try
                         {
-                            List<CellMatrix> oldValues = table.ChangesOfDataTable();
-                            historyHelper.AddHistory(new History { State = State.ValueChange, Table = oldValues }, GetSorting());
-                            table.Columns.Remove(tempSortName);
-                            AssignDataSource(table);
-                        }));
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorHelper.LogMessage(ex, this);
-                    }
-                    StopLoadingBar();
+                            Thread.CurrentThread.IsBackground = true;
+                            StartLoadingBarCount(RowCount);
+                            DatabaseHelper.MergeRows(columnName, additionalColumns, separator, this, UpdateLoadingBar, TableName);
+                            DatabaseHelper.SetSavepoint();
+                            LoadData(true);
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorHelper.LogMessage(ex, this);
+                        }
+                        StopLoadingBar();
 
-                }).Start();
+                    }).Start();
+                }
             }
-            form.Dispose();
         }
 
         private void zeichenAuffüllenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PaddingForm form = new PaddingForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (PaddingForm form = new PaddingForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
-                StartSingleWorkflow(form.Proc);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Proc);
+                }
             }
         }
 
         private void textErsetzenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InsertText form = new InsertText("Spalte mit Text befüllen", "Bitte Text eingeben");
-            if (form.ShowDialog(this) == DialogResult.OK)
+            using (InsertText form = new InsertText("Spalte mit Text befüllen", "Bitte Text eingeben"))
             {
-                DataTable newTable = GetDataSource();
-                string newText = form.NewText;
-
-                foreach (DataRow row in newTable.Rows)
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
-                    row[selectedColumn] = newText;
-                }
+                    string newText = form.NewText;
 
-                AddDataSourceValueChange(newTable);
+                    DatabaseHelper.SetColumnValues(dgTable.Columns[selectedColumn].HeaderText, newText, TableName);
+                    foreach (DataGridViewRow row in dgTable.Rows)
+                    {
+                        row.Cells[selectedColumn].Value = newText;
+                    }
+                    DatabaseHelper.SetSavepoint();
+                }
             }
         }
 
         private void nummerierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            NumerationForm form = new NumerationForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (NumerationForm form = new NumerationForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
             {
-                StartSingleWorkflow(form.Procedure);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Procedure);
+                }
             }
         }
 
@@ -1560,20 +1418,24 @@ namespace DataTableConverter
 
         private void substringToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SubstringForm form = new SubstringForm(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (SubstringForm form = new SubstringForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
-                StartSingleWorkflow(form.Procedure);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Procedure);
+                }
             }
         }
 
         private void textErsetzenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            ReplaceWholeForm form = new ReplaceWholeForm(sourceTable.HeadersOfDataTable(), contextGlobal);
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (ReplaceWholeForm form = new ReplaceWholeForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), contextGlobal))
             {
-                ProcReplaceWhole proc = new ProcReplaceWhole(form.Table);
-                StartSingleWorkflow(proc);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    ProcReplaceWhole proc = new ProcReplaceWhole(form.Table);
+                    StartSingleWorkflow(proc);
+                }
             }
         }
 
@@ -1593,13 +1455,14 @@ namespace DataTableConverter
             if (oldHeight != Properties.Settings.Default.RowHeight)
             {
                 ColumnWidths.Clear();
-                AssignDataSource(null,true);
+                LoadData(true, true);
             }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             SaveSize();
+            DatabaseHelper.Close();
         }
 
         private void SaveSize()
@@ -1614,207 +1477,139 @@ namespace DataTableConverter
 
         private void spaltenVergleichenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CompareForm form = new CompareForm(sourceTable.HeadersOfDataTable(), sourceTable);
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (CompareForm form = new CompareForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray(), DatabaseHelper, TableName))
             {
-                StartSingleWorkflow(form.Procedure);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Procedure);
+                }
             }
-            form.Dispose();
         }
 
         private void PrüfzifferToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DataTable table = GetDataSource();
-            SelectHeader headerForm = new SelectHeader(table.HeadersOfDataTable());
-            if (headerForm.ShowDialog(this) == DialogResult.OK)
+            using (SelectHeader headerForm = new SelectHeader(DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
-                string column = headerForm.Column;
-                bool continueLoop = false;
-                StartLoadingBarCount(table.Rows.Count);
-                new Thread(() =>
+                if (headerForm.ShowDialog(this) == DialogResult.OK)
                 {
-                    for (int i = 0; i < table.Rows.Count; i++)
+                    string column = headerForm.Column;
+                    StartLoadingBarCount(RowCount);
+                    new Thread(() =>
                     {
-                        DataRow row = table.Rows[i];
-                        string value = row[column].ToString();
-                        int checkSum = ChecksumEAN9(value);
-                        if (checkSum == -1 && !continueLoop)
-                        {
-                            DialogResult result = this.MessagesYesNo(MessageBoxIcon.Warning, $"Ungültige Zahl in Zeile {i + 1}. Trotzdem fortfahren?");
-                            if (result == DialogResult.No)
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                continueLoop = true;
-                            }
-                        }
-                        else
-                        {
-                            row[column] = value + checkSum;
-                        }
-                        UpdateLoadingBar();
-                    }
-                    StopLoadingBar();
-                    dgTable.Invoke(new MethodInvoker(() =>
-                    {
-                        AddDataSourceValueChange(table);
-                    }));
-                }).Start();
-            }
-            headerForm.Dispose();
-        }
-
-        private int ChecksumEAN9(string data)
-        {
-            int result = -1;
-            if (int.TryParse(data, out int _))
-            {
-                int sum1 = 0;
-                for(int i = data.Length-2; i >= 0; i -= 2)
-                {
-                    sum1 += (int) char.GetNumericValue(data[i]);
+                        Thread.CurrentThread.IsBackground = true;
+                        DatabaseHelper.SetCheckSum(column, UpdateLoadingBar, this, TableName);
+                        StopLoadingBar();
+                        DatabaseHelper.SetSavepoint();
+                        LoadData(true);
+                    }).Start();
                 }
-
-                int sum2 = 0;
-                for (int i = data.Length - 1; i >= 0; i -= 2)
-                {
-                    sum2 += (int)char.GetNumericValue(data[i]);
-                }
-
-                int checksum_digit = 10 - ((sum1 + (sum2*3)) % 10);
-
-                result = checksum_digit == 10 ? 0 : checksum_digit;
             }
-            return result;
         }
 
         private void längsteZeileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MaxRowLengthForm form = new MaxRowLengthForm(sourceTable.HeadersOfDataTable());
-
-            if (form.ShowDialog(this) == DialogResult.OK)
+            using (MaxRowLengthForm form = new MaxRowLengthForm(DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
-                DataTable table = GetDataSource();
-                string shortcut = form.Shortcut;
-                string newColumn = form.NewColumn;
-                int minLength = form.MinLength;
-                string column = form.Column;
-                StartLoadingBar();
-                Thread thread = new Thread(() =>
-                {
-                    int maxIndex = 0;
-                    int maxLength = 0;
-                    for (int i = 0; i < table.Rows.Count; i++)
-                    {
-                        int max = table.Rows[i].ItemArray.Sum(item => item.ToString().Length);
-                        if (max > maxLength)
-                        {
-                            maxLength = max;
-                            maxIndex = i;
-                        }
-                    }
 
-                    if (shortcut != string.Empty && newColumn != string.Empty)
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    string shortcut = form.Shortcut;
+                    string newColumn = form.NewColumn;
+                    int minLength = form.MinLength;
+                    string columnName = form.Column;
+                    StartLoadingBar();
+                    Thread thread = new Thread(() =>
                     {
-                        newColumn = table.TryAddColumn(newColumn);
-                        if (minLength != -1)
+
+                        int index = -1;
+                        if (shortcut != string.Empty && newColumn != string.Empty)
                         {
-                            foreach(DataRow row in table.AsEnumerable())
+                            newColumn = DatabaseHelper.AddColumnWithAdditionalIfExists(newColumn, TableName);
+
+                            if (minLength != -1)
                             {
-                                if(row[column].ToString().Length >= minLength)
-                                {
-                                    row[newColumn] = shortcut;
-                                }
+                                DatabaseHelper.UpdateRowsWithMinCharacters(columnName, minLength, shortcut, newColumn, TableName);
                             }
+                            else
+                            {
+                                long id = DatabaseHelper.GetRowWithMaxCharacters(GetSorting(), OrderType, out index, TableName);
+                                DatabaseHelper.UpdateCell(shortcut, newColumn, id, TableName, true);
+                            }
+                            DatabaseHelper.SetSavepoint();
+                            LoadData(true);
                         }
-                        else
+                        if (index != -1)
                         {
-                            table.Rows[maxIndex][newColumn] = shortcut;
+                            SelectDataGridViewRow(index);
                         }
-                        dgTable.Invoke(new MethodInvoker(()=> {
-                            AddDataSourceValueChange(table);
-                        }));
-                    }
-                    if (minLength != -1)
-                    {
-                        SelectDataGridViewRow(maxIndex);
-                    }
-                    StopLoadingBar();
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
+                        StopLoadingBar();
+                    });
+                    thread.IsBackground = true;
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                }
             }
-            form.Dispose();
         }
 
-        private void SelectDataGridViewRow(int index)
+        private void SelectDataGridViewRow(long index)
         {
-            dgTable.Invoke(new MethodInvoker(() =>
+            decimal maxRecords = Properties.Settings.Default.MaxRows;
+            decimal desiredPage = Math.Ceiling((index + 1) / maxRecords);
+            decimal newIndex = index;
+            while (newIndex >= maxRecords)
             {
+                newIndex -= maxRecords;
+            }
+
+            Invoke(new MethodInvoker(() =>
+            {
+                if (desiredPage != Page)
+                {
+                    NumPage.Value = desiredPage;
+                }
+
                 dgTable.ClearSelection();
-                dgTable.Rows[index].Selected = true;
-                dgTable.FirstDisplayedScrollingRowIndex = index;
+                dgTable.Rows[(int)newIndex].Selected = true;
+                dgTable.FirstDisplayedScrollingRowIndex = (int)newIndex;
             }));
         }
 
         private void suchenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SearchForm form = new SearchForm(sourceTable.HeadersOfDataTableAsString());
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (SearchForm form = new SearchForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
-                ProcSearch proc;
-                if (form.FromToSelected)
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
-                    proc = new ProcSearch(form.SearchText, form.Header, form.From, form.To, form.NewColumn, form.CheckTotal);
+                    ProcSearch proc;
+                    if (form.FromToSelected)
+                    {
+                        proc = new ProcSearch(form.SearchText, form.Header, form.From, form.To, form.NewColumn, form.CheckTotal);
+                    }
+                    else
+                    {
+                        proc = new ProcSearch(form.SearchText, form.Header, form.NewColumn, form.CheckTotal, form.Shortcut);
+                    }
+                    StartSingleWorkflow(proc, delegate { SearchAndSelect(proc.SearchText, proc.Header, form.CheckTotal); });
                 }
-                else
-                {
-                    proc = new ProcSearch(form.SearchText, form.Header, form.NewColumn, form.CheckTotal, form.Shortcut);
-                }
-                StartSingleWorkflow(proc, delegate { SearchAndSelect(proc.SearchText, proc.Header, form.CheckTotal, sourceTable.GetSortedTable(SortingOrder,OrderType)); });
             }
-            form.Dispose();
         }
 
-        private void SearchAndSelect(string searchText, string header, bool totalSearch, IEnumerable<DataRow> table)
+        private void SearchAndSelect(string searchText, string alias, bool totalSearch)
         {
-            int index = 0;
-            Func<string, string, bool> searchMethod;
-            if (totalSearch)
+            long index = DatabaseHelper.SearchValue(searchText, alias, totalSearch, GetSorting(), OrderType, TableName);
+            if (index == -1)
             {
-                searchMethod = searchTotal;
+                MessageHandler.MessagesOK(this, MessageBoxIcon.Warning, $"Der Suchtext \"{searchText}\" konnte nicht gefunden werden");
             }
             else
             {
-                searchMethod = searchPartial;
-            }
-
-            foreach(DataRow row in table)
-            {
-                if(searchMethod.Invoke(row[header].ToString(), searchText))
-                {
-                    SelectDataGridViewRow(index);
-                    break;
-                }
-                index++;
-            }
-
-            bool searchTotal(string value, string search)
-            {
-                return value == search;
-            }
-
-            bool searchPartial(string value, string search)
-            {
-                return value.Contains(search);
+                SelectDataGridViewRow(index);
             }
         }
 
         private void Form1_DragDrop(object sender, DragEventArgs e)
         {
-            importToolStripMenuItem_Click(ImportState.None,(string[])e.Data.GetData(DataFormats.FileDrop));
+            importToolStripMenuItem_Click(ImportState.None, (string[])e.Data.GetData(DataFormats.FileDrop));
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
@@ -1827,10 +1622,12 @@ namespace DataTableConverter
 
         private void aufteilenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SplitFormMain form = new SplitFormMain(sourceTable.HeadersOfDataTable());
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (SplitFormMain form = new SplitFormMain(DatabaseHelper.GetSortedColumnsAsAlias(TableName).ToArray()))
             {
-                StartSingleWorkflow(form.Procedure);
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Procedure);
+                }
             }
         }
 
@@ -1842,7 +1639,7 @@ namespace DataTableConverter
         private void NumPage_ValueChanged(object sender, EventArgs e)
         {
             int page = (int)NumPage.Value;
-            if(page > 0 && page <= MaxPages)
+            if (page > 0 && page <= MaxPages)
             {
                 Page = page;
             }
@@ -1850,66 +1647,44 @@ namespace DataTableConverter
 
         private void zeilenLöschenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            DeleteRows form = new DeleteRows(sourceTable.Rows.Count, sourceTable.HeadersOfDataTableAsString());
-            form.ShowDialog();
-            if (form.DialogResult == DialogResult.OK)
+            using (DeleteRows form = new DeleteRows(RowCount, DatabaseHelper.GetAliasColumnMapping(TableName)))
             {
-                if (form.Range == null)
+                if (form.ShowDialog(this) == DialogResult.OK)
                 {
-                    DeleteRowsMatchingText(form.ColumnText, form.Column, form.EqualsText);
-                }
-                else
-                {
-                    DeleteRows(form.Range);
+                    StartLoadingBar();
+                    if (form.Range == null)
+                    {
+                        DatabaseHelper.DeleteRowByMatch(form.ColumnText, form.ColumnName, form.EqualsText, TableName);
+                    }
+                    else
+                    {
+                        DeleteRows(form.Range);
+                    }
+                    DatabaseHelper.SetSavepoint();
+                    LoadData(false);
+                    StopLoadingBar();
                 }
             }
-        }
-
-        private void DeleteRowsMatchingText(string value, string column, bool equals)
-        {
-            pgbLoading.StartLoadingBar(sourceTable.Rows.Count, this);
-            Thread thread = new Thread(() =>
-            {
-                List<CellMatrix> newHistoryEntry = new List<CellMatrix>();
-                for (int i = sourceTable.Rows.Count - 1; i >= 0; i--)
-                {
-                    DataRow row = sourceTable.Rows[i];
-                    if (equals ? row[column].ToString() == value : row[column].ToString().Contains(value))
-                    {
-                        object[][] oldContent = new object[1][];
-                        oldContent[0] = row.ItemArray.Clone() as object[];
-
-                        newHistoryEntry.Add(new CellMatrix(new History { State = State.DeleteRow, Row = oldContent, RowIndex = i }));
-
-                        row.Delete();
-                    }
-                    pgbLoading.UpdateLoadingBar(this);
-                }
-                StopLoadingBar();
-
-                AddDataSourceAddHistory(newHistoryEntry);
-                sourceTable.AcceptChanges();
-                Invoke(new MethodInvoker(() =>
-                {
-                    ResetPage();
-                    AssignDataSource();
-                }));
-                SetRowCount();
-            });
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
         }
 
         private void sortierenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SortForm form = new SortForm(sourceTable.HeadersOfDataTable(), SortingOrder, OrderType);
-            if(form.ShowDialog(this) == DialogResult.OK)
+            using (SortForm form = new SortForm(DatabaseHelper.GetAliasColumnMapping(TableName), SortingOrder, OrderType))
             {
-                OrderType = form.OrderType;
-                SetSorting(form.SortString);
-                AssignDataSource();
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    OrderType = form.OrderType;
+                    SetSorting(form.SortString);
+                    LoadData(true);
+                }
             }
-            form.Dispose();
+        }
+
+        private void CheckAllowToAddRows()
+        {
+            dgTable.RowsAdded -= dgTable_RowsAdded;
+            dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
+            dgTable.RowsAdded += dgTable_RowsAdded;
         }
     }
 }

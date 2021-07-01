@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace DataTableConverter.Classes
 {
@@ -36,11 +32,11 @@ namespace DataTableConverter.Classes
 
         internal void Next()
         {
-            if(State == RowMergeState.Nothing)
+            if (State == RowMergeState.Nothing)
             {
                 State = RowMergeState.Sum;
             }
-            else if(State == RowMergeState.Sum)
+            else if (State == RowMergeState.Sum)
             {
                 State = RowMergeState.Count;
             }

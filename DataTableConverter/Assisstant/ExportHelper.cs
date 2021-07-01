@@ -1,23 +1,24 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
+using DataTableConverter.Extensions;
+using DataTableConverter.View;
+using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Windows.Forms;
-using DataTableConverter.Extensions;
 using System.Threading;
-using DataTableConverter.View;
+using System.Windows.Forms;
 
 namespace DataTableConverter
 {
+    internal enum SaveFormat { CSV = 0, DBASE = 1, EXCEL = 2};
     class ExportHelper
     {
         [DllImport("gdi32.dll", EntryPoint = "AddFontResourceW", SetLastError = true)]
@@ -25,35 +26,44 @@ namespace DataTableConverter
                                          string lpFileName);
 
         internal static readonly string ProjectName = "Tabellenkonvertierung";
-        internal static string ProjectPath { get
+        internal static string ProjectPath
+        {
+            get
             {
                 return Properties.Settings.Default.SettingPath == string.Empty ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName) : Properties.Settings.Default.SettingPath;
-            } }
-        
-        internal static string ProjectPresets => Path.Combine(ProjectPath,"Vorlagen");
-        internal static string ProjectProcedures => Path.Combine(ProjectPath,"Funktionen.bin");
-        internal static string ProjectTolerance => Path.Combine(ProjectPath,"Toleranzen.bin");
-        internal static string ProjectCases => Path.Combine(ProjectPath,"Fälle.bin");
-        internal static string ProjectWorkflows => Path.Combine(ProjectPath,"Arbeitsabläufe.bin");
+            }
+        }
+
+        internal static string ProjectPresets => Path.Combine(ProjectPath, "Vorlagen");
+        internal static string ProjectProcedures => Path.Combine(ProjectPath, "Funktionen.bin");
+        internal static string ProjectTolerance => Path.Combine(ProjectPath, "Toleranzen.bin");
+        internal static string ProjectCases => Path.Combine(ProjectPath, "Fälle.bin");
+        internal static string ProjectWorkflows => Path.Combine(ProjectPath, "Arbeitsabläufe.bin");
         internal static string WorkflowPath => Path.Combine(ProjectPath, "Arbeitsabläufe");
         internal static string ProcedurePath => Path.Combine(ProjectPath, "Suchen & Ersetzen");
         internal static string ProjectHeaderPresets => Path.Combine(ProjectPath, "Vorlagen Überschriften");
-        private static readonly string CSVSeparator = ";";
-        private static readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
-        internal static readonly int DbaseMaxFileLength = 8;
-        private static readonly int DbaseMaxHeaderLength = 10;
-        private static readonly int DbaseMaxCharacterLength = 254;
-        private static readonly int DbaseMaxRecordCharacterLength = 3999;
-        private static readonly string FontFileName = "seguisym.ttf";
+        private readonly string CSVSeparator = ";";
+        private readonly Encoding DbaseEncoding = Encoding.GetEncoding(850); //858; 850; "ISO-8859-1"; 866
+        internal readonly int DbaseMaxFileLength = 8;
+        private readonly int DbaseMaxHeaderLength = 10;
+        private readonly int DbaseMaxCharacterLength = 254;
+        private readonly int DbaseMaxRecordCharacterLength = 3999;
+        private readonly string FontFileName = "seguisym.ttf";
+        private readonly DatabaseHelper DatabaseHelper;
 
 
-        internal static void CheckRequired()
+        internal ExportHelper(DatabaseHelper databaseHelper)
+        {
+            DatabaseHelper = databaseHelper;
+        }
+
+        internal void CheckRequired()
         {
             CheckFolders();
             CheckFont();
         }
 
-        private static void CheckFolders()
+        private void CheckFolders()
         {
             if (!Directory.Exists(ProjectPath))
             {
@@ -74,7 +84,7 @@ namespace DataTableConverter
             }
         }
 
-        private static void CheckFont()
+        private void CheckFont()
         {
             string fontName = "Segoe UI Symbol";
             float fontSize = 12;
@@ -95,8 +105,8 @@ namespace DataTableConverter
                 }
             }
         }
-        
-        internal static bool SaveProcedures(List<Proc> procedures, Form mainForm)
+
+        internal bool SaveProcedures(List<Proc> procedures, Form mainForm)
         {
             bool error = false;
             List<string> files = new List<string>(GetProcedures());
@@ -129,7 +139,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static string RemoveSpecialCharacters(string text)
+        internal string RemoveSpecialCharacters(string text)
         {
             return text.Replace("?", "？")
                        .Replace(" : ", "：")
@@ -142,7 +152,7 @@ namespace DataTableConverter
                        .Replace("*", "＊");
         }
 
-        internal static bool SaveWorkflows(List<Work> workflows, Form mainForm)
+        internal bool SaveWorkflows(List<Work> workflows, Form mainForm)
         {
             bool error = false;
             List<string> files = new List<string>(GetWorkflows());
@@ -151,7 +161,7 @@ namespace DataTableConverter
                 try
                 {
                     string filename = RemoveSpecialCharacters(work.Name);
-                    string path = Path.Combine(WorkflowPath, filename+".bin");
+                    string path = Path.Combine(WorkflowPath, filename + ".bin");
                     using (Stream stream = File.Open(path, FileMode.Create))
                     {
                         BinaryFormatter bin = new BinaryFormatter();
@@ -167,7 +177,7 @@ namespace DataTableConverter
             }
             if (!error)
             {
-                foreach(string file in files)
+                foreach (string file in files)
                 {
                     File.Delete(file);
                 }
@@ -175,17 +185,17 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static string[] GetWorkflows()
+        internal string[] GetWorkflows()
         {
             return Directory.GetFiles(WorkflowPath, "*.bin");
         }
 
-        internal static string[] GetProcedures()
+        internal string[] GetProcedures()
         {
             return Directory.GetFiles(ProcedurePath, "*.bin");
         }
 
-        internal static bool SaveTextImportTemplate(TextImportTemplate template, string path)
+        internal bool SaveTextImportTemplate(TextImportTemplate template, string path)
         {
             bool error = false;
             try
@@ -203,7 +213,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool SaveTolerances(List<Tolerance> tolerances)
+        internal bool SaveTolerances(List<Tolerance> tolerances)
         {
             bool error = false;
             try
@@ -221,7 +231,7 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static bool SaveCases(List<Case> cases)
+        internal bool SaveCases(List<Case> cases)
         {
             bool error = false;
             try
@@ -239,291 +249,193 @@ namespace DataTableConverter
             return error;
         }
 
-        internal static void ExportCsv(DataTable dt, string directory, string filename, int codePage, Form mainForm, Action updateLoadingBar = null)
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, SaveFormat format, string order, OrderType orderType, Form invokeForm, string tableName, System.Action updateLoadingBar = null, string orderColumnName = null)
         {
-            string path = Path.Combine(directory, filename + ".csv");
-            StreamWriter writer;
-            FileStream fileStream = null;
-            if (codePage == 0)
-            {
-                SelectEncoding form = new SelectEncoding();
-                DialogResult result = DialogResult.Cancel;
-                mainForm.Invoke(new MethodInvoker(() =>
-                {
-                    result = form.ShowDialog(mainForm);
-                }));
-                if(result == DialogResult.OK)
-                {
-                    codePage = form.FileEncoding;
-                }
-            }
-            if (codePage != 0)
-            {
-                fileStream = new FileStream(path, FileMode.Create);
-                writer = new StreamWriter(fileStream, Encoding.GetEncoding(codePage));
-
-                writer.WriteLine(string.Join(CSVSeparator, dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName)));
-                foreach (DataRow row in dt.Rows)
-                {
-                    writer.WriteLine(string.Join(CSVSeparator, row.ItemArray.Select(field => field.ToString())));
-                    updateLoadingBar?.Invoke();
-                }
-                writer.Close();
-                fileStream.Close();
-            }
+            SQLiteCommand command = orderColumnName == string.Empty ? DatabaseHelper.GetDataCommand(tableName, order, orderType) : DatabaseHelper.GetDataCommand(tableName, order, orderType, orderColumnName);
+            return Save(directory, fileName, oldFileExtension, encoding, format, order, orderType, invokeForm, tableName, command, updateLoadingBar);
         }
 
-        internal static string ExportExcel(DataTable dt, string directory, string filename, Form mainForm)
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, SaveFormat format, string order, OrderType orderType, Form invokeForm, string tableName, SQLiteCommand command, System.Action updateLoadingBar = null)
         {
-            string path = null;
-            int rowRange = 10000;
-            int columns = dt.Columns.Count;
-            // Add the +1 to allow room for column headers.
-            int rowCount = dt.Rows.Count;
-            if (rowCount != 0)
+            int rowCount = 0;
+            if (command == null)
             {
+                command = DatabaseHelper.GetDataCommand(tableName, order, orderType);
+            }
+
+            switch (format)
+            {
+                //CSV
+                case SaveFormat.CSV:
+                    rowCount = ExportCsv(directory, fileName, encoding, command, invokeForm, tableName, updateLoadingBar);
+                    break;
+
+                //Dbase
+                case SaveFormat.DBASE:
+                    rowCount = ExportDbase(tableName, directory, fileName, command, invokeForm);
+                    break;
+
+                //Excel
+                case SaveFormat.EXCEL:
+                    rowCount = ExportExcel(directory, fileName, oldFileExtension, command, invokeForm, tableName, updateLoadingBar);
+                    break;
+            }
+            return rowCount;
+        }
+
+        private int ExportDbase(string tableName, string directory, string fileName, SQLiteCommand command, Form invokeForm)
+        {
+            int rowCount = 0;
+            List<string> duplicates = new List<string>();
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                string[] aliases = new string[reader.FieldCount];
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    aliases[i] = reader.GetName(i);
+                }
+                string[] sortedHeaders = aliases.OrderBy(h => h, System.StringComparer.OrdinalIgnoreCase).ToArray();
+                for (int i = 1; i < sortedHeaders.Length; i++)
+                {
+                    string originalHeader = sortedHeaders[i];
+                    string originalHeaderBefore = sortedHeaders[i - 1];
+                    string header = originalHeader.Length > DbaseMaxHeaderLength ? originalHeader.Substring(0, DbaseMaxHeaderLength) : originalHeader;
+                    string headerBefore = originalHeaderBefore.Length > DbaseMaxHeaderLength ? originalHeaderBefore.Substring(0, DbaseMaxHeaderLength) : originalHeaderBefore;
+                    if (header == headerBefore)
+                    {
+                        duplicates.Add($"\"{originalHeaderBefore}\" und \"{originalHeader}\"");
+                    }
+                }
+
+                if (duplicates.Count > 0)
+                {
+                    MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n" + string.Join(" ,\n", duplicates));
+                    return 0;
+                }
+
+
+                if (fileName.Length > DbaseMaxFileLength)
+                {
+                    fileName = fileName.Substring(0, DbaseMaxFileLength);
+                }
+                string tempDirectoryPath = Path.Combine(Path.GetDirectoryName(directory), "temp");
                 try
                 {
-                    string workSheetName = "Tabelle 1";
+                    Directory.CreateDirectory(tempDirectoryPath);
+                }
+                catch (Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex, invokeForm);
+                    return 0;
+                }
+                string fullPathTemp = Path.Combine(tempDirectoryPath, fileName + ".DBF");
+                string fullPathOriginal = Path.Combine(directory, fileName + ".DBF");
 
-                    Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application
+                if (File.Exists(fullPathTemp))
+                {
+                    File.Delete(fullPathTemp);
+                }
+
+                int[] max = DatabaseHelper.GetMaxColumnLength(aliases, tableName);
+                for (int i = 0; i < max.Length; i++)
+                {
+                    if (max[i] > DbaseMaxCharacterLength)
                     {
-                        DisplayAlerts = false,
-                        Visible = false,
-                        ScreenUpdating = false,
-                        SheetsInNewWorkbook = 1
-                    };
-
-                    Microsoft.Office.Interop.Excel.Workbooks workbooks = excel.Workbooks;
-                    Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Type.Missing);
-
-                    Microsoft.Office.Interop.Excel.Sheets worksheets = workbook.Sheets;
-                    Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)worksheets[1];
-
-                    excel.Calculation = Microsoft.Office.Interop.Excel.XlCalculation.xlCalculationManual;
-                    worksheet.Name = workSheetName;
-
-                    InsertHeadersToExcel(dt, worksheet);
-                    InsertRowsSkeleton(worksheet, rowCount, columns);
-
-                    int rowStart = 2;
-                    for (int step = 0; step < rowCount; step += rowRange)
-                    {
-                        int rows = Math.Min(rowRange, rowCount - step);
-                        object[,] data = new object[rows, columns];
-                        for (int srcRow = step, dstRow = 0; dstRow < rows; srcRow++, dstRow++)
-                        {
-                            for (int column = 0; column < columns; column++)
-                            {
-                                data[dstRow, column] = dt.Rows[srcRow][column];
-                            }
-                        }
-                        InsertRowsToExcel(worksheet, data, rowStart, rows - 1, columns);
-                        rowStart += rows;
+                        max[i] = DbaseMaxCharacterLength;
                     }
+                }
 
-                    string saveName = Path.GetFileNameWithoutExtension(filename) + ".xls";
-                    Microsoft.Office.Interop.Excel.XlFileFormat fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal;
-                    if (Path.GetExtension(filename) != ".xls")
-                    {
-                        saveName += "x";
-                        fileFormat = Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook;
-                    }
-                    path = Path.Combine(directory, saveName);
+                if (max.Sum() <= DbaseMaxRecordCharacterLength)
+                {
+                    string query = string.Empty;
                     try
                     {
-                        workbook.SaveAs(Path.Combine(directory, saveName), fileFormat, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                        CreateTable(aliases, max, tempDirectoryPath, fileName, ref query);
+                        if (File.Exists(fullPathTemp))
+                        {
+                            #region Adjust Header. Update number of records
+                            using (FileStream stream = new FileStream(fullPathTemp, FileMode.OpenOrCreate))
+                            {
+                                byte[] bytes = new byte[1] { 0x1A };
+                                stream.Position = stream.Length - 1;
+
+                                if (stream.ReadByte() == bytes[0])
+                                {
+                                    stream.Position--;
+                                }
+
+
+                                for (; reader.Read(); rowCount++)
+                                {
+                                    StringBuilder builder = new StringBuilder(" ");
+                                    for (int i = 0; i < aliases.Length; i++)
+                                    {
+                                        string temp = reader.GetValue(i).ToString();
+                                        builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[i]));
+                                    }
+                                    stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
+                                }
+
+                                stream.Write(bytes, 0, bytes.Length);
+
+                                byte[] records = BitConverter.GetBytes(rowCount);
+                                stream.Position = 4;
+                                stream.Write(records, 0, records.Length);
+                                #endregion
+                            }
+                            if (File.Exists(fullPathOriginal))
+                            {
+                                File.Delete(fullPathOriginal);
+                            }
+                            try
+                            {
+                                File.Move(fullPathTemp, fullPathOriginal);
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
+                            }
+                        }
+                        else
+                        {
+                            MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Error, $"Die Datei {fullPathTemp} konnte nicht erstellt werden.\nDieses Problem ist höchstwahrscheinlich aufgrund eines Anti-Virenprogrammes aufgetreten.");
+                        }
+
                     }
                     catch (Exception ex)
                     {
-                        mainForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gespeichert werden! Wird die Datei gerade verwendet?");
-                        ErrorHelper.LogMessage(ex, mainForm, false);
+                        ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {tempDirectoryPath}; fileName: {fileName}; headers:[{string.Join("; ", aliases)}]", invokeForm);
+                        return 0;
                     }
-                    workbook.Close(false, Type.Missing, Type.Missing);
-                    excel.Quit();
-
-                    // Release our resources.
-                    Marshal.ReleaseComObject(workbook);
-                    Marshal.ReleaseComObject(workbooks);
-                    Marshal.ReleaseComObject(excel);
-                    Marshal.FinalReleaseComObject(excel);
                 }
-                catch (Exception ex)
+                else
                 {
-                    ErrorHelper.LogMessage(ex, mainForm);
+                    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
+                    rowCount = 0;
+                }
+                if (Directory.Exists(tempDirectoryPath))
+                {
+                    DeleteDirectory(tempDirectoryPath, invokeForm);
+                }
+                else
+                {
+                    invokeForm.MessagesOK(MessageBoxIcon.Warning, $"Der temporär angelegte Ordner kann nicht wieder gelöscht werden, da er nicht gefunden werden kann");
                 }
             }
-            return path;
+            return rowCount;
         }
 
-        private static Microsoft.Office.Interop.Excel.ListObject InsertHeadersToExcel(DataTable table, Microsoft.Office.Interop.Excel.Worksheet worksheet)
-        {
-            // Insert column headers.
-            object[,] data = new object[1, table.Columns.Count];
-            for (int column = 0; column < table.Columns.Count; column++)
-            {
-                data[0, column] = table.Columns[column].ColumnName;
-            }
-
-            Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, 1];
-            Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, table.Columns.Count];
-            Microsoft.Office.Interop.Excel.Range sheetData = worksheet.Range[beginWrite, endWrite];
-            sheetData.NumberFormat = "@";
-            sheetData.Value2 = data;
-
-            worksheet.Select();
-            return sheetData.Worksheet.ListObjects.Add(Microsoft.Office.Interop.Excel.XlListObjectSourceType.xlSrcRange,
-                                                   sheetData,
-                                                   System.Type.Missing,
-                                                   Microsoft.Office.Interop.Excel.XlYesNoGuess.xlYes,
-                                                   System.Type.Missing);
-        }
-
-        private static void InsertRowsToExcel( Microsoft.Office.Interop.Excel.Worksheet worksheet, object[,] data, int rowStart, int rowCount, int columnCount)
-        {
-            Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowStart, 1];
-            Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowStart + rowCount, columnCount];
-            Microsoft.Office.Interop.Excel.Range range = worksheet.Range[beginWrite, endWrite];
-            range.NumberFormat = "@";
-            range.Value2 = data;
-        }
-
-        private static void InsertRowsSkeleton(Microsoft.Office.Interop.Excel.Worksheet worksheet, int rowCount, int columnCount)
-        {
-            Microsoft.Office.Interop.Excel.Range beginWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[2, 1];
-            Microsoft.Office.Interop.Excel.Range endWrite = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[rowCount, columnCount];
-            Microsoft.Office.Interop.Excel.Range addNewRows = worksheet.Range[beginWrite, endWrite];
-            addNewRows.Insert(Microsoft.Office.Interop.Excel.XlInsertShiftDirection.xlShiftDown, Microsoft.Office.Interop.Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove);
-        }
-
-        internal static bool ExportDbase(string originalFileName, DataTable dataTable, string originalPath, Form mainForm, Action updateLoadingBar = null)
-        {
-            bool saved = false;
-
-            List<string> duplicates = new List<string>();
-            string[] headers = dataTable.HeadersOfDataTableAsString().OrderBy(header => header).ToArray();
-            for (int i = 1; i < headers.Length; i++)
-            {
-                string header = headers[i].Length > DbaseMaxHeaderLength ? headers[i].Substring(0, DbaseMaxHeaderLength) : headers[i];
-                string headerBefore = headers[i-1].Length > DbaseMaxHeaderLength ? headers[i-1].Substring(0, DbaseMaxHeaderLength) : headers[i-1];
-                if (header == headerBefore)
-                {
-                    duplicates.Add($"\"{headers[i-1]}\" und \"{headers[i]}\"");
-                }
-            }
-
-            if(duplicates.Count > 0)
-            {
-                MessageHandler.MessagesOK(mainForm, MessageBoxIcon.Warning, "Aufgrund der Kürzung von Spaltennamen durch DBASE gibt es Duplikate: \n"+string.Join(" ,\n",duplicates));
-                return saved;
-            }
-            
-            string fileName = originalFileName.ToUpper();
-            if (fileName.Length > DbaseMaxFileLength)
-            {
-                fileName = fileName.Substring(0, DbaseMaxFileLength);
-            }
-            string path = Path.Combine(originalPath, "temp");
-            try
-            {
-                Directory.CreateDirectory(path);
-            }
-            catch (Exception ex)
-            {
-                ErrorHelper.LogMessage(ex, mainForm);
-                return saved;
-            }
-            string fullpath = Path.Combine(path,fileName+".DBF");
-            string fullPathOriginal = Path.Combine(originalPath, originalFileName + ".DBF");
-
-            if (File.Exists(fullpath))
-            {
-                File.Delete(fullpath);
-            }
-
-
-            int[] max = MaxLengthOfColumns(dataTable);
-            if (max.Sum() <= DbaseMaxRecordCharacterLength)
-            {
-                string query = string.Empty;
-                try
-                {
-                    CreateTable(dataTable, max, path, fileName, ref query);
-                }
-                catch (Exception ex)
-                {
-                    DeleteDirectory(path);
-                    ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {path}; fileName: {fileName}; headers:[{string.Join("; ", dataTable.HeadersOfDataTableAsString())}]", mainForm);
-                    return saved;
-                }
-
-                try
-                {
-                    #region Adjust Header. Update number of records
-
-                    FileStream stream = new FileStream(fullpath, FileMode.Open);
-                    byte[] records = BitConverter.GetBytes(dataTable.Rows.Count);
-                    byte[] bytes = new byte[1] { 0x1A };
-
-                    stream.Position = 4;
-                    stream.Write(records, 0, records.Length);
-
-                    stream.Position = stream.Length - 1;
-
-                    if (stream.ReadByte() == bytes[0])
-                    {
-                        stream.Position--;
-                    }
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        StringBuilder builder = new StringBuilder();
-                        builder.Append(" ");
-                        for (int y = 0; y < dataTable.Columns.Count; y++)
-                        {
-                            string temp = y >= row.ItemArray.Length ? string.Empty : row[y].ToString();
-                            builder.Append(temp.Length > DbaseMaxCharacterLength ? temp.Substring(0, DbaseMaxCharacterLength) : temp.PadRight(max[y]));
-                        }
-                        stream.Write(DbaseEncoding.GetBytes(builder.ToString()), 0, builder.Length);
-                        updateLoadingBar?.Invoke();
-                    }
-
-                    stream.Write(bytes, 0, bytes.Length);
-                    stream.Close();
-                    if (File.Exists(fullPathOriginal))
-                    {
-                        File.Delete(fullPathOriginal);
-                    }
-                    File.Move(fullpath, fullPathOriginal);
-                    saved = true;
-                    #endregion
-                }
-                catch (Exception ex)
-                {
-                    ErrorHelper.LogMessage(ex, mainForm);
-                }
-                finally
-                {
-                    DeleteDirectory(path);
-                }
-            }
-            else
-            {
-                DeleteDirectory(path);
-                mainForm.MessagesOK(MessageBoxIcon.Warning, $"Die maximal unterstützte Zeilenlänge von {DbaseMaxRecordCharacterLength + 1:n0} Zeichen wurde überschritten!\nDie Datei kann nicht erstellt werden");
-            }
-            return saved;
-        }
 
         /// <summary>
         /// Depth-first recursive delete, with handling for descendant 
         /// directories open in Windows Explorer.
         /// </summary>
-        private static void DeleteDirectory(string path)
+        private void DeleteDirectory(string path, Form mainForm)
         {
+
             foreach (string directory in Directory.GetDirectories(path))
             {
-                DeleteDirectory(directory);
+                DeleteDirectory(directory, mainForm);
             }
 
             try
@@ -538,183 +450,352 @@ namespace DataTableConverter
             {
                 Directory.Delete(path, true);
             }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage(ex, mainForm, true);
+            }
         }
 
-        private static void CreateTable(DataTable table, int[] max, string path, string filename, ref string query)
+        private void CreateTable(string[] columns, int[] max, string path, string filename, ref string query)
         {
-            query = CreateQuery(table, filename, max);
-            
-            OleDbConnection con = new OleDbConnection(GetConnection(path));
-            OleDbCommand cmd = new OleDbCommand(query, con);
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
-            cmd.Dispose();
+            using (OleDbConnection con = new OleDbConnection(GetConnection(path)))
+            {
+                con.Open();
+                using (OleDbCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = CreateQuery(columns, filename, max);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
-        private static string CreateQuery(DataTable table, string filename, int[] max)
+        private string CreateQuery(string[] columns, string filename, int[] max)
         {
             StringBuilder csb = new StringBuilder($"create table [{filename}] (");
-            for (int i = 0; i < table.Columns.Count; i++)
+            for (int i = 0; i < columns.Length; i++)
             {
-                csb.Append($"[{table.Columns[i].ColumnName}] varchar({max[i]}),");
+                csb.Append($"[{columns[i]}] varchar({max[i]}),");
             }
 
             csb[csb.Length - 1] = ')';
             return csb.ToString();
         }
 
-        private static int[] MaxLengthOfColumns(DataTable dataTable)
-        {
-            int[] max = new int[dataTable.Columns.Count];
-            for(int i = 0; i < max.Length; i++)
-            {
-                max[i] = 1;
-            }
-            foreach (DataRow row in dataTable.Rows)
-            {
-                for (int i = 0; i < row.ItemArray.Length; i++)
-                {
-                    int length = row.ItemArray[i].ToString().Length;
-                    if (length > max[i])
-                    {
-                        max[i] = length;
-                    }
-                }
-            }
-            for (int i = 0; i < max.Length; i++)
-            {
-                if (max[i] > DbaseMaxCharacterLength)
-                {
-                    max[i] = DbaseMaxCharacterLength;
-                }
-            }
-            return max;
-        }
-
-        private static string GetConnection(string path)
+        private string GetConnection(string path)
         {
             return $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={path};Extended Properties=dBase IV";
         }
 
-        internal static void ExportTableWithColumnCondition(DataTable originalTable, IEnumerable<ExportCustomItem> items, string filePath, Action stopLoadingBar, Action saveFinished, int codePage, Form mainForm, string continuedNumberColumn)
+        internal int ExportCsv(string directory, string fileName, int encoding, SQLiteCommand command, Form invokeForm, string tableName, System.Action updateLoadingBar = null)
         {
-            new Thread(() =>
+            int rowCount = 0;
+            string path = Path.Combine(directory, fileName + ".csv");
+
+            if (encoding == 0)
             {
-
-                foreach (ExportCustomItem item in items)
+                SelectEncoding form = new SelectEncoding();
+                DialogResult result = DialogResult.Cancel;
+                invokeForm.Invoke(new MethodInvoker(() =>
                 {
-                    Dictionary<string, DataTable> Dict = new Dictionary<string, DataTable>();
-                    DataTable tableSkeleton = originalTable.Clone();
-                    if (item.CheckedAllValues)
+                    result = form.ShowDialog(invokeForm);
+                }));
+                if (result == DialogResult.OK)
+                {
+                    encoding = form.FileEncoding;
+                }
+            }
+            if (encoding != 0)
+            {
+                using (FileStream fileStream = new FileStream(path, FileMode.Create))
+                {
+                    using (StreamWriter writer = new StreamWriter(fileStream, Encoding.GetEncoding(encoding)))
                     {
-                        foreach (string value in item.AllValues)
+                        using (SQLiteDataReader reader = command.ExecuteReader())
                         {
-                            DataTable table = tableSkeleton.Copy();
-                            table.TableName = $"{item.Name}_{value}";
-                            Dict.Add(value, table);
-                        }
-                    }
-                    else
-                    {
-
-                        DataTable temp = tableSkeleton.Copy();
-                        temp.TableName = item.Name;
-                        foreach (string value in item.SelectedValues)
-                        {
-                            if (!Dict.TryGetValue(value, out DataTable tables))
-                            {   
-                                Dict.Add(value, temp);
-                            }
-                        }
-                    }
-                    foreach(DataRow row in originalTable.Rows)
-                    {
-                        if (Dict.TryGetValue(row[item.Column].ToString(), out DataTable table))
-                        {
-                            table.ImportRow(row);
-                        }
-                    }
-
-                    foreach (DataTable table in Dict.Values.Distinct())
-                    {
-                        if(continuedNumberColumn != string.Empty)
-                        {
-                            string col = table.TryAddColumn(continuedNumberColumn);
-                            table.Columns[col].SetOrdinal(0);
-                            for(int i = 0; i < table.Rows.Count; i++)
+                            if (reader.HasRows)
                             {
-                                table.Rows[i][col] = (i + 1).ToString();
+                                for (var i = 0; i < reader.FieldCount - 1; i++)
+                                {
+                                    writer.Write(reader.GetName(i));
+                                    writer.Write(CSVSeparator);
+                                }
+                                writer.Write(reader.GetName(reader.FieldCount - 1));
+                                writer.Write(writer.NewLine);
+
+                                for (; reader.Read(); rowCount++)
+                                {
+
+                                    for (int i = 0; i < reader.FieldCount - 1; i++)
+                                    {
+                                        writer.Write(reader.GetValue(i).ToString());
+                                        writer.Write(CSVSeparator);
+                                    }
+                                    writer.Write(reader.GetValue(reader.FieldCount - 1).ToString());
+                                    writer.Write(writer.NewLine);
+                                    updateLoadingBar?.Invoke();
+                                }
                             }
-                        }
-                        string FileName = table.TableName;
-                        string path = Path.GetDirectoryName(filePath);
-                        switch (item.Format)
-                        {
-                            //CSV
-                            case 0:
-                                {
-                                    ExportCsv(table, path, FileName, codePage, mainForm);
-                                }
-                                break;
-
-                            //Dbase
-                            case 1:
-                                {
-                                    ExportDbase(FileName, table, path, mainForm);
-                                }
-                                break;
-
-                            //Excel
-                            case 2:
-                                {
-                                    ExportExcel(table, path, FileName, mainForm);
-                                }
-                                break;
                         }
                     }
                 }
-                stopLoadingBar.Invoke();
-                saveFinished.Invoke();
-            }).Start();
-            
+            }
+            return rowCount;
         }
 
-        internal static DataTable ExportCount(string selectedValue, int count, bool showFromTo, DataTable oldTable, OrderType orderType)
+        private int ExportExcel(string directory, string fileName, string oldFileExtension, SQLiteCommand command, Form invokeForm, string tableName, System.Action updateLoadingBar)
         {
-            DataTable table = oldTable.GetSortedView($"[{selectedValue}] asc", orderType, -1).ToTable();
-            int columnIndex = table.Columns.IndexOf(selectedValue);
-            DataTable newTable = new DataTable();
+            int rowCount = 0;
+            Workbooks workbooks = null;
+            Workbook workbook = null;
+            Microsoft.Office.Interop.Excel.Application excel = null;
+            try
+            {
+                string workSheetName = "Tabelle 1";
+
+                excel = new Microsoft.Office.Interop.Excel.Application
+                {
+                    DisplayAlerts = false,
+                    Visible = false,
+                    ScreenUpdating = false,
+                    SheetsInNewWorkbook = 1
+                };
+
+                workbooks = excel.Workbooks;
+                workbook = workbooks.Add(Type.Missing);
+
+                Sheets worksheets = workbook.Sheets;
+                Worksheet worksheet = (Worksheet)worksheets[1];
+
+                excel.Calculation = XlCalculation.xlCalculationManual;
+                worksheet.Name = workSheetName;
+
+                int maxRows = DatabaseHelper.GetRowCount(tableName);
+                
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) //write header
+                    {
+                        string[] aliases = new string[reader.FieldCount];
+                        int maxRowsPerExecution = ImportHelper.MaxCellsPerIteration / reader.FieldCount; // about 50000 cells per iteration
+                        for (var i = 0; i < reader.FieldCount; i++)
+                        {
+                            aliases[i] = reader.GetName(i);
+                        }
+                        InsertHeadersToExcel(aliases, worksheet);
+                        InsertRowsSkeleton(worksheet, maxRows, aliases.Length);
+                        int rowStart = 2; //+2 because index starts at 1 and header is first
+                        while (reader.HasRows)
+                        {
+                            int max = rowCount + maxRowsPerExecution > maxRows ? maxRows - rowCount : maxRowsPerExecution;
+                            int newRows;
+                            object[,] data = new object[max, aliases.Length];
+                            for (newRows = 0; newRows < maxRowsPerExecution && reader.Read(); rowCount++, newRows++)
+                            {
+                                object[] row = new object[aliases.Length];
+                                for (int y = 0; y < aliases.Length; y++)
+                                {
+                                    data[newRows, y] = reader.GetValue(y).ToString();
+                                }
+                                updateLoadingBar?.Invoke();
+                            }
+
+                            try
+                            {
+                                InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, aliases.Length);
+                            }
+                            catch(Exception ex)
+                            {
+                                ErrorHelper.LogMessage($"Error while inserting rows to Excel{Environment.NewLine}rowStart: {rowStart}; count: {newRows - 1}; columnCount: {aliases.Length}; maxRows: {maxRows}; max: {max}", invokeForm, false);
+                                throw ex;
+                            }
+                            rowStart += newRows;
+                        }
+                    }
+                }
+
+                SaveExcelFile(directory, fileName, oldFileExtension, workbook, invokeForm);
+            }
+            catch (Exception ex)
+            {
+                ErrorHelper.LogMessage(ex, invokeForm);
+                rowCount = 0;
+            }
+            finally
+            {
+                workbook?.Close(false, Type.Missing, Type.Missing);
+                excel?.Quit();
+
+                // Release our resources.
+                if (workbook != null) Marshal.ReleaseComObject(workbook);
+                if (workbooks != null) Marshal.ReleaseComObject(workbooks);
+                if (excel != null)
+                {
+                    Marshal.ReleaseComObject(excel);
+                    Marshal.FinalReleaseComObject(excel);
+                }
+            }
+
+            return rowCount;
+        }
+
+        private void SaveExcelFile(string directory, string fileName, string oldFileExtension, Workbook workbook, Form invokeForm)
+        {
+            string saveName = fileName + ".xls";
+            XlFileFormat fileFormat = XlFileFormat.xlWorkbookNormal;
+            if (oldFileExtension != ".xls")
+            {
+                saveName += "x";
+                fileFormat = XlFileFormat.xlOpenXMLWorkbook;
+            }
+            string path = Path.Combine(directory, saveName);
+            try
+            {
+                workbook.SaveAs(path, fileFormat, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+            }
+            catch (Exception ex)
+            {
+                invokeForm.MessagesOK(MessageBoxIcon.Warning, "Die Datei konnte nicht gespeichert werden! Wird die Datei gerade verwendet?");
+                ErrorHelper.LogMessage(ex, invokeForm, false);
+            }
+        }
+
+        private ListObject InsertHeadersToExcel(string[] columns, Worksheet worksheet)
+        {
+            // Insert column headers.
+            object[,] data = new object[1, columns.Length];
+            for (int column = 0; column < columns.Length; column++)
+            {
+                data[0, column] = columns[column];
+            }
+
+            Range beginWrite = (Range)worksheet.Cells[1, 1];
+            Range endWrite = (Range)worksheet.Cells[1, columns.Length];
+            Range sheetData = worksheet.Range[beginWrite, endWrite];
+            sheetData.NumberFormat = "@";
+            sheetData.Value2 = data;
+
+            worksheet.Select();
+            return sheetData.Worksheet.ListObjects.Add(XlListObjectSourceType.xlSrcRange,
+                                                   sheetData,
+                                                   Type.Missing,
+                                                   XlYesNoGuess.xlYes,
+                                                   Type.Missing);
+        }
+
+        private void InsertRowsToExcel(Worksheet worksheet, object[,] data, int rowStart, int rowCount, int columnCount)
+        {
+            Range beginWrite = (Range)worksheet.Cells[rowStart, 1];
+            Range endWrite = (Range)worksheet.Cells[rowStart + rowCount, columnCount];
+            Range range = worksheet.Range[beginWrite, endWrite];
+            range.NumberFormat = "@";
+            range.Value2 = data;
+        }
+
+        private void InsertRowsSkeleton(Worksheet worksheet, int rowCount, int columnCount)
+        {
+            Range beginWrite = (Range)worksheet.Cells[2, 1];
+            Range endWrite = (Range)worksheet.Cells[rowCount + 2, columnCount];
+            Range addNewRows = worksheet.Range[beginWrite, endWrite];
+            addNewRows.Insert(XlInsertShiftDirection.xlShiftDown, XlInsertFormatOrigin.xlFormatFromLeftOrAbove);
+        }
+
+
+        /// <summary>
+        /// Split table depending on row values. Each row with a specific value goes into another table
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="filePath"></param>
+        /// <param name="stopLoadingBar"></param>
+        /// <param name="saveFinished"></param>
+        /// <param name="codePage"></param>
+        /// <param name="mainForm"></param>
+        /// <param name="continuedNumberColumn"></param>
+        /// <param name="tableName"></param>
+        internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName, Action<string> setStatus)
+        {
+            foreach (ExportCustomItem item in items)
+            {
+                Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
+                string fileExtension = GetFileExtension(item.Format);
+
+                if (item.CheckedAllValues)
+                {
+                    foreach (string value in item.AllValues)
+                    {
+                        setStatus($"Die Datei {item.Name}_{value}.{fileExtension} wird vorbereitet");
+                        string newTable = Guid.NewGuid().ToString();
+                        DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
+                        dict.Add(value, new string[] { newTable, $"{item.Name}_{value}" });
+                    }
+                }
+                else
+                {
+                    string newTable = Guid.NewGuid().ToString();
+                    DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray(), newTable);
+                    foreach (string value in item.SelectedValues)
+                    {
+                        setStatus($"Die Datei {item.Name}.{fileExtension} wird vorbereitet");
+                        if (!dict.ContainsKey(value))
+                        {
+                            dict.Add(value, new string[] { newTable, item.Name });
+                        }
+                    }
+                }
+
+                setStatus($"Die Datei wird vorbereitet");
+                DatabaseHelper.SplitTableOnRowValue(dict, item.Column, tableName);
+
+                foreach (string[] tableInfo in dict.Values.Distinct())
+                {
+                    string newTable = tableInfo[0];
+                    string fileName = tableInfo[1];
+                    setStatus($"Die Datei {fileName}.{fileExtension} wird gespeichert");
+                    Save(Path.GetDirectoryName(filePath), fileName, Path.GetExtension(filePath), codePage, (SaveFormat)item.Format, order, orderType, mainForm, newTable, null, continuedNumberColumn);
+                    DatabaseHelper.Delete(newTable);
+                }
+            }
+        }
+
+        private string GetFileExtension(int format)
+        {
+            string result;
+            switch(format)
+            {
+                case 0:
+                    result = "csv";
+                    break;
+                case 1:
+                    result = "DBASE";
+                    break;
+                default:
+                    result = "xlsx";
+                    break;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Export either group and count of column or {count} rows per distinct value in column
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="count"></param>
+        /// <param name="showFromTo"></param>
+        /// <param name="tableName"></param>
+        /// <param name="orderType"></param>
+        /// <returns></returns>
+        internal string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName)
+        {
+            string newTable = Guid.NewGuid().ToString();
 
             if (count == 0)
             {
-                Dictionary<string, int> pair = table.GroupCountOfColumn(columnIndex);
-
-                newTable = DataHelper.DictionaryToDataTable(pair, selectedValue, showFromTo);
-                newTable.Rows.Add(new string[] { "Gesamt", table.Rows.Count.ToString() });
+                Dictionary<string, long> pair = DatabaseHelper.GroupCountOfColumn(columnName, tableName);
+                DatabaseHelper.DictionaryToTable(pair, columnName, showFromTo, newTable, DatabaseHelper.GetRowCount(tableName));
             }
             else
             {
-                Dictionary<string, int> pair = new Dictionary<string, int>();
-                foreach (string col in table.HeadersOfDataTable())
-                {
-                    newTable.Columns.Add(col);
-                }
-                foreach (DataRow row in table.Rows)
-                {
-                    string item = row[columnIndex].ToString();
-                    bool contains;
-                    if ((contains = pair.ContainsKey(item)) && pair[item] < count)
-                    {
-                        newTable.Rows.Add(row.ItemArray);
-                        pair[item] = pair[item] + 1;
-                    }
-                    else if (!contains)
-                    {
-                        pair.Add(item, 1);
-                        newTable.Rows.Add(row.ItemArray);
-                    }
-                }
+                DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName), newTable);
+                DatabaseHelper.InsertDataPerColumnValue(columnName, orderType, count, tableName, newTable);
             }
             return newTable;
         }

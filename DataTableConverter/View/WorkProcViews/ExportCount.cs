@@ -1,11 +1,6 @@
-﻿using System;
+﻿using DataTableConverter.Assisstant;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -15,25 +10,29 @@ namespace DataTableConverter.View
         internal bool CountChecked => cbCount.Checked;
         internal int Count => (int)nbCount.Value;
         internal bool ShowFromTo => cbShowFromTo.Checked;
-        internal DataTable Table;
+        internal string Table;
+        private readonly DatabaseHelper DatabaseHelper;
 
-        public ExportCount(object[] headers, DataTable table)
+        internal ExportCount(Dictionary<string, string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName)
         {
             InitializeComponent();
-            Table = table;
-            SetHeaders(headers);
+            DatabaseHelper = databaseHelper;
+            Table = tableName;
+            SetHeaders(aliasColumnMapping);
             cbShowFromTo.Checked = Properties.Settings.Default.CountFromTo;
             SetCheckedType();
         }
 
-        private void SetHeaders(object[] headers)
+        private void SetHeaders(Dictionary<string, string> aliasColumnMapping)
         {
             ComboBox[] comboBoxes = new ComboBox[] { cmbColumn, CmbSecondFirstColumn, cmbSecondSecondColumn };
             CmbSecondFirstColumn.SelectedIndexChanged -= CmbSecondFirstColumn_SelectedIndexChanged;
             cmbSecondSecondColumn.SelectedIndexChanged -= CmbSecondFirstColumn_SelectedIndexChanged;
             foreach (ComboBox comboBox in comboBoxes)
             {
-                comboBox.Items.AddRange(headers);
+                comboBox.DataSource = new BindingSource(aliasColumnMapping, null);
+                comboBox.DisplayMember = "key";
+                comboBox.ValueMember = "value";
                 comboBox.SelectedIndex = 0;
             }
 
@@ -46,12 +45,11 @@ namespace DataTableConverter.View
         {
             RbOneColumn.Checked = Properties.Settings.Default.CountSelectedType == 0;
             RbTwoColumns.Checked = !RbOneColumn.Checked;
-            //RbColumn_CheckedChanged(null, null);
         }
 
         internal string getSelectedValue()
         {
-            return cmbColumn.SelectedItem.ToString();
+            return cmbColumn.SelectedValue.ToString();
         }
 
         internal int getColumnIndex()
@@ -79,7 +77,7 @@ namespace DataTableConverter.View
 
         private void CmbSecondFirstColumn_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LblCount.Text = Table.AsEnumerable().Count(row => row[CmbSecondFirstColumn.SelectedItem.ToString()].ToString() == row[cmbSecondSecondColumn.SelectedItem.ToString()].ToString()).ToString();
+            LblCount.Text = DatabaseHelper.CompareColumnsCount(CmbSecondFirstColumn.SelectedValue.ToString(), cmbSecondSecondColumn.SelectedValue.ToString(), Table).ToString();
         }
     }
 }

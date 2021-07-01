@@ -1,10 +1,7 @@
 ﻿using DataTableConverter.Classes;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
@@ -25,7 +22,7 @@ namespace DataTableConverter.View.CustomControls
                 Size glyphSize = CheckBoxRenderer.GetGlyphSize(e.Graphics, state);
 
                 int checkPad = (e.Bounds.Height - glyphSize.Height) / 2;
-                
+
 
                 if (Items[e.Index] is CountListboxItem item)
                 {

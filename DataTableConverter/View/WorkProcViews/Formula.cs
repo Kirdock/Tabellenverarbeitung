@@ -1,60 +1,27 @@
-﻿using CheckComboBoxTest;
-using DataTableConverter.Classes;
+﻿using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
 {
     public partial class Formula : Form
     {
-        private FormulaState Type;
         internal bool OldColumn => cbOldColumn.Checked;
 
-        internal Formula(FormulaState type, object[] headers)
+        internal Formula(IEnumerable<string> aliases)
         {
             InitializeComponent();
-            Type = type;
-            AdjustForm();
-            
-            cbHeaders.Items.AddRange(headers);
-            if (Type == FormulaState.Export)
-            {
-                LoadSetting();
-            }
-        }
+            SetNewColumnVisibility();
 
-        private void LoadSetting()
-        {
-            if (Properties.Settings.Default.ExportSpec != null)
-            {
-
-                foreach (string header in Properties.Settings.Default.ExportSpec)
-                {
-                    int index = cbHeaders.Items.IndexOf(header);
-                    if (index != -1)
-                    {
-                        cbHeaders.SetItemChecked(index, true);
-                    }
-                }
-            }
+            cbHeaders.Items.AddRange(aliases.ToArray());
         }
 
         internal string[] SelectedHeaders()
         {
             return ViewHelper.GetSelectedHeaders(cbHeaders);
-        }
-
-        private void AdjustForm()
-        {
-            cbNewColumn.Visible = cbOldColumn.Visible = Type == FormulaState.Procedure;
-            SetNewColumnVisibility();
         }
 
         private void SetNewColumnVisibility()
@@ -70,7 +37,7 @@ namespace DataTableConverter.View
 
         private void txtFormula_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
             {
                 CloseForm();
             }
@@ -94,13 +61,13 @@ namespace DataTableConverter.View
 
         private bool IsDuplicate(string text)
         {
-            return cbHeaders.Items.Contains(text);
+            return cbHeaders.Items.Cast<string>().Contains(text, StringComparer.OrdinalIgnoreCase);
         }
 
         private void cbNewColumn_CheckedChanged(object sender, EventArgs e)
         {
             SetNewColumnVisibility();
-            cbOldColumn.Visible = !cbNewColumn.Checked && Type == FormulaState.Procedure;
+            cbOldColumn.Visible = !cbNewColumn.Checked;
             if (!cbNewColumn.Checked)
             {
                 txtHeader.Text = string.Empty;

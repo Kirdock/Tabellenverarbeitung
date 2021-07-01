@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
@@ -17,15 +14,16 @@ namespace DataTableConverter.Assisstant
         private readonly static string Repository = "https://github.com/Kirdock/Tabellenverarbeitung/releases";
         private readonly static string Tags = $"{Repository}/latest";
         private readonly static string FileNameWithoutExtension = "Anwendung";
-        private readonly static string FileName = FileNameWithoutExtension+".zip";
-        private readonly static string Download = Repository+"/download/{0}/"+FileName;
-        
+        private readonly static string FileName = FileNameWithoutExtension + ".zip";
+        private readonly static string Download = Repository + "/download/{0}/" + FileName;
+
         internal static void CheckUpdate(bool prompt, ProgressBar progressBar, Form mainForm)
         {
             if (!prompt || !Properties.Settings.Default.UpdateDialogShowed)
             {
                 new Thread(() =>
                 {
+                    Thread.CurrentThread.IsBackground = true;
                     try
                     {
                         WebRequest request = WebRequest.Create(Tags);
@@ -35,7 +33,7 @@ namespace DataTableConverter.Assisstant
                         System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                         FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
-                        if (char.GetNumericValue(version.FirstOrDefault()) < 1 && version != fvi.FileVersion.Substring(0, version.Length))
+                        if (version.FirstOrDefault() == '1' && version != fvi.FileVersion.Substring(0, version.Length))
                         {
                             if (prompt)
                             {
@@ -66,7 +64,7 @@ namespace DataTableConverter.Assisstant
                         ErrorHelper.LogMessage("Update nicht möglich! Besteht eine Internetverbindung?", mainForm);
                     }
                 }).Start();
-            
+
             }
         }
 
@@ -84,7 +82,7 @@ namespace DataTableConverter.Assisstant
             }));
             using (var client = new WebClient())
             {
-                client.DownloadFile(string.Format(Download,version), FileName);
+                client.DownloadFile(string.Format(Download, version), FileName);
 
                 string path = GetCurrentDirectory();
                 string zipPath = Path.Combine(path, FileName);
@@ -122,7 +120,7 @@ namespace DataTableConverter.Assisstant
                 {
                     RestartApp();
                 }
-                
+
             }
         }
 
@@ -142,7 +140,7 @@ namespace DataTableConverter.Assisstant
             writer.WriteLine($"start \"\" \"{Path.Combine(directory, AppDomain.CurrentDomain.FriendlyName)}\"");
             writer.WriteLine($"rmdir \"{ZipFolder}\"");
             writer.WriteLine($"del /Q \"{BatchPath}\"");
-            
+
             writer.Close();
             Process process = new Process();
             process.StartInfo.FileName = BatchPath;

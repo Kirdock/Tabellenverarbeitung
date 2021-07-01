@@ -1,10 +1,5 @@
-﻿using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -19,7 +14,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool TotalSearch;
         public string Shortcut;
 
-        public ProcSearch(int ordinal, int id, string name) : base(ordinal, id, name){}
+        public ProcSearch(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
         public ProcSearch(string searchText, string header, int from, int to, string newColumn, bool totalSearch)
         {
@@ -40,73 +35,13 @@ namespace DataTableConverter.Classes.WorkProcs
             NewColumn = newColumn;
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
-            int index = table.Columns.IndexOf(Header);
-            if (index != -1 && From <= To )
+            string alias = Header;
+            if (!string.IsNullOrWhiteSpace(NewColumn) && PrepareSingle(ref alias, invokeForm, tableName, out string destination) && alias != null && From <= To)
             {
-                if (!string.IsNullOrWhiteSpace(NewColumn))
-                {
-                    string col = table.Columns.Contains(NewColumn) ? NewColumn : table.TryAddColumn(NewColumn);
-                    
-                    Func<string, string, bool> search;
-                    if (TotalSearch)
-                    {
-                        search = SearchTotal;
-                    }
-                    else
-                    {
-                        search = PartialSearch;
-                    }
-                    if (string.IsNullOrWhiteSpace(Shortcut))
-                    {
-                        int counter = From;
-                        bool found = false;
-                        foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
-                        {
-                            if (found)
-                            {
-                                if (counter > To)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    row[col] = counter;
-                                    counter++;
-                                }
-                            }
-                            else if (search.Invoke(row[index].ToString(), SearchText))
-                            {
-                                row[col] = counter;
-                                found = true;
-                                counter++;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (DataRow row in table.GetSortedTable(sortingOrder, orderType))
-                        {
-                            if (search.Invoke(row[index].ToString(), SearchText))
-                            {
-                                row[col] = Shortcut;
-                            }
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.SearchAndShortcut(Header, destination, TotalSearch, SearchText, Shortcut, From, To, sortingOrder, orderType, tableName);
             }
-        }
-
-        private bool SearchTotal(string value, string searchText)
-        {
-            return value == searchText;
-        }
-
-        private bool PartialSearch(string value, string searchText)
-        {
-            return value.Contains(searchText);
         }
 
         public override string[] GetHeaders()
@@ -116,7 +51,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            if(colName == Header)
+            if (colName == Header)
             {
                 Header = string.Empty;
             }
@@ -124,7 +59,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RenameHeaders(string oldName, string newName)
         {
-            if(oldName == Header)
+            if (oldName == Header)
             {
                 Header = newName;
             }

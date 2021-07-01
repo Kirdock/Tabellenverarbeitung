@@ -1,14 +1,7 @@
-﻿using CheckComboBoxTest;
-using DataTableConverter.Classes;
-using DataTableConverter.Classes.WorkProcs;
+﻿using DataTableConverter.Classes.WorkProcs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -33,6 +26,7 @@ namespace DataTableConverter.View
         {
             Table = new DataTable();
             ProcReplaceWhole.SetColumns(Table);
+            Table.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].DefaultValue = headers.First();
 
             dgTable.DataSource = Table;
 
@@ -45,12 +39,16 @@ namespace DataTableConverter.View
             dgTable.Columns.Add(cmb);
             dgTable.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].Visible = false;
             ComboBoxIndex = cmb.DisplayIndex = 0;
-            
+
         }
 
         private void CloseForm()
         {
             ViewHelper.EndDataGridViewEdit(dgTable);
+            if(Table.Rows.Count == 0)
+            {
+                Table.Rows.Add(new object[] { Table.Columns[(int)ProcReplaceWhole.ColumnIndex.Column].DefaultValue });
+            }
             DialogResult = DialogResult.OK;
         }
 

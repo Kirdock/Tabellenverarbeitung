@@ -158,9 +158,6 @@
     <Setting Name="SeparateSelectable" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="NotAdjustColumnOver100" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="MaxRows" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">15000</Value>
     </Setting>
@@ -169,6 +166,15 @@
     </Setting>
     <Setting Name="EditShortcut" Type="System.Windows.Forms.Keys" Scope="User">
       <Value Profile="(Default)">Strg+Alt+LButton</Value>
+    </Setting>
+    <Setting Name="LongPathEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UnhideRows" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UnhideColumns" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

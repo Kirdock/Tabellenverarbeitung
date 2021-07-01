@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes
 {
@@ -15,6 +12,7 @@ namespace DataTableConverter.Classes
         internal List<int> Values = null;
         internal List<string> Headers = null;
         internal bool ContainsHeaders;
+        internal bool HasRowBreaks;
 
         internal ImportSettings(int codePage, string textBegin, string textEnd, bool containsHeaders, object[] headers)
         {
@@ -33,11 +31,12 @@ namespace DataTableConverter.Classes
             Headers = headers.Cast<string>().ToList();
         }
 
-        internal ImportSettings(List<int> values, List<string> headers, int codePage)
+        internal ImportSettings(List<int> values, List<string> headers, int codePage, bool hasRowBreaks)
         {
             Values = values;
             Headers = headers;
             CodePage = codePage;
+            HasRowBreaks = hasRowBreaks;
         }
     }
 }

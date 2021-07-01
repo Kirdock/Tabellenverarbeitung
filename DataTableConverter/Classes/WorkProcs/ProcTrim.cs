@@ -1,13 +1,10 @@
-﻿using DataTableConverter.Assisstant;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataTableConverter.Extensions;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
@@ -19,7 +16,7 @@ namespace DataTableConverter.Classes.WorkProcs
         public bool DeleteDouble;
         public bool AllColumns = true;
 
-        public enum TrimType { Start, End, Both};
+        public enum TrimType { Start, End, Both };
         public TrimType Type;
 
         public ProcTrim()
@@ -54,7 +51,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return AllColumns ? new string[0] : WorkflowHelper.RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
+            return AllColumns ? new string[0] : RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -79,45 +76,18 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
-            if (Characters.Contains(" "))
+            string[] trimHeaders = null;
+            if (!AllColumns)
             {
-                Characters += (char)160;
-            }
-            char[] charArray = Characters.ToCharArray();
-            string[] columns = AllColumns ? table.HeadersOfDataTableAsString() : GetHeaders();
-
-            if (DeleteDouble)
-            {
-                foreach (DataRow row in table.Rows)
+                 string[] headers = GetHeaders();
+                if(headers.Length != 0)
                 {
-                    foreach (char c in charArray)
-                    {
-                        Regex regex = new Regex("[" + c + "]{2,}", RegexOptions.None);
-                        foreach (string col in columns)
-                        {
-                            row[col] = regex.Replace(GetTrimmed(row[col].ToString(), charArray), c.ToString());
-                        }
-                    }
+                    trimHeaders = headers;
                 }
             }
-            else
-            {
-                foreach (DataRow row in table.Rows)
-                {
-                    foreach (string col in columns)
-                    {
-                        row[col] = GetTrimmed(row[col].ToString(), charArray);
-                    }
-                }
-            }
-
-            foreach (DataColumn col in table.Columns)
-            {
-                col.ColumnName = GetTrimmed(col.ColumnName, charArray);
-            }
+            invokeForm.DatabaseHelper.Trim(Characters, trimHeaders, DeleteDouble, Type, tableName);
         }
 
         /// <summary>
@@ -132,25 +102,6 @@ namespace DataTableConverter.Classes.WorkProcs
             return regex.Replace(value.Trim(), " ");
         }
 
-        private string GetTrimmed(string text, char[] charArray)
-        {
-            string result;
-            switch (Type)
-            {
-                case TrimType.Start:
-                    result = text.TrimStart(charArray);
-                    break;
 
-                case TrimType.End:
-                    result = text.TrimEnd(charArray);
-                    break;
-
-                case TrimType.Both:
-                default:
-                    result = text.Trim(charArray);
-                    break;
-            }
-            return result;
-        }
     }
 }

@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes
 {
     internal class CountListboxItem : IEquatable<CountListboxItem>
     {
-        internal int Count;
+        internal long Count;
         internal object Value;
 
-        public CountListboxItem(int count, object value)
+        public CountListboxItem(long count, object value)
         {
             Count = count;
             Value = value;

@@ -1,11 +1,5 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -21,14 +15,18 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public ProcCount(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
-            DataTable newTable = ExportHelper.ExportCount(Column, CountChecked ? Count : 0, ShowFromTo, table, orderType);
-            invokeForm.BeginInvoke(new MethodInvoker(() =>
+            string columnName = invokeForm.DatabaseHelper.GetColumnName(Column, tableName);
+            if (columnName != null)
             {
-                new Form1(newTable).Show(invokeForm);
-            }));
+                string newTable = invokeForm.ExportHelper.ExportCount(columnName, CountChecked ? Count : 0, ShowFromTo, orderType, tableName);
+                invokeForm.BeginInvoke(new MethodInvoker(() =>
+                {
+                    invokeForm.DatabaseHelper.CopyToNewDatabaseFile(newTable);
+                    new Form1(newTable).Show(invokeForm);
+                }));
+            }
         }
 
         public override string[] GetHeaders()
@@ -38,7 +36,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            if(Column == colName)
+            if (Column == colName)
             {
                 Column = string.Empty;
             }
@@ -46,7 +44,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RenameHeaders(string oldName, string newName)
         {
-            if(Column == oldName)
+            if (Column == oldName)
             {
                 Column = newName;
             }

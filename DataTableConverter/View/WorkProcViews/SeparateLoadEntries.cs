@@ -1,31 +1,28 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
-using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View.WorkProcViews
 {
     public partial class SeparateLoadEntries : Form
     {
-        private DataTable Table;
-        private Dictionary<string, Dictionary<string, int>> CacheDataTableGroupCount = new Dictionary<string, Dictionary<string, int>>();
+        private string TableName;
         private IEnumerable<ExportCustomItem> items;
         internal ExportCustomItem SelectedItem;
         private IEnumerable<ExportCustomItem> Items => items.Where(item => item != null && item.Column == CmBColumns.SelectedItem.ToString());
+        private readonly DatabaseHelper DatabaseHelper;
 
-        internal SeparateLoadEntries(ExportSeparate selectedItem, BindingList<ExportSeparate> items, object[] headers, DataTable table)
+        internal SeparateLoadEntries(DatabaseHelper databaseHelper, ExportSeparate selectedItem, BindingList<ExportSeparate> items, object[] headers, string tableName)
         {
             InitializeComponent();
-            Table = table;
-            SelectedItem = new ExportCustomItem(selectedItem.Name,selectedItem.Column);
+            DatabaseHelper = databaseHelper;
+            TableName = tableName;
+            SelectedItem = new ExportCustomItem(selectedItem.Name, selectedItem.Column);
             this.items = items.Where(item => item != selectedItem).Select(item => new ExportCustomItem(item.Name, item.Column, item.Table.AsEnumerable().Select(row => row[0].ToString()))).Concat(new ExportCustomItem[] { SelectedItem });
             CLBValues.Dict = Items;
             CmBColumns.Items.AddRange(headers);
@@ -38,7 +35,7 @@ namespace DataTableConverter.View.WorkProcViews
         private void LoadHeaders(IEnumerable<string> headers)
         {
             CLBValues.ItemCheck -= CLBValues_ItemCheck;
-            for(int i = 0; i < CLBValues.Items.Count; i++)
+            for (int i = 0; i < CLBValues.Items.Count; i++)
             {
                 CountListboxItem item = CLBValues.Items[i] as CountListboxItem;
                 if (headers.Contains(item.Value))
@@ -78,27 +75,22 @@ namespace DataTableConverter.View.WorkProcViews
 
         private void SetCheckedListBox()
         {
-            Dictionary<string, int> pair;
-            string identifier = CmBColumns.SelectedItem.ToString();
-            if (CacheDataTableGroupCount.ContainsKey(identifier))
+            try
             {
-                pair = CacheDataTableGroupCount[identifier];
-            }
-            else
-            {
-                pair = Table.GroupCountOfColumn(identifier);
-                CacheDataTableGroupCount.Add(identifier, pair);
-            }
-            
-            CLBValues.BeginUpdate();
-            CLBValues.Items.Clear();
-            foreach (string key in pair.Keys.OrderBy(key => key, new NaturalStringComparer(SortOrder.Ascending)))
-            {
-                CLBValues.Items.Add(new CountListboxItem(0, key));
-            }
-            CLBValues.EndUpdate();
+                string alias = CmBColumns.SelectedItem.ToString(); //DataSource = AliasColumnMapping? NO, because it is used for a workflow
+                Dictionary<string, long> pair = DatabaseHelper.GroupCountOfColumn(DatabaseHelper.GetColumnName(alias, TableName), TableName);
 
-            ViewHelper.ResizeCountListBox(CLBValues);
+                CLBValues.BeginUpdate();
+                CLBValues.Items.Clear();
+                foreach (string key in pair.Keys)
+                {
+                    CLBValues.Items.Add(new CountListboxItem(0, key));
+                }
+                CLBValues.EndUpdate();
+
+                ViewHelper.ResizeCountListBox(CLBValues);
+            }
+            catch { }
         }
 
         private void CmBColumns_SelectedIndexChanged(object sender, EventArgs e)

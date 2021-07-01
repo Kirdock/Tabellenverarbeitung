@@ -22,15 +22,17 @@ namespace DataTableConverter
         private ToolStripItem ClipboardItem, DeleteRowItem, InsertRowItem;
         private Action<object, EventArgs> MyFunction;
         private List<Work> Workflows;
+        internal int SelectedCase { get; set; }
+        private static readonly string LockIcon = "\uD83D\uDD12";
 
         internal static void AdjustComboBoxGridView(DataGridView dataGridView, int comboBoxIndex, object[] headers)
         {
             dataGridView.EditMode = DataGridViewEditMode.EditOnEnter;
-            dataGridView.CellFormatting += (sender, e) => DataGridView_CellFormatting(sender, e, comboBoxIndex, headers);
+            dataGridView.CellFormatting += (sender, e) => DataGridView_CellFormatting(e, comboBoxIndex, headers);
             dataGridView.EditingControlShowing += dataGridView_EditingControlShowing;
         }
 
-        private static void DataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
+        private static void DataGridView_CellFormatting(DataGridViewCellFormattingEventArgs e, int comboBoxIndex, object[] headers)
         {
             if (e.ColumnIndex == comboBoxIndex && string.IsNullOrWhiteSpace(e.Value?.ToString()))
             {
@@ -53,14 +55,11 @@ namespace DataTableConverter
             (sender as ComboBox).DroppedDown = true;
         }
 
-        internal int SelectedCase { get; set; }
-        private static readonly string LockIcon = "\uD83D\uDD12";
-
-        public ViewHelper(ContextMenuStrip ctxrow, Action<object,EventArgs> myfunction, List<Work> workflows)
+        public ViewHelper(ContextMenuStrip ctxrow, Action<object, EventArgs> myfunction, List<Work> workflows)
         {
             CtxRow = ctxrow;
             MyFunction = myfunction;
-            ClipboardItem = CtxRow.Items.Cast<ToolStripItem>().First(x=> x.Name == "clipboardItem");
+            ClipboardItem = CtxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "clipboardItem");
             DeleteRowItem = CtxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "deleteRowItem");
             InsertRowItem = CtxRow.Items.Cast<ToolStripItem>().First(x => x.Name == "insertRowItem");
             Workflows = workflows;
@@ -185,7 +184,7 @@ namespace DataTableConverter
                                 }
                             } //Error, wenn Typen wie int nicht übereinstimmen
                         }
-                        if(dgEvent != null)
+                        if (dgEvent != null)
                         {
                             myDataGridView.CellValidating -= dgEvent;
                         }
@@ -202,11 +201,12 @@ namespace DataTableConverter
                     }
                 }
             });
+            thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
-            
+
         }
-        
+
 
         internal static Dictionary<string, SortOrder> GenerateSortingList(string orderBefore)
         {
@@ -214,7 +214,7 @@ namespace DataTableConverter
             if (!string.IsNullOrWhiteSpace(orderBefore))
             {
 
-                string[] headersInformation = orderBefore.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                string[] headersInformation = orderBefore.Replace("COLLATE NATURALSORT ", string.Empty).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string info in headersInformation)
                 {
                     string[] headerInfo = info.Split(new string[] { "] " }, StringSplitOptions.RemoveEmptyEntries);
@@ -228,7 +228,7 @@ namespace DataTableConverter
 
         internal void AddContextMenuToDataGridView(DataGridView view, Form mainForm, bool clipboard)
         {
-            view.MouseClick +=(sender, e)=> DataGridView_MouseClick((DataGridView)sender, e, mainForm, clipboard);
+            view.MouseClick += (sender, e) => DataGridView_MouseClick((DataGridView)sender, e, mainForm, clipboard);
         }
 
         private void DataGridView_MouseClick(DataGridView view, MouseEventArgs e, Form mainForm, bool clipboard)
@@ -257,7 +257,7 @@ namespace DataTableConverter
                     InsertRowItem.Click += CtxRowInsertRowHandler = (sender2, e2) => InsertRowClick(view, selectedRow);
                 }
                 ClipboardItem.Visible = clipboard;
-                
+
                 CtxRow.Show(view, new Point(e.X, e.Y));
 
             }
@@ -289,9 +289,25 @@ namespace DataTableConverter
             }
             if (view.Name == "dgCaseColumns")
             {
-                WorkflowHelper.RemoveRowThroughCaseChange(Workflows, rowIndizes, SelectedCase);
+                RemoveRowThroughCaseChange(Workflows, rowIndizes, SelectedCase);
             }
             MyFunction?.Invoke(null, null);
+        }
+
+        private void RemoveRowThroughCaseChange(List<Work> workflows, List<int> rowIndizes, int casId)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == casId && proc.GetType() == typeof(Classes.WorkProcs.ProcDuplicate)).ToList().ForEach((caseProc) =>
+                {
+                    List<string> columns = caseProc.DuplicateColumns.ToList();
+                    foreach (int index in rowIndizes.OrderByDescending(x => x))
+                    {
+                        columns.RemoveAt(index);
+                    }
+                    caseProc.DuplicateColumns = columns.ToArray();
+                });
+            }
         }
 
         private void InsertRowClick(DataGridView view, int rowIndex)
@@ -304,9 +320,22 @@ namespace DataTableConverter
 
             if (view.Name == "dgCaseColumns")
             {
-                WorkflowHelper.InsertRowThroughCaseChange(Workflows, rowIndex, SelectedCase);
+                InsertRowThroughCaseChange(Workflows, rowIndex, SelectedCase);
             }
             MyFunction?.Invoke(null, null);
+        }
+
+        private void InsertRowThroughCaseChange(List<Work> workflows, int rowIndex, int casId)
+        {
+            foreach (Work work in workflows)
+            {
+                work.Procedures.Where(proc => proc.ProcedureId == casId).ToList().ForEach((caseProc) =>
+                {
+                    List<string> columns = caseProc.DuplicateColumns.ToList();
+                    columns.Insert(rowIndex, string.Empty);
+                    caseProc.DuplicateColumns = columns.ToArray();
+                });
+            }
         }
 
 
@@ -353,10 +382,11 @@ namespace DataTableConverter
             }
             if (newColumn == null)
             {
-                int indexFrom = adjustSort.IndexOf($"[{column}]");
+                string colString = $"[{column}] COLLATE NATURALSORT";
+                int indexFrom = adjustSort.IndexOf(colString);
                 if (indexFrom != -1)
                 {
-                    int indexTo = adjustSort.IndexOf(",", column.Length + 2 + indexFrom);
+                    int indexTo = adjustSort.IndexOf(",", column.Length + indexFrom);
                     adjustSort = adjustSort.Remove(indexFrom, indexTo == -1 ? adjustSort.Length : (indexTo - indexFrom + 2)); //+2 weil nach "," noch ein Leerzeichen ist
                 }
             }
@@ -367,7 +397,7 @@ namespace DataTableConverter
             return adjustSort;
         }
 
-        internal static void CheckAllItemsOfCheckedCombobox(CheckedComboBox cbHeaders,bool status)
+        internal static void CheckAllItemsOfCheckedCombobox(CheckedComboBox cbHeaders, bool status)
         {
             for (int i = 0; i < cbHeaders.Items.Count; i++)
             {
@@ -433,30 +463,11 @@ namespace DataTableConverter
             //}
         }
 
-        private static IEnumerable<Control> GetControlHierarchy(Control root)
-        {
-            Queue<Control> queue = new Queue<Control>();
-            queue.Enqueue(root);
-
-            do
-            {
-                Control control = queue.Dequeue();
-                yield return control;
-
-                foreach (Control child in control.Controls.OfType<Control>())
-                {
-                    queue.Enqueue(child);
-                }
-
-            } while (queue.Count > 0);
-
-        }
-
         internal static void SetDataGridViewStyle(DataGridView table)
         {
             table.DefaultCellStyle.Font = new Font(table.DefaultCellStyle.Font.Name, Properties.Settings.Default.TableFontSize);
             table.RowTemplate.Height = Properties.Settings.Default.RowHeight;
-            foreach(DataGridViewRow row in table.Rows)
+            foreach (DataGridViewRow row in table.Rows)
             {
                 row.Height = Properties.Settings.Default.RowHeight;
             }

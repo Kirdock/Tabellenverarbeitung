@@ -1,14 +1,8 @@
-﻿using CheckComboBoxTest;
-using DataTableConverter.Classes;
+﻿using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -28,7 +22,7 @@ namespace DataTableConverter.View
             UIHelper = new ViewHelper(ctxRow, null, null);
             UIHelper.AddContextMenuToDataGridView(dgvMerge, this, false);
             ViewHelper.SetDataGridViewStyle(dgvMerge);
-            
+
         }
 
         private void InitDataGridView(object[] headers)
@@ -53,7 +47,6 @@ namespace DataTableConverter.View
                 dgvMerge.Columns[i].DisplayIndex = i;
             }
 
-            int comboBoxIndex = dgvMerge.Columns.Count;
             dgvMerge.Columns.Add(col);
             dgvMerge.Columns.Add(boxCol);
             dgvMerge.Columns[(int)ProcMerge.ConditionColumn.Spalte].Visible = false;
@@ -64,20 +57,6 @@ namespace DataTableConverter.View
             boxCol.DisplayIndex = 5;
 
             ViewHelper.AdjustComboBoxGridView(dgvMerge, 1, headers);
-        }
-
-        private void addColumn(string column)
-        {
-            if (!txtFormula.Text.Contains(column))
-            {
-                string separator = txtFormula.Text.Length > 0 ? " " : string.Empty;
-                txtFormula.Text = $"{txtFormula.Text}{separator}[{column}]";
-            }
-        }
-
-        private void removeColumn(string column)
-        {
-            txtFormula.Text = txtFormula.Text.Replace($" [{column}]", string.Empty).Replace($"[{column}] ", string.Empty);
         }
 
         private void CloseForm()
@@ -101,7 +80,7 @@ namespace DataTableConverter.View
 
         private bool IsDuplicate(string text)
         {
-            return Headers.Contains(text);
+            return Headers.Cast<string>().Contains(text, StringComparer.OrdinalIgnoreCase);
         }
 
 
@@ -123,13 +102,11 @@ namespace DataTableConverter.View
         private void BtnFormat_Click(object sender, EventArgs e)
         {
             MergeFormatView view = new MergeFormatView(Proc.Format, Headers);
-            if(view.ShowDialog(this) == DialogResult.OK)
+            if (view.ShowDialog(this) == DialogResult.OK)
             {
                 txtFormula.Text = Proc.Format.ToString();
             }
         }
-
-
 
         private void dgvMerge_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {

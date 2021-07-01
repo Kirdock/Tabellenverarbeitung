@@ -107,7 +107,7 @@
             this.btnSelectAll.TabIndex = 6;
             this.btnSelectAll.Text = "Alle auswählen";
             this.btnSelectAll.UseVisualStyleBackColor = true;
-            this.btnSelectAll.Click += new System.EventHandler(this.btnSelectAll_Click);
+            this.btnSelectAll.Click += new System.EventHandler(this.BtnSelectAll_Click);
             // 
             // btnRemoveAll
             // 
@@ -117,16 +117,16 @@
             this.btnRemoveAll.TabIndex = 7;
             this.btnRemoveAll.Text = "Alle abwählen";
             this.btnRemoveAll.UseVisualStyleBackColor = true;
-            this.btnRemoveAll.Click += new System.EventHandler(this.btnRemoveAll_Click);
+            this.btnRemoveAll.Click += new System.EventHandler(this.BtnRemoveAll_Click);
             // 
             // lblImportTable
             // 
             this.lblImportTable.AutoSize = true;
             this.lblImportTable.Location = new System.Drawing.Point(374, 9);
             this.lblImportTable.Name = "lblImportTable";
-            this.lblImportTable.Size = new System.Drawing.Size(63, 13);
+            this.lblImportTable.Size = new System.Drawing.Size(127, 13);
             this.lblImportTable.TabIndex = 11;
-            this.lblImportTable.Text = "ImportTable";
+            this.lblImportTable.Text = "Zu importierende Tabelle:";
             // 
             // lblSourceTable
             // 

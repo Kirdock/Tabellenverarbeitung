@@ -1,11 +1,5 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -27,45 +21,16 @@ namespace DataTableConverter.Classes.WorkProcs
             CompareColumn = compareColumn;
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
-            bool isNewColumn = !string.IsNullOrWhiteSpace(NewColumn);
             if (string.IsNullOrWhiteSpace(SourceColumn) || string.IsNullOrWhiteSpace(CompareColumn))
             {
                 return;
             }
 
-            string column = SourceColumn;
-            if (CopyOldColumn)
+            if (PrepareSingle(ref SourceColumn, invokeForm, tableName, out string destinationColumn))
             {
-                table.CopyColumns(new string[] { SourceColumn });
-            }
-            else if (isNewColumn)
-            {
-                column = table.AddColumnWithDialog(NewColumn, invokeForm) ? NewColumn : null;
-            }
-
-            if (column != null)
-            {
-                if (isNewColumn)
-                {
-                    foreach (DataRow row in table.Rows)
-                    {
-                        string source = row[SourceColumn].ToString();
-                        row[column] = source == row[CompareColumn].ToString() ? string.Empty : source;
-                    }
-                }
-                else
-                {
-                    foreach (DataRow row in table.Rows)
-                    {
-                        if (row[SourceColumn].ToString() == row[CompareColumn].ToString())
-                        {
-                            row[column] = string.Empty;
-                        }
-                    }
-                }
+                invokeForm.DatabaseHelper.EmptyColumnByCondition(SourceColumn, destinationColumn, CompareColumn, tableName);
             }
         }
 
@@ -76,11 +41,11 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RenameHeaders(string oldName, string newName)
         {
-            if(SourceColumn == oldName)
+            if (SourceColumn == oldName)
             {
                 SourceColumn = newName;
             }
-            if(CompareColumn == oldName)
+            if (CompareColumn == oldName)
             {
                 CompareColumn = newName;
             }
@@ -88,11 +53,11 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override void RemoveHeader(string colName)
         {
-            if(CompareColumn == colName)
+            if (CompareColumn == colName)
             {
                 CompareColumn = null;
             }
-            if(SourceColumn == colName)
+            if (SourceColumn == colName)
             {
                 SourceColumn = null;
             }

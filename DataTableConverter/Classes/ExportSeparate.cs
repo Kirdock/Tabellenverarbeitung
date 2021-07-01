@@ -1,10 +1,7 @@
-﻿using System;
+﻿using DataTableConverter.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using DataTableConverter.Extensions;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes
 {

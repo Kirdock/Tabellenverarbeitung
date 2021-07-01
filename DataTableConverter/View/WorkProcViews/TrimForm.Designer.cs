@@ -37,7 +37,6 @@
             this.TxtTrimText = new System.Windows.Forms.TextBox();
             this.BtnConfirm = new System.Windows.Forms.Button();
             this.CCBHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.BtnCheckAll = new System.Windows.Forms.Button();
             this.BtnUncheckAll = new System.Windows.Forms.Button();
@@ -140,15 +139,6 @@
             this.CCBHeaders.TabIndex = 24;
             this.CCBHeaders.ValueSeparator = ", ";
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(205, 151);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 25;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -186,7 +176,6 @@
             this.Controls.Add(this.BtnUncheckAll);
             this.Controls.Add(this.BtnCheckAll);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.CCBHeaders);
             this.Controls.Add(this.BtnConfirm);
             this.Controls.Add(this.label10);
@@ -216,7 +205,6 @@
         private System.Windows.Forms.TextBox TxtTrimText;
         private System.Windows.Forms.Button BtnConfirm;
         private CheckComboBoxTest.CheckedComboBox CCBHeaders;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button BtnCheckAll;
         private System.Windows.Forms.Button BtnUncheckAll;

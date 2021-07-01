@@ -1,12 +1,7 @@
 ﻿using DataTableConverter.Classes.WorkProcs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -34,7 +29,7 @@ namespace DataTableConverter.View
 
         private void btnSubmit_Click(object sender, EventArgs e)
         {
-            if(clbHeaders.CheckedItems.Count > 0 || allColumns())
+            if (clbHeaders.CheckedItems.Count > 0 || allColumns())
             {
                 Procedure = new ProcUpLowCase(clbHeaders.CheckedItems.Cast<string>().ToArray(), allColumns(), cmbOption.SelectedIndex);
                 DialogResult = DialogResult.OK;

@@ -1,35 +1,31 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Classes;
-using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
 {
     public partial class ExportCustom : Form
     {
-        internal IEnumerable<ExportCustomItem> SelectedColumnItems => CmBFileNames.Items.Cast<ExportCustomItem>().Where(item => item.Column == cmbColumn.SelectedItem.ToString());
+        private IEnumerable<ExportCustomItem> SelectedColumnItems => CmBFileNames.Items.Cast<ExportCustomItem>().Where(item => item.Column == cmbColumn.SelectedValue.ToString());
         internal IEnumerable<ExportCustomItem> Items => CmBFileNames.Items.Cast<ExportCustomItem>();
-        private readonly DataTable Table;
-        private Dictionary<string, Dictionary<string, int>> CacheDataTableGroupCount;
         private ExportCustomItem SelectedItem => (CmBFileNames.SelectedItem as ExportCustomItem);
         internal string ContinuedNumberName => CbContinuedNumber.Checked ? TxtContinuedNumber.Text : string.Empty;
-        internal ExportCustom(object[] headers, DataTable table)
+        private readonly DatabaseHelper DatabaseHelper;
+        private readonly string TableName;
+        internal ExportCustom(Dictionary<string, string> aliasColumnMapping, DatabaseHelper databaseHelper, string tableName)
         {
             InitializeComponent();
+            DatabaseHelper = databaseHelper;
             clbValues.Dict = SelectedColumnItems;
-            CacheDataTableGroupCount = new Dictionary<string, Dictionary<string, int>>();
+            TableName = tableName;
             SetListBoxStyle();
-            Table = table;
-            cmbColumn.Items.AddRange(headers);
-            
+            cmbColumn.DataSource = new BindingSource(aliasColumnMapping, null);
+            cmbColumn.DisplayMember = "key";
+            cmbColumn.ValueMember= "value";
             SetEnabled();
         }
 
@@ -52,7 +48,7 @@ namespace DataTableConverter.View
                 BtnUncheckAll
             };
 
-            foreach(Control control in controls)
+            foreach (Control control in controls)
             {
                 control.Enabled = enabled;
             }
@@ -66,7 +62,7 @@ namespace DataTableConverter.View
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            if(CbContinuedNumber.Checked && string.IsNullOrWhiteSpace(TxtContinuedNumber.Text))
+            if (CbContinuedNumber.Checked && string.IsNullOrWhiteSpace(TxtContinuedNumber.Text))
             {
                 MessageHandler.MessagesOK(this, MessageBoxIcon.Error, "Bitte geben Sie eine Spaltenbezeichnung für die fortlaufende Nummer ein");
             }
@@ -86,9 +82,9 @@ namespace DataTableConverter.View
         {
             if (CmBFileNames.SelectedIndex > -1)
             {
-                if(CmBFileNames.Items.Count > 1 && this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie wirklich eine andere Spalte verwenden?") == DialogResult.Yes || CmBFileNames.Items.Count == 1)
+                if (CmBFileNames.Items.Count > 1 && this.MessagesYesNoCancel(MessageBoxIcon.Warning, "Wollen Sie wirklich eine andere Spalte verwenden?") == DialogResult.Yes || CmBFileNames.Items.Count == 1)
                 {
-                    SelectedItem.Column = cmbColumn.SelectedItem.ToString();
+                    SelectedItem.Column = cmbColumn.SelectedValue.ToString();
                     SetListValues();
                     SetValues(false);
                     SetSumCount();
@@ -96,7 +92,7 @@ namespace DataTableConverter.View
                 else
                 {
                     cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
-                    cmbColumn.SelectedIndex = cmbColumn.Items.Cast<string>().Select((value, index) => new { value, index }).Where(pair => pair.value == SelectedItem.Column).FirstOrDefault()?.index ?? 0;
+                    cmbColumn.SelectedValue = SelectedItem.Column;
                     cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
                 }
             }
@@ -104,21 +100,13 @@ namespace DataTableConverter.View
 
         private void SetListValues()
         {
-            string identifier = cmbColumn.SelectedItem.ToString();
+            string columnName = cmbColumn.SelectedValue.ToString();
 
-            Dictionary<string, int> pair;
-            if (CacheDataTableGroupCount.ContainsKey(identifier))
-            {
-                pair = CacheDataTableGroupCount[identifier];
-            }
-            else
-            {
-                pair = Table.GroupCountOfColumn(Table.Columns.IndexOf(cmbColumn.SelectedItem.ToString()));
-                CacheDataTableGroupCount.Add(identifier, pair);
-            }
+            Dictionary<string, long> pair = DatabaseHelper.GroupCountOfColumn(columnName, TableName);
+
             clbValues.BeginUpdate();
             clbValues.Items.Clear();
-            foreach (string key in pair.Keys.OrderBy(key => key, new NaturalStringComparer(SortOrder.Ascending)))
+            foreach (string key in pair.Keys)
             {
                 clbValues.Items.Add(new CountListboxItem(pair[key], key));
             }
@@ -128,7 +116,7 @@ namespace DataTableConverter.View
 
         private void btnDeleteFile_Click(object sender, EventArgs e)
         {
-            if(CmBFileNames.SelectedIndex != -1)
+            if (CmBFileNames.SelectedIndex != -1)
             {
                 CmBFileNames.Items.RemoveAt(CmBFileNames.SelectedIndex);
                 if (CmBFileNames.Items.Count > 0)
@@ -172,7 +160,7 @@ namespace DataTableConverter.View
         private void CmBFileNames_SelectedIndexChanged(object sender, EventArgs e)
         {
             cmbColumn.SelectedIndexChanged -= cmbColumn_SelectedIndexChanged;
-            cmbColumn.SelectedItem = SelectedItem.Column;
+            cmbColumn.SelectedValue = SelectedItem.Column;
             cmbColumn.SelectedIndexChanged += cmbColumn_SelectedIndexChanged;
 
             CmBFormat.SelectedIndex = SelectedItem.Format;
@@ -184,13 +172,13 @@ namespace DataTableConverter.View
             {
                 clbValues.SetItemChecked(i, SelectedItem.Values[clbValues.Items[i].ToString()]);
             }
-            
+
             clbValues.ItemCheck += clbValues_ItemCheck;
 
             SetSumCount();
         }
 
-        private void SetSumCount(int add = 0)
+        private void SetSumCount(long add = 0)
         {
             lblSumCount.Text = (clbValues.CheckedItems.Cast<CountListboxItem>().Sum(item => item.Count) + add).ToString();
         }
@@ -207,7 +195,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    ExportCustomItem item = new ExportCustomItem(newText, cmbColumn.Items[0].ToString());
+                    ExportCustomItem item = new ExportCustomItem(newText, ((KeyValuePair<string, string>)cmbColumn.Items[0]).Value);
                     int index = CmBFileNames.Items.Count;
                     ExportCustomItem lastItem = CmBFileNames.Items.Cast<ExportCustomItem>().LastOrDefault();
                     if (lastItem != null)
@@ -223,7 +211,7 @@ namespace DataTableConverter.View
                         SetListValues();
                     }
 
-                    
+
                     SetValues(false, item);
                     CmBFileNames.Items.Add(item);
                     CmBFileNames.SelectedIndex = index;
@@ -246,7 +234,7 @@ namespace DataTableConverter.View
 
         private void BtnRename_Click(object sender, EventArgs e)
         {
-            if(CmBFileNames.SelectedIndex > -1)
+            if (CmBFileNames.SelectedIndex > -1)
             {
                 string newText = Microsoft.VisualBasic.Interaction.InputBox("Bitte den Dateinamen eingeben", "Dateiname", SelectedItem.Name);
                 if (!string.IsNullOrWhiteSpace(newText))

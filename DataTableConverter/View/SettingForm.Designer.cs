@@ -61,11 +61,13 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.CBLoadHiddenRows = new System.Windows.Forms.CheckBox();
+            this.TxTShortcut = new System.Windows.Forms.TextBox();
+            this.label40 = new System.Windows.Forms.Label();
             this.CBTrimImport = new System.Windows.Forms.CheckBox();
             this.NumMaxRows = new System.Windows.Forms.NumericUpDown();
             this.label39 = new System.Windows.Forms.Label();
             this.label38 = new System.Windows.Forms.Label();
-            this.CbAdjustColumnOver100 = new System.Windows.Forms.CheckBox();
             this.CbSeparateSelectable = new System.Windows.Forms.CheckBox();
             this.label37 = new System.Windows.Forms.Label();
             this.CbImportWorkflowAuto = new System.Windows.Forms.CheckBox();
@@ -120,8 +122,7 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label40 = new System.Windows.Forms.Label();
-            this.TxTShortcut = new System.Windows.Forms.TextBox();
+            this.CBLoadHiddenColumns = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -478,13 +479,14 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.CBLoadHiddenColumns);
+            this.tabPage2.Controls.Add(this.CBLoadHiddenRows);
             this.tabPage2.Controls.Add(this.TxTShortcut);
             this.tabPage2.Controls.Add(this.label40);
             this.tabPage2.Controls.Add(this.CBTrimImport);
             this.tabPage2.Controls.Add(this.NumMaxRows);
             this.tabPage2.Controls.Add(this.label39);
             this.tabPage2.Controls.Add(this.label38);
-            this.tabPage2.Controls.Add(this.CbAdjustColumnOver100);
             this.tabPage2.Controls.Add(this.CbSeparateSelectable);
             this.tabPage2.Controls.Add(this.label37);
             this.tabPage2.Controls.Add(this.CbImportWorkflowAuto);
@@ -511,10 +513,39 @@
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // CBLoadHiddenRows
+            // 
+            this.CBLoadHiddenRows.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBLoadHiddenRows.Location = new System.Drawing.Point(13, 613);
+            this.CBLoadHiddenRows.Name = "CBLoadHiddenRows";
+            this.CBLoadHiddenRows.Size = new System.Drawing.Size(252, 34);
+            this.CBLoadHiddenRows.TabIndex = 31;
+            this.CBLoadHiddenRows.Text = "Ausgeblendete Zeilen laden";
+            this.CBLoadHiddenRows.UseVisualStyleBackColor = true;
+            // 
+            // TxTShortcut
+            // 
+            this.TxTShortcut.Location = new System.Drawing.Point(249, 313);
+            this.TxTShortcut.Name = "TxTShortcut";
+            this.TxTShortcut.ReadOnly = true;
+            this.TxTShortcut.Size = new System.Drawing.Size(130, 20);
+            this.TxTShortcut.TabIndex = 30;
+            this.TxTShortcut.Click += new System.EventHandler(this.TxTShortcut_Click);
+            this.TxTShortcut.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxTShortcut_KeyDown);
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(8, 316);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(225, 13);
+            this.label40.TabIndex = 27;
+            this.label40.Text = "Tastenkombination zum Bearbeiten einer Zelle";
+            // 
             // CBTrimImport
             // 
             this.CBTrimImport.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CBTrimImport.Location = new System.Drawing.Point(11, 630);
+            this.CBTrimImport.Location = new System.Drawing.Point(11, 573);
             this.CBTrimImport.Name = "CBTrimImport";
             this.CBTrimImport.Size = new System.Drawing.Size(254, 34);
             this.CBTrimImport.TabIndex = 26;
@@ -523,7 +554,7 @@
             // 
             // NumMaxRows
             // 
-            this.NumMaxRows.Location = new System.Drawing.Point(247, 586);
+            this.NumMaxRows.Location = new System.Drawing.Point(247, 529);
             this.NumMaxRows.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -545,7 +576,7 @@
             // 
             // label39
             // 
-            this.label39.Location = new System.Drawing.Point(10, 588);
+            this.label39.Location = new System.Drawing.Point(10, 531);
             this.label39.Name = "label39";
             this.label39.Size = new System.Drawing.Size(207, 28);
             this.label39.TabIndex = 24;
@@ -560,16 +591,6 @@
             this.label38.Size = new System.Drawing.Size(55, 16);
             this.label38.TabIndex = 23;
             this.label38.Text = "Import:";
-            // 
-            // CbAdjustColumnOver100
-            // 
-            this.CbAdjustColumnOver100.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CbAdjustColumnOver100.Location = new System.Drawing.Point(8, 532);
-            this.CbAdjustColumnOver100.Name = "CbAdjustColumnOver100";
-            this.CbAdjustColumnOver100.Size = new System.Drawing.Size(254, 34);
-            this.CbAdjustColumnOver100.TabIndex = 22;
-            this.CbAdjustColumnOver100.Text = "Spaltenbreite bei über 100 Spalten nicht anpassen";
-            this.CbAdjustColumnOver100.UseVisualStyleBackColor = true;
             // 
             // CbSeparateSelectable
             // 
@@ -1090,24 +1111,15 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // label40
+            // CBLoadHiddenColumns
             // 
-            this.label40.AutoSize = true;
-            this.label40.Location = new System.Drawing.Point(8, 316);
-            this.label40.Name = "label40";
-            this.label40.Size = new System.Drawing.Size(225, 13);
-            this.label40.TabIndex = 27;
-            this.label40.Text = "Tastenkombination zum Bearbeiten einer Zelle";
-            // 
-            // TxTShortcut
-            // 
-            this.TxTShortcut.Location = new System.Drawing.Point(249, 313);
-            this.TxTShortcut.Name = "TxTShortcut";
-            this.TxTShortcut.ReadOnly = true;
-            this.TxTShortcut.Size = new System.Drawing.Size(130, 20);
-            this.TxTShortcut.TabIndex = 30;
-            this.TxTShortcut.Click += new System.EventHandler(this.TxTShortcut_Click);
-            this.TxTShortcut.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxTShortcut_KeyDown);
+            this.CBLoadHiddenColumns.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBLoadHiddenColumns.Location = new System.Drawing.Point(13, 653);
+            this.CBLoadHiddenColumns.Name = "CBLoadHiddenColumns";
+            this.CBLoadHiddenColumns.Size = new System.Drawing.Size(252, 34);
+            this.CBLoadHiddenColumns.TabIndex = 32;
+            this.CBLoadHiddenColumns.Text = "Ausgeblendete Spalten laden";
+            this.CBLoadHiddenColumns.UseVisualStyleBackColor = true;
             // 
             // SettingForm
             // 
@@ -1235,11 +1247,12 @@
         private System.Windows.Forms.CheckBox CbSeparateSelectable;
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.Label label38;
-        private System.Windows.Forms.CheckBox CbAdjustColumnOver100;
         private System.Windows.Forms.NumericUpDown NumMaxRows;
         private System.Windows.Forms.Label label39;
         private System.Windows.Forms.CheckBox CBTrimImport;
         private System.Windows.Forms.TextBox TxTShortcut;
         private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.CheckBox CBLoadHiddenRows;
+        private System.Windows.Forms.CheckBox CBLoadHiddenColumns;
     }
 }

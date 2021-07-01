@@ -1,12 +1,6 @@
-﻿using DataTableConverter.Classes.WorkProcs;
+﻿using DataTableConverter.Assisstant;
+using DataTableConverter.Classes.WorkProcs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View.WorkProcViews
@@ -14,11 +8,13 @@ namespace DataTableConverter.View.WorkProcViews
     public partial class CompareForm : Form
     {
         internal ProcCompare Procedure;
-        private DataTable Table;
-        internal CompareForm(object[] headers, DataTable table)
+        private string TableName;
+        private readonly DatabaseHelper DatabaseHelper;
+        internal CompareForm(object[] headers, DatabaseHelper databaseHelper, string tableName)
         {
             InitializeComponent();
-            Table = table;
+            TableName = tableName;
+            DatabaseHelper = databaseHelper;
             cbFirstColumn.Items.AddRange(headers);
             cbSecondColumn.Items.AddRange(headers);
             cbFirstColumn.SelectedIndex = cbSecondColumn.SelectedIndex = 0;
@@ -46,11 +42,11 @@ namespace DataTableConverter.View.WorkProcViews
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            if(cbFirstColumn.SelectedItem == cbSecondColumn.SelectedItem)
+            if (cbFirstColumn.SelectedItem == cbSecondColumn.SelectedItem)
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Es kann nicht zwei mal dieselbe Spalte ausgewählt werden!");
             }
-            else if(cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtNewColumn.Text))
+            else if (cbNewColumn.Checked && string.IsNullOrWhiteSpace(txtNewColumn.Text))
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Bitte geben Sie einen Spaltennamen an!");
             }
@@ -67,7 +63,7 @@ namespace DataTableConverter.View.WorkProcViews
             string secondColumn = cbSecondColumn.SelectedItem?.ToString();
             if (firstColumn != null && secondColumn != null)
             {
-                LblCount.Text = Table.AsEnumerable().Count(row => row[firstColumn].ToString() == row[secondColumn].ToString()).ToString();
+                LblCount.Text = DatabaseHelper.CompareColumnsCount(firstColumn, secondColumn, TableName).ToString();
             }
         }
     }

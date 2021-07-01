@@ -1,6 +1,4 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Classes.WorkProcs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,14 +10,12 @@ namespace DataTableConverter.Classes
     abstract class WorkProc : IComparable<WorkProc>, IEquatable<WorkProc>
     {
         public int ProcedureId { get; set; }
-        public bool ReplacesTable = false;
-        internal bool CommitDelete = false;
-        internal DataTable Columns { get; set; }
-        internal string[] DuplicateColumns { get; set; }
-        internal int Ordinal { get; set; }
-        virtual internal string NewColumn { get; set; }
+        public DataTable Columns { get; set; }
+        public string[] DuplicateColumns { get; set; }
+        public int Ordinal { get; set; }
+        virtual public string NewColumn { get; set; }
         public string Name { get; set; }
-        internal bool CopyOldColumn { get; set; }
+        public bool CopyOldColumn { get; set; }
         internal WorkProc() { }
 
         internal WorkProc(int ordinal, int id, string name)
@@ -57,10 +53,57 @@ namespace DataTableConverter.Classes
             return hashCode;
         }
 
+        protected bool PrepareMultiple(string[] columns, Form1 invokeForm, string tableName, out string[] sourceColumns, out string[] destinationColumns)
+        {
+            if (columns.Length != 0)
+            {
+                sourceColumns = invokeForm.DatabaseHelper.GetColumnNames(columns, tableName);
+
+                if (CopyOldColumn)
+                {
+                    destinationColumns = invokeForm.DatabaseHelper.CopyColumns(columns, tableName);
+                }
+                else if (!string.IsNullOrWhiteSpace(NewColumn))
+                {
+                    invokeForm.DatabaseHelper.AddColumnsWithDialog(NewColumn, columns, invokeForm, tableName, out destinationColumns);
+                }
+                else
+                {
+                    destinationColumns = sourceColumns;
+                }
+            }
+            else
+            {
+                sourceColumns = new string[0];
+                destinationColumns = null;
+            }
+            return destinationColumns != null;
+        }
+
+        protected bool PrepareSingle(ref string aliasToColumn, Form1 invokeForm, string tableName, out string destinationColumn)
+        {
+            aliasToColumn = invokeForm.DatabaseHelper.GetColumnName(aliasToColumn, tableName);
+            destinationColumn = aliasToColumn;
+            if (CopyOldColumn && destinationColumn != null)
+            {
+                destinationColumn = invokeForm.DatabaseHelper.CopyColumn(aliasToColumn, tableName);
+            }
+            else if (!string.IsNullOrWhiteSpace(NewColumn))
+            {
+                invokeForm.DatabaseHelper.AddColumnWithDialog(NewColumn, invokeForm, tableName, out destinationColumn);
+            }
+            return destinationColumn != null;
+        }
+
+        protected static string[] RemoveEmptyHeaders(IEnumerable<string> headers)
+        {
+            return headers.Where(header => !string.IsNullOrWhiteSpace(header)).ToArray();
+        }
+
         abstract public string[] GetHeaders();
 
         abstract public void RenameHeaders(string oldName, string newName);
         abstract public void RemoveHeader(string colName);
-        abstract public void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices);
+        abstract public void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName);
     }
 }

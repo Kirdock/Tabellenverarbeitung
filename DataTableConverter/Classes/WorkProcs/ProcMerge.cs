@@ -6,7 +6,6 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -20,7 +19,8 @@ namespace DataTableConverter.Classes.WorkProcs
         public DataTable Conditions;
         public MergeFormat Format;
 
-        internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name) {
+        internal ProcMerge(int ordinal, int id, string name) : base(ordinal, id, name)
+        {
             InitConditions();
             Format = new MergeFormat();
         }
@@ -51,7 +51,7 @@ namespace DataTableConverter.Classes.WorkProcs
         {
             IEnumerable<string> mergeFormatHeaders = Format.GetHeaders();
             IEnumerable<string> conditionHeaders = GetConditionHeaders();
-            
+
             return mergeFormatHeaders.Concat(conditionHeaders).Distinct().ToArray();
         }
 
@@ -103,48 +103,53 @@ namespace DataTableConverter.Classes.WorkProcs
             Conditions = Conditions.AsEnumerable().Where(condition => condition[(int)ConditionColumn.Spalte].ToString() != colName).ToTable(Conditions);
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filename, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
             if (!string.IsNullOrWhiteSpace(NewColumn))
             {
-                string column = NewColumn;
-                if (CopyOldColumn && table.Columns.IndexOf(NewColumn) > -1)
-                {
-                    table.CopyColumns(new string[] { NewColumn });
-                }
-                else if(!CopyOldColumn)
-                {
-                    if (!table.AddColumnWithDialog(NewColumn, invokeForm))
-                    {
-                        column = null;
-                    }
-                }
-                if (column != null)
-                {
-                    foreach (DataRow row in table.Rows)
-                    {
-                        DataRow match = Conditions.AsEnumerable().FirstOrDefault(condition =>
-                        {
-                            string value = condition[(int)ConditionColumn.Spalte]?.ToString();
-                            string rowValue;
-                            bool notEmpty = condition[(int)ConditionColumn.NichtLeer] == DBNull.Value ? false : (bool)condition[(int)ConditionColumn.NichtLeer];
-                            return !string.IsNullOrWhiteSpace(value)
-                                &&
-                                (
-                                    ((rowValue = row[value].ToString()) == condition[(int)ConditionColumn.Wert].ToString() && !notEmpty)
-                                    ||
-                                    (
-                                        notEmpty
-                                        &&
-                                        !string.IsNullOrWhiteSpace(rowValue)
-                                    )
-                                );
-                        });
-                        MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
 
-                        row[column] = format.IsStringFormat() ? GetFormat(row, format.Formula, table.Columns, invokeForm) : GetFormat(row, format, table.Columns);
+                //column is alias
+                string column = NewColumn;
+                PrepareSingle(ref column, invokeForm, tableName, out string destinationColumn);
+
+                //column is columnName now
+                if (destinationColumn != null)
+                {
+                    List<string> aliases = invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).Select(alias => alias.ToLower()).ToList();
+                    List<KeyValuePair<long, string>> updates = new List<KeyValuePair<long, string>>();
+                    using (System.Data.SQLite.SQLiteDataReader reader = invokeForm.DatabaseHelper.GetDataCommand(tableName, "id").ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            DataRow match = Conditions.AsEnumerable().FirstOrDefault(condition =>
+                            {
+                                string alias = condition[(int)ConditionColumn.Spalte]?.ToString().ToLower();
+                                string rowValue;
+                                bool notEmpty = condition[(int)ConditionColumn.NichtLeer] == DBNull.Value ? false : (bool)condition[(int)ConditionColumn.NichtLeer];
+                                return !string.IsNullOrWhiteSpace(alias)
+                                    &&
+                                    (
+                                        ((rowValue = reader.GetValue(aliases.IndexOf(alias) + 1).ToString()) == condition[(int)ConditionColumn.Wert].ToString() && !notEmpty)
+                                        ||
+                                        (
+                                            notEmpty
+                                            &&
+                                            !string.IsNullOrWhiteSpace(rowValue)
+                                        )
+                                    );
+                            });
+                            Dictionary<string, string> aliasValueMapping = new Dictionary<string, string>();
+                            for (int i = 1; i < reader.FieldCount; i++)
+                            {
+                                aliasValueMapping.Add(aliases[i - 1], reader.GetValue(i).ToString());
+                            }
+                            MergeFormat format = match == null ? Format : match[(int)ConditionColumn.Format] as MergeFormat;
+                            string result = format.IsStringFormat() ? GetFormat(aliasValueMapping, format.Formula, aliases, invokeForm) : GetFormat(aliasValueMapping, format, aliases);
+                            updates.Add(new KeyValuePair<long, string>(reader.GetInt64(0), result));
+                        }
                     }
+
+                    invokeForm.DatabaseHelper.UpdateCells(updates, destinationColumn, tableName);
                 }
             }
             else
@@ -153,38 +158,57 @@ namespace DataTableConverter.Classes.WorkProcs
             }
         }
 
-        private string GetFormat(DataRow sourceRow, MergeFormat format, DataColumnCollection tableColumns)
+        private string GetFormat(Dictionary<string, string> sourceRow, MergeFormat format, List<string> tableColumns)
         {
             StringBuilder result = new StringBuilder();
-            IEnumerable<string> formatHeaders = format.GetHeaders();
+            IEnumerable<string> formatHeaders = format.GetHeaders().Select(header => header.ToLower());
             Dictionary<string, bool> dict = new Dictionary<string, bool>();
-            foreach(string header in formatHeaders)
+            foreach (string header in formatHeaders)
             {
                 dict.Add(header, tableColumns.Contains(header));
             }
 
-            foreach(DataRow row in format.Table.AsEnumerable())
+            foreach (DataRow row in format.Table.AsEnumerable())
             {
                 string column = row[(int)MergeFormat.MergeColumns.Column]?.ToString();
                 bool columnIsEmpty = string.IsNullOrWhiteSpace(column);
                 if (columnIsEmpty || dict[column])
                 {
                     //could contain columns that are not in the table
-                    IEnumerable<string> emptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.Empty]?.ToString()).Where(header => dict[header]);
+                    IEnumerable<string> emptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.Empty]?.ToString()).Select(header => header.ToLower()).Where(header => dict[header]);
                     bool emptyAllChecked = row[(int)MergeFormat.MergeColumns.EmptyAll] == DBNull.Value ? false : (bool)row[(int)MergeFormat.MergeColumns.EmptyAll];
-                    bool emptyFullFilled = emptyHeaderOfRow.Count() == 0 || emptyAllChecked ? emptyHeaderOfRow.All(header => string.IsNullOrWhiteSpace(sourceRow[header]?.ToString())) : emptyHeaderOfRow.Any(header => string.IsNullOrWhiteSpace(sourceRow[header]?.ToString()));
+                    bool emptyFullFilled = emptyHeaderOfRow.Count() == 0 || emptyAllChecked ? emptyHeaderOfRow.All(header =>
+                    {
+                        sourceRow.TryGetValue(header, out string res);
+                        return string.IsNullOrWhiteSpace(res);
+                    }) : emptyHeaderOfRow.Any(header =>
+                    {
+                        sourceRow.TryGetValue(header, out string res);
+                        return string.IsNullOrWhiteSpace(res);
+                    });
 
                     if (emptyFullFilled)
                     {
-                        IEnumerable<string> notEmptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.NotEmpty]?.ToString()).Where(header => dict[header]);
+                        IEnumerable<string> notEmptyHeaderOfRow = GetHeaderOfFormula(row[(int)MergeFormat.MergeColumns.NotEmpty]?.ToString()).Select(header => header.ToLower()).Where(header => dict[header]);
                         bool notEmptyAllChecked = row[(int)MergeFormat.MergeColumns.NotEmptyAll] == DBNull.Value ? false : (bool)row[(int)MergeFormat.MergeColumns.NotEmptyAll];
-                        bool notEmptyFullFilled = notEmptyHeaderOfRow.Count() == 0 || notEmptyAllChecked ? notEmptyHeaderOfRow.All(header => !string.IsNullOrWhiteSpace(sourceRow[header]?.ToString())) : notEmptyHeaderOfRow.Any(header => !string.IsNullOrWhiteSpace(sourceRow[header]?.ToString()));
+                        bool notEmptyFullFilled = notEmptyHeaderOfRow.Count() == 0 || notEmptyAllChecked ? notEmptyHeaderOfRow.All(header =>
+                        {
+                            sourceRow.TryGetValue(header, out string res);
+                            return string.IsNullOrWhiteSpace(res);
+                        }) : notEmptyHeaderOfRow.Any(header =>
+                        {
+                            sourceRow.TryGetValue(header, out string res);
+                            return string.IsNullOrWhiteSpace(res);
+                        });
                         if (notEmptyFullFilled)
                         {
                             if (!columnIsEmpty)
                             {
-                                string value = sourceRow[column]?.ToString();
-                                result.Append(value);
+                                if (sourceRow.TryGetValue(column, out string value))
+                                {
+                                    result.Append(value);
+                                }
+
                                 if (!string.IsNullOrWhiteSpace(value))
                                 {
                                     result.Append(row[(int)MergeFormat.MergeColumns.Text]?.ToString());
@@ -202,9 +226,9 @@ namespace DataTableConverter.Classes.WorkProcs
         }
 
 
-        private string GetFormat(DataRow row, string formula, DataColumnCollection tableColumns, Form mainForm)
+        private string GetFormat(Dictionary<string, string> row, string formula, List<string> tableColumns, Form mainForm)
         {
-            string[] columns = GetHeaderOfFormula(formula).ToArray();
+            string[] columns = GetHeaderOfFormula(formula).Select(header => header.ToLower()).ToArray();
             Dictionary<FormatIdentifier, bool> emptyAfterHeader = GetEmptyAfterHeaders(columns, row, tableColumns);
             StringBuilder result = new StringBuilder();
             int counter = 0;
@@ -227,7 +251,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     string value = headersInBrackets[bracketCount].FirstOrDefault(h => tableColumns.Contains(h) && !string.IsNullOrWhiteSpace(row[h]?.ToString())) ?? string.Empty;
                     if (value != string.Empty)
                     {
-                        result.Append(row[value].ToString());
+                        result.Append(row[value]?.ToString());
                     }
                     counter += headersInBrackets[bracketCount].Length;
                     i = formula.IndexOf(')', i);
@@ -253,7 +277,7 @@ namespace DataTableConverter.Classes.WorkProcs
                     {
                         stringBetween.Clear();
                     }
-                    
+
                     result.Append(stringBetween);
 
                     if (!isEmpty)
@@ -261,7 +285,7 @@ namespace DataTableConverter.Classes.WorkProcs
                         result.Append(value);
                     }
 
-                    
+
 
                     stringBetween.Clear();
 
@@ -283,21 +307,22 @@ namespace DataTableConverter.Classes.WorkProcs
             return stringBetween.Length != 0 ? result.Append(stringBetween).ToString() : result.ToString();
         }
 
-        private Dictionary<FormatIdentifier, bool> GetEmptyAfterHeaders(string[] headers, DataRow row, DataColumnCollection tableColumns)
+        private Dictionary<FormatIdentifier, bool> GetEmptyAfterHeaders(string[] headers, Dictionary<string, string> row, List<string> tableColumns)
         {
             Dictionary<FormatIdentifier, bool> dict = new Dictionary<FormatIdentifier, bool>();
             Dictionary<string, bool> isEmpty = new Dictionary<string, bool>();
-            foreach(string header in headers)
+            foreach (string header in headers)
             {
                 if (!isEmpty.ContainsKey(header))
                 {
-                    isEmpty.Add(header, !tableColumns.Contains(header) || string.IsNullOrWhiteSpace(row[header]?.ToString()));
+                    row.TryGetValue(header, out string value);
+                    isEmpty.Add(header, !tableColumns.Contains(header) || string.IsNullOrWhiteSpace(value));
                 }
             }
 
             for (int i = 0; i < headers.Length; i++)
             {
-                dict.Add(new FormatIdentifier { Header = headers[i], Index = i }, i != headers.Length && headers.Skip(i+1).All(header => isEmpty[header]));
+                dict.Add(new FormatIdentifier { Header = headers[i], Index = i }, i != headers.Length && headers.Skip(i + 1).All(header => isEmpty[header]));
             }
 
             return dict;
@@ -332,7 +357,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             for (int i = 0; i < matches.Count; i++)
             {
-                yield return GetHeaderOfFormula(matches[i].Groups[1].Value).ToArray();
+                yield return GetHeaderOfFormula(matches[i].Groups[1].Value.ToLower()).ToArray();
             }
         }
 

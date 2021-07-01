@@ -1,43 +1,111 @@
-﻿using System.Collections.Generic;
+﻿using DataTableConverter.View;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
 {
     class DataHelper
     {
 
-        internal static DataTable DictionaryToDataTable(Dictionary<string, int> dict, string columnName, bool showFromTo)
+        internal static int StartMerge(string importTable, int encoding, string filePath, string sourceIdentifierColumnName, string importIdentifierColumnName, string invalidColumnAlias, Form1 invokeForm, string tableName)
         {
-            DataTable result = new DataTable();
-            if (dict.Count == 0)
-            {
-                return result;
-            }
+            string[] importColumnNames = new string[0];
+            string filename = System.IO.Path.GetFileNameWithoutExtension(filePath);
+            int count = 0;
+            DialogResult result = DialogResult.No;
+            int importRowCount = invokeForm.DatabaseHelper.GetRowCount(importTable);
+            int originalRowCount = invokeForm.DatabaseHelper.GetRowCount(tableName);
+            Dictionary<string, string> importTableColumnAliasMapping = invokeForm.DatabaseHelper.GetAliasColumnMapping(importTable);
+            Dictionary<string, string> originalTableColumnAliasMapping = invokeForm.DatabaseHelper.GetAliasColumnMapping(tableName);
 
-            var columnNames = dict.Keys;
-            if (showFromTo)
+            if (string.IsNullOrWhiteSpace(sourceIdentifierColumnName) || string.IsNullOrWhiteSpace(importIdentifierColumnName))
             {
-                result.Columns.AddRange(new string[] { columnName, "Anzahl", "Von", "Bis" }.Select(c => new DataColumn(c,typeof(string))).ToArray());
-                int count = 1;
-                foreach (KeyValuePair<string, int> item in dict)
-                {
-                    int newCount = count + item.Value;
-                    result.Rows.Add(new object[] { item.Key, item.Value.ToString(), count.ToString(), (newCount - 1).ToString() });
-                    count = newCount;
-                }
+                result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, invokeForm);
             }
             else
             {
-                result.Columns.AddRange(new string[] { columnName, "Anzahl" }.Select(c => new DataColumn(c, typeof(string))).ToArray());
-                foreach (KeyValuePair<string, int> item in dict)
+                string res = originalTableColumnAliasMapping.FirstOrDefault(pair => pair.Key.Equals(sourceIdentifierColumnName, System.StringComparison.OrdinalIgnoreCase)).Value;
+                if (res!= null)
                 {
-                    result.Rows.Add(new object[] { item.Key, item.Value.ToString()});
+                    sourceIdentifierColumnName = res;
+                    res = importTableColumnAliasMapping.FirstOrDefault(pair => pair.Key.Equals(importIdentifierColumnName, System.StringComparison.OrdinalIgnoreCase)).Value;
+                    if (res != null)
+                    {
+                        importIdentifierColumnName = res;
+
+                        importColumnNames = importTableColumnAliasMapping.Values.Cast<string>().ToArray();
+                        result = DialogResult.Yes;
+                        if (originalRowCount != importRowCount)
+                        {
+                            result = MessageHandler.MessagesYesNo(invokeForm, MessageBoxIcon.Warning, $"Die Zeilenanzahl der beiden Tabellen stimmt nicht überein ({originalRowCount} zu {importRowCount })!\nTrotzdem fortfahren?");
+                        }
+                    }
+                    else
+                    {
+                        MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Warning, $"Die zu importierende Tabelle hat keine Spalte mit der Bezeichnung {importIdentifierColumnName}");
+                        result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, invokeForm);
+                    }
+                }
+                else
+                {
+                    MessageHandler.MessagesOK(invokeForm, MessageBoxIcon.Warning, $"Die Haupttabelle hat keine Spalte mit der Bezeichnung {sourceIdentifierColumnName}");
+                    result = ShowMergeForm(ref importColumnNames, ref sourceIdentifierColumnName, ref importIdentifierColumnName, originalTableColumnAliasMapping, originalRowCount, importTableColumnAliasMapping, importRowCount, filename, invokeForm);
                 }
             }
 
-            return result;
+            if (result == DialogResult.Yes)
+            {
+                string invalidColumnName = importTableColumnAliasMapping.FirstOrDefault(pair => pair.Key.Equals(invalidColumnAlias, System.StringComparison.OrdinalIgnoreCase)).Value;
+                if (invalidColumnName == null || !importColumnNames.Contains(invalidColumnName))
+                {
+                    SelectDuplicateColumns f = new SelectDuplicateColumns(new string[] { invalidColumnAlias }, importTableColumnAliasMapping, true);
+                    DialogResult res = DialogResult.Cancel;
+                    invokeForm.Invoke(new MethodInvoker(() =>
+                    {
+                        res = f.ShowDialog(invokeForm);
+                    }));
+                    if (res == DialogResult.OK)
+                    {
+                        invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
+                    }
+                }
+
+                bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm, out string orderColumn);
+
+                if (abort) return 0;
+
+                invokeForm.DatabaseHelper.ApplyOrder(orderColumn, tableName);
+                invokeForm.DatabaseHelper.DeleteColumn(orderColumn, tableName);
+
+                if (Properties.Settings.Default.SplitPVM)
+                {
+                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, string.Empty, Classes.OrderType.Windows, tableName);
+                }
+                invokeForm.DatabaseHelper.DeleteInvalidRows(tableName, invalidColumnName);
+            }
+            return count;
         }
-        
+
+        private static DialogResult ShowMergeForm(ref string[] importColumns, ref string sourceColumnName, ref string importColumnName, Dictionary<string, string> originalTableHeaders, int originalRowCount, Dictionary<string, string> importTableHeaders, int importRowCount, string filename, Form invokeForm)
+        {
+            bool result;
+            using (MergeTable form = new MergeTable(originalTableHeaders, importTableHeaders, filename, originalRowCount, importRowCount))
+            {
+                DialogResult res = DialogResult.Cancel;
+                invokeForm.Invoke(new MethodInvoker(() =>
+                {
+                    res = form.ShowDialog(invokeForm);
+                }));
+                if (result = (res == DialogResult.OK))
+                {
+                    importColumns = form.SelectedColumns.ToArray();
+                    sourceColumnName = form.OriginalIdentifierColumnName;
+                    importColumnName = form.ImportIdentifierColumnName;
+                }
+            }
+            return result ? DialogResult.Yes : DialogResult.No;
+        }
     }
 }

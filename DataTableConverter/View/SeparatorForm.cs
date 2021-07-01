@@ -1,13 +1,9 @@
-﻿using System;
+﻿using DataTableConverter.Extensions;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataTableConverter.Extensions;
 
 namespace DataTableConverter.View
 {
@@ -37,7 +33,7 @@ namespace DataTableConverter.View
         {
             DataTable table = new DataTable { TableName = "Separators" };
             table.Columns.Add("Trennzeichen", typeof(string));
-            foreach(string separator in separators)
+            foreach (string separator in separators)
             {
                 table.Rows.Add(separator);
             }

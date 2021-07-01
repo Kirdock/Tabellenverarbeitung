@@ -1,31 +1,30 @@
 ﻿using DataTableConverter.Classes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
 {
     public partial class SortForm : Form
     {
-        public string SortString;
+        internal string SortString;
         private readonly string DescString = "↓";
         private readonly string AscString = "↑";
         private Dictionary<string, string> Orders;
+        private Dictionary<string, string> AliasColumnMapping;
         internal OrderType OrderType => GetOrderType();
 
-        internal SortForm(object[] items, string orderBefore, OrderType orderType)
+        internal SortForm(Dictionary<string, string> aliasColumnMapping, string orderBefore, OrderType orderType)
         {
             InitializeComponent();
             SetListBoxStyle();
+            AliasColumnMapping = aliasColumnMapping;
             Orders = new Dictionary<string, string>();
-            clBoxHeaders.Items.AddRange(items);
+            clBoxHeaders.Items.AddRange(aliasColumnMapping.Keys.ToArray());
             adjustListBox(orderBefore);
             SetOrderType(orderType);
         }
@@ -78,8 +77,8 @@ namespace DataTableConverter.View
             {
                 clBoxHeaders.ItemCheck -= clBoxHeaders_ItemCheck;
 
-                string[] headersInformation = orderBefore.Split(new string[] { ","}, StringSplitOptions.RemoveEmptyEntries);
-                foreach(string info in headersInformation)
+                string[] headersInformation = orderBefore.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string info in headersInformation)
                 {
                     string[] headerInfo = info.Split(new string[] { "] " }, StringSplitOptions.RemoveEmptyEntries);
                     string header = headerInfo[0].Trim().Substring(1);
@@ -114,14 +113,14 @@ namespace DataTableConverter.View
         private void btnOk_Click(object sender, EventArgs e)
         {
             StringBuilder builder = new StringBuilder();
-            lBoxSelectedHeaders.Items.Cast<object>().ToList().ForEach(x => builder.Append("[").Append(x).Append("] ").Append(Orders[x.ToString()] == AscString ? "ASC" : "DESC").Append(", "));
-            SortString = builder.Length >= 2 ? builder.ToString().Substring(0,builder.Length-2) : string.Empty;
+            lBoxSelectedHeaders.Items.Cast<object>().ToList().ForEach(x => builder.Append("[").Append(AliasColumnMapping[x.ToString()]).Append("] COLLATE NATURALSORT ").Append(Orders[x.ToString()] == AscString ? "ASC" : "DESC").Append(", "));
+            SortString = builder.Length >= 2 ? builder.ToString().Substring(0, builder.Length - 2) : string.Empty;
             DialogResult = DialogResult.OK;
         }
 
         private void lBoxSelectedHeaders_DoubleClick(object sender, EventArgs e)
         {
-            if(lBoxSelectedHeaders.SelectedIndex != -1)
+            if (lBoxSelectedHeaders.SelectedIndex != -1)
             {
                 Orders.Remove(lBoxSelectedHeaders.SelectedItem.ToString());
                 clBoxHeaders.SetItemChecked(clBoxHeaders.Items.IndexOf(lBoxSelectedHeaders.SelectedItem), false);
@@ -131,7 +130,7 @@ namespace DataTableConverter.View
         private void btnUp_Click(object sender, EventArgs e)
         {
             int index = lBoxSelectedHeaders.SelectedIndex;
-            if ( index > 0)
+            if (index > 0)
             {
                 setUpOrDown(index, -1);
             }
@@ -140,7 +139,7 @@ namespace DataTableConverter.View
         private void btnDown_Click(object sender, EventArgs e)
         {
             int index = lBoxSelectedHeaders.SelectedIndex;
-            if (index < lBoxSelectedHeaders.Items.Count-1)
+            if (index < lBoxSelectedHeaders.Items.Count - 1)
             {
                 setUpOrDown(index, 1);
             }
@@ -168,11 +167,11 @@ namespace DataTableConverter.View
         private void btnBottom_Click(object sender, EventArgs e)
         {
             int index = lBoxSelectedHeaders.SelectedIndex;
-            if (index < lBoxSelectedHeaders.Items.Count-1)
+            if (index < lBoxSelectedHeaders.Items.Count - 1)
             {
                 lBoxSelectedHeaders.Items.Add(lBoxSelectedHeaders.Items[index]);
                 lBoxSelectedHeaders.Items.RemoveAt(index);
-                lBoxSelectedHeaders.SelectedIndex = lBoxSelectedHeaders.Items.Count-1;
+                lBoxSelectedHeaders.SelectedIndex = lBoxSelectedHeaders.Items.Count - 1;
             }
         }
 
@@ -199,7 +198,7 @@ namespace DataTableConverter.View
             if (e.Button == MouseButtons.Right)
             {
                 int index = lBoxSelectedHeaders.IndexFromPoint(e.Location);
-                if(index > -1)
+                if (index > -1)
                 {
                     lBoxSelectedHeaders.SelectedIndex = index;
                     string value = lBoxSelectedHeaders.SelectedItem.ToString();

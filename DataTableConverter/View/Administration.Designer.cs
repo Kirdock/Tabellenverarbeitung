@@ -65,23 +65,25 @@
             this.btnDown = new System.Windows.Forms.Button();
             this.btnAddProcedureToWorkflow = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
-            this.GbMergeRows = new System.Windows.Forms.GroupBox();
-            this.CBMergeRowsSeparator = new System.Windows.Forms.CheckBox();
-            this.label41 = new System.Windows.Forms.Label();
-            this.lblMergeRowsIdentifier = new System.Windows.Forms.Label();
-            this.label43 = new System.Windows.Forms.Label();
-            this.TxtMergeRowsIdentifier = new System.Windows.Forms.TextBox();
-            this.dgMergeRowsColumns = new System.Windows.Forms.DataGridView();
-            this.gbProcedure = new System.Windows.Forms.GroupBox();
-            this.BtnProcUserOpen = new System.Windows.Forms.Button();
-            this.cbOldColumn = new System.Windows.Forms.CheckBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.lblNewColumn = new System.Windows.Forms.Label();
-            this.lblHeaders = new System.Windows.Forms.Label();
-            this.txtNewColumn = new System.Windows.Forms.TextBox();
-            this.cbNewColumn = new System.Windows.Forms.CheckBox();
-            this.dgvColumns = new System.Windows.Forms.DataGridView();
+            this.gbPVMExport = new System.Windows.Forms.GroupBox();
+            this.label42 = new System.Windows.Forms.Label();
+            this.RBPVMExcel = new System.Windows.Forms.RadioButton();
+            this.RBPVMCSV = new System.Windows.Forms.RadioButton();
+            this.RBPVMDBASE = new System.Windows.Forms.RadioButton();
+            this.label22 = new System.Windows.Forms.Label();
+            this.CmBPVMExportEncodings = new System.Windows.Forms.ComboBox();
+            this.BtnSearchPVM = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.TxtPVMPath = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cbHeadersPVMExport = new CheckComboBoxTest.CheckedComboBox();
+            this.dgvPVMExport = new System.Windows.Forms.DataGridView();
+            this.gbDefDuplicate = new System.Windows.Forms.GroupBox();
+            this.dgColumnDefDuplicate = new System.Windows.Forms.DataGridView();
             this.gbSeparate = new System.Windows.Forms.GroupBox();
+            this.LblSeparateContinuedNumber = new System.Windows.Forms.Label();
+            this.TxtSeparateContinuedNumber = new System.Windows.Forms.TextBox();
+            this.CbSeparateContinuedNumber = new System.Windows.Forms.CheckBox();
             this.CbSeparateSaveRemaining = new System.Windows.Forms.CheckBox();
             this.BtnSeparateLoadEntries = new System.Windows.Forms.Button();
             this.CbSeparateSaveAll = new System.Windows.Forms.CheckBox();
@@ -95,6 +97,24 @@
             this.CmBSeparate = new System.Windows.Forms.ComboBox();
             this.BtnSeparateAdd = new System.Windows.Forms.Button();
             this.DgvSeparate = new System.Windows.Forms.DataGridView();
+            this.GbMergeRows = new System.Windows.Forms.GroupBox();
+            this.CBMergeRowsSeparator = new System.Windows.Forms.CheckBox();
+            this.label41 = new System.Windows.Forms.Label();
+            this.CLBMergeRowsHeaders = new CheckComboBoxTest.CheckedComboBox();
+            this.lblMergeRowsIdentifier = new System.Windows.Forms.Label();
+            this.label43 = new System.Windows.Forms.Label();
+            this.TxtMergeRowsIdentifier = new System.Windows.Forms.TextBox();
+            this.dgMergeRowsColumns = new System.Windows.Forms.DataGridView();
+            this.gbProcedure = new System.Windows.Forms.GroupBox();
+            this.BtnProcUserOpen = new System.Windows.Forms.Button();
+            this.cbOldColumn = new System.Windows.Forms.CheckBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.clbHeaderProcedure = new CheckComboBoxTest.CheckedComboBox();
+            this.lblNewColumn = new System.Windows.Forms.Label();
+            this.lblHeaders = new System.Windows.Forms.Label();
+            this.txtNewColumn = new System.Windows.Forms.TextBox();
+            this.cbNewColumn = new System.Windows.Forms.CheckBox();
+            this.dgvColumns = new System.Windows.Forms.DataGridView();
             this.GbSplit = new System.Windows.Forms.GroupBox();
             this.TxtSplitText = new System.Windows.Forms.TextBox();
             this.LblSplitText = new System.Windows.Forms.Label();
@@ -133,9 +153,11 @@
             this.cbSubstringNewColumn = new System.Windows.Forms.CheckBox();
             this.dgvSubstringColumns = new System.Windows.Forms.DataGridView();
             this.lblSubstringNewColumn = new System.Windows.Forms.Label();
+            this.cbSubstringHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.label35 = new System.Windows.Forms.Label();
             this.txtSubstringNewColumn = new System.Windows.Forms.TextBox();
             this.gbTrim = new System.Windows.Forms.GroupBox();
+            this.CLBTrimHeaders = new CheckComboBoxTest.CheckedComboBox();
             this.label39 = new System.Windows.Forms.Label();
             this.label38 = new System.Windows.Forms.Label();
             this.CBTrimAllColumns = new System.Windows.Forms.CheckBox();
@@ -147,14 +169,6 @@
             this.RbTrimStart = new System.Windows.Forms.RadioButton();
             this.lblTrimCharacter = new System.Windows.Forms.Label();
             this.TxtTrimText = new System.Windows.Forms.TextBox();
-            this.gbPVMExport = new System.Windows.Forms.GroupBox();
-            this.label22 = new System.Windows.Forms.Label();
-            this.CmBPVMExportEncodings = new System.Windows.Forms.ComboBox();
-            this.BtnSearchPVM = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.TxtPVMPath = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.dgvPVMExport = new System.Windows.Forms.DataGridView();
             this.gbAddTableColumns = new System.Windows.Forms.GroupBox();
             this.CmBPVMImportEncoding = new System.Windows.Forms.ComboBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -179,6 +193,7 @@
             this.label19 = new System.Windows.Forms.Label();
             this.dgvPadConditions = new System.Windows.Forms.DataGridView();
             this.lblPadNewColumn = new System.Windows.Forms.Label();
+            this.cbHeadersPad = new CheckComboBoxTest.CheckedComboBox();
             this.label21 = new System.Windows.Forms.Label();
             this.txtNewColumnPad = new System.Windows.Forms.TextBox();
             this.gbRound = new System.Windows.Forms.GroupBox();
@@ -188,6 +203,7 @@
             this.label17 = new System.Windows.Forms.Label();
             this.numDec = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
+            this.clbHeadersRound = new CheckComboBoxTest.CheckedComboBox();
             this.lblNewColumnRound = new System.Windows.Forms.Label();
             this.lblUsedColumnsRound = new System.Windows.Forms.Label();
             this.txtNewColumnRound = new System.Windows.Forms.TextBox();
@@ -220,13 +236,13 @@
             this.txtNewColumnMerge = new System.Windows.Forms.TextBox();
             this.gbOrder = new System.Windows.Forms.GroupBox();
             this.label8 = new System.Windows.Forms.Label();
+            this.clbHeaderOrder = new CheckComboBoxTest.CheckedComboBox();
             this.dgOrderColumns = new System.Windows.Forms.DataGridView();
-            this.gbDefDuplicate = new System.Windows.Forms.GroupBox();
-            this.dgColumnDefDuplicate = new System.Windows.Forms.DataGridView();
             this.gbUpLowCase = new System.Windows.Forms.GroupBox();
             this.cbUpLow = new System.Windows.Forms.CheckBox();
             this.cmbUpLow = new System.Windows.Forms.ComboBox();
             this.lblUpLowCaseHeader = new System.Windows.Forms.Label();
+            this.clbUpLowHeader = new CheckComboBoxTest.CheckedComboBox();
             this.lblUsedColumnsUpLowCase = new System.Windows.Forms.Label();
             this.dgUpLow = new System.Windows.Forms.DataGridView();
             this.gbNumber = new System.Windows.Forms.GroupBox();
@@ -240,6 +256,7 @@
             this.gbReplaceWhole = new System.Windows.Forms.GroupBox();
             this.lblUsedColumnsReplaceWhole = new System.Windows.Forms.Label();
             this.dgvReplaceWhole = new System.Windows.Forms.DataGridView();
+            this.cbHeadersReplaceWhole = new CheckComboBoxTest.CheckedComboBox();
             this.label26 = new System.Windows.Forms.Label();
             this.gbMain = new System.Windows.Forms.GroupBox();
             this.lblOriginalName = new System.Windows.Forms.Label();
@@ -268,24 +285,12 @@
             this.txtShortcut = new System.Windows.Forms.TextBox();
             this.lblCaseName = new System.Windows.Forms.Label();
             this.gbCaseColumns = new System.Windows.Forms.GroupBox();
+            this.CBCaseCheckAll = new System.Windows.Forms.CheckBox();
             this.dgCaseColumns = new System.Windows.Forms.DataGridView();
             this.txtCaseName = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.CLBMergeRowsHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.clbHeaderProcedure = new CheckComboBoxTest.CheckedComboBox();
-            this.cbSubstringHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.CLBTrimHeaders = new CheckComboBoxTest.CheckedComboBox();
-            this.cbHeadersPVMExport = new CheckComboBoxTest.CheckedComboBox();
-            this.cbHeadersPad = new CheckComboBoxTest.CheckedComboBox();
-            this.clbHeadersRound = new CheckComboBoxTest.CheckedComboBox();
-            this.clbHeaderOrder = new CheckComboBoxTest.CheckedComboBox();
-            this.clbUpLowHeader = new CheckComboBoxTest.CheckedComboBox();
-            this.cbHeadersReplaceWhole = new CheckComboBoxTest.CheckedComboBox();
-            this.LblSeparateContinuedNumber = new System.Windows.Forms.Label();
-            this.TxtSeparateContinuedNumber = new System.Windows.Forms.TextBox();
-            this.CbSeparateContinuedNumber = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitProcedures)).BeginInit();
@@ -308,12 +313,16 @@
             this.splitWorkflowProperties.Panel1.SuspendLayout();
             this.splitWorkflowProperties.Panel2.SuspendLayout();
             this.splitWorkflowProperties.SuspendLayout();
+            this.gbPVMExport.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).BeginInit();
+            this.gbDefDuplicate.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgColumnDefDuplicate)).BeginInit();
+            this.gbSeparate.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).BeginInit();
             this.GbMergeRows.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgMergeRowsColumns)).BeginInit();
             this.gbProcedure.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).BeginInit();
-            this.gbSeparate.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).BeginInit();
             this.GbSplit.SuspendLayout();
             this.GbSearch.SuspendLayout();
             this.GBSearchShortcut.SuspendLayout();
@@ -326,8 +335,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvSubstringColumns)).BeginInit();
             this.gbTrim.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DGVTrimColumns)).BeginInit();
-            this.gbPVMExport.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).BeginInit();
             this.gbAddTableColumns.SuspendLayout();
             this.gbPadding.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbPadCount)).BeginInit();
@@ -343,8 +350,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvMerge)).BeginInit();
             this.gbOrder.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).BeginInit();
-            this.gbDefDuplicate.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgColumnDefDuplicate)).BeginInit();
             this.gbUpLowCase.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgUpLow)).BeginInit();
             this.gbNumber.SuspendLayout();
@@ -679,6 +684,8 @@
             // splitWorkflowProcProperties.Panel2
             // 
             this.splitWorkflowProcProperties.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
+            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbDefDuplicate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSeparate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.GbMergeRows);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbProcedure);
@@ -686,7 +693,6 @@
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.GbSearch);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbSubstring);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbTrim);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPVMExport);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbAddTableColumns);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbPadding);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbRound);
@@ -694,7 +700,6 @@
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbCompare);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbMerge);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbOrder);
-            this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbDefDuplicate);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbUpLowCase);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbNumber);
             this.splitWorkflowProcProperties.Panel2.Controls.Add(this.gbReplaceWhole);
@@ -867,192 +872,189 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // GbMergeRows
+            // gbPVMExport
             // 
-            this.GbMergeRows.Controls.Add(this.CBMergeRowsSeparator);
-            this.GbMergeRows.Controls.Add(this.label41);
-            this.GbMergeRows.Controls.Add(this.CLBMergeRowsHeaders);
-            this.GbMergeRows.Controls.Add(this.lblMergeRowsIdentifier);
-            this.GbMergeRows.Controls.Add(this.label43);
-            this.GbMergeRows.Controls.Add(this.TxtMergeRowsIdentifier);
-            this.GbMergeRows.Controls.Add(this.dgMergeRowsColumns);
-            this.GbMergeRows.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GbMergeRows.Location = new System.Drawing.Point(0, 92);
-            this.GbMergeRows.Name = "GbMergeRows";
-            this.GbMergeRows.Size = new System.Drawing.Size(245, 643);
-            this.GbMergeRows.TabIndex = 29;
-            this.GbMergeRows.TabStop = false;
-            this.GbMergeRows.Text = "Spaltenangabe";
+            this.gbPVMExport.Controls.Add(this.label42);
+            this.gbPVMExport.Controls.Add(this.RBPVMExcel);
+            this.gbPVMExport.Controls.Add(this.RBPVMCSV);
+            this.gbPVMExport.Controls.Add(this.RBPVMDBASE);
+            this.gbPVMExport.Controls.Add(this.label22);
+            this.gbPVMExport.Controls.Add(this.CmBPVMExportEncodings);
+            this.gbPVMExport.Controls.Add(this.BtnSearchPVM);
+            this.gbPVMExport.Controls.Add(this.label6);
+            this.gbPVMExport.Controls.Add(this.TxtPVMPath);
+            this.gbPVMExport.Controls.Add(this.label5);
+            this.gbPVMExport.Controls.Add(this.cbHeadersPVMExport);
+            this.gbPVMExport.Controls.Add(this.dgvPVMExport);
+            this.gbPVMExport.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbPVMExport.Location = new System.Drawing.Point(0, 92);
+            this.gbPVMExport.Name = "gbPVMExport";
+            this.gbPVMExport.Size = new System.Drawing.Size(245, 643);
+            this.gbPVMExport.TabIndex = 23;
+            this.gbPVMExport.TabStop = false;
+            this.gbPVMExport.Text = "Spaltenangabe";
             // 
-            // CBMergeRowsSeparator
+            // label42
             // 
-            this.CBMergeRowsSeparator.AutoSize = true;
-            this.CBMergeRowsSeparator.Location = new System.Drawing.Point(7, 77);
-            this.CBMergeRowsSeparator.Name = "CBMergeRowsSeparator";
-            this.CBMergeRowsSeparator.Size = new System.Drawing.Size(145, 17);
-            this.CBMergeRowsSeparator.TabIndex = 10;
-            this.CBMergeRowsSeparator.Text = "Tausender-Trennzeichen";
-            this.CBMergeRowsSeparator.UseVisualStyleBackColor = true;
-            this.CBMergeRowsSeparator.CheckedChanged += new System.EventHandler(this.CBMergeRowsSeparator_CheckedChanged);
+            this.label42.AutoSize = true;
+            this.label42.Location = new System.Drawing.Point(3, 173);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(74, 13);
+            this.label42.TabIndex = 28;
+            this.label42.Text = "Speichern als:";
             // 
-            // label41
+            // RBPVMExcel
             // 
-            this.label41.AutoSize = true;
-            this.label41.Location = new System.Drawing.Point(3, 107);
-            this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(209, 13);
-            this.label41.TabIndex = 9;
-            this.label41.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            this.RBPVMExcel.AutoSize = true;
+            this.RBPVMExcel.Location = new System.Drawing.Point(124, 187);
+            this.RBPVMExcel.Name = "RBPVMExcel";
+            this.RBPVMExcel.Size = new System.Drawing.Size(51, 17);
+            this.RBPVMExcel.TabIndex = 27;
+            this.RBPVMExcel.Text = "Excel";
+            this.RBPVMExcel.UseVisualStyleBackColor = true;
+            this.RBPVMExcel.CheckedChanged += new System.EventHandler(this.PVMSaveFormat_CheckedChanged);
             // 
-            // lblMergeRowsIdentifier
+            // RBPVMCSV
             // 
-            this.lblMergeRowsIdentifier.AutoSize = true;
-            this.lblMergeRowsIdentifier.Location = new System.Drawing.Point(3, 16);
-            this.lblMergeRowsIdentifier.Name = "lblMergeRowsIdentifier";
-            this.lblMergeRowsIdentifier.Size = new System.Drawing.Size(114, 13);
-            this.lblMergeRowsIdentifier.TabIndex = 7;
-            this.lblMergeRowsIdentifier.Text = "Identifizierende Spalte:";
+            this.RBPVMCSV.AutoSize = true;
+            this.RBPVMCSV.Checked = true;
+            this.RBPVMCSV.Location = new System.Drawing.Point(72, 187);
+            this.RBPVMCSV.Name = "RBPVMCSV";
+            this.RBPVMCSV.Size = new System.Drawing.Size(46, 17);
+            this.RBPVMCSV.TabIndex = 26;
+            this.RBPVMCSV.TabStop = true;
+            this.RBPVMCSV.Text = "CSV";
+            this.RBPVMCSV.UseVisualStyleBackColor = true;
+            this.RBPVMCSV.CheckedChanged += new System.EventHandler(this.PVMSaveFormat_CheckedChanged);
             // 
-            // label43
+            // RBPVMDBASE
             // 
-            this.label43.AutoSize = true;
-            this.label43.Location = new System.Drawing.Point(2, 158);
-            this.label43.Name = "label43";
-            this.label43.Size = new System.Drawing.Size(121, 13);
-            this.label43.TabIndex = 5;
-            this.label43.Text = "Angewendeten Spalten:";
+            this.RBPVMDBASE.AutoSize = true;
+            this.RBPVMDBASE.Location = new System.Drawing.Point(5, 187);
+            this.RBPVMDBASE.Name = "RBPVMDBASE";
+            this.RBPVMDBASE.Size = new System.Drawing.Size(61, 17);
+            this.RBPVMDBASE.TabIndex = 25;
+            this.RBPVMDBASE.Text = "DBASE";
+            this.RBPVMDBASE.UseVisualStyleBackColor = true;
+            this.RBPVMDBASE.CheckedChanged += new System.EventHandler(this.PVMSaveFormat_CheckedChanged);
             // 
-            // TxtMergeRowsIdentifier
+            // label22
             // 
-            this.TxtMergeRowsIdentifier.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(4, 71);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(60, 13);
+            this.label22.TabIndex = 24;
+            this.label22.Text = "CodePage:";
+            // 
+            // CmBPVMExportEncodings
+            // 
+            this.CmBPVMExportEncodings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtMergeRowsIdentifier.Location = new System.Drawing.Point(7, 36);
-            this.TxtMergeRowsIdentifier.Name = "TxtMergeRowsIdentifier";
-            this.TxtMergeRowsIdentifier.Size = new System.Drawing.Size(233, 20);
-            this.TxtMergeRowsIdentifier.TabIndex = 2;
-            this.TxtMergeRowsIdentifier.TextChanged += new System.EventHandler(this.TxtMergeRowsIdentifier_TextChanged);
+            this.CmBPVMExportEncodings.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CmBPVMExportEncodings.FormattingEnabled = true;
+            this.CmBPVMExportEncodings.Location = new System.Drawing.Point(6, 87);
+            this.CmBPVMExportEncodings.Name = "CmBPVMExportEncodings";
+            this.CmBPVMExportEncodings.Size = new System.Drawing.Size(239, 21);
+            this.CmBPVMExportEncodings.TabIndex = 23;
+            this.CmBPVMExportEncodings.SelectedIndexChanged += new System.EventHandler(this.CmBPVMExportEncodings_SelectedIndexChanged);
             // 
-            // dgMergeRowsColumns
+            // BtnSearchPVM
             // 
-            this.dgMergeRowsColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.BtnSearchPVM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnSearchPVM.Location = new System.Drawing.Point(169, 135);
+            this.BtnSearchPVM.Name = "BtnSearchPVM";
+            this.BtnSearchPVM.Size = new System.Drawing.Size(75, 23);
+            this.BtnSearchPVM.TabIndex = 22;
+            this.BtnSearchPVM.Text = "Suchen";
+            this.BtnSearchPVM.UseVisualStyleBackColor = true;
+            this.BtnSearchPVM.Click += new System.EventHandler(this.BtnSearchPVM_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(4, 121);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(117, 13);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Pfad der zweiten Datei:";
+            // 
+            // TxtPVMPath
+            // 
+            this.TxtPVMPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtPVMPath.Location = new System.Drawing.Point(7, 138);
+            this.TxtPVMPath.Name = "TxtPVMPath";
+            this.TxtPVMPath.Size = new System.Drawing.Size(157, 20);
+            this.TxtPVMPath.TabIndex = 20;
+            this.TxtPVMPath.TextChanged += new System.EventHandler(this.TxtPVMPath_TextChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(2, 23);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(209, 13);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // cbHeadersPVMExport
+            // 
+            this.cbHeadersPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbHeadersPVMExport.CheckOnClick = true;
+            this.cbHeadersPVMExport.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cbHeadersPVMExport.DropDownHeight = 1;
+            this.cbHeadersPVMExport.FormattingEnabled = true;
+            this.cbHeadersPVMExport.IntegralHeight = false;
+            this.cbHeadersPVMExport.Location = new System.Drawing.Point(5, 42);
+            this.cbHeadersPVMExport.Name = "cbHeadersPVMExport";
+            this.cbHeadersPVMExport.Size = new System.Drawing.Size(240, 21);
+            this.cbHeadersPVMExport.TabIndex = 18;
+            this.cbHeadersPVMExport.ValueSeparator = ", ";
+            this.cbHeadersPVMExport.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeadersPVMExport_ItemCheck);
+            // 
+            // dgvPVMExport
+            // 
+            this.dgvPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgMergeRowsColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgMergeRowsColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgMergeRowsColumns.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dgMergeRowsColumns.Location = new System.Drawing.Point(6, 179);
-            this.dgMergeRowsColumns.Name = "dgMergeRowsColumns";
-            this.dgMergeRowsColumns.RowHeadersVisible = false;
-            this.dgMergeRowsColumns.Size = new System.Drawing.Size(233, 444);
-            this.dgMergeRowsColumns.TabIndex = 0;
-            this.dgMergeRowsColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
-            this.dgMergeRowsColumns.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgMergeRowsColumns_CellFormatting);
-            this.dgMergeRowsColumns.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgMergeRowsColumns_EditingControlShowing);
+            this.dgvPVMExport.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvPVMExport.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvPVMExport.Location = new System.Drawing.Point(6, 219);
+            this.dgvPVMExport.Name = "dgvPVMExport";
+            this.dgvPVMExport.RowHeadersVisible = false;
+            this.dgvPVMExport.Size = new System.Drawing.Size(230, 403);
+            this.dgvPVMExport.TabIndex = 16;
+            this.dgvPVMExport.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
-            // gbProcedure
+            // gbDefDuplicate
             // 
-            this.gbProcedure.Controls.Add(this.BtnProcUserOpen);
-            this.gbProcedure.Controls.Add(this.cbOldColumn);
-            this.gbProcedure.Controls.Add(this.label7);
-            this.gbProcedure.Controls.Add(this.clbHeaderProcedure);
-            this.gbProcedure.Controls.Add(this.lblNewColumn);
-            this.gbProcedure.Controls.Add(this.lblHeaders);
-            this.gbProcedure.Controls.Add(this.txtNewColumn);
-            this.gbProcedure.Controls.Add(this.cbNewColumn);
-            this.gbProcedure.Controls.Add(this.dgvColumns);
-            this.gbProcedure.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbProcedure.Location = new System.Drawing.Point(0, 92);
-            this.gbProcedure.Name = "gbProcedure";
-            this.gbProcedure.Size = new System.Drawing.Size(245, 643);
-            this.gbProcedure.TabIndex = 9;
-            this.gbProcedure.TabStop = false;
-            this.gbProcedure.Text = "Spaltenangabe";
-            this.gbProcedure.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            this.gbDefDuplicate.Controls.Add(this.dgColumnDefDuplicate);
+            this.gbDefDuplicate.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbDefDuplicate.Location = new System.Drawing.Point(0, 92);
+            this.gbDefDuplicate.Name = "gbDefDuplicate";
+            this.gbDefDuplicate.Size = new System.Drawing.Size(245, 643);
+            this.gbDefDuplicate.TabIndex = 12;
+            this.gbDefDuplicate.TabStop = false;
+            this.gbDefDuplicate.Text = "Spaltenangabe";
+            this.gbDefDuplicate.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
             // 
-            // BtnProcUserOpen
+            // dgColumnDefDuplicate
             // 
-            this.BtnProcUserOpen.Location = new System.Drawing.Point(5, 19);
-            this.BtnProcUserOpen.Name = "BtnProcUserOpen";
-            this.BtnProcUserOpen.Size = new System.Drawing.Size(168, 23);
-            this.BtnProcUserOpen.TabIndex = 11;
-            this.BtnProcUserOpen.Text = "Suchen && Ersetzen festlegen";
-            this.BtnProcUserOpen.UseVisualStyleBackColor = true;
-            this.BtnProcUserOpen.Click += new System.EventHandler(this.BtnProcUserOpen_Click);
-            // 
-            // cbOldColumn
-            // 
-            this.cbOldColumn.AutoSize = true;
-            this.cbOldColumn.Location = new System.Drawing.Point(7, 78);
-            this.cbOldColumn.Name = "cbOldColumn";
-            this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
-            this.cbOldColumn.TabIndex = 10;
-            this.cbOldColumn.Text = "Alte Werte in ALT speichern?";
-            this.cbOldColumn.UseVisualStyleBackColor = true;
-            this.cbOldColumn.CheckedChanged += new System.EventHandler(this.cbOldColumn_CheckedChanged);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 111);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(209, 13);
-            this.label7.TabIndex = 9;
-            this.label7.Text = "Spalten aus geladener Tabelle hinzufügen:";
-            // 
-            // lblNewColumn
-            // 
-            this.lblNewColumn.AutoSize = true;
-            this.lblNewColumn.Location = new System.Drawing.Point(3, 66);
-            this.lblNewColumn.Name = "lblNewColumn";
-            this.lblNewColumn.Size = new System.Drawing.Size(89, 13);
-            this.lblNewColumn.TabIndex = 7;
-            this.lblNewColumn.Text = "Name der Spalte:";
-            this.lblNewColumn.Visible = false;
-            // 
-            // lblHeaders
-            // 
-            this.lblHeaders.AutoSize = true;
-            this.lblHeaders.Location = new System.Drawing.Point(2, 158);
-            this.lblHeaders.Name = "lblHeaders";
-            this.lblHeaders.Size = new System.Drawing.Size(121, 13);
-            this.lblHeaders.TabIndex = 5;
-            this.lblHeaders.Text = "Angewendeten Spalten:";
-            // 
-            // txtNewColumn
-            // 
-            this.txtNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtNewColumn.Location = new System.Drawing.Point(6, 83);
-            this.txtNewColumn.Name = "txtNewColumn";
-            this.txtNewColumn.Size = new System.Drawing.Size(233, 20);
-            this.txtNewColumn.TabIndex = 2;
-            this.txtNewColumn.Visible = false;
-            this.txtNewColumn.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
-            // 
-            // cbNewColumn
-            // 
-            this.cbNewColumn.AutoSize = true;
-            this.cbNewColumn.Location = new System.Drawing.Point(6, 50);
-            this.cbNewColumn.Name = "cbNewColumn";
-            this.cbNewColumn.Size = new System.Drawing.Size(193, 17);
-            this.cbNewColumn.TabIndex = 1;
-            this.cbNewColumn.Text = "Ergebnis in neue Spalte schreiben?";
-            this.cbNewColumn.UseVisualStyleBackColor = true;
-            this.cbNewColumn.CheckedChanged += new System.EventHandler(this.cbNewColumn_CheckedChanged);
-            // 
-            // dgvColumns
-            // 
-            this.dgvColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.dgColumnDefDuplicate.AllowUserToAddRows = false;
+            this.dgColumnDefDuplicate.AllowUserToDeleteRows = false;
+            this.dgColumnDefDuplicate.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvColumns.Location = new System.Drawing.Point(6, 179);
-            this.dgvColumns.Name = "dgvColumns";
-            this.dgvColumns.RowHeadersVisible = false;
-            this.dgvColumns.Size = new System.Drawing.Size(233, 444);
-            this.dgvColumns.TabIndex = 0;
-            this.dgvColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            this.dgColumnDefDuplicate.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgColumnDefDuplicate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgColumnDefDuplicate.Location = new System.Drawing.Point(6, 19);
+            this.dgColumnDefDuplicate.Name = "dgColumnDefDuplicate";
+            this.dgColumnDefDuplicate.RowHeadersVisible = false;
+            this.dgColumnDefDuplicate.Size = new System.Drawing.Size(230, 603);
+            this.dgColumnDefDuplicate.TabIndex = 16;
+            this.dgColumnDefDuplicate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgColumnDefDuplicate_CellEndEdit);
             // 
             // gbSeparate
             // 
@@ -1079,6 +1081,39 @@
             this.gbSeparate.TabIndex = 26;
             this.gbSeparate.TabStop = false;
             this.gbSeparate.Text = "Spaltenangabe";
+            // 
+            // LblSeparateContinuedNumber
+            // 
+            this.LblSeparateContinuedNumber.AutoSize = true;
+            this.LblSeparateContinuedNumber.Location = new System.Drawing.Point(4, 73);
+            this.LblSeparateContinuedNumber.Name = "LblSeparateContinuedNumber";
+            this.LblSeparateContinuedNumber.Size = new System.Drawing.Size(72, 13);
+            this.LblSeparateContinuedNumber.TabIndex = 35;
+            this.LblSeparateContinuedNumber.Text = "Spaltenname:";
+            this.LblSeparateContinuedNumber.Visible = false;
+            // 
+            // TxtSeparateContinuedNumber
+            // 
+            this.TxtSeparateContinuedNumber.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSeparateContinuedNumber.Location = new System.Drawing.Point(6, 92);
+            this.TxtSeparateContinuedNumber.Name = "TxtSeparateContinuedNumber";
+            this.TxtSeparateContinuedNumber.Size = new System.Drawing.Size(230, 20);
+            this.TxtSeparateContinuedNumber.TabIndex = 34;
+            this.TxtSeparateContinuedNumber.Text = "FTNR";
+            this.TxtSeparateContinuedNumber.Visible = false;
+            this.TxtSeparateContinuedNumber.TextChanged += new System.EventHandler(this.TxtSeparateContinuedNumber_TextChanged);
+            // 
+            // CbSeparateContinuedNumber
+            // 
+            this.CbSeparateContinuedNumber.AutoSize = true;
+            this.CbSeparateContinuedNumber.Location = new System.Drawing.Point(8, 51);
+            this.CbSeparateContinuedNumber.Name = "CbSeparateContinuedNumber";
+            this.CbSeparateContinuedNumber.Size = new System.Drawing.Size(182, 17);
+            this.CbSeparateContinuedNumber.TabIndex = 33;
+            this.CbSeparateContinuedNumber.Text = "Fortlaufende Nummer hinzufügen";
+            this.CbSeparateContinuedNumber.UseVisualStyleBackColor = true;
+            this.CbSeparateContinuedNumber.Click += new System.EventHandler(this.CbSeparateContinuedNumber_Click);
             // 
             // CbSeparateSaveRemaining
             // 
@@ -1220,6 +1255,225 @@
             this.DgvSeparate.Size = new System.Drawing.Size(230, 336);
             this.DgvSeparate.TabIndex = 16;
             this.DgvSeparate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            // 
+            // GbMergeRows
+            // 
+            this.GbMergeRows.Controls.Add(this.CBMergeRowsSeparator);
+            this.GbMergeRows.Controls.Add(this.label41);
+            this.GbMergeRows.Controls.Add(this.CLBMergeRowsHeaders);
+            this.GbMergeRows.Controls.Add(this.lblMergeRowsIdentifier);
+            this.GbMergeRows.Controls.Add(this.label43);
+            this.GbMergeRows.Controls.Add(this.TxtMergeRowsIdentifier);
+            this.GbMergeRows.Controls.Add(this.dgMergeRowsColumns);
+            this.GbMergeRows.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GbMergeRows.Location = new System.Drawing.Point(0, 92);
+            this.GbMergeRows.Name = "GbMergeRows";
+            this.GbMergeRows.Size = new System.Drawing.Size(245, 643);
+            this.GbMergeRows.TabIndex = 29;
+            this.GbMergeRows.TabStop = false;
+            this.GbMergeRows.Text = "Spaltenangabe";
+            // 
+            // CBMergeRowsSeparator
+            // 
+            this.CBMergeRowsSeparator.AutoSize = true;
+            this.CBMergeRowsSeparator.Location = new System.Drawing.Point(7, 77);
+            this.CBMergeRowsSeparator.Name = "CBMergeRowsSeparator";
+            this.CBMergeRowsSeparator.Size = new System.Drawing.Size(145, 17);
+            this.CBMergeRowsSeparator.TabIndex = 10;
+            this.CBMergeRowsSeparator.Text = "Tausender-Trennzeichen";
+            this.CBMergeRowsSeparator.UseVisualStyleBackColor = true;
+            this.CBMergeRowsSeparator.CheckedChanged += new System.EventHandler(this.CBMergeRowsSeparator_CheckedChanged);
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(3, 107);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(209, 13);
+            this.label41.TabIndex = 9;
+            this.label41.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // CLBMergeRowsHeaders
+            // 
+            this.CLBMergeRowsHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CLBMergeRowsHeaders.CheckOnClick = true;
+            this.CLBMergeRowsHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.CLBMergeRowsHeaders.DropDownHeight = 1;
+            this.CLBMergeRowsHeaders.FormattingEnabled = true;
+            this.CLBMergeRowsHeaders.IntegralHeight = false;
+            this.CLBMergeRowsHeaders.Location = new System.Drawing.Point(7, 128);
+            this.CLBMergeRowsHeaders.Name = "CLBMergeRowsHeaders";
+            this.CLBMergeRowsHeaders.Size = new System.Drawing.Size(233, 21);
+            this.CLBMergeRowsHeaders.TabIndex = 8;
+            this.CLBMergeRowsHeaders.ValueSeparator = ", ";
+            this.CLBMergeRowsHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.CLBMergeRowsHeaders_ItemCheck);
+            // 
+            // lblMergeRowsIdentifier
+            // 
+            this.lblMergeRowsIdentifier.AutoSize = true;
+            this.lblMergeRowsIdentifier.Location = new System.Drawing.Point(3, 16);
+            this.lblMergeRowsIdentifier.Name = "lblMergeRowsIdentifier";
+            this.lblMergeRowsIdentifier.Size = new System.Drawing.Size(114, 13);
+            this.lblMergeRowsIdentifier.TabIndex = 7;
+            this.lblMergeRowsIdentifier.Text = "Identifizierende Spalte:";
+            // 
+            // label43
+            // 
+            this.label43.AutoSize = true;
+            this.label43.Location = new System.Drawing.Point(2, 158);
+            this.label43.Name = "label43";
+            this.label43.Size = new System.Drawing.Size(121, 13);
+            this.label43.TabIndex = 5;
+            this.label43.Text = "Angewendeten Spalten:";
+            // 
+            // TxtMergeRowsIdentifier
+            // 
+            this.TxtMergeRowsIdentifier.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtMergeRowsIdentifier.Location = new System.Drawing.Point(7, 36);
+            this.TxtMergeRowsIdentifier.Name = "TxtMergeRowsIdentifier";
+            this.TxtMergeRowsIdentifier.Size = new System.Drawing.Size(233, 20);
+            this.TxtMergeRowsIdentifier.TabIndex = 2;
+            this.TxtMergeRowsIdentifier.TextChanged += new System.EventHandler(this.TxtMergeRowsIdentifier_TextChanged);
+            // 
+            // dgMergeRowsColumns
+            // 
+            this.dgMergeRowsColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgMergeRowsColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgMergeRowsColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgMergeRowsColumns.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.dgMergeRowsColumns.Location = new System.Drawing.Point(6, 179);
+            this.dgMergeRowsColumns.Name = "dgMergeRowsColumns";
+            this.dgMergeRowsColumns.RowHeadersVisible = false;
+            this.dgMergeRowsColumns.Size = new System.Drawing.Size(233, 444);
+            this.dgMergeRowsColumns.TabIndex = 0;
+            this.dgMergeRowsColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            this.dgMergeRowsColumns.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgMergeRowsColumns_CellFormatting);
+            this.dgMergeRowsColumns.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgMergeRowsColumns_EditingControlShowing);
+            // 
+            // gbProcedure
+            // 
+            this.gbProcedure.Controls.Add(this.BtnProcUserOpen);
+            this.gbProcedure.Controls.Add(this.cbOldColumn);
+            this.gbProcedure.Controls.Add(this.label7);
+            this.gbProcedure.Controls.Add(this.clbHeaderProcedure);
+            this.gbProcedure.Controls.Add(this.lblNewColumn);
+            this.gbProcedure.Controls.Add(this.lblHeaders);
+            this.gbProcedure.Controls.Add(this.txtNewColumn);
+            this.gbProcedure.Controls.Add(this.cbNewColumn);
+            this.gbProcedure.Controls.Add(this.dgvColumns);
+            this.gbProcedure.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbProcedure.Location = new System.Drawing.Point(0, 92);
+            this.gbProcedure.Name = "gbProcedure";
+            this.gbProcedure.Size = new System.Drawing.Size(245, 643);
+            this.gbProcedure.TabIndex = 9;
+            this.gbProcedure.TabStop = false;
+            this.gbProcedure.Text = "Spaltenangabe";
+            this.gbProcedure.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
+            // 
+            // BtnProcUserOpen
+            // 
+            this.BtnProcUserOpen.Location = new System.Drawing.Point(5, 19);
+            this.BtnProcUserOpen.Name = "BtnProcUserOpen";
+            this.BtnProcUserOpen.Size = new System.Drawing.Size(168, 23);
+            this.BtnProcUserOpen.TabIndex = 11;
+            this.BtnProcUserOpen.Text = "Suchen && Ersetzen festlegen";
+            this.BtnProcUserOpen.UseVisualStyleBackColor = true;
+            this.BtnProcUserOpen.Click += new System.EventHandler(this.BtnProcUserOpen_Click);
+            // 
+            // cbOldColumn
+            // 
+            this.cbOldColumn.AutoSize = true;
+            this.cbOldColumn.Location = new System.Drawing.Point(7, 78);
+            this.cbOldColumn.Name = "cbOldColumn";
+            this.cbOldColumn.Size = new System.Drawing.Size(165, 17);
+            this.cbOldColumn.TabIndex = 10;
+            this.cbOldColumn.Text = "Alte Werte in ALT speichern?";
+            this.cbOldColumn.UseVisualStyleBackColor = true;
+            this.cbOldColumn.CheckedChanged += new System.EventHandler(this.cbOldColumn_CheckedChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 111);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(209, 13);
+            this.label7.TabIndex = 9;
+            this.label7.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // clbHeaderProcedure
+            // 
+            this.clbHeaderProcedure.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.clbHeaderProcedure.CheckOnClick = true;
+            this.clbHeaderProcedure.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.clbHeaderProcedure.DropDownHeight = 1;
+            this.clbHeaderProcedure.FormattingEnabled = true;
+            this.clbHeaderProcedure.IntegralHeight = false;
+            this.clbHeaderProcedure.Location = new System.Drawing.Point(6, 131);
+            this.clbHeaderProcedure.Name = "clbHeaderProcedure";
+            this.clbHeaderProcedure.Size = new System.Drawing.Size(233, 21);
+            this.clbHeaderProcedure.TabIndex = 8;
+            this.clbHeaderProcedure.ValueSeparator = ", ";
+            this.clbHeaderProcedure.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderProcedure_ItemCheck);
+            // 
+            // lblNewColumn
+            // 
+            this.lblNewColumn.AutoSize = true;
+            this.lblNewColumn.Location = new System.Drawing.Point(3, 66);
+            this.lblNewColumn.Name = "lblNewColumn";
+            this.lblNewColumn.Size = new System.Drawing.Size(89, 13);
+            this.lblNewColumn.TabIndex = 7;
+            this.lblNewColumn.Text = "Name der Spalte:";
+            this.lblNewColumn.Visible = false;
+            // 
+            // lblHeaders
+            // 
+            this.lblHeaders.AutoSize = true;
+            this.lblHeaders.Location = new System.Drawing.Point(2, 158);
+            this.lblHeaders.Name = "lblHeaders";
+            this.lblHeaders.Size = new System.Drawing.Size(121, 13);
+            this.lblHeaders.TabIndex = 5;
+            this.lblHeaders.Text = "Angewendeten Spalten:";
+            // 
+            // txtNewColumn
+            // 
+            this.txtNewColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtNewColumn.Location = new System.Drawing.Point(6, 83);
+            this.txtNewColumn.Name = "txtNewColumn";
+            this.txtNewColumn.Size = new System.Drawing.Size(233, 20);
+            this.txtNewColumn.TabIndex = 2;
+            this.txtNewColumn.Visible = false;
+            this.txtNewColumn.TextChanged += new System.EventHandler(this.txtNewColumn_TextChanged);
+            // 
+            // cbNewColumn
+            // 
+            this.cbNewColumn.AutoSize = true;
+            this.cbNewColumn.Location = new System.Drawing.Point(6, 50);
+            this.cbNewColumn.Name = "cbNewColumn";
+            this.cbNewColumn.Size = new System.Drawing.Size(193, 17);
+            this.cbNewColumn.TabIndex = 1;
+            this.cbNewColumn.Text = "Ergebnis in neue Spalte schreiben?";
+            this.cbNewColumn.UseVisualStyleBackColor = true;
+            this.cbNewColumn.CheckedChanged += new System.EventHandler(this.cbNewColumn_CheckedChanged);
+            // 
+            // dgvColumns
+            // 
+            this.dgvColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvColumns.Location = new System.Drawing.Point(6, 179);
+            this.dgvColumns.Name = "dgvColumns";
+            this.dgvColumns.RowHeadersVisible = false;
+            this.dgvColumns.Size = new System.Drawing.Size(233, 444);
+            this.dgvColumns.TabIndex = 0;
+            this.dgvColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
             // GbSplit
             // 
@@ -1677,6 +1931,22 @@
             this.lblSubstringNewColumn.Text = "Name der neuen Spalte:";
             this.lblSubstringNewColumn.Visible = false;
             // 
+            // cbSubstringHeaders
+            // 
+            this.cbSubstringHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbSubstringHeaders.CheckOnClick = true;
+            this.cbSubstringHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cbSubstringHeaders.DropDownHeight = 1;
+            this.cbSubstringHeaders.FormattingEnabled = true;
+            this.cbSubstringHeaders.IntegralHeight = false;
+            this.cbSubstringHeaders.Location = new System.Drawing.Point(6, 200);
+            this.cbSubstringHeaders.Name = "cbSubstringHeaders";
+            this.cbSubstringHeaders.Size = new System.Drawing.Size(233, 21);
+            this.cbSubstringHeaders.TabIndex = 6;
+            this.cbSubstringHeaders.ValueSeparator = ", ";
+            this.cbSubstringHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbSubstringHeaders_ItemCheck);
+            // 
             // label35
             // 
             this.label35.AutoSize = true;
@@ -1718,6 +1988,22 @@
             this.gbTrim.TabIndex = 25;
             this.gbTrim.TabStop = false;
             this.gbTrim.Text = "Spaltenangabe";
+            // 
+            // CLBTrimHeaders
+            // 
+            this.CLBTrimHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CLBTrimHeaders.CheckOnClick = true;
+            this.CLBTrimHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.CLBTrimHeaders.DropDownHeight = 1;
+            this.CLBTrimHeaders.FormattingEnabled = true;
+            this.CLBTrimHeaders.IntegralHeight = false;
+            this.CLBTrimHeaders.Location = new System.Drawing.Point(8, 325);
+            this.CLBTrimHeaders.Name = "CLBTrimHeaders";
+            this.CLBTrimHeaders.Size = new System.Drawing.Size(233, 21);
+            this.CLBTrimHeaders.TabIndex = 19;
+            this.CLBTrimHeaders.ValueSeparator = ", ";
+            this.CLBTrimHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.CLBTrimHeaders_ItemCheck);
             // 
             // label39
             // 
@@ -1835,98 +2121,6 @@
             this.TxtTrimText.Size = new System.Drawing.Size(233, 20);
             this.TxtTrimText.TabIndex = 8;
             this.TxtTrimText.TextChanged += new System.EventHandler(this.TxtTrimText_TextChanged);
-            // 
-            // gbPVMExport
-            // 
-            this.gbPVMExport.Controls.Add(this.label22);
-            this.gbPVMExport.Controls.Add(this.CmBPVMExportEncodings);
-            this.gbPVMExport.Controls.Add(this.BtnSearchPVM);
-            this.gbPVMExport.Controls.Add(this.label6);
-            this.gbPVMExport.Controls.Add(this.TxtPVMPath);
-            this.gbPVMExport.Controls.Add(this.label5);
-            this.gbPVMExport.Controls.Add(this.cbHeadersPVMExport);
-            this.gbPVMExport.Controls.Add(this.dgvPVMExport);
-            this.gbPVMExport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbPVMExport.Location = new System.Drawing.Point(0, 92);
-            this.gbPVMExport.Name = "gbPVMExport";
-            this.gbPVMExport.Size = new System.Drawing.Size(245, 643);
-            this.gbPVMExport.TabIndex = 23;
-            this.gbPVMExport.TabStop = false;
-            this.gbPVMExport.Text = "Spaltenangabe";
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(4, 71);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(60, 13);
-            this.label22.TabIndex = 24;
-            this.label22.Text = "CodePage:";
-            // 
-            // CmBPVMExportEncodings
-            // 
-            this.CmBPVMExportEncodings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CmBPVMExportEncodings.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CmBPVMExportEncodings.FormattingEnabled = true;
-            this.CmBPVMExportEncodings.Location = new System.Drawing.Point(6, 87);
-            this.CmBPVMExportEncodings.Name = "CmBPVMExportEncodings";
-            this.CmBPVMExportEncodings.Size = new System.Drawing.Size(239, 21);
-            this.CmBPVMExportEncodings.TabIndex = 23;
-            this.CmBPVMExportEncodings.SelectedIndexChanged += new System.EventHandler(this.CmBPVMExportEncodings_SelectedIndexChanged);
-            // 
-            // BtnSearchPVM
-            // 
-            this.BtnSearchPVM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnSearchPVM.Location = new System.Drawing.Point(169, 135);
-            this.BtnSearchPVM.Name = "BtnSearchPVM";
-            this.BtnSearchPVM.Size = new System.Drawing.Size(75, 23);
-            this.BtnSearchPVM.TabIndex = 22;
-            this.BtnSearchPVM.Text = "Suchen";
-            this.BtnSearchPVM.UseVisualStyleBackColor = true;
-            this.BtnSearchPVM.Click += new System.EventHandler(this.BtnSearchPVM_Click);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(4, 121);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(117, 13);
-            this.label6.TabIndex = 21;
-            this.label6.Text = "Pfad der zweiten Datei:";
-            // 
-            // TxtPVMPath
-            // 
-            this.TxtPVMPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtPVMPath.Location = new System.Drawing.Point(7, 138);
-            this.TxtPVMPath.Name = "TxtPVMPath";
-            this.TxtPVMPath.Size = new System.Drawing.Size(157, 20);
-            this.TxtPVMPath.TabIndex = 20;
-            this.TxtPVMPath.TextChanged += new System.EventHandler(this.TxtPVMPath_TextChanged);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(2, 23);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(209, 13);
-            this.label5.TabIndex = 19;
-            this.label5.Text = "Spalten aus geladener Tabelle hinzufügen:";
-            // 
-            // dgvPVMExport
-            // 
-            this.dgvPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvPVMExport.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvPVMExport.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPVMExport.Location = new System.Drawing.Point(6, 179);
-            this.dgvPVMExport.Name = "dgvPVMExport";
-            this.dgvPVMExport.RowHeadersVisible = false;
-            this.dgvPVMExport.Size = new System.Drawing.Size(230, 443);
-            this.dgvPVMExport.TabIndex = 16;
-            this.dgvPVMExport.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             // 
             // gbAddTableColumns
             // 
@@ -2214,6 +2408,22 @@
             this.lblPadNewColumn.Text = "Name der neuen Spalte:";
             this.lblPadNewColumn.Visible = false;
             // 
+            // cbHeadersPad
+            // 
+            this.cbHeadersPad.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbHeadersPad.CheckOnClick = true;
+            this.cbHeadersPad.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cbHeadersPad.DropDownHeight = 1;
+            this.cbHeadersPad.FormattingEnabled = true;
+            this.cbHeadersPad.IntegralHeight = false;
+            this.cbHeadersPad.Location = new System.Drawing.Point(7, 145);
+            this.cbHeadersPad.Name = "cbHeadersPad";
+            this.cbHeadersPad.Size = new System.Drawing.Size(233, 21);
+            this.cbHeadersPad.TabIndex = 6;
+            this.cbHeadersPad.ValueSeparator = ", ";
+            this.cbHeadersPad.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderPad_ItemCheck);
+            // 
             // label21
             // 
             this.label21.AutoSize = true;
@@ -2315,6 +2525,22 @@
             this.label9.Size = new System.Drawing.Size(209, 13);
             this.label9.TabIndex = 9;
             this.label9.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // clbHeadersRound
+            // 
+            this.clbHeadersRound.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.clbHeadersRound.CheckOnClick = true;
+            this.clbHeadersRound.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.clbHeadersRound.DropDownHeight = 1;
+            this.clbHeadersRound.FormattingEnabled = true;
+            this.clbHeadersRound.IntegralHeight = false;
+            this.clbHeadersRound.Location = new System.Drawing.Point(6, 155);
+            this.clbHeadersRound.Name = "clbHeadersRound";
+            this.clbHeadersRound.Size = new System.Drawing.Size(233, 21);
+            this.clbHeadersRound.TabIndex = 8;
+            this.clbHeadersRound.ValueSeparator = ", ";
+            this.clbHeadersRound.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeadersRound_ItemCheck);
             // 
             // lblNewColumnRound
             // 
@@ -2689,6 +2915,22 @@
             this.label8.TabIndex = 18;
             this.label8.Text = "Spalten aus geladener Tabelle hinzufügen:";
             // 
+            // clbHeaderOrder
+            // 
+            this.clbHeaderOrder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.clbHeaderOrder.CheckOnClick = true;
+            this.clbHeaderOrder.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.clbHeaderOrder.DropDownHeight = 1;
+            this.clbHeaderOrder.FormattingEnabled = true;
+            this.clbHeaderOrder.IntegralHeight = false;
+            this.clbHeaderOrder.Location = new System.Drawing.Point(6, 35);
+            this.clbHeaderOrder.Name = "clbHeaderOrder";
+            this.clbHeaderOrder.Size = new System.Drawing.Size(233, 21);
+            this.clbHeaderOrder.TabIndex = 17;
+            this.clbHeaderOrder.ValueSeparator = ", ";
+            this.clbHeaderOrder.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderOrder_ItemCheck);
+            // 
             // dgOrderColumns
             // 
             this.dgOrderColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -2705,34 +2947,6 @@
             this.dgOrderColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
             this.dgOrderColumns.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgOrderColumns_CellFormatting);
             this.dgOrderColumns.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgOrderColumns_EditingControlShowing);
-            // 
-            // gbDefDuplicate
-            // 
-            this.gbDefDuplicate.Controls.Add(this.dgColumnDefDuplicate);
-            this.gbDefDuplicate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbDefDuplicate.Location = new System.Drawing.Point(0, 92);
-            this.gbDefDuplicate.Name = "gbDefDuplicate";
-            this.gbDefDuplicate.Size = new System.Drawing.Size(245, 643);
-            this.gbDefDuplicate.TabIndex = 12;
-            this.gbDefDuplicate.TabStop = false;
-            this.gbDefDuplicate.Text = "Spaltenangabe";
-            this.gbDefDuplicate.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
-            // 
-            // dgColumnDefDuplicate
-            // 
-            this.dgColumnDefDuplicate.AllowUserToAddRows = false;
-            this.dgColumnDefDuplicate.AllowUserToDeleteRows = false;
-            this.dgColumnDefDuplicate.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgColumnDefDuplicate.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgColumnDefDuplicate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgColumnDefDuplicate.Location = new System.Drawing.Point(6, 19);
-            this.dgColumnDefDuplicate.Name = "dgColumnDefDuplicate";
-            this.dgColumnDefDuplicate.RowHeadersVisible = false;
-            this.dgColumnDefDuplicate.Size = new System.Drawing.Size(230, 603);
-            this.dgColumnDefDuplicate.TabIndex = 16;
-            this.dgColumnDefDuplicate.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgColumnDefDuplicate_CellEndEdit);
             // 
             // gbUpLowCase
             // 
@@ -2787,6 +3001,22 @@
             this.lblUpLowCaseHeader.Size = new System.Drawing.Size(209, 13);
             this.lblUpLowCaseHeader.TabIndex = 9;
             this.lblUpLowCaseHeader.Text = "Spalten aus geladener Tabelle hinzufügen:";
+            // 
+            // clbUpLowHeader
+            // 
+            this.clbUpLowHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.clbUpLowHeader.CheckOnClick = true;
+            this.clbUpLowHeader.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.clbUpLowHeader.DropDownHeight = 1;
+            this.clbUpLowHeader.FormattingEnabled = true;
+            this.clbUpLowHeader.IntegralHeight = false;
+            this.clbUpLowHeader.Location = new System.Drawing.Point(6, 94);
+            this.clbUpLowHeader.Name = "clbUpLowHeader";
+            this.clbUpLowHeader.Size = new System.Drawing.Size(233, 21);
+            this.clbUpLowHeader.TabIndex = 8;
+            this.clbUpLowHeader.ValueSeparator = ", ";
+            this.clbUpLowHeader.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbUpLowHeader_ItemCheck);
             // 
             // lblUsedColumnsUpLowCase
             // 
@@ -2950,6 +3180,22 @@
             this.dgvReplaceWhole.Size = new System.Drawing.Size(230, 535);
             this.dgvReplaceWhole.TabIndex = 10;
             this.dgvReplaceWhole.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellEndEdit);
+            // 
+            // cbHeadersReplaceWhole
+            // 
+            this.cbHeadersReplaceWhole.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbHeadersReplaceWhole.CheckOnClick = true;
+            this.cbHeadersReplaceWhole.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cbHeadersReplaceWhole.DropDownHeight = 1;
+            this.cbHeadersReplaceWhole.FormattingEnabled = true;
+            this.cbHeadersReplaceWhole.IntegralHeight = false;
+            this.cbHeadersReplaceWhole.Location = new System.Drawing.Point(7, 35);
+            this.cbHeadersReplaceWhole.Name = "cbHeadersReplaceWhole";
+            this.cbHeadersReplaceWhole.Size = new System.Drawing.Size(233, 21);
+            this.cbHeadersReplaceWhole.TabIndex = 6;
+            this.cbHeadersReplaceWhole.ValueSeparator = ", ";
+            this.cbHeadersReplaceWhole.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeadersReplaceWhole_ItemCheck);
             // 
             // label26
             // 
@@ -3293,6 +3539,7 @@
             this.gbCaseColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbCaseColumns.Controls.Add(this.CBCaseCheckAll);
             this.gbCaseColumns.Controls.Add(this.dgCaseColumns);
             this.gbCaseColumns.Location = new System.Drawing.Point(3, 137);
             this.gbCaseColumns.Name = "gbCaseColumns";
@@ -3302,14 +3549,26 @@
             this.gbCaseColumns.Text = "Spalten";
             this.gbCaseColumns.EnabledChanged += new System.EventHandler(this.GroupBox_EnabledChanged);
             // 
+            // CBCaseCheckAll
+            // 
+            this.CBCaseCheckAll.AutoSize = true;
+            this.CBCaseCheckAll.Location = new System.Drawing.Point(6, 21);
+            this.CBCaseCheckAll.Name = "CBCaseCheckAll";
+            this.CBCaseCheckAll.Size = new System.Drawing.Size(153, 17);
+            this.CBCaseCheckAll.TabIndex = 1;
+            this.CBCaseCheckAll.Text = "Auf alle Spalten anwenden";
+            this.CBCaseCheckAll.UseVisualStyleBackColor = true;
+            this.CBCaseCheckAll.CheckedChanged += new System.EventHandler(this.CBCaseCheckAll_CheckedChanged);
+            // 
             // dgCaseColumns
             // 
-            this.dgCaseColumns.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgCaseColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgCaseColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgCaseColumns.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgCaseColumns.Location = new System.Drawing.Point(3, 16);
+            this.dgCaseColumns.Location = new System.Drawing.Point(3, 44);
             this.dgCaseColumns.Name = "dgCaseColumns";
-            this.dgCaseColumns.Size = new System.Drawing.Size(424, 554);
+            this.dgCaseColumns.Size = new System.Drawing.Size(424, 526);
             this.dgCaseColumns.TabIndex = 0;
             this.dgCaseColumns.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgCaseColumns_CellEndEdit);
             this.dgCaseColumns.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgCaseColumns_EditingControlShowing);
@@ -3349,199 +3608,6 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // CLBMergeRowsHeaders
-            // 
-            this.CLBMergeRowsHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CLBMergeRowsHeaders.CheckOnClick = true;
-            this.CLBMergeRowsHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.CLBMergeRowsHeaders.DropDownHeight = 1;
-            this.CLBMergeRowsHeaders.FormattingEnabled = true;
-            this.CLBMergeRowsHeaders.IntegralHeight = false;
-            this.CLBMergeRowsHeaders.Location = new System.Drawing.Point(7, 128);
-            this.CLBMergeRowsHeaders.Name = "CLBMergeRowsHeaders";
-            this.CLBMergeRowsHeaders.Size = new System.Drawing.Size(233, 21);
-            this.CLBMergeRowsHeaders.TabIndex = 8;
-            this.CLBMergeRowsHeaders.ValueSeparator = ", ";
-            this.CLBMergeRowsHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.CLBMergeRowsHeaders_ItemCheck);
-            // 
-            // clbHeaderProcedure
-            // 
-            this.clbHeaderProcedure.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.clbHeaderProcedure.CheckOnClick = true;
-            this.clbHeaderProcedure.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.clbHeaderProcedure.DropDownHeight = 1;
-            this.clbHeaderProcedure.FormattingEnabled = true;
-            this.clbHeaderProcedure.IntegralHeight = false;
-            this.clbHeaderProcedure.Location = new System.Drawing.Point(6, 131);
-            this.clbHeaderProcedure.Name = "clbHeaderProcedure";
-            this.clbHeaderProcedure.Size = new System.Drawing.Size(233, 21);
-            this.clbHeaderProcedure.TabIndex = 8;
-            this.clbHeaderProcedure.ValueSeparator = ", ";
-            this.clbHeaderProcedure.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderProcedure_ItemCheck);
-            // 
-            // cbSubstringHeaders
-            // 
-            this.cbSubstringHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbSubstringHeaders.CheckOnClick = true;
-            this.cbSubstringHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cbSubstringHeaders.DropDownHeight = 1;
-            this.cbSubstringHeaders.FormattingEnabled = true;
-            this.cbSubstringHeaders.IntegralHeight = false;
-            this.cbSubstringHeaders.Location = new System.Drawing.Point(6, 200);
-            this.cbSubstringHeaders.Name = "cbSubstringHeaders";
-            this.cbSubstringHeaders.Size = new System.Drawing.Size(233, 21);
-            this.cbSubstringHeaders.TabIndex = 6;
-            this.cbSubstringHeaders.ValueSeparator = ", ";
-            this.cbSubstringHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbSubstringHeaders_ItemCheck);
-            // 
-            // CLBTrimHeaders
-            // 
-            this.CLBTrimHeaders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CLBTrimHeaders.CheckOnClick = true;
-            this.CLBTrimHeaders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.CLBTrimHeaders.DropDownHeight = 1;
-            this.CLBTrimHeaders.FormattingEnabled = true;
-            this.CLBTrimHeaders.IntegralHeight = false;
-            this.CLBTrimHeaders.Location = new System.Drawing.Point(8, 325);
-            this.CLBTrimHeaders.Name = "CLBTrimHeaders";
-            this.CLBTrimHeaders.Size = new System.Drawing.Size(233, 21);
-            this.CLBTrimHeaders.TabIndex = 19;
-            this.CLBTrimHeaders.ValueSeparator = ", ";
-            this.CLBTrimHeaders.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.CLBTrimHeaders_ItemCheck);
-            // 
-            // cbHeadersPVMExport
-            // 
-            this.cbHeadersPVMExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbHeadersPVMExport.CheckOnClick = true;
-            this.cbHeadersPVMExport.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cbHeadersPVMExport.DropDownHeight = 1;
-            this.cbHeadersPVMExport.FormattingEnabled = true;
-            this.cbHeadersPVMExport.IntegralHeight = false;
-            this.cbHeadersPVMExport.Location = new System.Drawing.Point(5, 42);
-            this.cbHeadersPVMExport.Name = "cbHeadersPVMExport";
-            this.cbHeadersPVMExport.Size = new System.Drawing.Size(240, 21);
-            this.cbHeadersPVMExport.TabIndex = 18;
-            this.cbHeadersPVMExport.ValueSeparator = ", ";
-            this.cbHeadersPVMExport.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeadersPVMExport_ItemCheck);
-            // 
-            // cbHeadersPad
-            // 
-            this.cbHeadersPad.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbHeadersPad.CheckOnClick = true;
-            this.cbHeadersPad.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cbHeadersPad.DropDownHeight = 1;
-            this.cbHeadersPad.FormattingEnabled = true;
-            this.cbHeadersPad.IntegralHeight = false;
-            this.cbHeadersPad.Location = new System.Drawing.Point(7, 145);
-            this.cbHeadersPad.Name = "cbHeadersPad";
-            this.cbHeadersPad.Size = new System.Drawing.Size(233, 21);
-            this.cbHeadersPad.TabIndex = 6;
-            this.cbHeadersPad.ValueSeparator = ", ";
-            this.cbHeadersPad.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderPad_ItemCheck);
-            // 
-            // clbHeadersRound
-            // 
-            this.clbHeadersRound.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.clbHeadersRound.CheckOnClick = true;
-            this.clbHeadersRound.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.clbHeadersRound.DropDownHeight = 1;
-            this.clbHeadersRound.FormattingEnabled = true;
-            this.clbHeadersRound.IntegralHeight = false;
-            this.clbHeadersRound.Location = new System.Drawing.Point(6, 155);
-            this.clbHeadersRound.Name = "clbHeadersRound";
-            this.clbHeadersRound.Size = new System.Drawing.Size(233, 21);
-            this.clbHeadersRound.TabIndex = 8;
-            this.clbHeadersRound.ValueSeparator = ", ";
-            this.clbHeadersRound.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeadersRound_ItemCheck);
-            // 
-            // clbHeaderOrder
-            // 
-            this.clbHeaderOrder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.clbHeaderOrder.CheckOnClick = true;
-            this.clbHeaderOrder.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.clbHeaderOrder.DropDownHeight = 1;
-            this.clbHeaderOrder.FormattingEnabled = true;
-            this.clbHeaderOrder.IntegralHeight = false;
-            this.clbHeaderOrder.Location = new System.Drawing.Point(6, 35);
-            this.clbHeaderOrder.Name = "clbHeaderOrder";
-            this.clbHeaderOrder.Size = new System.Drawing.Size(233, 21);
-            this.clbHeaderOrder.TabIndex = 17;
-            this.clbHeaderOrder.ValueSeparator = ", ";
-            this.clbHeaderOrder.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbHeaderOrder_ItemCheck);
-            // 
-            // clbUpLowHeader
-            // 
-            this.clbUpLowHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.clbUpLowHeader.CheckOnClick = true;
-            this.clbUpLowHeader.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.clbUpLowHeader.DropDownHeight = 1;
-            this.clbUpLowHeader.FormattingEnabled = true;
-            this.clbUpLowHeader.IntegralHeight = false;
-            this.clbUpLowHeader.Location = new System.Drawing.Point(6, 94);
-            this.clbUpLowHeader.Name = "clbUpLowHeader";
-            this.clbUpLowHeader.Size = new System.Drawing.Size(233, 21);
-            this.clbUpLowHeader.TabIndex = 8;
-            this.clbUpLowHeader.ValueSeparator = ", ";
-            this.clbUpLowHeader.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbUpLowHeader_ItemCheck);
-            // 
-            // cbHeadersReplaceWhole
-            // 
-            this.cbHeadersReplaceWhole.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbHeadersReplaceWhole.CheckOnClick = true;
-            this.cbHeadersReplaceWhole.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.cbHeadersReplaceWhole.DropDownHeight = 1;
-            this.cbHeadersReplaceWhole.FormattingEnabled = true;
-            this.cbHeadersReplaceWhole.IntegralHeight = false;
-            this.cbHeadersReplaceWhole.Location = new System.Drawing.Point(7, 35);
-            this.cbHeadersReplaceWhole.Name = "cbHeadersReplaceWhole";
-            this.cbHeadersReplaceWhole.Size = new System.Drawing.Size(233, 21);
-            this.cbHeadersReplaceWhole.TabIndex = 6;
-            this.cbHeadersReplaceWhole.ValueSeparator = ", ";
-            this.cbHeadersReplaceWhole.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cbHeadersReplaceWhole_ItemCheck);
-            // 
-            // LblSeparateContinuedNumber
-            // 
-            this.LblSeparateContinuedNumber.AutoSize = true;
-            this.LblSeparateContinuedNumber.Location = new System.Drawing.Point(4, 73);
-            this.LblSeparateContinuedNumber.Name = "LblSeparateContinuedNumber";
-            this.LblSeparateContinuedNumber.Size = new System.Drawing.Size(72, 13);
-            this.LblSeparateContinuedNumber.TabIndex = 35;
-            this.LblSeparateContinuedNumber.Text = "Spaltenname:";
-            this.LblSeparateContinuedNumber.Visible = false;
-            // 
-            // TxtSeparateContinuedNumber
-            // 
-            this.TxtSeparateContinuedNumber.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtSeparateContinuedNumber.Location = new System.Drawing.Point(6, 92);
-            this.TxtSeparateContinuedNumber.Name = "TxtSeparateContinuedNumber";
-            this.TxtSeparateContinuedNumber.Size = new System.Drawing.Size(230, 20);
-            this.TxtSeparateContinuedNumber.TabIndex = 34;
-            this.TxtSeparateContinuedNumber.Text = "FTNR";
-            this.TxtSeparateContinuedNumber.Visible = false;
-            this.TxtSeparateContinuedNumber.TextChanged += new System.EventHandler(this.TxtSeparateContinuedNumber_TextChanged);
-            // 
-            // CbSeparateContinuedNumber
-            // 
-            this.CbSeparateContinuedNumber.AutoSize = true;
-            this.CbSeparateContinuedNumber.Location = new System.Drawing.Point(8, 51);
-            this.CbSeparateContinuedNumber.Name = "CbSeparateContinuedNumber";
-            this.CbSeparateContinuedNumber.Size = new System.Drawing.Size(182, 17);
-            this.CbSeparateContinuedNumber.TabIndex = 33;
-            this.CbSeparateContinuedNumber.Text = "Fortlaufende Nummer hinzufügen";
-            this.CbSeparateContinuedNumber.UseVisualStyleBackColor = true;
-            this.CbSeparateContinuedNumber.Click += new System.EventHandler(this.CbSeparateContinuedNumber_Click);
-            // 
             // Administration
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -3579,15 +3645,20 @@
             this.splitWorkflowProperties.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitWorkflowProperties)).EndInit();
             this.splitWorkflowProperties.ResumeLayout(false);
+            this.gbPVMExport.ResumeLayout(false);
+            this.gbPVMExport.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).EndInit();
+            this.gbDefDuplicate.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgColumnDefDuplicate)).EndInit();
+            this.gbSeparate.ResumeLayout(false);
+            this.gbSeparate.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).EndInit();
             this.GbMergeRows.ResumeLayout(false);
             this.GbMergeRows.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgMergeRowsColumns)).EndInit();
             this.gbProcedure.ResumeLayout(false);
             this.gbProcedure.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).EndInit();
-            this.gbSeparate.ResumeLayout(false);
-            this.gbSeparate.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.DgvSeparate)).EndInit();
             this.GbSplit.ResumeLayout(false);
             this.GbSplit.PerformLayout();
             this.GbSearch.ResumeLayout(false);
@@ -3606,9 +3677,6 @@
             this.gbTrim.ResumeLayout(false);
             this.gbTrim.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DGVTrimColumns)).EndInit();
-            this.gbPVMExport.ResumeLayout(false);
-            this.gbPVMExport.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPVMExport)).EndInit();
             this.gbAddTableColumns.ResumeLayout(false);
             this.gbAddTableColumns.PerformLayout();
             this.gbPadding.ResumeLayout(false);
@@ -3631,8 +3699,6 @@
             this.gbOrder.ResumeLayout(false);
             this.gbOrder.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrderColumns)).EndInit();
-            this.gbDefDuplicate.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgColumnDefDuplicate)).EndInit();
             this.gbUpLowCase.ResumeLayout(false);
             this.gbUpLowCase.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgUpLow)).EndInit();
@@ -3666,6 +3732,7 @@
             this.gbCaseShortcuts.ResumeLayout(false);
             this.gbCaseShortcuts.PerformLayout();
             this.gbCaseColumns.ResumeLayout(false);
+            this.gbCaseColumns.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCaseColumns)).EndInit();
             this.ResumeLayout(false);
 
@@ -3930,5 +3997,10 @@
         private System.Windows.Forms.Label LblSeparateContinuedNumber;
         private System.Windows.Forms.TextBox TxtSeparateContinuedNumber;
         private System.Windows.Forms.CheckBox CbSeparateContinuedNumber;
+        private System.Windows.Forms.CheckBox CBCaseCheckAll;
+        private System.Windows.Forms.RadioButton RBPVMExcel;
+        private System.Windows.Forms.RadioButton RBPVMCSV;
+        private System.Windows.Forms.RadioButton RBPVMDBASE;
+        private System.Windows.Forms.Label label42;
     }
 }

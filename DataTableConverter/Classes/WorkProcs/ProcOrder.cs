@@ -1,11 +1,9 @@
-﻿using DataTableConverter.Assisstant;
-using DataTableConverter.Extensions;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Classes.WorkProcs
@@ -19,7 +17,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return WorkflowHelper.RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
+            return RemoveEmptyHeaders(Columns.ColumnValuesAsString(0));
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -38,16 +36,15 @@ namespace DataTableConverter.Classes.WorkProcs
             Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
             StringBuilder builder = new StringBuilder();
 
             foreach (DataRow row in Columns.Rows)
             {
-                object col = row[0];
+                string alias = row[0].ToString();
                 bool orderDESC = string.IsNullOrWhiteSpace(row[1]?.ToString()) ? false : (bool)row[1];
-                builder.Append("[").Append(col.ToString()).Append("] ").Append(orderDESC ? "DESC" : "ASC").Append(", ");
+                builder.Append("[").Append(invokeForm.DatabaseHelper.GetColumnName(alias, tableName)).Append("] COLLATE NATURALSORT ").Append(orderDESC ? "DESC" : "ASC").Append(", ");
             }
             string result = builder.ToString();
             if (result.Length > 2)

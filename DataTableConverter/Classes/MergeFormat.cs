@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes
 {
     [Serializable()]
     public class MergeFormat
     {
-        public enum MergeColumns:int { Column = 0, Text = 1, Empty = 3, NotEmpty = 5, EmptyAll = 2, NotEmptyAll = 4}
+        public enum MergeColumns : int { Column = 0, Text = 1, Empty = 3, NotEmpty = 5, EmptyAll = 2, NotEmptyAll = 4 }
         public DataTable Table { get; set; }
         public string Formula = string.Empty;
 
@@ -82,7 +81,7 @@ namespace DataTableConverter.Classes
 
         internal void RenameHeaders(string oldName, string newName)
         {
-            foreach(DataRow row in Table.Rows)
+            foreach (DataRow row in Table.Rows)
             {
                 ProcMerge.RenameHeader(row, (int)MergeColumns.Column, oldName, newName);
                 ProcMerge.RenameFormatHeader(row, (int)MergeColumns.Empty, oldName, newName);

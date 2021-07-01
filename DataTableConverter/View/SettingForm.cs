@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
 {
     public partial class SettingForm : Form
     {
-        internal enum Tabs { Color, Shortcut, Table, Other, Help};
+        internal enum Tabs { Color, Shortcut, Table, Other, Help };
 
         internal SettingForm(Tabs tab = Tabs.Color)
         {
@@ -28,11 +21,11 @@ namespace DataTableConverter.View
             //column, text, empty, not empty
             dgvFormat.Rows.Add(new object[] { "Titel 1", string.Empty, true, "[Titel 2] [Titel 3]" });
             dgvFormat.Rows.Add(new object[] { "Titel 2", string.Empty, true, "[Titel 1] [Titel 3]" });
-            dgvFormat.Rows.Add(new object[] { "Titel 3", string.Empty,true, "[Titel 1] [Titel 2]" });
-            dgvFormat.Rows.Add(new object[] {});
+            dgvFormat.Rows.Add(new object[] { "Titel 3", string.Empty, true, "[Titel 1] [Titel 2]" });
+            dgvFormat.Rows.Add(new object[] { });
 
 
-            DgVSecondExample.Rows.Add(new object[] { "Straße"});
+            DgVSecondExample.Rows.Add(new object[] { "Straße" });
             DgVSecondExample.Rows.Add(new object[] { string.Empty, "_", false, string.Empty, false, "[Straße] [HNR] [Stock] [Tuer]" });
             DgVSecondExample.Rows.Add(new object[] { "HNR" });
             DgVSecondExample.Rows.Add(new object[] { string.Empty, "_/_", false, string.Empty, false, "[HNR] [Stock] [Tuer]" });
@@ -67,9 +60,10 @@ namespace DataTableConverter.View
             TxTPVMIdentifier.Text = Properties.Settings.Default.PVMIdentifier;
             CbImportWorkflowAuto.Checked = Properties.Settings.Default.ImportWorkflowAuto;
             CbSeparateSelectable.Checked = Properties.Settings.Default.SeparateSelectable;
-            CbAdjustColumnOver100.Checked = Properties.Settings.Default.NotAdjustColumnOver100;
             NumMaxRows.Value = Properties.Settings.Default.MaxRows;
             CBTrimImport.Checked = Properties.Settings.Default.TrimImport;
+            CBLoadHiddenRows.Checked = Properties.Settings.Default.UnhideRows;
+            CBLoadHiddenColumns.Checked = Properties.Settings.Default.UnhideColumns;
             TxTShortcut.Text = new KeysConverter().ConvertToString(Properties.Settings.Default.EditShortcut);
         }
 
@@ -99,9 +93,10 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.SeparateColor = PSeparateColor.BackColor;
                 Properties.Settings.Default.ImportWorkflowAuto = CbImportWorkflowAuto.Checked;
                 Properties.Settings.Default.SeparateSelectable = CbSeparateSelectable.Checked;
-                Properties.Settings.Default.NotAdjustColumnOver100 = CbAdjustColumnOver100.Checked;
                 Properties.Settings.Default.MaxRows = NumMaxRows.Value;
                 Properties.Settings.Default.TrimImport = CBTrimImport.Checked;
+                Properties.Settings.Default.UnhideRows = CBLoadHiddenRows.Checked;
+                Properties.Settings.Default.UnhideColumns = CBLoadHiddenColumns.Checked;
                 Properties.Settings.Default.Save();
             }
             else
@@ -121,7 +116,7 @@ namespace DataTableConverter.View
                 txtInvalidColumn,
                 txtOldAffix
             };
-            foreach(TextBox textBox in textBoxes)
+            foreach (TextBox textBox in textBoxes)
             {
                 if (string.IsNullOrWhiteSpace(textBox.Text))
                 {
@@ -216,7 +211,8 @@ namespace DataTableConverter.View
 
         private void TxTShortcut_Click(object sender, EventArgs e)
         {
-            if (ModifierKeys != Keys.None) {
+            if (ModifierKeys != Keys.None)
+            {
                 TxTShortcut.KeyDown -= TxTShortcut_KeyDown;
 
                 var converter = new KeysConverter();

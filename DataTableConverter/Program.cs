@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter
@@ -16,9 +14,9 @@ namespace DataTableConverter
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1(null,args.FirstOrDefault()));
+            Application.Run(new Form1(path: args.FirstOrDefault()));
         }
 
-        
+
     }
 }

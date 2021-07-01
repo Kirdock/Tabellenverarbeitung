@@ -1,12 +1,9 @@
-﻿using DataTableConverter.Assisstant;
+﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataTableConverter.Extensions;
 
 namespace DataTableConverter.Classes.WorkProcs
 {
@@ -14,9 +11,10 @@ namespace DataTableConverter.Classes.WorkProcs
     class ProcReplaceWhole : WorkProc
     {
         internal static readonly string ClassName = "Text ersetzen";
-        internal enum ColumnIndex : int { Column = 0, Value = 1};
+        internal enum ColumnIndex : int { Column = 0, Value = 1 };
 
-        public ProcReplaceWhole(int ordinal, int id, string name) : base(ordinal, id, name) {
+        public ProcReplaceWhole(int ordinal, int id, string name) : base(ordinal, id, name)
+        {
             InitColumns();
         }
 
@@ -44,12 +42,12 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return new string[0];
+            return Columns.AsEnumerable().Select(row => row[(int)ColumnIndex.Column].ToString()).ToArray();
         }
 
-        private IEnumerable<DataRow> GetFoundRows(DataColumnCollection columns)
+        private IEnumerable<DataRow> GetFoundRows(List<string> columns)
         {
-            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr.ItemArray[0].ToString()));
+            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr[(int)ColumnIndex.Column].ToString(), StringComparer.OrdinalIgnoreCase));
         }
 
         public override void RenameHeaders(string oldName, string newName)
@@ -58,26 +56,22 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 if (row.ItemArray[(int)ColumnIndex.Column].ToString() == oldName)
                 {
-                    row.SetField((int) ColumnIndex.Column, newName);
+                    row.SetField((int)ColumnIndex.Column, newName);
                 }
             }
         }
 
         public override void RemoveHeader(string colName)
         {
-            Columns = Columns.AsEnumerable().Where(row => row[0].ToString() != colName).ToTable(Columns);
+            Columns = Columns.AsEnumerable().Where(row => row[(int)ColumnIndex.Column].ToString() != colName).ToTable(Columns);
         }
 
-        public override void DoWork(DataTable table, ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, out int[] newOrderIndices)
+        public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
-            newOrderIndices = new int[0];
-            IEnumerable<DataRow> distinctDataTale = GetFoundRows(table.Columns);
-            foreach (DataRow row in table.Rows)
+            DataRow[] distinctDataTale = GetFoundRows(invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName)).ToArray();
+            if (distinctDataTale.Length != 0)
             {
-                foreach(DataRow replaceRow in distinctDataTale)
-                {
-                    row[replaceRow[(int)ColumnIndex.Column].ToString()] = replaceRow[(int)ColumnIndex.Value].ToString();
-                }
+                invokeForm.DatabaseHelper.ReplaceColumnValues(distinctDataTale, tableName);
             }
         }
     }

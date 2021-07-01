@@ -1,28 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.Assisstant
 {
     class ErrorHelper
     {
-        private static readonly string path = Path.Combine(ExportHelper.ProjectPath,"Logs.log");
+        private static readonly string path = Path.Combine(ExportHelper.ProjectPath, "Logs.log");
         private static readonly string ErrorMessage = "Es ist ein Fehler aufgetreten!\nBitte kontaktieren Sie Ihren Administrator.";
 
         internal static void LogMessage(Exception exception, Form mainForm, bool showMessage = true)
         {
-            LogMessage(exception.ToString(), mainForm, showMessage);
+            if (exception is FileNotFoundException path)
+            {
+                ShowError($"Die Datei {path.FileName} kann nicht gefunden werden", mainForm);
+            }
+            else
+            {
+                LogMessage(exception.ToString(), mainForm, showMessage);
+            }
         }
 
         internal static void LogMessage(string text, Form mainForm, bool showMessage = true)
         {
             try
             {
-                File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Today} {text}{Environment.NewLine}");
+                File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Today}; Version:{FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion} {Environment.NewLine}{text}{Environment.NewLine}");
                 if (showMessage)
                 {
                     ShowError(ErrorMessage, mainForm);

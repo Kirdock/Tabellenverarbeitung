@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -26,7 +19,7 @@ namespace DataTableConverter.View
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            if(txtSplitString.Text.Length == 0)
+            if (txtSplitString.Text.Length == 0)
             {
                 this.MessagesOK(MessageBoxIcon.Warning, "Länge von 0 ist ungültig!");
             }

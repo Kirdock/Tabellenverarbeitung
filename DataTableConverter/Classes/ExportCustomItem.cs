@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Classes
 {
@@ -23,13 +20,27 @@ namespace DataTableConverter.Classes
             Name = name;
             Column = column;
             Values = new Dictionary<string, bool>();
-            foreach(string value in values)
+            foreach (string value in values)
             {
                 Values.Add(value, true);
             }
         }
 
-        internal ExportCustomItem(string name, string column) {
+        internal ExportCustomItem(string name, string column, IEnumerable<string> values, int format, bool checkedAllValues)
+        {
+            Name = name;
+            Column = column;
+            Format = format;
+            Values = new Dictionary<string, bool>();
+            CheckedAllValues = checkedAllValues;
+            foreach (string value in values)
+            {
+                Values.Add(value, true);
+            }
+        }
+
+        internal ExportCustomItem(string name, string column)
+        {
             Name = name;
             Column = column;
             Values = new Dictionary<string, bool>();

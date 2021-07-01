@@ -1,12 +1,7 @@
 ﻿using DataTableConverter.Classes;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -44,7 +39,7 @@ namespace DataTableConverter.View
         private void BtnConfirm_Click(object sender, EventArgs e)
         {
             ViewHelper.EndDataGridViewEdit(DGVProcedure);
-            if(Table.AsEnumerable().Any(row => row.ItemArray.Any(item => !string.IsNullOrEmpty(item.ToString()))))
+            if (Table.AsEnumerable().Any(row => row.ItemArray.Any(item => !string.IsNullOrEmpty(item.ToString()))))
             {
                 ViewHelper.EndDataGridViewEdit(DGVProcedure);
                 DialogResult = DialogResult.OK;

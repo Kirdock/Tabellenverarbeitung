@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -70,8 +64,8 @@ namespace DataTableConverter.View
             this.button1.Text = button1;
             this.button2.Text = button2;
             this.button3.Text = button3;
-            
-            FormClosing += (sender,e) => OnFormClosing(sii);
+
+            FormClosing += (sender, e) => OnFormClosing(sii);
         }
 
         private void OnFormClosing(SHSTOCKICONINFO sii)
