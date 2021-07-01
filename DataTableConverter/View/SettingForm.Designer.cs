@@ -61,6 +61,7 @@
             this.label22 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.CBLoadHiddenColumns = new System.Windows.Forms.CheckBox();
             this.CBLoadHiddenRows = new System.Windows.Forms.CheckBox();
             this.TxTShortcut = new System.Windows.Forms.TextBox();
             this.label40 = new System.Windows.Forms.Label();
@@ -122,7 +123,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.CBLoadHiddenColumns = new System.Windows.Forms.CheckBox();
+            this.label41 = new System.Windows.Forms.Label();
+            this.LblVersion = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tpFileShortcuts.SuspendLayout();
@@ -513,6 +515,16 @@
             this.tabPage2.Text = "Sonstiges";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // CBLoadHiddenColumns
+            // 
+            this.CBLoadHiddenColumns.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBLoadHiddenColumns.Location = new System.Drawing.Point(13, 653);
+            this.CBLoadHiddenColumns.Name = "CBLoadHiddenColumns";
+            this.CBLoadHiddenColumns.Size = new System.Drawing.Size(252, 34);
+            this.CBLoadHiddenColumns.TabIndex = 32;
+            this.CBLoadHiddenColumns.Text = "Ausgeblendete Spalten laden";
+            this.CBLoadHiddenColumns.UseVisualStyleBackColor = true;
+            // 
             // CBLoadHiddenRows
             // 
             this.CBLoadHiddenRows.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -766,6 +778,8 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.LblVersion);
+            this.tabPage3.Controls.Add(this.label41);
             this.tabPage3.Controls.Add(this.label35);
             this.tabPage3.Controls.Add(this.label34);
             this.tabPage3.Controls.Add(this.tabControl1);
@@ -1111,15 +1125,23 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // CBLoadHiddenColumns
+            // label41
             // 
-            this.CBLoadHiddenColumns.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CBLoadHiddenColumns.Location = new System.Drawing.Point(13, 653);
-            this.CBLoadHiddenColumns.Name = "CBLoadHiddenColumns";
-            this.CBLoadHiddenColumns.Size = new System.Drawing.Size(252, 34);
-            this.CBLoadHiddenColumns.TabIndex = 32;
-            this.CBLoadHiddenColumns.Text = "Ausgeblendete Spalten laden";
-            this.CBLoadHiddenColumns.UseVisualStyleBackColor = true;
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(70, 664);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(45, 13);
+            this.label41.TabIndex = 26;
+            this.label41.Text = "Version:";
+            // 
+            // LblVersion
+            // 
+            this.LblVersion.AutoSize = true;
+            this.LblVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblVersion.Location = new System.Drawing.Point(115, 664);
+            this.LblVersion.Name = "LblVersion";
+            this.LblVersion.Size = new System.Drawing.Size(0, 13);
+            this.LblVersion.TabIndex = 27;
             // 
             // SettingForm
             // 
@@ -1254,5 +1276,7 @@
         private System.Windows.Forms.Label label40;
         private System.Windows.Forms.CheckBox CBLoadHiddenRows;
         private System.Windows.Forms.CheckBox CBLoadHiddenColumns;
+        private System.Windows.Forms.Label LblVersion;
+        private System.Windows.Forms.Label label41;
     }
 }

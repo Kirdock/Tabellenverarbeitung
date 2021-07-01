@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace DataTableConverter.View
@@ -11,6 +13,9 @@ namespace DataTableConverter.View
         internal SettingForm(Tabs tab = Tabs.Color)
         {
             InitializeComponent();
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            LblVersion.Text = fvi.FileVersion;
             LoadSettings();
             tabSettings.SelectedIndex = (int)tab;
             InitDataGridView();
