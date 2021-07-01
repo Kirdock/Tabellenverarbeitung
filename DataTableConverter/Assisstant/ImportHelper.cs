@@ -661,13 +661,13 @@ namespace DataTableConverter.Assisstant
                         else
                         {
                             ErrorHelper.LogMessage(ex, mainForm);
-                            return data;
+                            return;
                         }
                     }
                     catch(Exception ex)
                     {
                         ErrorHelper.LogMessage(ex, mainForm);
-                        return data;
+                        return;
                     }
                 } while (hasPassword);
 
