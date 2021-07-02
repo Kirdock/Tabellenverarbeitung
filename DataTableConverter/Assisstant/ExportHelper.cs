@@ -30,7 +30,12 @@ namespace DataTableConverter
         {
             get
             {
-                return Properties.Settings.Default.SettingPath == string.Empty || !Directory.Exists(Properties.Settings.Default.SettingPath) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName) : Properties.Settings.Default.SettingPath;
+                if (Properties.Settings.Default.SettingPath == string.Empty || !Directory.Exists(Properties.Settings.Default.SettingPath))
+                {
+                    Properties.Settings.Default.SettingPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName);
+                    Properties.Settings.Default.Save();
+                }
+                return  Properties.Settings.Default.SettingPath;
             }
         }
 
@@ -68,6 +73,9 @@ namespace DataTableConverter
             if (!Directory.Exists(ProjectPath))
             {
                 Directory.CreateDirectory(ProjectPath);
+            }
+            if (!Directory.Exists(ProjectPresets))
+            {
                 Directory.CreateDirectory(ProjectPresets);
             }
             if (!Directory.Exists(ProjectHeaderPresets))

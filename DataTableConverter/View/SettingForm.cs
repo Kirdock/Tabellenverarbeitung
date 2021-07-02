@@ -161,7 +161,7 @@ namespace DataTableConverter.View
             };
             if (folderBrowser.ShowDialog(this) == DialogResult.OK)
             {
-                string folderPath = Path.Combine(Path.GetDirectoryName(folderBrowser.FileName), ExportHelper.ProjectName);
+                string folderPath = Path.GetDirectoryName(folderBrowser.FileName);
                 if (!Directory.Exists(folderPath))
                 {
                     Directory.CreateDirectory(folderPath);

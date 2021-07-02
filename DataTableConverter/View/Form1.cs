@@ -87,10 +87,7 @@ namespace DataTableConverter
             ColumnWidths = new Dictionary<string, int>();
             SetSize();
             ExportHelper.CheckRequired();
-            LoadProcedures();
-            LoadWorkflows();
-            LoadTolerances();
-            LoadCases();
+            LoadFiles();
             SetMenuEnabled(false);
             öffnenToolStripMenuItem1.Click += (sender, e) => importToolStripMenuItem_Click();
             cSVToolStripMenuItem.Click += (sender, e) => cSVToolStripMenuItem_Click();
@@ -109,6 +106,14 @@ namespace DataTableConverter
             {
                 importToolStripMenuItem_Click(ImportState.None, new string[] { path });
             }
+        }
+
+        private void LoadFiles()
+        {
+            LoadProcedures();
+            LoadWorkflows();
+            LoadTolerances();
+            LoadCases();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -1449,6 +1454,7 @@ namespace DataTableConverter
 
         private void SettingForm_FormClosed(object sender, FormClosedEventArgs e, int oldHeight)
         {
+            LoadFiles();
             dgTable.DefaultCellStyle.Font = new Font(dgTable.DefaultCellStyle.Font.Name, Properties.Settings.Default.TableFontSize);
             dgTable.RowTemplate.Height = Properties.Settings.Default.RowHeight;
 

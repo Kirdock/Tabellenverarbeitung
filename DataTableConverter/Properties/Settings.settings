@@ -2,179 +2,179 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DataTableConverter.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="TextSeparated" Type="System.Boolean" Scope="User">
+    <Setting Name="TextSeparated" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="Separator" Type="System.String" Scope="User">
+    <Setting Name="Separator" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TabSelected" Type="System.Int32" Scope="User">
+    <Setting Name="TabSelected" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="ExportSpec" Type="System.Collections.ArrayList" Scope="User">
+    <Setting Name="ExportSpec" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Collections.ArrayList" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Encoding" Type="System.Int32" Scope="User">
+    <Setting Name="Encoding" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">65001</Value>
     </Setting>
-    <Setting Name="TextBegin" Type="System.String" Scope="User">
+    <Setting Name="TextBegin" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TextEnd" Type="System.String" Scope="User">
+    <Setting Name="TextEnd" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="splitDuplicates" Type="System.Int32" Scope="User">
+    <Setting Name="splitDuplicates" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">456</Value>
     </Setting>
-    <Setting Name="splitTolerances" Type="System.Int32" Scope="User">
+    <Setting Name="splitTolerances" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">207</Value>
     </Setting>
-    <Setting Name="splitCases" Type="System.Int32" Scope="User">
+    <Setting Name="splitCases" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">220</Value>
     </Setting>
-    <Setting Name="splitProcedures" Type="System.Int32" Scope="User">
+    <Setting Name="splitProcedures" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">375</Value>
     </Setting>
-    <Setting Name="splitWorkflow" Type="System.Int32" Scope="User">
+    <Setting Name="splitWorkflow" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">240</Value>
     </Setting>
-    <Setting Name="splitWorkflowProcProperties" Type="System.Int32" Scope="User">
+    <Setting Name="splitWorkflowProcProperties" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">596</Value>
     </Setting>
-    <Setting Name="splitWorkflowProperties" Type="System.Int32" Scope="User">
+    <Setting Name="splitWorkflowProperties" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">239</Value>
     </Setting>
-    <Setting Name="UpdateDialogShowed" Type="System.Boolean" Scope="User">
+    <Setting Name="UpdateDialogShowed" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="TakeOverAllFiles" Type="System.Boolean" Scope="User">
+    <Setting Name="TakeOverAllFiles" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="HeaderInFirstRow" Type="System.Boolean" Scope="User">
+    <Setting Name="HeaderInFirstRow" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="RequiredField" Type="System.Drawing.Color" Scope="User">
+    <Setting Name="RequiredField" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Red</Value>
     </Setting>
-    <Setting Name="Locked" Type="System.Drawing.Color" Scope="User">
+    <Setting Name="Locked" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">255, 128, 128</Value>
     </Setting>
-    <Setting Name="FailAddressText" Type="System.String" Scope="User">
+    <Setting Name="FailAddressText" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">F</Value>
     </Setting>
-    <Setting Name="RightAddressText" Type="System.String" Scope="User">
+    <Setting Name="RightAddressText" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">P</Value>
     </Setting>
-    <Setting Name="PVMAddressText" Type="System.String" Scope="User">
+    <Setting Name="PVMAddressText" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">K</Value>
     </Setting>
-    <Setting Name="FailAddressValue" Type="System.String" Scope="User">
+    <Setting Name="FailAddressValue" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">X</Value>
     </Setting>
-    <Setting Name="InvalidColumnName" Type="System.String" Scope="User">
+    <Setting Name="InvalidColumnName" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">UNGÜLTIG</Value>
     </Setting>
-    <Setting Name="SplitPVM" Type="System.Boolean" Scope="User">
+    <Setting Name="SplitPVM" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ImportHeaderUpperCase" Type="System.Boolean" Scope="User">
+    <Setting Name="ImportHeaderUpperCase" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="PVMSaveFormat" Type="System.Int32" Scope="User">
+    <Setting Name="PVMSaveFormat" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="OldAffix" Type="System.String" Scope="User">
+    <Setting Name="OldAffix" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">_ALT</Value>
     </Setting>
-    <Setting Name="AdministrationWindowSize" Type="System.Drawing.Size" Scope="User">
+    <Setting Name="AdministrationWindowSize" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">1156, 836</Value>
     </Setting>
-    <Setting Name="Form1Size" Type="System.Drawing.Size" Scope="User">
+    <Setting Name="Form1Size" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">920, 489</Value>
     </Setting>
-    <Setting Name="TextFormatSize" Type="System.Drawing.Size" Scope="User">
+    <Setting Name="TextFormatSize" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">816, 615</Value>
     </Setting>
-    <Setting Name="AutoSavePVM" Type="System.Boolean" Scope="User">
+    <Setting Name="AutoSavePVM" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="FullWidthImport" Type="System.Boolean" Scope="User">
+    <Setting Name="FullWidthImport" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="CountFromTo" Type="System.Boolean" Scope="User">
+    <Setting Name="CountFromTo" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="RowHeight" Type="System.Int32" Scope="User">
+    <Setting Name="RowHeight" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">22</Value>
     </Setting>
-    <Setting Name="TableFontSize" Type="System.Int32" Scope="User">
+    <Setting Name="TableFontSize" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">8</Value>
     </Setting>
-    <Setting Name="SettingPath" Type="System.String" Scope="User">
+    <Setting Name="SettingPath" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ListBoxFontSize" Type="System.Int32" Scope="User">
+    <Setting Name="ListBoxFontSize" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">8</Value>
     </Setting>
-    <Setting Name="ListBoxRowHeight" Type="System.Int32" Scope="User">
+    <Setting Name="ListBoxRowHeight" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
-    <Setting Name="PVMSaveTwice" Type="System.Boolean" Scope="User">
+    <Setting Name="PVMSaveTwice" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="MergeFormatViewSize" Type="System.Drawing.Size" Scope="User">
+    <Setting Name="MergeFormatViewSize" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">721, 467</Value>
     </Setting>
-    <Setting Name="MergeFormatViewSizeSimple" Type="System.Drawing.Size" Scope="User">
+    <Setting Name="MergeFormatViewSizeSimple" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">721, 280</Value>
     </Setting>
-    <Setting Name="PVMIdentifier" Type="System.String" Scope="User">
+    <Setting Name="PVMIdentifier" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">PVM_ID</Value>
     </Setting>
-    <Setting Name="SeparateColor" Type="System.Drawing.Color" Scope="User">
+    <Setting Name="SeparateColor" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Red</Value>
     </Setting>
-    <Setting Name="AdministrationWindowMaximized" Type="System.Boolean" Scope="User">
+    <Setting Name="AdministrationWindowMaximized" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Form1Maximized" Type="System.Boolean" Scope="User">
+    <Setting Name="Form1Maximized" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="TextFormatMaximized" Type="System.Boolean" Scope="User">
+    <Setting Name="TextFormatMaximized" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="MergeFormatViewMaximized" Type="System.Boolean" Scope="User">
+    <Setting Name="MergeFormatViewMaximized" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="MergeFormatViewSimpleMaximized" Type="System.Boolean" Scope="User">
+    <Setting Name="MergeFormatViewSimpleMaximized" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="CountSelectedType" Type="System.Int32" Scope="User">
+    <Setting Name="CountSelectedType" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="ImportWorkflowAuto" Type="System.Boolean" Scope="User">
+    <Setting Name="ImportWorkflowAuto" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="SeparateSelectable" Type="System.Boolean" Scope="User">
+    <Setting Name="SeparateSelectable" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="MaxRows" Type="System.Decimal" Scope="User">
+    <Setting Name="MaxRows" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">15000</Value>
     </Setting>
-    <Setting Name="TrimImport" Type="System.Boolean" Scope="User">
+    <Setting Name="TrimImport" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="EditShortcut" Type="System.Windows.Forms.Keys" Scope="User">
-      <Value Profile="(Default)">Strg+Alt+LButton</Value>
-    </Setting>
-    <Setting Name="LongPathEnabled" Type="System.Boolean" Scope="User">
+    <Setting Name="LongPathEnabled" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="UnhideRows" Type="System.Boolean" Scope="User">
+    <Setting Name="UnhideRows" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="UnhideColumns" Type="System.Boolean" Scope="User">
+    <Setting Name="UnhideColumns" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="EditShortcut" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Windows.Forms.Keys" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
