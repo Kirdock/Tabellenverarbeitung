@@ -974,8 +974,8 @@ namespace DataTableConverter.Assisstant
             {
                 multiHeader = DatabaseHelper.AddColumn(tableName, multiHeader);
                 DatabaseHelper.MoveColumnToIndex(latestHeader, multiHeader, tableName);
+                row.Add(multiHeader, result);
             }
-            row.Add(multiHeader, result);
         }
         #endregion
 

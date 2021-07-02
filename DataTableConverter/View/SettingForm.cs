@@ -147,7 +147,7 @@ namespace DataTableConverter.View
 
         private void llSourceCode_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/Kirdock/Tabellenverarbeitung");
+            Process.Start("https://github.com/Kirdock/Tabellenverarbeitung");
         }
 
         private void BtnSearchFolder_Click(object sender, EventArgs e)
@@ -166,23 +166,27 @@ namespace DataTableConverter.View
                 {
                     Directory.CreateDirectory(folderPath);
                 }
-                foreach (string file in Directory.GetFiles(ExportHelper.ProjectPath))
+                DialogResult result = MessageHandler.MessagesYesNo(this, MessageBoxIcon.Information, "Soll der Inhalt des alten Ordners in den neuen kopiert werden?");
+                if (result == DialogResult.Yes)
                 {
-                    FileInfo mFile = new FileInfo(file);
-                    string path = Path.Combine(folderPath, mFile.Name);
-                    // to remove name collisions
-                    if (!File.Exists(path))
+                    foreach (string file in Directory.GetFiles(ExportHelper.ProjectPath))
                     {
-                        mFile.MoveTo(path);
+                        FileInfo mFile = new FileInfo(file);
+                        string path = Path.Combine(folderPath, mFile.Name);
+                        // to remove name collisions
+                        if (!File.Exists(path))
+                        {
+                            mFile.MoveTo(path);
+                        }
                     }
-                }
-                foreach (string directory in Directory.GetDirectories(ExportHelper.ProjectPath))
-                {
-                    string path = Path.Combine(folderPath, Path.GetFileName(directory));
-                    if (!Directory.Exists(path))
+                    foreach (string directory in Directory.GetDirectories(ExportHelper.ProjectPath))
                     {
+                        string path = Path.Combine(folderPath, Path.GetFileName(directory));
+                        if (!Directory.Exists(path))
+                        {
 
-                        Microsoft.VisualBasic.FileIO.FileSystem.MoveDirectory(directory, path);
+                            Microsoft.VisualBasic.FileIO.FileSystem.MoveDirectory(directory, path);
+                        }
                     }
                 }
 

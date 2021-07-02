@@ -30,7 +30,7 @@ namespace DataTableConverter
         {
             get
             {
-                return Properties.Settings.Default.SettingPath == string.Empty ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName) : Properties.Settings.Default.SettingPath;
+                return Properties.Settings.Default.SettingPath == string.Empty || !Directory.Exists(Properties.Settings.Default.SettingPath) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName) : Properties.Settings.Default.SettingPath;
             }
         }
 
@@ -745,7 +745,7 @@ namespace DataTableConverter
                 setStatus($"Die Datei wird vorbereitet");
                 DatabaseHelper.SplitTableOnRowValue(dict, item.Column, tableName);
 
-                foreach (string[] tableInfo in dict.Values.Distinct())
+                foreach (string[] tableInfo in dict.Values.GroupBy(info => info[0]).Select(group => group.First()))
                 {
                     string newTable = tableInfo[0];
                     string fileName = tableInfo[1];
