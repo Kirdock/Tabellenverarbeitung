@@ -992,7 +992,7 @@ namespace DataTableConverter
             if (e.RowIndex != -1 && e.ColumnIndex != -1)
             {
                 string value = dgTable[e.ColumnIndex, e.RowIndex].Value.ToString();
-                int id = int.Parse(dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString());
+                long id = long.Parse(dgTable[DatabaseHelper.IdColumnName, e.RowIndex].Value.ToString());
                 int width = TextRenderer.MeasureText(value, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
                 DataGridViewColumn col = dgTable.Columns[e.ColumnIndex];
                 if (width > col.Width)
@@ -1387,11 +1387,8 @@ namespace DataTableConverter
                     string newText = form.NewText;
 
                     DatabaseHelper.SetColumnValues(dgTable.Columns[selectedColumn].HeaderText, newText, TableName);
-                    foreach (DataGridViewRow row in dgTable.Rows)
-                    {
-                        row.Cells[selectedColumn].Value = newText;
-                    }
                     DatabaseHelper.SetSavepoint();
+                    LoadData(true);
                 }
             }
         }

@@ -1606,7 +1606,7 @@ namespace DataTableConverter.Assisstant
             using (SQLiteCommand command = connection.CreateCommand())
             {
                 CreateIndexOn(tableName, column, null, false);
-                command.CommandText = $"SELECT {headerString} from [{tableName}] where [{column}] = ?";
+                command.CommandText = $"SELECT {headerString} from [{tableName}] where [{column}] = ? COLLATE CASESENSITIVE";
                 command.Parameters.Add(new SQLiteParameter());
                 foreach (KeyValuePair<string, string[]> pair in dict)
                 {

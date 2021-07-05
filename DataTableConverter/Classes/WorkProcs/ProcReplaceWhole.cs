@@ -42,12 +42,12 @@ namespace DataTableConverter.Classes.WorkProcs
 
         public override string[] GetHeaders()
         {
-            return Columns.AsEnumerable().Select(row => row[(int)ColumnIndex.Column].ToString()).ToArray();
+            return RemoveEmptyHeaders(Columns.AsEnumerable().Select(row => row[(int)ColumnIndex.Column].ToString()));
         }
 
         private IEnumerable<DataRow> GetFoundRows(List<string> columns)
         {
-            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && columns.Contains(dr[(int)ColumnIndex.Column].ToString(), StringComparer.OrdinalIgnoreCase));
+            return Columns.AsEnumerable().Where(dr => dr.ItemArray.Length > 0 && dr[0].ToString().Length != 0 && columns.Contains(dr[(int)ColumnIndex.Column].ToString(), StringComparer.OrdinalIgnoreCase));
         }
 
         public override void RenameHeaders(string oldName, string newName)
