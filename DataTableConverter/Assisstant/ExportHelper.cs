@@ -26,6 +26,7 @@ namespace DataTableConverter
                                          string lpFileName);
 
         internal static readonly string ProjectName = "Tabellenkonvertierung";
+        private readonly int MaxCellsPerIteration = 50000;
         internal static string ProjectPath
         {
             get
@@ -291,13 +292,14 @@ namespace DataTableConverter
             return rowCount;
         }
 
-        private int ExportDbase(string tableName, string directory, string fileName, SQLiteCommand command, Form invokeForm)
+        private int ExportDbase(string tableName, string directory, string fullFileName, SQLiteCommand command, Form invokeForm)
         {
             int rowCount = 0;
             List<string> duplicates = new List<string>();
             using (SQLiteDataReader reader = command.ExecuteReader())
             {
                 string[] aliases = new string[reader.FieldCount];
+                string fileName = fullFileName;
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     aliases[i] = reader.GetName(i);
@@ -322,7 +324,7 @@ namespace DataTableConverter
                 }
 
 
-                if (fileName.Length > DbaseMaxFileLength)
+                if (fullFileName.Length > DbaseMaxFileLength)
                 {
                     fileName = fileName.Substring(0, DbaseMaxFileLength);
                 }
@@ -337,7 +339,7 @@ namespace DataTableConverter
                     return 0;
                 }
                 string fullPathTemp = Path.Combine(tempDirectoryPath, fileName + ".DBF");
-                string fullPathOriginal = Path.Combine(directory, fileName + ".DBF");
+                string fullPathOriginal = Path.Combine(directory, fullFileName + ".DBF");
 
                 if (File.Exists(fullPathTemp))
                 {
@@ -584,7 +586,7 @@ namespace DataTableConverter
                     if (reader.HasRows) //write header
                     {
                         string[] aliases = new string[reader.FieldCount];
-                        int maxRowsPerExecution = ImportHelper.MaxCellsPerIteration / reader.FieldCount; // about 50000 cells per iteration
+                        int maxRowsPerExecution = MaxCellsPerIteration / reader.FieldCount; // about 50000 cells per iteration
                         for (var i = 0; i < reader.FieldCount; i++)
                         {
                             aliases[i] = reader.GetName(i);
