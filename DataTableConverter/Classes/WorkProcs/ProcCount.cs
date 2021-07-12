@@ -9,7 +9,7 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "Zählen";
         public string Column;
-        public int Count;
+        public int Count = 1;
         public bool ShowFromTo;
         public bool CountChecked;
 
@@ -20,7 +20,7 @@ namespace DataTableConverter.Classes.WorkProcs
             string columnName = invokeForm.DatabaseHelper.GetColumnName(Column, tableName);
             if (columnName != null)
             {
-                string newTable = invokeForm.ExportHelper.ExportCount(columnName, CountChecked ? Count : 0, ShowFromTo, orderType, tableName);
+                string newTable = invokeForm.ExportHelper.ExportCount(columnName, CountChecked ? (Count == 0 ? 1 : Count) : 0, ShowFromTo, orderType, tableName);
                 invokeForm.BeginInvoke(new MethodInvoker(() =>
                 {
                     invokeForm.DatabaseHelper.CopyToNewDatabaseFile(newTable);

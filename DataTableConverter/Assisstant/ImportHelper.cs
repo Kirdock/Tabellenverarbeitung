@@ -39,6 +39,7 @@ namespace DataTableConverter.Assisstant
         private static readonly XName RowExcelNamespace = ExcelNamespace + "Row";
         private static readonly XName CellExcelNamespace = ExcelNamespace + "Cell";
         private static readonly XName IndexNamexpace = ExcelNamespace + "Index";
+        private static readonly XName TypeNamexpace = ExcelNamespace + "Type";
 
         [DllImport("kernel32.dll", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto)]
         private static extern int GetShortPathName(
@@ -851,8 +852,12 @@ namespace DataTableConverter.Assisstant
                         int.TryParse(indexAttribute.Value, out index);
                         index--;
                     }
-
+                    
                     string val = trimOperation(cell.Value.Replace("\t", string.Empty)); // remove tabs
+                    if ((cell.DescendantNodes().FirstOrDefault() as XElement)?.Attribute(TypeNamexpace)?.Value == "DateTime" && DateTime.TryParse(val, out DateTime datetime))
+                    {
+                        val = datetime.ToShortDateString();
+                    }
                     string[] multiCells = val.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
                     if (multiCells.Length > 1)

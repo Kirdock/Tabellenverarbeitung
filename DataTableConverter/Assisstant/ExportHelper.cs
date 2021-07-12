@@ -18,7 +18,7 @@ using System.Windows.Forms;
 
 namespace DataTableConverter
 {
-    internal enum SaveFormat { CSV = 0, DBASE = 1, EXCEL = 2};
+    internal enum SaveFormat { CSV = 0, DBASE = 1, EXCEL = 2 };
     class ExportHelper
     {
         [DllImport("gdi32.dll", EntryPoint = "AddFontResourceW", SetLastError = true)]
@@ -35,7 +35,7 @@ namespace DataTableConverter
                     Properties.Settings.Default.SettingPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ProjectName);
                     Properties.Settings.Default.Save();
                 }
-                return  Properties.Settings.Default.SettingPath;
+                return Properties.Settings.Default.SettingPath;
             }
         }
 
@@ -291,13 +291,14 @@ namespace DataTableConverter
             return rowCount;
         }
 
-        private int ExportDbase(string tableName, string directory, string fileName, SQLiteCommand command, Form invokeForm)
+        private int ExportDbase(string tableName, string directory, string fullFileName, SQLiteCommand command, Form invokeForm)
         {
             int rowCount = 0;
             List<string> duplicates = new List<string>();
             using (SQLiteDataReader reader = command.ExecuteReader())
             {
                 string[] aliases = new string[reader.FieldCount];
+                string fileName = fullFileName;
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     aliases[i] = reader.GetName(i);
@@ -322,7 +323,7 @@ namespace DataTableConverter
                 }
 
 
-                if (fileName.Length > DbaseMaxFileLength)
+                if (fullFileName.Length > DbaseMaxFileLength)
                 {
                     fileName = fileName.Substring(0, DbaseMaxFileLength);
                 }
@@ -337,7 +338,7 @@ namespace DataTableConverter
                     return 0;
                 }
                 string fullPathTemp = Path.Combine(tempDirectoryPath, fileName + ".DBF");
-                string fullPathOriginal = Path.Combine(directory, fileName + ".DBF");
+                string fullPathOriginal = Path.Combine(directory, fullFileName + ".DBF");
 
                 if (File.Exists(fullPathTemp))
                 {
@@ -578,7 +579,7 @@ namespace DataTableConverter
                 worksheet.Name = workSheetName;
 
                 int maxRows = DatabaseHelper.GetRowCount(tableName);
-                
+
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.HasRows) //write header
@@ -611,7 +612,7 @@ namespace DataTableConverter
                             {
                                 InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, aliases.Length);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 ErrorHelper.LogMessage($"Error while inserting rows to Excel{Environment.NewLine}rowStart: {rowStart}; count: {newRows - 1}; columnCount: {aliases.Length}; maxRows: {maxRows}; max: {max}", invokeForm, false);
                                 throw ex;
@@ -767,7 +768,7 @@ namespace DataTableConverter
         private string GetFileExtension(int format)
         {
             string result;
-            switch(format)
+            switch (format)
             {
                 case 0:
                     result = "csv";
