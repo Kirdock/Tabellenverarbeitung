@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using DataTableConverter.Classes;
+﻿using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.Extensions;
 using DataTableConverter.View;
@@ -13,7 +12,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace DataTableConverter.Assisstant
 {
@@ -30,8 +32,13 @@ namespace DataTableConverter.Assisstant
         internal readonly string DbfExt = "*.dbf";
         internal readonly string CsvExt = "*.csv";
         internal readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+        internal static readonly int MaxCellsPerIteration = 50000;
         private readonly DatabaseHelper DatabaseHelper;
         private readonly ExportHelper ExportHelper;
+        private static readonly XNamespace ExcelNamespace = "urn:schemas-microsoft-com:office:spreadsheet";
+        private static readonly XName RowExcelNamespace = ExcelNamespace + "Row";
+        private static readonly XName CellExcelNamespace = ExcelNamespace + "Cell";
+        private static readonly XName IndexNamexpace = ExcelNamespace + "Index";
 
         [DllImport("kernel32.dll", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto)]
         private static extern int GetShortPathName(
@@ -611,101 +618,274 @@ namespace DataTableConverter.Assisstant
         }
 
         #region Excel Import
-
         internal void OpenExcel(string path, ProgressBar progressBar, Form mainForm, string tableName, ref string password)
         {
-            XLWorkbook workbook = new XLWorkbook(path);
-            
-            if (workbook.IsPasswordProtected && password != string.Empty) {
-                password = Microsoft.VisualBasic.Interaction.InputBox("Bitte Passwort eingeben", "Datei durch Passwort geschützt", string.Empty);
-                if (string.IsNullOrWhiteSpace(password))
-                {
-                    return;
-                }
-                workbook.Unprotect(password);
-            }
-
-            IXLWorksheets sheets = workbook.Worksheets;
-            string[] sheetNames = sheets.Select(sh => sh.Name).ToArray();
-            int[] selectedSheetsIndizes = SelectItems(sheetNames, mainForm);
-            string[] selectedSheets = selectedSheetsIndizes.Select(index => sheetNames[index]).ToArray();
-            List<string> headers = new List<string>();
+            Microsoft.Office.Interop.Excel.Application objXL = null;
+            Microsoft.Office.Interop.Excel.Workbook objWB = null;
             Func<string, string> trimOperation = GetTrimOperation();
-            if (selectedSheets.Length > 1)
+            string clipboardBefore = string.Empty;
+            try
             {
-                headers.Add(Extensions.DataTableExtensions.FileName);
+                clipboardBefore = Clipboard.GetText();
             }
-
-            DatabaseHelper.CreateTable(headers, tableName);
-
-            foreach (IXLWorksheet sheet in sheets.Where(sh => selectedSheets.Contains(sh.Name)))
+            catch (Exception ex)
             {
-                string fileName = selectedSheets.Length != 1 ? Path.GetFileName(path) + "; " + sheet.Name : null;
-                IXLRows rows = sheet.RowsUsed(RowSelection);
-                string[] tableHeaders = rows.First().CellsUsed(CellSelection).Select(cell => cell.GetFormattedString()).ToArray();
-                List<string> newHeaders = new List<string>();
-                SQLiteCommand insertCommand = null;
+                ErrorHelper.LogMessage(ex, mainForm, false);
+            }
+            Clipboard.Clear();
 
-                foreach (string header in tableHeaders)
+            try
+            {
+                objXL = new Microsoft.Office.Interop.Excel.Application
                 {
-                    AddHeaderOfContent(newHeaders, header);
-                }
-
-                foreach (string header in newHeaders)
+                    DisplayAlerts = false
+                };
+                bool hasPassword = false;
+                do
                 {
-                    if (!headers.Contains(header, System.StringComparer.OrdinalIgnoreCase))
+                    try
                     {
-                        headers.Add(header);
-                        DatabaseHelper.AddColumn(tableName, header);
+                        objWB = objXL.Workbooks.Open(Filename: path, ReadOnly: true, Password: password);
+                        hasPassword = false;
                     }
-                }
-
-                progressBar?.StartLoadingBar(rows.Count(), mainForm);
-
-                foreach (IXLRow row in rows.Skip(1))
-                {
-                    Dictionary<string, string> values = new Dictionary<string, string>();
-                    int index = 0;
-
-                    foreach (IXLCell cell in row.CellsUsed(CellSelection))
+                    catch (COMException ex)
                     {
-                        string cellValue = cell.GetFormattedString();
-                        string value = trimOperation((cell.DataType == XLDataType.DateTime ? DateTime.Parse(cellValue).ToShortDateString() : cellValue).Replace("\t", string.Empty));
-                        string[] multiCells = value.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-                        if (multiCells.Length > 1)
+                        if (hasPassword = (ex.ErrorCode == -2146827284))
                         {
-                            for (int i = 0; i < multiCells.Length; ++i)
+                            password = Microsoft.VisualBasic.Interaction.InputBox("Bitte Passwort eingeben", "Datei durch Passwort geschützt", string.Empty);
+                            if (string.IsNullOrWhiteSpace(password))
                             {
-                                AddMultiCellColumn(newHeaders[index], i, tableName, values, multiCells[i]);
+                                return;
                             }
-                            insertCommand = null;
                         }
                         else
                         {
-                            values.Add(newHeaders[index], value);
-
+                            ErrorHelper.LogMessage(ex, mainForm);
+                            return;
                         }
-                        index++;
                     }
-                    insertCommand = AddContentDataRow(values, fileName, tableName, insertCommand);
-                    progressBar?.UpdateLoadingBar(mainForm);
+                    catch(Exception ex)
+                    {
+                        ErrorHelper.LogMessage(ex, mainForm);
+                        return;
+                    }
+                } while (hasPassword);
+
+                string[] sheets = objWB.Worksheets.Cast<Microsoft.Office.Interop.Excel.Worksheet>().Select(x => x.Name).ToArray();
+                int[] selectedSheetsIndizes = SelectItems(sheets, mainForm);
+                string[] selectedSheets = selectedSheetsIndizes.Select(index => sheets[index]).ToArray();
+                List<string> headers = new List<string>();
+                if (selectedSheets.Length > 1)
+                {
+                    headers.Add(Extensions.DataTableExtensions.FileName);
+                }
+
+                DatabaseHelper.CreateTable(headers.ToArray(), tableName);
+
+                foreach (string sheetName in selectedSheets)
+                {
+                    Microsoft.Office.Interop.Excel.Worksheet objSHT = objWB.Worksheets[sheetName];
+                    int rows = objSHT.Rows.Find("*", System.Reflection.Missing.Value,
+                                                   System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                                                   Microsoft.Office.Interop.Excel.XlSearchOrder.xlByRows, Microsoft.Office.Interop.Excel.XlSearchDirection.xlPrevious,
+                                                   false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    //int rows = objSHT.UsedRange.Rows.Count;
+                    int cols = objSHT.Cells.Find("*", System.Reflection.Missing.Value,
+                                                   System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                                                   Microsoft.Office.Interop.Excel.XlSearchOrder.xlByColumns, Microsoft.Office.Interop.Excel.XlSearchDirection.xlPrevious,
+                                                   false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Column;
+                    
+                    if (cols == 0)
+                    {
+                        continue;
+                    }
+
+                    if (Properties.Settings.Default.UnhideRows)
+                    {
+                        objSHT.Rows.EntireRow.Hidden = false;
+                    }
+
+                    if (Properties.Settings.Default.UnhideColumns)
+                    {
+                        objSHT.Columns.EntireColumn.Hidden = false;
+                    }
+
+                    List<string> newHeaders = SetHeaderOfExcel(objSHT, cols, mainForm);
+
+                    foreach(string header in newHeaders)
+                    {
+                        if (!headers.Contains(header, System.StringComparer.OrdinalIgnoreCase))
+                        {
+                            headers.Add(header);
+                            DatabaseHelper.AddColumn(tableName, header);
+                        }
+                    }
+
+                    progressBar?.StartLoadingBar(rows, mainForm);
+
+                    RangeToDataTable(objSHT, objXL, rows, cols, tableName, selectedSheets.Length != 1 ? Path.GetFileName(path) + "; " + sheetName : null, newHeaders, trimOperation, progressBar, mainForm);
+                    Marshal.ReleaseComObject(objSHT);
+                }
+                if (selectedSheets.Length > 1)
+                {
+                    DatabaseHelper.MoveColumnToIndex(headers.Count - 1, headers.First(), tableName);
                 }
             }
-            if (selectedSheets.Length > 1)
+            catch (Exception ex)
             {
-                DatabaseHelper.MoveColumnToIndex(headers.Count - 1, headers.First(), tableName);
+                ErrorHelper.LogMessage(ex, mainForm);
+            }
+            finally
+            {
+                if (objWB != null)
+                {
+                    objWB.Close(false);
+                    Marshal.ReleaseComObject(objWB);
+                }
+                if (objXL != null)
+                {
+                    objXL.DisplayAlerts = true;
+                    objXL.CutCopyMode = 0;
+                    objXL.Quit();
+                    Marshal.ReleaseComObject(objXL);
+                    Marshal.FinalReleaseComObject(objXL);
+                }
+
+                if (!string.IsNullOrEmpty(clipboardBefore))
+                {
+                    //idk why but the Clipboard text is not set when I do it immediately
+                    Thread thread = new Thread(() =>
+                    {
+                        Thread.Sleep(200);
+                        Clipboard.SetText(clipboardBefore);
+                    });
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                }
             }
         }
 
-        private bool CellSelection(IXLCell cell)
+        private void RangeToDataTable(Microsoft.Office.Interop.Excel.Worksheet objSHT, Microsoft.Office.Interop.Excel.Application objXL, int rows, int cols, string tableName, string fileName, List<string> newHeaders, Func<string,string> trimOperation, ProgressBar progressBar, Form mainForm)
         {
-            return Properties.Settings.Default.UnhideColumns || !cell.WorksheetColumn().IsHidden;
+            Clipboard.Clear();
+            objXL.CutCopyMode = 0;
+            int rowRange = MaxCellsPerIteration / cols; // about 50000 cells per iteration
+            SQLiteCommand insertCommand = null;
+            
+            for (int i = 2; i <= rows; i += rowRange + 1)
+            {
+                Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[i, 1];
+                int rowCount = i + rowRange;
+                int endRow = rowCount > rows ? rows : rowCount;
+                Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[endRow, cols];
+                Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
+                if(TryCopyClipboard(range, i, endRow, mainForm, true, out object content))
+                {
+                    insertCommand = ClipboardToDatabase((MemoryStream)content, newHeaders.ToArray(), fileName, tableName, progressBar, mainForm, insertCommand, trimOperation);
+                }
+            }
         }
 
-        private bool RowSelection(IXLRow row)
+        private bool TryCopyClipboard(Microsoft.Office.Interop.Excel.Range range, int begin, int end, Form mainForm, bool isXml, out object content)
         {
-            return Properties.Settings.Default.UnhideRows || !row.IsHidden;
+            int attempts = 0;
+            int maxAttempts = 5;
+            content = null;
+            string format = isXml ? "XML Spreadsheet" : DataFormats.UnicodeText;
+
+            while (content == null && attempts < maxAttempts)
+            {
+                range.Copy();
+                IDataObject dataObject = Clipboard.GetDataObject();
+                if ((!isXml || dataObject.GetDataPresent(format)) && Clipboard.ContainsText())
+                {
+                    content = dataObject.GetData(format);
+                }
+                attempts++;
+            }
+            bool isInvalid = attempts == maxAttempts && content == null;
+            if (isInvalid)
+            {
+                ErrorHelper.LogMessage($"Kopieren der Zeilen {begin} bis {end} {maxAttempts} mal fehlgeschlagen\nZeilen werden übersprungen", mainForm);
+            }
+            return !isInvalid;
+        }
+
+        private List<string> SetHeaderOfExcel(Microsoft.Office.Interop.Excel.Worksheet objSHT, int cols, Form mainForm)
+        {
+            Microsoft.Office.Interop.Excel.Range c1 = objSHT.Cells[1, 1];
+            Microsoft.Office.Interop.Excel.Range c2 = objSHT.Cells[1, cols];
+            Microsoft.Office.Interop.Excel.Range range = objSHT.get_Range(c1, c2);
+
+            return TryCopyClipboard(range, 1, 1, mainForm, false, out object content) ? GetHeadersOfContent((string)content) : new List<string>() ;
+        }
+
+        public static XDocument ForwardToXDocument(XmlDocument xmlDocument)
+        {
+            using (XmlNodeReader xmlNodeReader = new XmlNodeReader(xmlDocument))
+            {
+                xmlNodeReader.MoveToContent();
+                return XDocument.Load(xmlNodeReader);
+            }
+        }
+
+        private SQLiteCommand ClipboardToDatabase(MemoryStream content, string[] headers, string fileName, string tableName, ProgressBar progressBar, Form invokeForm, SQLiteCommand insertCommand, Func<string, string> trimOperation)
+        {
+            List<XElement> linqRows = GetRowsOfStream(content);
+
+            foreach (XElement rowElement in linqRows)
+            {
+                int index = 0;
+
+                Dictionary<string, string> row = new Dictionary<string, string>(); //column, value pair
+                for (int i = 0; i < headers.Length; ++i)
+                {
+                    row.Add(headers[i], string.Empty);
+                }
+                foreach (XElement cell in rowElement.Descendants(CellExcelNamespace))
+                {
+                    // emtpy columns are ignored in rowElement.Descendants, that's why we adjust the index
+                    XAttribute indexAttribute = cell.Attribute(IndexNamexpace);
+                    if (indexAttribute != null)
+                    {
+                        int.TryParse(indexAttribute.Value, out index);
+                        index--;
+                    }
+
+                    string val = trimOperation(cell.Value.Replace("\t", string.Empty)); // remove tabs
+                    string[] multiCells = val.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (multiCells.Length > 1)
+                    {
+                        for (int i = 0; i < multiCells.Length; ++i)
+                        {
+                            AddMultiCellColumn(headers[index], i, tableName, row, multiCells[i]);
+                        }
+                        insertCommand = null;
+                    }
+                    else
+                    {
+                        row[headers[index]] = val;
+
+                    }
+                    index++;
+                }
+
+                insertCommand = AddContentDataRow(row, fileName, tableName, insertCommand);
+                progressBar?.UpdateLoadingBar(invokeForm);
+            }
+            return insertCommand;
+        }
+
+        private List<XElement> GetRowsOfStream(MemoryStream content)
+        {
+            using (StreamReader streamReader = new StreamReader(content))
+            {
+                streamReader.BaseStream.SetLength(streamReader.BaseStream.Length - 1);
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(streamReader.ReadToEnd());
+                return ForwardToXDocument(xmlDocument).Descendants(RowExcelNamespace).ToList();
+            }
         }
 
         private SQLiteCommand AddContentDataRow(Dictionary<string, string> row, string fileName, string tableName, SQLiteCommand command)
@@ -720,8 +900,39 @@ namespace DataTableConverter.Assisstant
             }
             return command;
         }
-        private void AddHeaderOfContent(List<string> headers, string headerString)
+
+        private void SetContentRowValue(Dictionary<string, string> row, string column, StringBuilder builder, Func<string, string> trimOperation)
         {
+            row.Add(column, trimOperation(builder.ToString()));
+            builder.Clear();
+        }
+
+        private List<string> GetHeadersOfContent(string content)
+        {
+            List<string> headers = new List<string>();
+            StringBuilder header = new StringBuilder();
+            for (int i = 0; i < content.Length; i++)
+            {
+                if (content[i] == '\r' && content[i + 1] == '\n')
+                {
+                    AddHeaderOfContent(headers, header);
+                    break;
+                }
+                else if (content[i] == '\t')
+                {
+                    AddHeaderOfContent(headers, header);
+                }
+                else
+                {
+                    header.Append(content[i]);
+                }
+            }
+            return headers;
+        }
+
+        private void AddHeaderOfContent(List<string> headers, StringBuilder header)
+        {
+            string headerString = header.ToString();
             int counter = 0;
             if (string.IsNullOrWhiteSpace(headerString))
             {
@@ -729,6 +940,7 @@ namespace DataTableConverter.Assisstant
                 counter = 1;
             }
             TryAddColumn(headers, headerString, counter);
+            header.Clear();
         }
 
         private string TryAddColumn(List<string> headers, string headerName, int counter = 0)
