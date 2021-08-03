@@ -486,16 +486,19 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
-        internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, object[] values, string tableName, SQLiteCommand cmd = null)
+        internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, object[] values, string tableName, SQLiteCommand command = null)
         {
             string[] headers = eHeaders.ToArray();
             if (headers.Length > values.Length)
             {
                 headers = headers.Take(values.Length).ToArray();
-                cmd = null;
+                command = null;
+            }
+            if(command?.Parameters.Count != values.Length)
+            {
+                command = null;
             }
 
-            SQLiteCommand command = cmd;
             if (command == null)
             {
                 string headerString = GetHeaderString(headers);

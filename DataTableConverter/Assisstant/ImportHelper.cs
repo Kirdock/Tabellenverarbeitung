@@ -212,14 +212,25 @@ namespace DataTableConverter.Assisstant
                     var indexItem = newHeaders.Select((item, index) => new { item, index });
                     for (int i = 0; i < newHeaders.Count; ++i)
                     {
-                        var duplicates = indexItem.Where(element => element.index != i && element.item.Equals(newHeaders[i], StringComparison.OrdinalIgnoreCase)).ToArray();
+                        var duplicates = indexItem.Where(element => element.item == string.Empty || element.index != i && element.item.Equals(newHeaders[i], StringComparison.OrdinalIgnoreCase)).ToArray();
                         for(int y = 0; y < duplicates.Length; ++y)
                         {
                             int counter = y + 2;
                             string newValue;
+                            string item = duplicates[y].item; ;
+                            string header;
+                            if(item == string.Empty)
+                            {
+                                header = "Spalte";
+                                counter--;
+                            }
+                            else
+                            {
+                                header = item;
+                            }
                             do
                             {
-                                newValue = duplicates[y].item + counter;
+                                newValue = header + counter;
                                 ++counter;
                             } while (newHeaders.Contains(newValue));
 
