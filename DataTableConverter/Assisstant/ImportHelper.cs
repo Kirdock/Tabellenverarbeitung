@@ -758,18 +758,18 @@ namespace DataTableConverter.Assisstant
                         if (reader.GetColumnWidth(i) != 0 || Properties.Settings.Default.UnhideColumns)
                         {
                             string value = trimOperation(GetFormattedValue(reader, i)).Replace("\t", string.Empty);
-                            string[] multiCells = value.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] multiCells = value.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                             if (multiCells.Length > 1)
                             {
                                 for (int j = 0; j < multiCells.Length; ++j)
                                 {
-                                    AddMultiCellColumn(newHeaders[index], j, tableName, values, multiCells[j]);
+                                    AddMultiCellColumn(newHeaders[index], j, tableName, values, multiCells[j].Replace("\r", string.Empty));
                                 }
                                 insertCommand = null;
                             }
                             else
                             {
-                                values.Add(newHeaders[index], value);
+                                values.Add(newHeaders[index], value.Replace("\r", string.Empty));
                             }
                             index++;
                         }
