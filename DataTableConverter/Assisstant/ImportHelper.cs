@@ -758,7 +758,7 @@ namespace DataTableConverter.Assisstant
                         if (reader.GetColumnWidth(i) != 0 || Properties.Settings.Default.UnhideColumns)
                         {
                             string value = trimOperation(GetFormattedValue(reader, i)).Replace("\t", string.Empty);
-                            string[] multiCells = value.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] multiCells = value.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                             if (multiCells.Length > 1)
                             {
                                 for (int j = 0; j < multiCells.Length; ++j)
