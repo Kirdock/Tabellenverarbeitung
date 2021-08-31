@@ -213,7 +213,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 #endregion
 
                 #region Set Substring
-                if (subStringBegin != null)
+                if (subStringBegin != null && subStringBegin.Length > i)
                 {
                     int begin = subStringBegin[i-1];
                     int end = subStringEnd[i-1];
@@ -235,7 +235,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 res.Append("|").Append(result);
             }
-            return res.ToString();
+            return res.ToString().ToLower();
         }
     }
 }
