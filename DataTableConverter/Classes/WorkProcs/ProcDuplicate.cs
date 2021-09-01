@@ -65,9 +65,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     if (begin[i] == 0 || end[i] == 0 || end[i] < begin[i])
                     {
-                        begin.RemoveAt(i);
-                        end.RemoveAt(i);
-                        i--;
+                        begin[i] = -1;
                     }
                 }
 
@@ -212,10 +210,10 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
                 #endregion
 
+                int begin;
                 #region Set Substring
-                if (subStringBegin != null && subStringBegin.Length > i)
+                if (subStringBegin != null && subStringBegin.Length > i && (begin = subStringBegin[i - 1]) != -1)
                 {
-                    int begin = subStringBegin[i-1];
                     int end = subStringEnd[i-1];
                     if (begin - 1 > result.Length)
                     {
