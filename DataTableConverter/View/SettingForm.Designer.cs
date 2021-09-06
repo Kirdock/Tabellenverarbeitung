@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingForm));
             this.tabSettings = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.TPColors = new System.Windows.Forms.TabPage();
             this.PSeparateColor = new System.Windows.Forms.Panel();
             this.label26 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
@@ -38,7 +38,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cRequired = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
-            this.tpFileShortcuts = new System.Windows.Forms.TabPage();
+            this.TPFileShortcuts = new System.Windows.Forms.TabPage();
             this.label7 = new System.Windows.Forms.Label();
             this.txtInvalidColumn = new System.Windows.Forms.TextBox();
             this.txtFailAddressValue = new System.Windows.Forms.TextBox();
@@ -49,7 +49,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.txtFailAddress = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.TBSizes = new System.Windows.Forms.TabPage();
             this.label24 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.NbRowHeightListBox = new System.Windows.Forms.NumericUpDown();
@@ -87,7 +87,9 @@
             this.txtOldAffix = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.cbHeaderUpperCase = new System.Windows.Forms.CheckBox();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.TPHelp = new System.Windows.Forms.TabPage();
+            this.LblVersion = new System.Windows.Forms.Label();
+            this.label41 = new System.Windows.Forms.Label();
             this.label35 = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -123,33 +125,35 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label41 = new System.Windows.Forms.Label();
-            this.LblVersion = new System.Windows.Forms.Label();
+            this.TPDuplicate = new System.Windows.Forms.TabPage();
+            this.CBDuplicateCaseSensitive = new System.Windows.Forms.CheckBox();
             this.tabSettings.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tpFileShortcuts.SuspendLayout();
-            this.tabPage4.SuspendLayout();
+            this.TPColors.SuspendLayout();
+            this.TPFileShortcuts.SuspendLayout();
+            this.TBSizes.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NbRowHeightListBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbFontSizeListBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbRowHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbFontSize)).BeginInit();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumMaxRows)).BeginInit();
-            this.tabPage3.SuspendLayout();
+            this.TPHelp.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).BeginInit();
             this.tabPage6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DgVSecondExample)).BeginInit();
+            this.TPDuplicate.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabSettings
             // 
-            this.tabSettings.Controls.Add(this.tabPage1);
-            this.tabSettings.Controls.Add(this.tpFileShortcuts);
-            this.tabSettings.Controls.Add(this.tabPage4);
+            this.tabSettings.Controls.Add(this.TPDuplicate);
+            this.tabSettings.Controls.Add(this.TPFileShortcuts);
+            this.tabSettings.Controls.Add(this.TPColors);
+            this.tabSettings.Controls.Add(this.TBSizes);
             this.tabSettings.Controls.Add(this.tabPage2);
-            this.tabSettings.Controls.Add(this.tabPage3);
+            this.tabSettings.Controls.Add(this.TPHelp);
             this.tabSettings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabSettings.Location = new System.Drawing.Point(0, 0);
             this.tabSettings.Name = "tabSettings";
@@ -157,22 +161,22 @@
             this.tabSettings.Size = new System.Drawing.Size(800, 721);
             this.tabSettings.TabIndex = 0;
             // 
-            // tabPage1
+            // TPColors
             // 
-            this.tabPage1.Controls.Add(this.PSeparateColor);
-            this.tabPage1.Controls.Add(this.label26);
-            this.tabPage1.Controls.Add(this.label27);
-            this.tabPage1.Controls.Add(this.cLocked);
-            this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.cRequired);
-            this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(792, 695);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Farben";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.TPColors.Controls.Add(this.PSeparateColor);
+            this.TPColors.Controls.Add(this.label26);
+            this.TPColors.Controls.Add(this.label27);
+            this.TPColors.Controls.Add(this.cLocked);
+            this.TPColors.Controls.Add(this.label2);
+            this.TPColors.Controls.Add(this.cRequired);
+            this.TPColors.Controls.Add(this.label1);
+            this.TPColors.Location = new System.Drawing.Point(4, 22);
+            this.TPColors.Name = "TPColors";
+            this.TPColors.Padding = new System.Windows.Forms.Padding(3);
+            this.TPColors.Size = new System.Drawing.Size(792, 695);
+            this.TPColors.TabIndex = 0;
+            this.TPColors.Text = "Farben";
+            this.TPColors.UseVisualStyleBackColor = true;
             // 
             // PSeparateColor
             // 
@@ -235,25 +239,25 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Mussfelder:";
             // 
-            // tpFileShortcuts
+            // TPFileShortcuts
             // 
-            this.tpFileShortcuts.Controls.Add(this.label7);
-            this.tpFileShortcuts.Controls.Add(this.txtInvalidColumn);
-            this.tpFileShortcuts.Controls.Add(this.txtFailAddressValue);
-            this.tpFileShortcuts.Controls.Add(this.label6);
-            this.tpFileShortcuts.Controls.Add(this.txtPVM);
-            this.tpFileShortcuts.Controls.Add(this.label5);
-            this.tpFileShortcuts.Controls.Add(this.txtRightAddress);
-            this.tpFileShortcuts.Controls.Add(this.label4);
-            this.tpFileShortcuts.Controls.Add(this.txtFailAddress);
-            this.tpFileShortcuts.Controls.Add(this.label3);
-            this.tpFileShortcuts.Location = new System.Drawing.Point(4, 22);
-            this.tpFileShortcuts.Name = "tpFileShortcuts";
-            this.tpFileShortcuts.Padding = new System.Windows.Forms.Padding(3);
-            this.tpFileShortcuts.Size = new System.Drawing.Size(792, 695);
-            this.tpFileShortcuts.TabIndex = 1;
-            this.tpFileShortcuts.Text = "Dateikürzel";
-            this.tpFileShortcuts.UseVisualStyleBackColor = true;
+            this.TPFileShortcuts.Controls.Add(this.label7);
+            this.TPFileShortcuts.Controls.Add(this.txtInvalidColumn);
+            this.TPFileShortcuts.Controls.Add(this.txtFailAddressValue);
+            this.TPFileShortcuts.Controls.Add(this.label6);
+            this.TPFileShortcuts.Controls.Add(this.txtPVM);
+            this.TPFileShortcuts.Controls.Add(this.label5);
+            this.TPFileShortcuts.Controls.Add(this.txtRightAddress);
+            this.TPFileShortcuts.Controls.Add(this.label4);
+            this.TPFileShortcuts.Controls.Add(this.txtFailAddress);
+            this.TPFileShortcuts.Controls.Add(this.label3);
+            this.TPFileShortcuts.Location = new System.Drawing.Point(4, 22);
+            this.TPFileShortcuts.Name = "TPFileShortcuts";
+            this.TPFileShortcuts.Padding = new System.Windows.Forms.Padding(3);
+            this.TPFileShortcuts.Size = new System.Drawing.Size(792, 695);
+            this.TPFileShortcuts.TabIndex = 1;
+            this.TPFileShortcuts.Text = "Dateikürzel";
+            this.TPFileShortcuts.UseVisualStyleBackColor = true;
             // 
             // label7
             // 
@@ -335,25 +339,25 @@
             this.label3.TabIndex = 0;
             this.label3.Text = "Kürzel der fehlerhaften Adressen:";
             // 
-            // tabPage4
+            // TBSizes
             // 
-            this.tabPage4.Controls.Add(this.label24);
-            this.tabPage4.Controls.Add(this.label23);
-            this.tabPage4.Controls.Add(this.NbRowHeightListBox);
-            this.tabPage4.Controls.Add(this.NbFontSizeListBox);
-            this.tabPage4.Controls.Add(this.label17);
-            this.tabPage4.Controls.Add(this.label18);
-            this.tabPage4.Controls.Add(this.NbRowHeight);
-            this.tabPage4.Controls.Add(this.NbFontSize);
-            this.tabPage4.Controls.Add(this.label22);
-            this.tabPage4.Controls.Add(this.label21);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(792, 695);
-            this.tabPage4.TabIndex = 4;
-            this.tabPage4.Text = "Größen";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.TBSizes.Controls.Add(this.label24);
+            this.TBSizes.Controls.Add(this.label23);
+            this.TBSizes.Controls.Add(this.NbRowHeightListBox);
+            this.TBSizes.Controls.Add(this.NbFontSizeListBox);
+            this.TBSizes.Controls.Add(this.label17);
+            this.TBSizes.Controls.Add(this.label18);
+            this.TBSizes.Controls.Add(this.NbRowHeight);
+            this.TBSizes.Controls.Add(this.NbFontSize);
+            this.TBSizes.Controls.Add(this.label22);
+            this.TBSizes.Controls.Add(this.label21);
+            this.TBSizes.Location = new System.Drawing.Point(4, 22);
+            this.TBSizes.Name = "TBSizes";
+            this.TBSizes.Padding = new System.Windows.Forms.Padding(3);
+            this.TBSizes.Size = new System.Drawing.Size(792, 695);
+            this.TBSizes.TabIndex = 4;
+            this.TBSizes.Text = "Größen";
+            this.TBSizes.UseVisualStyleBackColor = true;
             // 
             // label24
             // 
@@ -776,34 +780,52 @@
             this.cbHeaderUpperCase.Text = "Überschriften in Großbuchstaben einlesen";
             this.cbHeaderUpperCase.UseVisualStyleBackColor = true;
             // 
-            // tabPage3
+            // TPHelp
             // 
-            this.tabPage3.Controls.Add(this.LblVersion);
-            this.tabPage3.Controls.Add(this.label41);
-            this.tabPage3.Controls.Add(this.label35);
-            this.tabPage3.Controls.Add(this.label34);
-            this.tabPage3.Controls.Add(this.tabControl1);
-            this.tabPage3.Controls.Add(this.label15);
-            this.tabPage3.Controls.Add(this.label14);
-            this.tabPage3.Controls.Add(this.label32);
-            this.tabPage3.Controls.Add(this.label31);
-            this.tabPage3.Controls.Add(this.label30);
-            this.tabPage3.Controls.Add(this.label29);
-            this.tabPage3.Controls.Add(this.label28);
-            this.tabPage3.Controls.Add(this.label12);
-            this.tabPage3.Controls.Add(this.label20);
-            this.tabPage3.Controls.Add(this.label19);
-            this.tabPage3.Controls.Add(this.llSourceCode);
-            this.tabPage3.Controls.Add(this.label13);
-            this.tabPage3.Controls.Add(this.label11);
-            this.tabPage3.Controls.Add(this.label10);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(792, 695);
-            this.tabPage3.TabIndex = 3;
-            this.tabPage3.Text = "Hilfe";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.TPHelp.Controls.Add(this.LblVersion);
+            this.TPHelp.Controls.Add(this.label41);
+            this.TPHelp.Controls.Add(this.label35);
+            this.TPHelp.Controls.Add(this.label34);
+            this.TPHelp.Controls.Add(this.tabControl1);
+            this.TPHelp.Controls.Add(this.label15);
+            this.TPHelp.Controls.Add(this.label14);
+            this.TPHelp.Controls.Add(this.label32);
+            this.TPHelp.Controls.Add(this.label31);
+            this.TPHelp.Controls.Add(this.label30);
+            this.TPHelp.Controls.Add(this.label29);
+            this.TPHelp.Controls.Add(this.label28);
+            this.TPHelp.Controls.Add(this.label12);
+            this.TPHelp.Controls.Add(this.label20);
+            this.TPHelp.Controls.Add(this.label19);
+            this.TPHelp.Controls.Add(this.llSourceCode);
+            this.TPHelp.Controls.Add(this.label13);
+            this.TPHelp.Controls.Add(this.label11);
+            this.TPHelp.Controls.Add(this.label10);
+            this.TPHelp.Location = new System.Drawing.Point(4, 22);
+            this.TPHelp.Name = "TPHelp";
+            this.TPHelp.Padding = new System.Windows.Forms.Padding(3);
+            this.TPHelp.Size = new System.Drawing.Size(792, 695);
+            this.TPHelp.TabIndex = 3;
+            this.TPHelp.Text = "Hilfe";
+            this.TPHelp.UseVisualStyleBackColor = true;
+            // 
+            // LblVersion
+            // 
+            this.LblVersion.AutoSize = true;
+            this.LblVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblVersion.Location = new System.Drawing.Point(115, 664);
+            this.LblVersion.Name = "LblVersion";
+            this.LblVersion.Size = new System.Drawing.Size(0, 13);
+            this.LblVersion.TabIndex = 27;
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(70, 664);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(45, 13);
+            this.label41.TabIndex = 26;
+            this.label41.Text = "Version:";
             // 
             // label35
             // 
@@ -1125,23 +1147,26 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Erweiterte Formatangabe:";
             // 
-            // label41
+            // TPDuplicate
             // 
-            this.label41.AutoSize = true;
-            this.label41.Location = new System.Drawing.Point(70, 664);
-            this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(45, 13);
-            this.label41.TabIndex = 26;
-            this.label41.Text = "Version:";
+            this.TPDuplicate.Controls.Add(this.CBDuplicateCaseSensitive);
+            this.TPDuplicate.Location = new System.Drawing.Point(4, 22);
+            this.TPDuplicate.Name = "TPDuplicate";
+            this.TPDuplicate.Padding = new System.Windows.Forms.Padding(3);
+            this.TPDuplicate.Size = new System.Drawing.Size(792, 695);
+            this.TPDuplicate.TabIndex = 5;
+            this.TPDuplicate.Text = "Abgleich";
+            this.TPDuplicate.UseVisualStyleBackColor = true;
             // 
-            // LblVersion
+            // CBDuplicateCaseSensitive
             // 
-            this.LblVersion.AutoSize = true;
-            this.LblVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblVersion.Location = new System.Drawing.Point(115, 664);
-            this.LblVersion.Name = "LblVersion";
-            this.LblVersion.Size = new System.Drawing.Size(0, 13);
-            this.LblVersion.TabIndex = 27;
+            this.CBDuplicateCaseSensitive.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CBDuplicateCaseSensitive.Location = new System.Drawing.Point(8, 17);
+            this.CBDuplicateCaseSensitive.Name = "CBDuplicateCaseSensitive";
+            this.CBDuplicateCaseSensitive.Size = new System.Drawing.Size(254, 17);
+            this.CBDuplicateCaseSensitive.TabIndex = 1;
+            this.CBDuplicateCaseSensitive.Text = "Groß- und Kleinschreibung beachten";
+            this.CBDuplicateCaseSensitive.UseVisualStyleBackColor = true;
             // 
             // SettingForm
             // 
@@ -1156,12 +1181,12 @@
             this.Text = "Einstellungen";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingForm_FormClosing);
             this.tabSettings.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tpFileShortcuts.ResumeLayout(false);
-            this.tpFileShortcuts.PerformLayout();
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
+            this.TPColors.ResumeLayout(false);
+            this.TPColors.PerformLayout();
+            this.TPFileShortcuts.ResumeLayout(false);
+            this.TPFileShortcuts.PerformLayout();
+            this.TBSizes.ResumeLayout(false);
+            this.TBSizes.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NbRowHeightListBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbFontSizeListBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NbRowHeight)).EndInit();
@@ -1169,13 +1194,14 @@
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumMaxRows)).EndInit();
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
+            this.TPHelp.ResumeLayout(false);
+            this.TPHelp.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvFormat)).EndInit();
             this.tabPage6.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.DgVSecondExample)).EndInit();
+            this.TPDuplicate.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1183,13 +1209,13 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabSettings;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage TPColors;
         private System.Windows.Forms.Panel cRequired;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Panel cLocked;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TabPage tpFileShortcuts;
+        private System.Windows.Forms.TabPage TPFileShortcuts;
         private System.Windows.Forms.TextBox txtPVM;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtRightAddress;
@@ -1205,7 +1231,7 @@
         private System.Windows.Forms.TextBox txtOldAffix;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.CheckBox cbAutoSavePVM;
-        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage TPHelp;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
@@ -1213,7 +1239,7 @@
         private System.Windows.Forms.LinkLabel llSourceCode;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage TBSizes;
         private System.Windows.Forms.NumericUpDown NbRowHeight;
         private System.Windows.Forms.NumericUpDown NbFontSize;
         private System.Windows.Forms.Label label22;
@@ -1278,5 +1304,7 @@
         private System.Windows.Forms.CheckBox CBLoadHiddenColumns;
         private System.Windows.Forms.Label LblVersion;
         private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.TabPage TPDuplicate;
+        private System.Windows.Forms.CheckBox CBDuplicateCaseSensitive;
     }
 }

@@ -88,6 +88,7 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 invokeForm.SetWorkflowText("Duplikate Abgleich");
                 invokeForm.StartLoadingBarCount(invokeForm.DatabaseHelper.GetRowCount(tableName));
+                Func<string, string> caseMethod = Properties.Settings.Default.DuplicateCaseSensitive ? (string value) => value : (Func<string, string>)((string value) => value.ToLower());
                 string[] aliases = duplicateCase.ApplyAll ? invokeForm.DatabaseHelper.GetSortedColumnsAsAlias(tableName).ToArray() : DuplicateColumns;
                 if (aliases.Length != 0)
                 {
@@ -115,7 +116,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                         while (reader.Read())
                         {
-                            string identifierTotal = GetColumnsAsObjectArray(reader, null, null, null);
+                            string identifierTotal = GetColumnsAsObjectArray(reader, null, null, null, caseMethod);
                             long id = reader.GetInt64(0);
 
                             if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierTotal, out int sourceId, selectCommandTotal))
@@ -143,7 +144,7 @@ namespace DataTableConverter.Classes.WorkProcs
                                 invokeForm.DatabaseHelper.InsertRowDuplicate(id.ToString(), identifierTotal, updateCommandTotal);
                                 if (containsShort)
                                 {
-                                    string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, preparedTolerances);
+                                    string identifierShort = GetColumnsAsObjectArray(reader, subStringBegin, subStringEnd, preparedTolerances, caseMethod);
                                     if (invokeForm.DatabaseHelper.ExistsValueInColumn(identifierShort, out int sourceId2, selectCommandShort))
                                     {
                                         if (!updates.ContainsKey(sourceId2))
@@ -189,7 +190,7 @@ namespace DataTableConverter.Classes.WorkProcs
             return preparedTolerances;
         }
 
-        private string GetColumnsAsObjectArray(SQLiteDataReader reader, int[] subStringBegin, int[] subStringEnd, PreparedTolerance[] preparedTolerances)
+        private string GetColumnsAsObjectArray(SQLiteDataReader reader, int[] subStringBegin, int[] subStringEnd, PreparedTolerance[] preparedTolerances, Func<string, string> caseMethod)
         {
             StringBuilder res = new StringBuilder();
             
@@ -233,7 +234,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 res.Append("|").Append(result);
             }
-            return res.ToString().ToLower();
+            return caseMethod(res.ToString());
         }
     }
 }

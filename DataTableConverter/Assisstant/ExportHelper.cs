@@ -257,9 +257,9 @@ namespace DataTableConverter
             return error;
         }
 
-        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, SaveFormat format, string order, OrderType orderType, Form invokeForm, string tableName, System.Action updateLoadingBar = null, string orderColumnName = null)
+        internal int Save(string directory, string fileName, string oldFileExtension, int encoding, SaveFormat format, string order, OrderType orderType, Form invokeForm, string tableName, System.Action updateLoadingBar = null)
         {
-            SQLiteCommand command = orderColumnName == string.Empty ? DatabaseHelper.GetDataCommand(tableName, order, orderType) : DatabaseHelper.GetDataCommand(tableName, order, orderType, orderColumnName);
+            SQLiteCommand command = DatabaseHelper.GetDataCommand(tableName, order, orderType);
             return Save(directory, fileName, oldFileExtension, encoding, format, order, orderType, invokeForm, tableName, command, updateLoadingBar);
         }
 
@@ -759,7 +759,13 @@ namespace DataTableConverter
                     string newTable = tableInfo[0];
                     string fileName = tableInfo[1];
                     setStatus($"Die Datei {fileName}.{fileExtension} wird gespeichert");
-                    Save(Path.GetDirectoryName(filePath), fileName, Path.GetExtension(filePath), codePage, (SaveFormat)item.Format, order, orderType, mainForm, newTable, null, continuedNumberColumn);
+                    if (!string.IsNullOrEmpty(continuedNumberColumn))
+                    {
+                        string col = DatabaseHelper.AddColumn(newTable, continuedNumberColumn);
+                        DatabaseHelper.Enumerate(col, 1, 0, false, order, orderType, newTable);
+                        DatabaseHelper.MoveColumnToIndex(0, col, newTable);
+                    }
+                    Save(Path.GetDirectoryName(filePath), fileName, Path.GetExtension(filePath), codePage, (SaveFormat)item.Format, order, orderType, mainForm, newTable);
                     DatabaseHelper.Delete(newTable);
                 }
             }

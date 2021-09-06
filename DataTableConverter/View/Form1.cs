@@ -96,7 +96,10 @@ namespace DataTableConverter
 
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
-            
+#if DEBUG
+            commitToolStripMenuItem.Visible = true;
+#endif
+
             if (isExistingDatabase)
             {
                 LoadData(true, false, true);
@@ -1681,6 +1684,11 @@ namespace DataTableConverter
                     LoadData(true);
                 }
             }
+        }
+
+        private void commitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DatabaseHelper.Commit();
         }
 
         private void CheckAllowToAddRows()

@@ -176,5 +176,8 @@
     <Setting Name="EditShortcut" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Windows.Forms.Keys" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="DuplicateCaseSensitive" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

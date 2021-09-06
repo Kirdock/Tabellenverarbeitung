@@ -774,5 +774,18 @@ namespace DataTableConverter.Properties {
                 this["EditShortcut"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(Bluegrams.Application.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DuplicateCaseSensitive {
+            get {
+                return ((bool)(this["DuplicateCaseSensitive"]));
+            }
+            set {
+                this["DuplicateCaseSensitive"] = value;
+            }
+        }
     }
 }

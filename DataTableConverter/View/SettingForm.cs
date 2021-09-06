@@ -8,7 +8,7 @@ namespace DataTableConverter.View
 {
     public partial class SettingForm : Form
     {
-        internal enum Tabs { Color, Shortcut, Table, Other, Help };
+        internal enum Tabs { Duplciate, Shortcut, Color, Table, Other, Help };
 
         internal SettingForm(Tabs tab = Tabs.Color)
         {
@@ -69,6 +69,7 @@ namespace DataTableConverter.View
             CBTrimImport.Checked = Properties.Settings.Default.TrimImport;
             CBLoadHiddenRows.Checked = Properties.Settings.Default.UnhideRows;
             CBLoadHiddenColumns.Checked = Properties.Settings.Default.UnhideColumns;
+            CBDuplicateCaseSensitive.Checked = Properties.Settings.Default.DuplicateCaseSensitive;
             TxTShortcut.Text = new KeysConverter().ConvertToString(Properties.Settings.Default.EditShortcut);
         }
 
@@ -102,6 +103,7 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.TrimImport = CBTrimImport.Checked;
                 Properties.Settings.Default.UnhideRows = CBLoadHiddenRows.Checked;
                 Properties.Settings.Default.UnhideColumns = CBLoadHiddenColumns.Checked;
+                Properties.Settings.Default.DuplicateCaseSensitive = CBDuplicateCaseSensitive.Checked;
                 Properties.Settings.Default.Save();
             }
             else

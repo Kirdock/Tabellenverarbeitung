@@ -55,6 +55,13 @@ namespace DataTableConverter.Assisstant
             Init(createMain);
         }
 
+#if DEBUG
+        internal void Commit()
+        {
+            Transaction.Commit();
+        }
+#endif
+
         private void Init(bool createMainDatabase)
         {
             Reset();
@@ -1344,11 +1351,11 @@ namespace DataTableConverter.Assisstant
         /// <param name="orderType"></param>
         /// <param name="orderAlias"></param>
         /// <returns></returns>
-        internal SQLiteCommand GetDataCommand(string tableName, string order, OrderType orderType, string orderAlias = null)
+        internal SQLiteCommand GetDataCommand(string tableName, string order, OrderType orderType)
         {
             Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
             SQLiteCommand command = GetConnection(tableName).CreateCommand();
-            command.CommandText = GetSortedSelectString(GetHeaderStringWithAlias(columnAliasMapping), order, orderType, -1, -1, orderAlias != null, tableName, string.Empty, orderAlias);
+            command.CommandText = GetSortedSelectString(GetHeaderStringWithAlias(columnAliasMapping), order, orderType, -1, -1, false, tableName, string.Empty);
             return command;
         }
 
