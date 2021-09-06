@@ -97,6 +97,7 @@ namespace DataTableConverter
             ViewHelper.SetDataGridViewStyle(dgTable);
             UpdateHelper.CheckUpdate(true, pgbLoading, this);
 #if DEBUG
+            commitToolStripMenuItem.Click += commitToolStripMenuItem_Click;
             commitToolStripMenuItem.Visible = true;
 #endif
 
@@ -118,6 +119,14 @@ namespace DataTableConverter
             LoadTolerances();
             LoadCases();
         }
+
+#if DEBUG
+
+        private void commitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DatabaseHelper.Commit();
+        }
+#endif
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -1686,10 +1695,6 @@ namespace DataTableConverter
             }
         }
 
-        private void commitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            DatabaseHelper.Commit();
-        }
 
         private void CheckAllowToAddRows()
         {
