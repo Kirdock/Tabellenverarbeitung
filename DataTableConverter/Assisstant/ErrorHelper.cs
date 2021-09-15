@@ -16,6 +16,11 @@ namespace DataTableConverter.Assisstant
             {
                 ShowError($"Die Datei {path.FileName} kann nicht gefunden werden", mainForm);
             }
+            else if(exception is FileLoadException ex)
+            {
+                ShowError($"Die Datei {ex.FileName} kann nicht geladen werden\nWird sie von einem anderen Prozess verwendet?", mainForm);
+                LogMessage(exception.ToString(), mainForm, false);
+            }
             else
             {
                 LogMessage(exception.ToString(), mainForm, showMessage);
@@ -26,7 +31,7 @@ namespace DataTableConverter.Assisstant
         {
             try
             {
-                File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Today}; Version:{FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion} {Environment.NewLine}{text}{Environment.NewLine}");
+                File.AppendAllText(path, $"{Environment.NewLine}{DateTime.Now}; Version:{FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion} {Environment.NewLine}{text}{Environment.NewLine}");
                 if (showMessage)
                 {
                     ShowError(ErrorMessage, mainForm);

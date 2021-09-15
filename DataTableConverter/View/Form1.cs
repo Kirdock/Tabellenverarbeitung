@@ -661,34 +661,42 @@ namespace DataTableConverter
 
             void load()
             {
-                if (readjustColumnWidth)
+                try
                 {
-                    ColumnWidths.Clear();
+                    if (readjustColumnWidth)
+                    {
+                        ColumnWidths.Clear();
+                    }
+                    else
+                    {
+                        SaveWidthOfDataGridViewColumns();
+                    }
+                    MaxPages = Math.Ceiling(DatabaseHelper.GetRowCount(TableName) / Properties.Settings.Default.MaxRows);
+                    SetPage();
+                    CheckAllowToAddRows();
+
+                    int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
+                    if (!preventLoading)
+                    {
+                        DataTable table = DatabaseHelper.GetData(SortingOrder, OrderType, (int)((Page - 1) * Properties.Settings.Default.MaxRows), TableName);
+
+                        dgTable.RowsAdded -= dgTable_RowsAdded;
+                        dgTable.DataSource = null; //else readded columns are at the wrong index
+                        dgTable.DataSource = table;
+                        dgTable.Columns[0].Visible = false;
+                        dgTable.RowsAdded += dgTable_RowsAdded;
+                        SetRowCount(DatabaseHelper.GetRowCount(TableName));
+                    }
+                    RestoreDataGridSortMode();
+                    SetWidth();
+
+                    dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
                 }
-                else
+                catch(OutOfMemoryException)
                 {
-                    SaveWidthOfDataGridViewColumns();
+                    ErrorHelper.LogMessage("Es können nicht so viele Zeilen gelesen werden. Bitte reduzieren sie die maximal geladenen Zeilen pro Seite in den Einstellungen", this);
+                    GC.Collect();
                 }
-                MaxPages = Math.Ceiling(DatabaseHelper.GetRowCount(TableName) / Properties.Settings.Default.MaxRows);
-                SetPage();
-                CheckAllowToAddRows();
-
-                int scrollBarHorizontal = dgTable.HorizontalScrollingOffset;
-                if (!preventLoading)
-                {
-                    DataTable table = DatabaseHelper.GetData(SortingOrder, OrderType, (int)((Page - 1) * Properties.Settings.Default.MaxRows), TableName);
-
-                    dgTable.RowsAdded -= dgTable_RowsAdded;
-                    dgTable.DataSource = null; //else readded columns are at the wrong index
-                    dgTable.DataSource = table;
-                    dgTable.Columns[0].Visible = false;
-                    dgTable.RowsAdded += dgTable_RowsAdded;
-                    SetRowCount(DatabaseHelper.GetRowCount(TableName));
-                }
-                RestoreDataGridSortMode();
-                SetWidth();
-
-                dgTable.HorizontalScrollingOffset = scrollBarHorizontal;
             }
         }
 

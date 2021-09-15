@@ -661,7 +661,7 @@ namespace DataTableConverter.Assisstant
         internal void OpenExcel(string path, ProgressBar progressBar, Form mainForm, string tableName, ref string password)
         {
             
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 // Auto-detect format, supports:
                 //  - Binary Excel files (2.0-2003 format; *.xls)

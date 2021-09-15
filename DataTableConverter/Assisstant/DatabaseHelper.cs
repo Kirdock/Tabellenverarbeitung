@@ -1599,11 +1599,10 @@ namespace DataTableConverter.Assisstant
 
         internal void SplitTableOnRowValue(Dictionary<string, string[]> dict, string column, string tableName)
         {
-            SQLiteConnection connection = GetConnection(tableName);
             Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(tableName);
             string headerString = GetHeaderString(aliasColumnMapping.Keys);
             string valueString = GetValueString(aliasColumnMapping.Count);
-            using (SQLiteCommand command = connection.CreateCommand())
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 CreateIndexOn(tableName, column, null, false);
                 command.CommandText = $"SELECT {headerString} from [{tableName}] where [{column}] = ? COLLATE CASESENSITIVE";
