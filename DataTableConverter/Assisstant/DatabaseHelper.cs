@@ -1124,7 +1124,6 @@ namespace DataTableConverter.Assisstant
                 AddColumnIfNotExists(destinationTable, ref headers[i]);
             }
 
-            string newTableHeaderString = GetHeaderString(headers);
             Dictionary<string, string> destinationHeaders = GetAliasColumnMapping(destinationTable);
             List<string> headerMapping = new List<string>();
 
@@ -1135,10 +1134,10 @@ namespace DataTableConverter.Assisstant
             }
             //map headers of newTable to original column name of originalTable
 
-            string headerString = GetHeaderString(headerMapping);
-
             using (SQLiteCommand destinationCommand = destinationConnection.CreateCommand())
             {
+                string newTableHeaderString = GetHeaderString(headers);
+                string headerString = GetHeaderString(headerMapping);
                 destinationCommand.CommandText = $"INSERT into [{destinationTable}] ({headerString}) values ({GetValueString(headerMapping.Count)})";
                 for (int i = 0; i < headerMapping.Count; ++i)
                 {
@@ -1147,25 +1146,16 @@ namespace DataTableConverter.Assisstant
 
                 using (SQLiteCommand command = GetConnection(newTable).CreateCommand())
                 {
-                    int rowCount = GetRowCount(newTable);
-                    int offset = 0;
-                    while (offset < rowCount)
+                    command.CommandText = $"SELECT {newTableHeaderString} from [{newTable}]";
+                    SQLiteDataReader reader = command.ExecuteReader();
+
+                    while(reader.Read())
                     {
-                        DataTable table = new DataTable();
-                        command.CommandText = $"SELECT {newTableHeaderString} from [{newTable}] LIMIT {Properties.Settings.Default.MaxRows} OFFSET {offset}";
-                        SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
-                        adapter.Fill(table);
-
-                        foreach (DataRow row in table.AsEnumerable())
+                        for (int i = 0; i < reader.FieldCount; ++i)
                         {
-                            for (int i = 0; i < table.Columns.Count; ++i)
-                            {
-                                destinationCommand.Parameters[i].Value = row[i].ToString();
-                            }
-                            destinationCommand.ExecuteNonQuery();
+                            destinationCommand.Parameters[i].Value = reader.GetValue(i).ToString();
                         }
-
-                        offset += (int)Properties.Settings.Default.MaxRows;
+                        destinationCommand.ExecuteNonQuery();
                     }
                 }
             }
