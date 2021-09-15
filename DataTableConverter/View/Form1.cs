@@ -501,61 +501,68 @@ namespace DataTableConverter
 
         private void importToolStripMenuItem_Click(ImportState state = ImportState.None, string[] openFiles = null)
         {
-            OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state != ImportState.Header);
-            string mergePath = string.Empty;
-            bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath, ref mergePath);
-            if (openFiles != null || validMerge || dialog.ShowDialog(this) == DialogResult.OK)
+            using (OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state != ImportState.Header))
             {
-                string[] filenames = openFiles ?? (validMerge ? new string[1] { mergePath } : dialog.FileNames);
-                ProgressBar loadingBar = pgbLoading;
-                Thread thread = new Thread(() =>
+                string mergePath = string.Empty;
+                bool validMerge = state == ImportState.Merge && ProcAddTableColumns.CheckFile(FilePath, ref mergePath);
+                if (openFiles != null || validMerge || dialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    bool fileNameSet = state != ImportState.None;
-                    bool multipleFiles = filenames.Length > 1;
-                    Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
-                    string newTable = null;
-                    string fileNameBefore = Path.GetFileName(filenames[0]);
-                    int fileEncoding = 0;
-                    string password = string.Empty;
-                    foreach (string file in filenames)
+                    string[] filenames = openFiles ?? (validMerge ? new string[1] { mergePath } : dialog.FileNames);
+                    ProgressBar loadingBar = pgbLoading;
+                    Thread thread = new Thread(() =>
                     {
-                        try
+                        bool fileNameSet = state != ImportState.None;
+                        bool multipleFiles = filenames.Length > 1;
+                        Dictionary<string, ImportSettings> fileImportSettings = new Dictionary<string, ImportSettings>();
+                        string newTable = null;
+                        string fileNameBefore = Path.GetFileName(filenames[0]);
+                        int fileEncoding = 0;
+                        string password = string.Empty;
+                        foreach (string file in filenames)
                         {
-                            string filename = Path.GetFileName(file);
-                            string tableName = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding, ref password);
-
-                            if (tableName != null)
+                            try
                             {
+                                string filename = Path.GetFileName(file);
+                                string tableName = ImportHelper.ImportFile(file, multipleFiles, fileImportSettings, contextGlobal, loadingBar, this, ref fileEncoding, ref password);
 
-                                if (newTable != null)
+                                if (tableName != null)
                                 {
-                                    DatabaseHelper.ConcatTable(newTable, tableName, fileNameBefore, filename);
-                                }
-                                else
-                                {
-                                    newTable = tableName;
-                                }
-                                fileNameBefore = filename;
-                                if (!fileNameSet)
-                                {
-                                    fileNameSet = true;
-                                    SetFileMeta(file, fileEncoding);
+
+                                    if (newTable != null)
+                                    {
+                                        DatabaseHelper.ConcatTable(newTable, tableName, fileNameBefore, filename);
+                                    }
+                                    else
+                                    {
+                                        newTable = tableName;
+                                    }
+                                    fileNameBefore = filename;
+                                    if (!fileNameSet)
+                                    {
+                                        fileNameSet = true;
+                                        SetFileMeta(file, fileEncoding);
+                                    }
                                 }
                             }
+                            catch (Exception ex)
+                            {
+                                ErrorHelper.LogMessage(ex, this);
+                            }
+                        }
+                        try
+                        {
+                            FinishImport(newTable, state, Path.GetFileName(filenames[0]), fileEncoding);
                         }
                         catch (Exception ex)
                         {
                             ErrorHelper.LogMessage(ex, this);
                         }
-                    }
-
-                    FinishImport(newTable, state, Path.GetFileName(filenames[0]), fileEncoding);
-                });
-                thread.IsBackground = true;
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
+                    });
+                    thread.IsBackground = true;
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                }
             }
-            dialog.Dispose();
         }
 
         private void SetFileMeta(string file, int encoding)
