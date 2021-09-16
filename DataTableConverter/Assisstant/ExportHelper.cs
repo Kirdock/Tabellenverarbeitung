@@ -413,7 +413,7 @@ namespace DataTableConverter
                     }
                     catch (Exception ex)
                     {
-                        ErrorHelper.LogMessage($"{ex.ToString() + Environment.NewLine} query:{query};   path: {tempDirectoryPath}; fileName: {fileName}; headers:[{string.Join("; ", aliases)}]", invokeForm);
+                        ErrorHelper.LogMessage($"{ex}{Environment.NewLine} query:{query};   path: {tempDirectoryPath}; fileName: {fileName}; headers:[{string.Join("; ", aliases)}]", invokeForm, false);
                         return 0;
                     }
                 }
@@ -461,7 +461,7 @@ namespace DataTableConverter
             }
             catch (Exception ex)
             {
-                ErrorHelper.LogMessage(ex, mainForm, true);
+                ErrorHelper.LogMessage(ex, mainForm);
             }
         }
 

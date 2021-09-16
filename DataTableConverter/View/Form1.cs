@@ -694,7 +694,7 @@ namespace DataTableConverter
                 }
                 catch(OutOfMemoryException)
                 {
-                    ErrorHelper.LogMessage("Es können nicht so viele Zeilen gelesen werden. Bitte reduzieren sie die maximal geladenen Zeilen pro Seite in den Einstellungen", this);
+                    ErrorHelper.ShowError("Es können nicht so viele Zeilen gelesen werden. Bitte reduzieren sie die maximal geladenen Zeilen pro Seite in den Einstellungen", this);
                     GC.Collect();
                 }
             }
@@ -1162,7 +1162,7 @@ namespace DataTableConverter
                         }
                         catch (Exception ex)
                         {
-                            ErrorHelper.LogMessage(ex, this, true);
+                            ErrorHelper.LogMessage(ex, this);
                         }
                         SetWorkflowText();
                         SaveFinished();

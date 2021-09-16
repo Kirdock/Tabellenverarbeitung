@@ -61,7 +61,7 @@ namespace DataTableConverter.Assisstant
                     catch (Exception ex)
                     {
                         ErrorHelper.LogMessage(ex, mainForm, false);
-                        ErrorHelper.LogMessage("Update nicht möglich! Besteht eine Internetverbindung?", mainForm);
+                        ErrorHelper.ShowError("Update nicht möglich! Besteht eine Internetverbindung?", mainForm);
                     }
                 }).Start();
 
@@ -109,7 +109,7 @@ namespace DataTableConverter.Assisstant
                 {
                     finished = false;
                     ErrorHelper.LogMessage($"{e.Message}\nZipPath: {zipPath}; ApplicationPath: {path}", mainForm, false);
-                    ErrorHelper.LogMessage("Das Archiv konnte nicht enpackt werden", mainForm, true);
+                    ErrorHelper.ShowError("Das Archiv konnte nicht enpackt werden", mainForm);
                 }
                 finally
                 {

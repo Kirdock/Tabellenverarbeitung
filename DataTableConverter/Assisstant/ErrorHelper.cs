@@ -39,17 +39,17 @@ namespace DataTableConverter.Assisstant
             }
             catch (IOException)
             {
-                ShowError($"Es kann nicht auf die Datei \"Logs.log\" zugegriffen werden{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text, mainForm);
+                ShowError($"Es kann nicht auf die Datei \"Logs.log\" zugegriffen werden{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}{text}", mainForm);
             }
             catch (Exception ex)
             {
-                ShowError(ErrorMessage + $"{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}" + text + $"{Environment.NewLine}Log Fehler:{Environment.NewLine}" + ex.ToString(), mainForm);
+                ShowError($"{ErrorMessage}{Environment.NewLine}Ursprünglicher Fehler:{Environment.NewLine}{text}{Environment.NewLine}Log Fehler:{Environment.NewLine}{ex}", mainForm);
             }
         }
 
-        private static void ShowError(string Message, Form mainForm)
+        internal static void ShowError(string message, Form mainForm)
         {
-            mainForm.MessagesOK(MessageBoxIcon.Error, Message);
+            mainForm.MessagesOK(MessageBoxIcon.Error, message);
         }
     }
 }

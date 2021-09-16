@@ -261,7 +261,7 @@ namespace DataTableConverter.Classes.WorkProcs
                 {
                     if (counter > columns.Length)
                     {
-                        ErrorHelper.LogMessage($"Ungültiges Format? Format:{formula}", mainForm);
+                        ErrorHelper.ShowError($"Ungültiges Format? Format:{formula}", mainForm);
                         continue;
                     }
                     string header = columns[counter];
