@@ -2259,7 +2259,7 @@ namespace DataTableConverter.Assisstant
                 if (max != 0)
                 {
                     StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] set ");
-                    for (int i = 0; i < max; i++)
+                    for (int i = 0; i <= max; i++)
                     {
                         string createdColumn = AddColumnWithAdditionalIfExists($"{newColumn}{i + 1}", tableName);
                         builder.Append($"[{createdColumn}] = GETSPLIT([{sourceColumn}], $splitText,{i}),");
