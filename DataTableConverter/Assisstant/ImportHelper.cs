@@ -208,7 +208,7 @@ namespace DataTableConverter.Assisstant
                     skip = 1;
                     newHeaders = File.ReadLines(path, Encoding.GetEncoding(codePage)).Take(1)
                         .SelectMany(x => x.Split(separators.ToArray(), StringSplitOptions.None))
-                        .Select(column => importOperation(column)).ToList();
+                        .Select(column => importOperation(TrimQuotes(column))).ToList();
                     var indexItem = newHeaders.Select((item, index) => new { item, index });
                     for (int i = 0; i < newHeaders.Count; ++i)
                     {
@@ -267,6 +267,15 @@ namespace DataTableConverter.Assisstant
             }
         }
 
+        private string TrimQuotes(string text)
+        {
+            if (text.StartsWith("\"") && text.EndsWith("\""))
+            {
+                text = text.Substring(1, text.Length - 2);
+            }
+            return text;
+        }
+
         private void InsertTextIntoDataTable(IEnumerable<string> enumerable, string tableName, int skip, List<string> separators, List<string> headers, ProgressBar progressBar, Form mainForm)
         {
             Func<string, string> trimOperation = GetTrimOperation();
@@ -277,7 +286,7 @@ namespace DataTableConverter.Assisstant
             SQLiteCommand insertCommand = null;
             foreach (string[] line in enumerableArray)
             {
-                string[] values = line.Select(ln => trimOperation(ln)).ToArray();
+                string[] values = line.Select(ln => trimOperation(TrimQuotes(ln))).ToArray();
                 bool addedColumns = values.Length > headers.Count;
                 while (values.Length > headers.Count)
                 {
