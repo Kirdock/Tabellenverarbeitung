@@ -103,7 +103,9 @@ namespace DataTableConverter.View
                 { gbSeparate, typeof(ProcSeparate) },
                 { GbSearch, typeof(ProcSearch) },
                 { GbSplit, typeof(ProcSplit) },
-                { GbMergeRows, typeof(ProcMergeRows) }
+                { GbMergeRows, typeof(ProcMergeRows) },
+                { GBDivide, typeof(ProcDivide) },
+                { GbThousandSeparator, typeof(ProcThousandSeparator) }
             };
 
             assignControls = new Dictionary<Type, Action<WorkProc>> {
@@ -125,7 +127,9 @@ namespace DataTableConverter.View
                 { typeof(ProcSeparate), SetSeparateControls },
                 { typeof(ProcSearch), SetSearchControls },
                 { typeof(ProcSplit), SetSplitControls },
-                { typeof(ProcMergeRows), SetMergeRowsControls }
+                { typeof(ProcMergeRows), SetMergeRowsControls },
+                { typeof(ProcDivide), SetDivideControls},
+                { typeof(ProcThousandSeparator), SetThousandSeparatorControls}
             };
         }
 
@@ -150,7 +154,9 @@ namespace DataTableConverter.View
                 new Proc(ProcSearch.ClassName, null, 15),
                 new Proc(ProcSplit.ClassName, null, 16),
                 new Proc(ProcUser.ClassName, null, 17),
-                new Proc(ProcMergeRows.ClassName, null, 18)
+                new Proc(ProcMergeRows.ClassName, null, 18),
+                new Proc(ProcDivide.ClassName, null, 19),
+                new Proc(ProcThousandSeparator.ClassName, null, 20)
             };
             SystemProc.Sort();
             GenerateDuplicateProc();
@@ -188,7 +194,8 @@ namespace DataTableConverter.View
                 LblSplitColumn,
                 LblSplitNewColumn,
                 LblSplitText,
-                lblMergeRowsIdentifier
+                lblMergeRowsIdentifier,
+                LblDivisor
             };
             foreach (Label label in labels)
             {
@@ -213,7 +220,9 @@ namespace DataTableConverter.View
                 dgvReplaceWhole,
                 dgvPVMExport,
                 DgvSeparate,
-                DGVTrimColumns
+                DGVTrimColumns,
+                DgvDivide,
+                DgvThousandSeparator
             };
 
             DataGridView[] dataGridViews = new DataGridView[]
@@ -247,7 +256,9 @@ namespace DataTableConverter.View
                 cbHeadersPVMExport,
                 CLBTrimHeaders,
                 CLBMergeRowsHeaders,
-                cbHeadersPad
+                cbHeadersPad,
+                ClbHeadersDivisor,
+                ClbHeadersThousandSeparator
             };
             foreach (CheckedComboBox checkedComboBox in checkedComboBoxes)
             {
@@ -952,8 +963,31 @@ namespace DataTableConverter.View
             lblOriginalNameText.Text = ProcRound.ClassName;
             cbNewColumnRound.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
             txtNewColumnRound.SetText(selectedProc.NewColumn);
+            cbOldColumnRound.Checked = selectedProc.CopyOldColumn;
             SetDataSource(dgvRound, selectedProc.Columns);
             SetHeaderRound(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
+        }
+
+        private void SetDivideControls(WorkProc proc)
+        {
+            ProcDivide selectedProc = proc as ProcDivide;
+            lblOriginalNameText.Text = ProcDivide.ClassName;
+            CbNewColumnDivide.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
+            TxtNewColumnDivide.SetText(selectedProc.NewColumn);
+            CbOldColumnDivide.Checked = selectedProc.CopyOldColumn;
+            NumDivisor.Value = selectedProc.Divisor;
+            SetDataSource(DgvDivide, selectedProc.Columns);
+            SetHeaderDivide(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
+        }
+
+        private void SetThousandSeparatorControls(WorkProc selectedProc)
+        {
+            lblOriginalNameText.Text = ProcThousandSeparator.ClassName;
+            CbNewColumnThousandSeparator.Checked = !string.IsNullOrWhiteSpace(selectedProc.NewColumn);
+            TxtNewColumnThousandSeparator.SetText(selectedProc.NewColumn);
+            CbOldColumnThousandSeparator.Checked = selectedProc.CopyOldColumn;
+            SetDataSource(DgvThousandSeparator, selectedProc.Columns);
+            SetHeaderThousandSeparator(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
         }
 
         private void SetSearchControls(WorkProc selectedProc)
@@ -1230,6 +1264,16 @@ namespace DataTableConverter.View
         private void SetHeaderRound(string[] headers)
         {
             SetChecked(clbHeadersRound, headers, clbHeadersRound_ItemCheck);
+        }
+
+        private void SetHeaderDivide(string[] headers)
+        {
+            SetChecked(ClbHeadersDivisor, headers, ClbHeadersDivisor_ItemCheck);
+        }
+
+        private void SetHeaderThousandSeparator(string[] headers)
+        {
+            SetChecked(ClbHeadersThousandSeparator, headers, ClbHeadersThousandSeparator_ItemCheck);
         }
 
         private void SetHeaderTrim(string[] headers)
@@ -1674,7 +1718,17 @@ namespace DataTableConverter.View
 
         private void clbHeadersRound_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvColumns, e, (CheckedListBox)sender);
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(dgvRound, e, (CheckedListBox)sender);
+        }
+
+        private void ClbHeadersDivisor_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(DgvDivide, e, (CheckedListBox)sender);
+        }
+
+        private void ClbHeadersThousandSeparator_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ViewHelper.AddRemoveHeaderThroughCheckedListBox(DgvThousandSeparator, e, (CheckedListBox)sender);
         }
 
         private void clbHeaderOrder_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -2648,6 +2702,41 @@ namespace DataTableConverter.View
         private void TxtSplitNewColumn_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcSplit).NewColumn = TxtSplitNewColumn.Text;
+        }
+
+        private void CbNewColumnDivide_CheckedChanged(object sender, EventArgs e)
+        {
+            NewColumnChanged(CbNewColumnDivide, CbOldColumnDivide, lblNewColumnDivide, TxtNewColumnDivide);
+        }
+
+        private void CbNewColumnThousandSeparator_CheckedChanged(object sender, EventArgs e)
+        {
+            NewColumnChanged(CbNewColumnThousandSeparator, CbOldColumnThousandSeparator, lblNewColumnThousandSeparator, TxtNewColumnThousandSeparator);
+        }
+
+        private void TxtNewColumnThousandSeparator_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcThousandSeparator).NewColumn = ((TextBox)sender).Text;
+        }
+
+        private void TxtNewColumnDivide_TextChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcDivide).NewColumn = ((TextBox)sender).Text;
+        }
+
+        private void CbOldColumnThousandSeparator_CheckedChanged(object sender, EventArgs e)
+        {
+            ((ProcThousandSeparator)GetSelectedWorkProcedure()).CopyOldColumn = ((CheckBox)sender).Checked;
+        }
+
+        private void CbOldColumnDivide_CheckedChanged(object sender, EventArgs e)
+        {
+            ((ProcDivide)GetSelectedWorkProcedure()).CopyOldColumn = ((CheckBox)sender).Checked;
+        }
+
+        private void NumDivisor_ValueChanged(object sender, EventArgs e)
+        {
+            ((ProcDivide)GetSelectedWorkProcedure()).Divisor = ((NumericUpDown)sender).Value;
         }
 
         private void BtnProcUserOpen_Click(object sender, EventArgs e)

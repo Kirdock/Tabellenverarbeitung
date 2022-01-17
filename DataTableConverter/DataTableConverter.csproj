@@ -117,12 +117,14 @@
     <Compile Include="Assisstant\SQL Functions\CustomSubstring.cs" />
     <Compile Include="Assisstant\SQL Functions\CustomTrim.cs" />
     <Compile Include="Assisstant\SQL Functions\CustomUppercase.cs" />
+    <Compile Include="Assisstant\SQL Functions\Divide.cs" />
     <Compile Include="Assisstant\SQL Functions\GetSplit.cs" />
     <Compile Include="Assisstant\SQL Functions\CountString.cs" />
     <Compile Include="Assisstant\SQL Functions\NumberToString.cs" />
     <Compile Include="Assisstant\SQL Functions\Padding.cs" />
     <Compile Include="Assisstant\SQL Functions\Round.cs" />
     <Compile Include="Assisstant\SQL Functions\SQLiteSensitive.cs" />
+    <Compile Include="Assisstant\SQL Functions\ThousandSeparator.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />
     <Compile Include="Assisstant\UpdateHelper.cs" />
     <Compile Include="Assisstant\WorkflowFactory.cs" />
@@ -150,6 +152,7 @@
     <Compile Include="Classes\WorkProcs\ProcAddTableColumns.cs" />
     <Compile Include="Classes\WorkProcs\ProcCompare.cs" />
     <Compile Include="Classes\WorkProcs\ProcCount.cs" />
+    <Compile Include="Classes\WorkProcs\ProcDivide.cs" />
     <Compile Include="Classes\WorkProcs\ProcMergeRows.cs" />
     <Compile Include="Classes\WorkProcs\ProcNumber.cs" />
     <Compile Include="Classes\WorkProcs\ProcOrder.cs" />
@@ -161,6 +164,7 @@
     <Compile Include="Classes\WorkProcs\ProcRound.cs" />
     <Compile Include="Classes\WorkProcs\ProcSplit.cs" />
     <Compile Include="Classes\WorkProcs\ProcSubstring.cs" />
+    <Compile Include="Classes\WorkProcs\ProcThousandSeparator.cs" />
     <Compile Include="Classes\WorkProcs\ProcTrim.cs" />
     <Compile Include="Classes\WorkProcs\ProcMerge.cs" />
     <Compile Include="Classes\WorkProcs\ProcDuplicate.cs" />
@@ -255,6 +259,12 @@
     </Compile>
     <Compile Include="View\SplitFormMain.Designer.cs">
       <DependentUpon>SplitFormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\WorkProcViews\DivideForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\DivideForm.Designer.cs">
+      <DependentUpon>DivideForm.cs</DependentUpon>
     </Compile>
     <Compile Include="View\WorkProcViews\ExportCount.cs">
       <SubType>Form</SubType>
@@ -443,6 +453,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\SplitFormMain.resx">
       <DependentUpon>SplitFormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\DivideForm.resx">
+      <DependentUpon>DivideForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\ExportCount.resx">
       <DependentUpon>ExportCount.cs</DependentUpon>

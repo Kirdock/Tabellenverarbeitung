@@ -86,6 +86,14 @@ namespace DataTableConverter.Assisstant
                             newProc = new ProcMergeRows(ordinal, id, name);
                             break;
 
+                        case 19:
+                            newProc = new ProcDivide(ordinal, id, name);
+                            break;
+
+                        case 20:
+                            newProc = new ProcThousandSeparator(ordinal, id, name);
+                            break;
+
                         case 1:
                         default:
                             newProc = new ProcTrim(ordinal, id, name);

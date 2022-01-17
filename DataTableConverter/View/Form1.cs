@@ -1710,6 +1710,33 @@ namespace DataTableConverter
             }
         }
 
+        private void tausenderTrennzeichenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (Formula formula = new Formula(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
+            {
+                if (formula.ShowDialog(this) == DialogResult.OK)
+                {
+                    string[] columns = formula.SelectedHeaders();
+
+                    if (columns.Length > 0)
+                    {
+                        ProcThousandSeparator proc = new ProcThousandSeparator(columns, formula.HeaderName(), formula.OldColumn);
+                        StartSingleWorkflow(proc);
+                    }
+                }
+            }
+        }
+
+        private void dividierenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (DivideForm form = new DivideForm(DatabaseHelper.GetSortedColumnsAsAlias(TableName)))
+            {
+                if (form.ShowDialog(this) == DialogResult.OK)
+                {
+                    StartSingleWorkflow(form.Proc);
+                }
+            }
+        }
 
         private void CheckAllowToAddRows()
         {

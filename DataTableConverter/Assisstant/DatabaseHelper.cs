@@ -75,6 +75,8 @@ namespace DataTableConverter.Assisstant
             SQLiteFunction.RegisterFunction(typeof(CustomTrim)); //CUSTOMTRIM(myValue, myCharacters, isDeleteDouble, trimType)
             SQLiteFunction.RegisterFunction(typeof(CustomSubstring)); //CUSTOMSUBSTRING(myValue, replaceText, start, end, isReplace, isReverse)
             SQLiteFunction.RegisterFunction(typeof(SQL_Functions.Padding)); //PADDING(value, type, count, character)
+            SQLiteFunction.RegisterFunction(typeof(Divide)); //DIVIDE(value, divisor)
+            SQLiteFunction.RegisterFunction(typeof(ThousandSeparator)); //THOUSAND_SEPARATOR(value)
 
             if (createMainDatabase)
             {
@@ -829,7 +831,7 @@ namespace DataTableConverter.Assisstant
             {
                 newAlias = columnName + counter;
             }
-            return AddColumnFixedAlias(newAlias, tableName, defaultValue, destinationTableColumnAliasMapping.Values);
+            return AddColumnFixedAlias(newAlias, tableName, defaultValue);
         }
 
         /// <summary>
@@ -839,16 +841,16 @@ namespace DataTableConverter.Assisstant
         /// <param name="tableName"></param>
         /// <param name="defaultValue"></param>
         /// /// <returns>Column name of created column</returns>
-        internal string AddColumnFixedAlias(string alias, string tableName, string defaultValue = "", IEnumerable<string> columnNames = null)
+        internal string AddColumnFixedAlias(string alias, string tableName, string defaultValue = "")
         {
-            string columnName = GetValidColumnName(alias, tableName, columnNames);
+            string columnName = GetValidColumnName(alias, tableName);
             AddColumnWithAlias(columnName, alias, tableName, defaultValue);
             return columnName;
         }
 
-        private string GetValidColumnName(string alias, string tableName, IEnumerable<string> columnNames = null)
+        private string GetValidColumnName(string alias, string tableName)
         {
-            columnNames = columnNames ?? GetColumnNames(tableName, true);
+            List<string> columnNames = GetColumnNames(tableName, true);
             string columnName = alias;
             for (int counter = 1; columnNames.Any(col => col.Equals(columnName, StringComparison.OrdinalIgnoreCase)); ++counter)
             {
@@ -2584,6 +2586,37 @@ namespace DataTableConverter.Assisstant
             command.Parameters[0].Value = id;
             command.Parameters[1].Value = value;
             command.ExecuteNonQuery();
+        }
+
+        internal void Divide(string[] sourceColumns, string[] destinationColumns, decimal divisor, string tableName)
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < sourceColumns.Length; ++i)
+                {
+                    builder.Append("[").Append(destinationColumns[i]).Append("]=DIVIDE([").Append(sourceColumns[i]).Append("],$divisor), ");
+                }
+                builder.Remove(builder.Length - 2, 2);
+                command.Parameters.AddWithValue("$divisor", divisor);
+                command.CommandText = $"UPDATE [{tableName}] SET {builder}";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal void ThousandSeparator(string[] sourceColumns, string[] destinationColumns, string tableName)
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < sourceColumns.Length; ++i)
+                {
+                    builder.Append("[").Append(destinationColumns[i]).Append("]=THOUSAND_SEPARATOR([").Append(sourceColumns[i]).Append("]), ");
+                }
+                builder.Remove(builder.Length - 2, 2);
+                command.CommandText = $"UPDATE [{tableName}] SET {builder}";
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

@@ -39,6 +39,7 @@
             this.rückgängigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wiederholenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.einstellungenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.commitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.verwaltungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.funktionenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -104,8 +105,9 @@
             this.lblPage = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
-            this.commitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
+            this.dividierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tausenderTrennzeichenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -176,6 +178,13 @@
             this.einstellungenToolStripMenuItem.Text = "Einstellungen";
             this.einstellungenToolStripMenuItem.Click += new System.EventHandler(this.einstellungenToolStripMenuItem_Click_1);
             // 
+            // commitToolStripMenuItem
+            // 
+            this.commitToolStripMenuItem.Name = "commitToolStripMenuItem";
+            this.commitToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.commitToolStripMenuItem.Text = "Commit";
+            this.commitToolStripMenuItem.Visible = false;
+            // 
             // verwaltungToolStripMenuItem
             // 
             this.verwaltungToolStripMenuItem.Name = "verwaltungToolStripMenuItem";
@@ -188,6 +197,7 @@
             this.funktionenToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zeileToolStripMenuItem,
             this.aufteilenToolStripMenuItem,
+            this.dividierenToolStripMenuItem,
             this.großKleinschreibungToolStripMenuItem,
             this.längsteZeileToolStripMenuItem,
             this.nummerierenToolStripMenuItem,
@@ -198,6 +208,7 @@
             this.zeilenZusammenfügenToolStripMenuItem1,
             this.substringToolStripMenuItem,
             this.suchenToolStripMenuItem,
+            this.tausenderTrennzeichenToolStripMenuItem,
             this.textErsetzenToolStripMenuItem1,
             this.trimToolStripMenuItem,
             this.zählenToolStripMenuItem1,
@@ -364,31 +375,31 @@
             // WorkflowItem19
             // 
             this.WorkflowItem19.Name = "WorkflowItem19";
-            this.WorkflowItem19.Size = new System.Drawing.Size(99, 22);
+            this.WorkflowItem19.Size = new System.Drawing.Size(180, 22);
             this.WorkflowItem19.Text = "1-9";
             // 
             // WorkflowItemAF
             // 
             this.WorkflowItemAF.Name = "WorkflowItemAF";
-            this.WorkflowItemAF.Size = new System.Drawing.Size(99, 22);
+            this.WorkflowItemAF.Size = new System.Drawing.Size(180, 22);
             this.WorkflowItemAF.Text = "A-F";
             // 
             // WorkflowItemGL
             // 
             this.WorkflowItemGL.Name = "WorkflowItemGL";
-            this.WorkflowItemGL.Size = new System.Drawing.Size(99, 22);
+            this.WorkflowItemGL.Size = new System.Drawing.Size(180, 22);
             this.WorkflowItemGL.Text = "G-L";
             // 
             // WorkflowItemMQ
             // 
             this.WorkflowItemMQ.Name = "WorkflowItemMQ";
-            this.WorkflowItemMQ.Size = new System.Drawing.Size(99, 22);
+            this.WorkflowItemMQ.Size = new System.Drawing.Size(180, 22);
             this.WorkflowItemMQ.Text = "M-Q";
             // 
             // WorkflowItemRZ
             // 
             this.WorkflowItemRZ.Name = "WorkflowItemRZ";
-            this.WorkflowItemRZ.Size = new System.Drawing.Size(99, 22);
+            this.WorkflowItemRZ.Size = new System.Drawing.Size(180, 22);
             this.WorkflowItemRZ.Text = "R-Z";
             // 
             // duplikateToolStripMenuItem
@@ -458,14 +469,14 @@
             // pVMToolStripMenuItem
             // 
             this.pVMToolStripMenuItem.Name = "pVMToolStripMenuItem";
-            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pVMToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.pVMToolStripMenuItem.Text = "PVM";
             this.pVMToolStripMenuItem.Click += new System.EventHandler(this.postwurfToolStripMenuItem_Click);
             // 
             // trennenToolStripMenuItem
             // 
             this.trennenToolStripMenuItem.Name = "trennenToolStripMenuItem";
-            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.trennenToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.trennenToolStripMenuItem.Text = "Trennen";
             this.trennenToolStripMenuItem.Click += new System.EventHandler(this.nachWertInSpalteToolStripMenuItem_Click);
             // 
@@ -691,13 +702,6 @@
             0});
             this.NumPage.ValueChanged += new System.EventHandler(this.NumPage_ValueChanged);
             // 
-            // commitToolStripMenuItem
-            // 
-            this.commitToolStripMenuItem.Name = "commitToolStripMenuItem";
-            this.commitToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.commitToolStripMenuItem.Text = "Commit";
-            this.commitToolStripMenuItem.Visible = false;
-            // 
             // dgTable
             // 
             this.dgTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -718,6 +722,20 @@
             this.dgTable.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgTable_RowsAdded);
             this.dgTable.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgTable_KeyDown);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
+            // 
+            // dividierenToolStripMenuItem
+            // 
+            this.dividierenToolStripMenuItem.Name = "dividierenToolStripMenuItem";
+            this.dividierenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.dividierenToolStripMenuItem.Text = "Dividieren";
+            this.dividierenToolStripMenuItem.Click += new System.EventHandler(this.dividierenToolStripMenuItem_Click);
+            // 
+            // tausenderTrennzeichenToolStripMenuItem
+            // 
+            this.tausenderTrennzeichenToolStripMenuItem.Name = "tausenderTrennzeichenToolStripMenuItem";
+            this.tausenderTrennzeichenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.tausenderTrennzeichenToolStripMenuItem.Text = "Tausender Trennzeichen";
+            this.tausenderTrennzeichenToolStripMenuItem.Click += new System.EventHandler(this.tausenderTrennzeichenToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -830,6 +848,8 @@
         private System.Windows.Forms.ToolStripMenuItem WorkflowItemRZ;
         private System.Windows.Forms.ToolStripStatusLabel LblWorkProc;
         private System.Windows.Forms.ToolStripMenuItem commitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dividierenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tausenderTrennzeichenToolStripMenuItem;
     }
 }
 
