@@ -823,9 +823,9 @@
             // checkBoxLeadingZero
             // 
             this.checkBoxLeadingZero.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.checkBoxLeadingZero.Location = new System.Drawing.Point(10, 263);
+            this.checkBoxLeadingZero.Location = new System.Drawing.Point(8, 263);
             this.checkBoxLeadingZero.Name = "checkBoxLeadingZero";
-            this.checkBoxLeadingZero.Size = new System.Drawing.Size(252, 23);
+            this.checkBoxLeadingZero.Size = new System.Drawing.Size(254, 23);
             this.checkBoxLeadingZero.TabIndex = 33;
             this.checkBoxLeadingZero.Text = "Führende Null durch Zeichen ersetzen?";
             this.checkBoxLeadingZero.UseVisualStyleBackColor = true;
