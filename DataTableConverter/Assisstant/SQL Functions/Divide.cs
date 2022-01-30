@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTableConverter.Assisstant.SQL_Functions
 {
-    [SQLiteFunction(Name = "DIVIDE", Arguments = 2, FuncType = FunctionType.Scalar)]
+    [SQLiteFunction(Name = "DIVIDE", Arguments = 3, FuncType = FunctionType.Scalar)]
     class Divide : SQLiteFunction
     {
 
@@ -15,7 +11,8 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         {
             decimal.TryParse(args[0].ToString(), out decimal dividend);
             decimal.TryParse(args[1].ToString(), out decimal divisor);
-            return divisor != 0 ? (Math.Floor((dividend / divisor) * 100)/100).ToString("0.##") : "0";
+            string numberFormat = (long)args[2] == 1 ? "F2" : "0.##"; // bool becomes 1 or 0 (int64)
+            return (divisor != 0 ? (Math.Floor((dividend / divisor) * 100)/100) : 0).ToString(numberFormat);
         }
     }
 }

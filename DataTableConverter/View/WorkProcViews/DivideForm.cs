@@ -58,7 +58,7 @@ namespace DataTableConverter.View.WorkProcViews
             }
             else
             {
-                Proc = new ProcDivide(SelectedHeaders, NumDivisor.Value, txtHeader.Text, cbOldColumn.Checked);
+                Proc = new ProcDivide(SelectedHeaders, NumDivisor.Value, txtHeader.Text, cbOldColumn.Checked, checkBoxDecimals.Checked);
                 DialogResult = DialogResult.OK;
             }
         }

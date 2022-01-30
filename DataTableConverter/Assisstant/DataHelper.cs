@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.View;
+using DataTableConverter.View.WorkProcViews;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -71,6 +72,28 @@ namespace DataTableConverter.Assisstant
                         invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
                     }
                 }
+                if (Properties.Settings.Default.PVMLeadingZero)
+                {
+                    string leadingZeroColumn = importTableColumnAliasMapping.FirstOrDefault(pair => pair.Key.Equals(Properties.Settings.Default.PVMLeadingZeroAlias, System.StringComparison.OrdinalIgnoreCase)).Value;
+                    string leadingZeroText = Properties.Settings.Default.PVMLeadingZeroText;
+                    if ( leadingZeroColumn == null || leadingZeroText.Length == 0)
+                    {
+                        using (PVMImportLeadingZeroForm form = new PVMImportLeadingZeroForm(importTableColumnAliasMapping))
+                        {
+                            if (form.ShowDialog() == DialogResult.OK)
+                            {
+                                leadingZeroColumn = form.LeadingZeroColumn;
+                                leadingZeroText = form.LeadingZeroText;
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+                        }
+                    }
+                    invokeForm.DatabaseHelper.ReplaceLeadingZero(leadingZeroColumn, leadingZeroText, importTable);
+                }
+                
 
                 bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm, out string orderColumn);
 
@@ -88,7 +111,7 @@ namespace DataTableConverter.Assisstant
             return count;
         }
 
-        private static DialogResult ShowMergeForm(ref string[] importColumns, ref string sourceColumnName, ref string importColumnName, Dictionary<string, string> originalTableHeaders, int originalRowCount, Dictionary<string, string> importTableHeaders, int importRowCount, string filename, Form invokeForm)
+        private static DialogResult ShowMergeForm(ref string[] importColumns, ref string sourceColumnName, ref string importColumnName, Dictionary<string, string> originalTableHeaders, int originalRowCount, Dictionary<string, string> importTableHeaders, int importRowCount, string filename, Form1 invokeForm)
         {
             bool result;
             using (MergeTable form = new MergeTable(originalTableHeaders, importTableHeaders, filename, originalRowCount, importRowCount))

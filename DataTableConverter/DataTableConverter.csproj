@@ -13,6 +13,9 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -27,9 +30,6 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -117,6 +117,7 @@
     <Compile Include="Assisstant\SQL Functions\CustomSubstring.cs" />
     <Compile Include="Assisstant\SQL Functions\CustomTrim.cs" />
     <Compile Include="Assisstant\SQL Functions\CustomUppercase.cs" />
+    <Compile Include="Assisstant\SQL Functions\ReplaceLeadingZero.cs" />
     <Compile Include="Assisstant\SQL Functions\Divide.cs" />
     <Compile Include="Assisstant\SQL Functions\GetSplit.cs" />
     <Compile Include="Assisstant\SQL Functions\CountString.cs" />
@@ -310,6 +311,12 @@
     <Compile Include="View\WorkProcViews\PVMExport.Designer.cs">
       <DependentUpon>PVMExport.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\WorkProcViews\PVMImportLeadingZeroForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WorkProcViews\PVMImportLeadingZeroForm.Designer.cs">
+      <DependentUpon>PVMImportLeadingZeroForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\WorkProcViews\ReplaceWholeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -491,6 +498,9 @@
     <EmbeddedResource Include="View\WorkProcViews\PVMExport.resx">
       <DependentUpon>PVMExport.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="View\WorkProcViews\PVMImportLeadingZeroForm.resx">
+      <DependentUpon>PVMImportLeadingZeroForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="View\WorkProcViews\ReplaceWholeForm.resx">
       <DependentUpon>ReplaceWholeForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -589,7 +599,7 @@
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 und x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

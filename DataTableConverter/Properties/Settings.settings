@@ -179,5 +179,14 @@
     <Setting Name="DuplicateCaseSensitive" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="PVMLeadingZeroAlias" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PLZ</Value>
+    </Setting>
+    <Setting Name="PVMLeadingZeroText" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">X</Value>
+    </Setting>
+    <Setting Name="PVMLeadingZero" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

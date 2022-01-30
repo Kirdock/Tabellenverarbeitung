@@ -496,5 +496,13 @@ namespace DataTableConverter
         {
             return Encoding.GetEncodings().Select(encoding => new NewEncodingInfo(encoding.DisplayName, encoding.CodePage)).OrderBy(encoding => encoding.DisplayName, new NaturalStringComparer(SortOrder.Ascending));
         }
+
+        internal static void SetComboboxWithDictionary(ComboBox cmb, Dictionary<string, string> items)
+        {
+            cmb.DataSource = new BindingSource(items, null);
+            cmb.DisplayMember = "key";
+            cmb.ValueMember = "value";
+            cmb.SelectedIndex = 0;
+        }
     }
 }

@@ -787,5 +787,44 @@ namespace DataTableConverter.Properties {
                 this["DuplicateCaseSensitive"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(Bluegrams.Application.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PLZ")]
+        public string PVMLeadingZeroAlias {
+            get {
+                return ((string)(this["PVMLeadingZeroAlias"]));
+            }
+            set {
+                this["PVMLeadingZeroAlias"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(Bluegrams.Application.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("X")]
+        public string PVMLeadingZeroText {
+            get {
+                return ((string)(this["PVMLeadingZeroText"]));
+            }
+            set {
+                this["PVMLeadingZeroText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(Bluegrams.Application.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PVMLeadingZero {
+            get {
+                return ((bool)(this["PVMLeadingZero"]));
+            }
+            set {
+                this["PVMLeadingZero"] = value;
+            }
+        }
     }
 }

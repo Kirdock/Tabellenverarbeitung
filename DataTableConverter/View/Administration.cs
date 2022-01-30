@@ -976,6 +976,7 @@ namespace DataTableConverter.View
             TxtNewColumnDivide.SetText(selectedProc.NewColumn);
             CbOldColumnDivide.Checked = selectedProc.CopyOldColumn;
             NumDivisor.Value = selectedProc.Divisor;
+            checkBoxDivideShowDecimals.Checked = selectedProc.AlwaysShowTwoDecimals;
             SetDataSource(DgvDivide, selectedProc.Columns);
             SetHeaderDivide(selectedProc.Columns.AsEnumerable().Select(row => row[0].ToString()).ToArray());
         }
@@ -2717,6 +2718,11 @@ namespace DataTableConverter.View
         private void TxtNewColumnThousandSeparator_TextChanged(object sender, EventArgs e)
         {
             (GetSelectedWorkProcedure() as ProcThousandSeparator).NewColumn = ((TextBox)sender).Text;
+        }
+
+        private void checkBoxDivideShowDecimals_CheckedChanged(object sender, EventArgs e)
+        {
+            (GetSelectedWorkProcedure() as ProcDivide).AlwaysShowTwoDecimals = checkBoxDivideShowDecimals.Checked;
         }
 
         private void TxtNewColumnDivide_TextChanged(object sender, EventArgs e)

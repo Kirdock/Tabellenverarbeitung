@@ -40,6 +40,7 @@ namespace DataTableConverter.View.WorkProcViews
             this.txtHeader = new System.Windows.Forms.TextBox();
             this.NumDivisor = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
+            this.checkBoxDecimals = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.NumDivisor)).BeginInit();
             this.SuspendLayout();
             // 
@@ -158,11 +159,24 @@ namespace DataTableConverter.View.WorkProcViews
             this.label2.TabIndex = 24;
             this.label2.Text = "Divisor";
             // 
+            // checkBoxDecimals
+            // 
+            this.checkBoxDecimals.AutoSize = true;
+            this.checkBoxDecimals.Checked = true;
+            this.checkBoxDecimals.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxDecimals.Location = new System.Drawing.Point(160, 26);
+            this.checkBoxDecimals.Name = "checkBoxDecimals";
+            this.checkBoxDecimals.Size = new System.Drawing.Size(194, 17);
+            this.checkBoxDecimals.TabIndex = 25;
+            this.checkBoxDecimals.Text = "Immer zwei Dezimalstellen anzeigen";
+            this.checkBoxDecimals.UseVisualStyleBackColor = true;
+            // 
             // DivideForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(408, 238);
+            this.Controls.Add(this.checkBoxDecimals);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.NumDivisor);
             this.Controls.Add(this.cbOldColumn);
@@ -174,6 +188,7 @@ namespace DataTableConverter.View.WorkProcViews
             this.Controls.Add(this.cbNewColumn);
             this.Controls.Add(this.lblHeader);
             this.Controls.Add(this.txtHeader);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "DivideForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Dividieren";
@@ -196,5 +211,6 @@ namespace DataTableConverter.View.WorkProcViews
         private System.Windows.Forms.TextBox txtHeader;
         private System.Windows.Forms.NumericUpDown NumDivisor;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox checkBoxDecimals;
     }
 }

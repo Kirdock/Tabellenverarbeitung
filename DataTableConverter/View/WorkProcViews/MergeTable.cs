@@ -20,8 +20,8 @@ namespace DataTableConverter.View
             InitializeComponent();
 
             SetListBoxStyle();
-            SetCmbItems(cmbIdentifierOriginal, originalHeaders);
-            SetCmbItems(cmbIdentifierMerge, importHeaders);
+            ViewHelper.SetComboboxWithDictionary(cmbIdentifierOriginal, originalHeaders);
+            ViewHelper.SetComboboxWithDictionary(cmbIdentifierMerge, importHeaders);
             ImportAliasColumnMapping = importHeaders;
             SetListItems(importHeaders);
             lblImportTable.Text = filename;
@@ -41,14 +41,6 @@ namespace DataTableConverter.View
         private void SetListItems(Dictionary<string, string> items)
         {
             clbColumns.Items.AddRange(items.Keys.ToArray());
-        }
-
-        private void SetCmbItems(ComboBox cmb, Dictionary<string, string> items)
-        {
-            cmb.DataSource = new BindingSource(items, null);
-            cmb.DisplayMember = "key";
-            cmb.ValueMember = "value";
-            cmb.SelectedIndex = 0;
         }
 
         private void btnTakeOver_Click(object sender, EventArgs e)

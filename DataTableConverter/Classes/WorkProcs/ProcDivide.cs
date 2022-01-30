@@ -14,13 +14,15 @@ namespace DataTableConverter.Classes.WorkProcs
     {
         internal static readonly string ClassName = "Dividieren";
         public decimal Divisor = 1;
+        public bool AlwaysShowTwoDecimals = true;
 
         public ProcDivide(int ordinal, int id, string name) : base(ordinal, id, name) { }
 
-        public ProcDivide(string[] columns, decimal divisor, string newColumn, bool copyOldColumn)
+        public ProcDivide(string[] columns, decimal divisor, string newColumn, bool copyOldColumn, bool alwaysShowTwoDecimals)
         {
             Divisor = divisor;
             NewColumn = newColumn;
+            AlwaysShowTwoDecimals = alwaysShowTwoDecimals;
             Columns = new DataTable { TableName = "Columnnames" };
             Columns.Columns.Add("Spalten", typeof(string));
             foreach (string col in columns)
@@ -56,7 +58,7 @@ namespace DataTableConverter.Classes.WorkProcs
             string[] columns = GetHeaders();
             if (PrepareMultiple(columns, invokeForm, tableName, out string[] sourceColumns, out string[] destinationColumns))
             {
-                invokeForm.DatabaseHelper.Divide(sourceColumns, destinationColumns, Divisor, tableName);
+                invokeForm.DatabaseHelper.Divide(sourceColumns, destinationColumns, Divisor, AlwaysShowTwoDecimals, tableName);
             }
         }
     }

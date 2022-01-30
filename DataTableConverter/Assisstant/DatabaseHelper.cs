@@ -2588,17 +2588,18 @@ namespace DataTableConverter.Assisstant
             command.ExecuteNonQuery();
         }
 
-        internal void Divide(string[] sourceColumns, string[] destinationColumns, decimal divisor, string tableName)
+        internal void Divide(string[] sourceColumns, string[] destinationColumns, decimal divisor, bool alwaysShowTwoDecimals, string tableName)
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < sourceColumns.Length; ++i)
                 {
-                    builder.Append("[").Append(destinationColumns[i]).Append("]=DIVIDE([").Append(sourceColumns[i]).Append("],$divisor), ");
+                    builder.Append("[").Append(destinationColumns[i]).Append("]=DIVIDE([").Append(sourceColumns[i]).Append("],$divisor, $showDecimals), ");
                 }
                 builder.Remove(builder.Length - 2, 2);
                 command.Parameters.AddWithValue("$divisor", divisor);
+                command.Parameters.AddWithValue("$showDecimals", alwaysShowTwoDecimals);
                 command.CommandText = $"UPDATE [{tableName}] SET {builder}";
                 command.ExecuteNonQuery();
             }
@@ -2615,6 +2616,16 @@ namespace DataTableConverter.Assisstant
                 }
                 builder.Remove(builder.Length - 2, 2);
                 command.CommandText = $"UPDATE [{tableName}] SET {builder}";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        internal void ReplaceLeadingZero(string column, string text, string tableName)
+        {
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"UPDATE [{tableName}] SET [{column}]=REPLACE_LEADING_ZERO([{column}], ?)";
+                command.Parameters.Add(new SQLiteParameter { Value = text });
                 command.ExecuteNonQuery();
             }
         }

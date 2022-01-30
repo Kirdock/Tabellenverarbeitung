@@ -10,7 +10,7 @@ namespace DataTableConverter.View
     {
         internal enum Tabs { Duplciate, Shortcut, Color, Table, Other, Help };
 
-        internal SettingForm(Tabs tab = Tabs.Color)
+        internal SettingForm(Tabs tab = Tabs.Duplciate)
         {
             InitializeComponent();
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -71,6 +71,9 @@ namespace DataTableConverter.View
             CBLoadHiddenColumns.Checked = Properties.Settings.Default.UnhideColumns;
             CBDuplicateCaseSensitive.Checked = Properties.Settings.Default.DuplicateCaseSensitive;
             TxTShortcut.Text = new KeysConverter().ConvertToString(Properties.Settings.Default.EditShortcut);
+            checkBoxLeadingZero.Checked = Properties.Settings.Default.PVMLeadingZero;
+            textBoxLeadingZeroText.Text = Properties.Settings.Default.PVMLeadingZeroText;
+            textBoxLeadingZeroAlias.Text = Properties.Settings.Default.PVMLeadingZeroAlias;
         }
 
         private void SettingForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -104,6 +107,9 @@ namespace DataTableConverter.View
                 Properties.Settings.Default.UnhideRows = CBLoadHiddenRows.Checked;
                 Properties.Settings.Default.UnhideColumns = CBLoadHiddenColumns.Checked;
                 Properties.Settings.Default.DuplicateCaseSensitive = CBDuplicateCaseSensitive.Checked;
+                Properties.Settings.Default.PVMLeadingZero = checkBoxLeadingZero.Checked;
+                Properties.Settings.Default.PVMLeadingZeroText = textBoxLeadingZeroText.Text;
+                Properties.Settings.Default.PVMLeadingZeroAlias = textBoxLeadingZeroAlias.Text;
                 Properties.Settings.Default.Save();
             }
             else
