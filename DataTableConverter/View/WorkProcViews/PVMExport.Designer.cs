@@ -37,6 +37,7 @@ namespace DataTableConverter.View.WorkProcViews
             this.RBCSV = new System.Windows.Forms.RadioButton();
             this.RBDBASE = new System.Windows.Forms.RadioButton();
             this.cbHeaders = new CheckComboBoxTest.CheckedComboBox();
+            this.buttonConfirm = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,7 +75,7 @@ namespace DataTableConverter.View.WorkProcViews
             this.groupBox1.Controls.Add(this.RBExcel);
             this.groupBox1.Controls.Add(this.RBCSV);
             this.groupBox1.Controls.Add(this.RBDBASE);
-            this.groupBox1.Location = new System.Drawing.Point(25, 103);
+            this.groupBox1.Location = new System.Drawing.Point(26, 99);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(341, 74);
             this.groupBox1.TabIndex = 16;
@@ -126,11 +127,22 @@ namespace DataTableConverter.View.WorkProcViews
             this.cbHeaders.TabIndex = 12;
             this.cbHeaders.ValueSeparator = ", ";
             // 
+            // buttonConfirm
+            // 
+            this.buttonConfirm.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.buttonConfirm.Location = new System.Drawing.Point(156, 189);
+            this.buttonConfirm.Name = "buttonConfirm";
+            this.buttonConfirm.Size = new System.Drawing.Size(75, 23);
+            this.buttonConfirm.TabIndex = 44;
+            this.buttonConfirm.Text = "Bestätigen";
+            this.buttonConfirm.UseVisualStyleBackColor = true;
+            // 
             // PVMExport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(408, 189);
+            this.ClientSize = new System.Drawing.Size(408, 224);
+            this.Controls.Add(this.buttonConfirm);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnUncheckAll);
             this.Controls.Add(this.btnCheckAll);
@@ -158,5 +170,6 @@ namespace DataTableConverter.View.WorkProcViews
         private System.Windows.Forms.RadioButton RBExcel;
         private System.Windows.Forms.RadioButton RBCSV;
         private System.Windows.Forms.RadioButton RBDBASE;
+        private System.Windows.Forms.Button buttonConfirm;
     }
 }

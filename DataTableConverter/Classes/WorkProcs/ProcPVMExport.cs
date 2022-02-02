@@ -1,5 +1,6 @@
 ﻿using DataTableConverter.Assisstant;
 using DataTableConverter.Extensions;
+using DataTableConverter.View.WorkProcViews;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -35,8 +36,29 @@ namespace DataTableConverter.Classes.WorkProcs
         public override void DoWork(ref string sortingOrder, Case duplicateCase, List<Tolerance> tolerances, Proc procedure, string filePath, ContextMenuStrip ctxRow, OrderType orderType, Form1 invokeForm, string tableName)
         {
             PrepareMultiple(GetHeaders(), invokeForm, tableName, out string[] sourceColumns, out _);
+            string newTable = null;
 
             System.Data.SQLite.SQLiteCommand command = invokeForm.DatabaseHelper.SplitTableOnColumnsCommand(sourceColumns, sortingOrder, orderType, tableName);
+            if (Properties.Settings.Default.PVMLeadingZero)
+            {
+                tableName = newTable = invokeForm.DatabaseHelper.CreateTableWithCommand(command);
+                command = null;
+                Dictionary<string, string> aliasColumnMapping = invokeForm.DatabaseHelper.GetAliasColumnMapping(tableName);
+                string leadingZeroColumn = aliasColumnMapping.FirstOrDefault(pair => pair.Key.Equals(Properties.Settings.Default.PVMLeadingZeroAlias, StringComparison.OrdinalIgnoreCase)).Value;
+                string leadingZeroText = Properties.Settings.Default.PVMLeadingZeroText;
+                if (leadingZeroColumn == null || leadingZeroText.Length == 0)
+                {
+                    using (PVMImportLeadingZeroForm form = new PVMImportLeadingZeroForm(aliasColumnMapping))
+                    {
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            leadingZeroColumn = form.LeadingZeroColumn;
+                            leadingZeroText = form.LeadingZeroText;
+                        }
+                    }
+                }
+                invokeForm.DatabaseHelper.ReplaceLeadingZero(leadingZeroColumn, leadingZeroText, tableName);
+            }
 
             string path = Properties.Settings.Default.AutoSavePVM ? Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath)) + Properties.Settings.Default.PVMAddressText + ".csv" : null;
 
@@ -98,6 +120,10 @@ namespace DataTableConverter.Classes.WorkProcs
                 }
             }
             saveFileDialog1.Dispose();
+            if(newTable != null)
+            {
+                invokeForm.DatabaseHelper.Delete(newTable);
+            }
         }
 
         public override string[] GetHeaders()

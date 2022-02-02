@@ -72,27 +72,6 @@ namespace DataTableConverter.Assisstant
                         invalidColumnName = f.Table.AsEnumerable().First()[1].ToString();
                     }
                 }
-                if (Properties.Settings.Default.PVMLeadingZero)
-                {
-                    string leadingZeroColumn = importTableColumnAliasMapping.FirstOrDefault(pair => pair.Key.Equals(Properties.Settings.Default.PVMLeadingZeroAlias, System.StringComparison.OrdinalIgnoreCase)).Value;
-                    string leadingZeroText = Properties.Settings.Default.PVMLeadingZeroText;
-                    if ( leadingZeroColumn == null || leadingZeroText.Length == 0)
-                    {
-                        using (PVMImportLeadingZeroForm form = new PVMImportLeadingZeroForm(importTableColumnAliasMapping))
-                        {
-                            if (form.ShowDialog() == DialogResult.OK)
-                            {
-                                leadingZeroColumn = form.LeadingZeroColumn;
-                                leadingZeroText = form.LeadingZeroText;
-                            }
-                            else
-                            {
-                                return 0;
-                            }
-                        }
-                    }
-                    invokeForm.DatabaseHelper.ReplaceLeadingZero(leadingZeroColumn, leadingZeroText, importTable);
-                }
                 
 
                 bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm, out string orderColumn);

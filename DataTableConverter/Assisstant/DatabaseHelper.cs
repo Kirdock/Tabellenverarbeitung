@@ -531,10 +531,9 @@ namespace DataTableConverter.Assisstant
             return command;
         }
 
-        internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, SQLiteDataReader reader, string tableName, SQLiteCommand cmd = null, SQLiteConnection connection = null)
+        internal SQLiteCommand InsertRow(IEnumerable<string> eHeaders, SQLiteDataReader reader, string tableName, SQLiteCommand command = null, SQLiteConnection connection = null)
         {
-            SQLiteCommand command = cmd;
-            if (cmd == null)
+            if (command == null)
             {
                 command = CreateInsertRowCommand(eHeaders, tableName, reader, connection);
             }
@@ -2628,6 +2627,26 @@ namespace DataTableConverter.Assisstant
                 command.Parameters.Add(new SQLiteParameter { Value = text });
                 command.ExecuteNonQuery();
             }
+        }
+
+        internal string CreateTableWithCommand(SQLiteCommand command)
+        {
+            string tablename = Guid.NewGuid().ToString();
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                List<string> columns = new List<string>();
+                for(int i = 0; i < reader.FieldCount; ++i)
+                {
+                    columns.Add(reader.GetName(i));
+                }
+                CreateTable(columns, tablename);
+                SQLiteCommand insertCommand = null;
+                while (reader.Read())
+                {
+                    insertCommand = InsertRow(columns, reader, tablename, insertCommand);
+                }
+            }
+            return tablename;
         }
     }
 }
