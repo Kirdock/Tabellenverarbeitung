@@ -253,6 +253,23 @@ namespace DataTableConverter.Assisstant
             return aliases;
         }
 
+        private List<string> GetSortedColumns(string tableName)
+        {
+            List<string> columns = new List<string>();
+            using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
+            {
+                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where alias is not null order by sortorder asc";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        columns.Add(reader.GetValue(0).ToString());
+                    }
+                }
+            }
+            return columns;
+        }
+
         /// <summary>
         /// Creates table and meta table
         /// </summary>
@@ -1117,18 +1134,19 @@ namespace DataTableConverter.Assisstant
             string fileNameColumn = FileNameColumn;
             AddColumnIfNotExists(destinationTable, ref fileNameColumn, fileNameBefore);
             AddColumnIfNotExists(newTable, ref fileNameColumn, filename);
-            string[] headers = GetSortedColumnsAsAlias(newTable).ToArray();
+            string[] headersAliases = GetSortedColumnsAsAlias(newTable).ToArray();
+            List<string> headersColumns = GetSortedColumns(newTable);
             SQLiteConnection destinationConnection = GetConnection(destinationTable);
 
-            for (int i = 0; i < headers.Length; ++i)
+            for (int i = 0; i < headersAliases.Length; ++i)
             {
-                AddColumnIfNotExists(destinationTable, ref headers[i]);
+                AddColumnIfNotExists(destinationTable, ref headersAliases[i]);
             }
 
             Dictionary<string, string> destinationHeaders = GetAliasColumnMapping(destinationTable);
             List<string> headerMapping = new List<string>();
 
-            foreach (string header in headers)
+            foreach (string header in headersAliases)
             {
                 string value = destinationHeaders.First(pair => pair.Key.Equals(header, StringComparison.OrdinalIgnoreCase)).Value; //should be case insensitive
                 headerMapping.Add(value);
@@ -1137,7 +1155,7 @@ namespace DataTableConverter.Assisstant
 
             using (SQLiteCommand destinationCommand = destinationConnection.CreateCommand())
             {
-                string newTableHeaderString = GetHeaderString(headers);
+                string newTableHeaderString = GetHeaderString(headersColumns);
                 string headerString = GetHeaderString(headerMapping);
                 destinationCommand.CommandText = $"INSERT into [{destinationTable}] ({headerString}) values ({GetValueString(headerMapping.Count)})";
                 for (int i = 0; i < headerMapping.Count; ++i)
