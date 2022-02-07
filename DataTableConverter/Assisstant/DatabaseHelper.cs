@@ -2072,7 +2072,7 @@ namespace DataTableConverter.Assisstant
                     bool isAlias = reader.GetValue(1).ToString() == "1";
                     string[] names = reader.GetValue(2).ToString().Split('\t');
                     string[] columnNames = isAlias ? names.Select(name => aliasColumnMapping.First(pair => pair.Key.Equals(name, StringComparison.OrdinalIgnoreCase)).Value).ToArray() : names;
-                    updateCommand = UpdateRow(id, columnNames, reader.GetValue(3).ToString().Split('\t'), tableName, updateCommand);
+                    UpdateRow(id, columnNames, reader.GetValue(3).ToString().Split('\t'), tableName);
                 }
             }
             Delete(newTableName);
