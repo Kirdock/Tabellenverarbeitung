@@ -124,6 +124,7 @@
     <Compile Include="Assisstant\SQL Functions\NumberToString.cs" />
     <Compile Include="Assisstant\SQL Functions\Padding.cs" />
     <Compile Include="Assisstant\SQL Functions\Round.cs" />
+    <Compile Include="Assisstant\SQL Functions\SQLiteNoCase.cs" />
     <Compile Include="Assisstant\SQL Functions\SQLiteSensitive.cs" />
     <Compile Include="Assisstant\SQL Functions\ThousandSeparator.cs" />
     <Compile Include="Assisstant\StringComparer.cs" />

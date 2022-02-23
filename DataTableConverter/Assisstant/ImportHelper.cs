@@ -38,11 +38,6 @@ namespace DataTableConverter.Assisstant
         internal static readonly int MaxCellsPerIteration = 50000;
         private readonly DatabaseHelper DatabaseHelper;
         private readonly ExportHelper ExportHelper;
-        private static readonly XNamespace ExcelNamespace = "urn:schemas-microsoft-com:office:spreadsheet";
-        private static readonly XName RowExcelNamespace = ExcelNamespace + "Row";
-        private static readonly XName CellExcelNamespace = ExcelNamespace + "Cell";
-        private static readonly XName IndexNamexpace = ExcelNamespace + "Index";
-        private static readonly XName TypeNamexpace = ExcelNamespace + "Type";
 
         [DllImport("kernel32.dll", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto)]
         private static extern int GetShortPathName(

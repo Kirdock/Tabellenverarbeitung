@@ -67,6 +67,7 @@ namespace DataTableConverter.Assisstant
             Reset();
             SQLiteFunction.RegisterFunction(typeof(SQLiteSensitive)); // COLLATE CASESENSITIVE
             SQLiteFunction.RegisterFunction(typeof(SQLiteComparator)); //COLLATE NATURALSORT
+            SQLiteFunction.RegisterFunction(typeof(SQLiteNoCase)); //COLLATE NO_CASE, fixes NOCASE of database (special characters not working)
             SQLiteFunction.RegisterFunction(typeof(NumberToString)); //TOSTRING(myValue, myFormat)
             SQLiteFunction.RegisterFunction(typeof(Round)); //ROUND2(myValue, type, decimalCount)
             SQLiteFunction.RegisterFunction(typeof(CountString)); //COUNTSTRING(myValue, mySubstring)
@@ -294,7 +295,7 @@ namespace DataTableConverter.Assisstant
                 command.CommandText = $"DROP table if exists [{tableName}]";
                 command.ExecuteNonQuery();
 
-                string colType = "varchar(255) not null default '' COLLATE "+ (naturalSort ? "NATURALSORT" : "NOCASE");
+                string colType = "varchar(255) not null default '' COLLATE "+ (naturalSort ? "NATURALSORT" : "NO_CASE");
                 command.CommandText = $"CREATE table [{tableName}] ({IdColumnName} INTEGER PRIMARY KEY AUTOINCREMENT, [{string.Join($"] {colType},[", columnNames)}] {colType})";
 
                 command.ExecuteNonQuery();
@@ -585,7 +586,7 @@ namespace DataTableConverter.Assisstant
             bool status = false;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT count(*) FROM [{tableName + MetaTableAffix}] WHERE alias = $column COLLATE NOCASE";
+                command.CommandText = $"SELECT count(*) FROM [{tableName + MetaTableAffix}] WHERE alias = $column COLLATE NO_CASE";
                 command.Parameters.Add(new SQLiteParameter("$column", column));
                 int count = Convert.ToInt32(command.ExecuteScalar());
                 status = count != 0;
@@ -1407,7 +1408,7 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT alias from [{tableName + MetaTableAffix}] where column = $column COLLATE NOCASE";
+                command.CommandText = $"SELECT alias from [{tableName + MetaTableAffix}] where column = $column COLLATE NO_CASE";
                 command.Parameters.Add(new SQLiteParameter("$column", columnName));
                 return command.ExecuteScalar()?.ToString();
             }
@@ -1417,7 +1418,7 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where alias = $alias COLLATE NOCASE";
+                command.CommandText = $"SELECT column from [{tableName + MetaTableAffix}] where alias = $alias COLLATE NO_CASE";
                 command.Parameters.Add(new SQLiteParameter("$alias", alias));
                 return command.ExecuteScalar()?.ToString();
             }
@@ -2199,11 +2200,11 @@ namespace DataTableConverter.Assisstant
         internal long SearchValue(string value, string alias, bool strictMatch, string order, OrderType orderType, string tableName)
         {
             long index = -1;
-            //strictMatch == true: column = value NOCASE
+            //strictMatch == true: column = value NO_CASE
             //strictMatch == false: column like %value% //nocase not needed; default of like is case insensitive
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName, $"where [{GetColumnName(alias, tableName)}] {(strictMatch ? "= ? COLLATE NOCASE" : "like ?")}");
+                command.CommandText = GetSortedSelectString(string.Empty, order, orderType, -1, 0, true, tableName, $"where [{GetColumnName(alias, tableName)}] {(strictMatch ? "= ? COLLATE NO_CASE" : "like ?")}");
                 command.Parameters.Add(new SQLiteParameter() { Value = strictMatch ? value : $"%{value}%" });
                 string id = command.ExecuteScalar()?.ToString();
                 if (id != null)
@@ -2242,7 +2243,7 @@ namespace DataTableConverter.Assisstant
         {
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = $"DELETE from [{tableName}] where [{columnName}] {(strictMatch ? "=? COLLATE NOCASE" : "like ?")}";
+                command.CommandText = $"DELETE from [{tableName}] where [{columnName}] {(strictMatch ? "=? COLLATE NO_CASE" : "like ?")}";
                 command.Parameters.Add(new SQLiteParameter() { Value = strictMatch ? value : $"%{value}%" });
                 command.ExecuteNonQuery();
             }
