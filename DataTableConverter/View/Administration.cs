@@ -2304,10 +2304,6 @@ namespace DataTableConverter.View
         {
             ExportSeparate selectedItem = GetSeparateSelectedItem();
             selectedItem.CheckedAllValues = CbSeparateSaveAll.Checked;
-            if (selectedItem.CheckedAllValues)
-            {
-                selectedItem.SaveRemaining = CbSeparateSaveRemaining.Checked = false;
-            }
 
             SetSeparateEnabled();
         }
@@ -2551,10 +2547,6 @@ namespace DataTableConverter.View
         {
             ExportSeparate selectedItem = GetSeparateSelectedItem();
             selectedItem.SaveRemaining = CbSeparateSaveRemaining.Checked;
-            if (selectedItem.SaveRemaining)
-            {
-                selectedItem.CheckedAllValues = CbSeparateSaveAll.Checked = false;
-            }
         }
 
         private void TxtPVMPath_TextChanged(object sender, EventArgs e)

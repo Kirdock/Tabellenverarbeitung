@@ -1620,11 +1620,12 @@ namespace DataTableConverter.Assisstant
         {
             Dictionary<string, string> aliasColumnMapping = GetAliasColumnMapping(tableName);
             string headerString = GetHeaderString(aliasColumnMapping.Keys);
-            string valueString = GetValueString(aliasColumnMapping.Count);
+            string valueString = GetValueString(aliasColumnMapping.Count +1);
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
                 CreateIndexOn(tableName, column, null, false);
-                command.CommandText = $"SELECT {headerString} from [{tableName}] where [{column}] = ? COLLATE CASESENSITIVE";
+                command.CommandText = $"SELECT {IdColumnName},{headerString} from [{tableName}] where [{column}] = ? COLLATE CASESENSITIVE";
+                // ID Column is used to keep original order
                 command.Parameters.Add(new SQLiteParameter());
                 foreach (KeyValuePair<string, string[]> pair in dict)
                 {
@@ -1635,8 +1636,8 @@ namespace DataTableConverter.Assisstant
                         {
                             //0 => tableName
                             //1 => fileName
-                            insertCommand.CommandText = $"INSERT INTO [{pair.Value[0]}] ({headerString}) values ({valueString})";
-                            for (int i = 0; i < aliasColumnMapping.Count; i++)
+                            insertCommand.CommandText = $"INSERT INTO [{pair.Value[0]}] ({IdColumnName},{headerString}) values ({valueString})";
+                            for (int i = 0; i < aliasColumnMapping.Count+1; i++)
                             {
                                 insertCommand.Parameters.Add(new SQLiteParameter());
                             }

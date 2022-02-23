@@ -722,6 +722,10 @@ namespace DataTableConverter
         /// <param name="tableName"></param>
         internal void ExportTableWithColumnCondition(IEnumerable<ExportCustomItem> items, string filePath, int codePage, string order, OrderType orderType, Form mainForm, string continuedNumberColumn, string tableName, Action<string> setStatus)
         {
+            if(order == string.Empty)
+            {
+                order = $"[{DatabaseHelper.IdColumnName}] asc";
+            }
             foreach (ExportCustomItem item in items)
             {
                 Dictionary<string, string[]> dict = new Dictionary<string, string[]>();

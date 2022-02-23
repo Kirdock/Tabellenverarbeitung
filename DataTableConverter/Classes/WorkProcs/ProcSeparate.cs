@@ -28,19 +28,19 @@ namespace DataTableConverter.Classes.WorkProcs
             {
                 string columnName = invokeForm.DatabaseHelper.GetColumnName(item.Column, tableName);
                 IEnumerable<string> values;
-                if (item.CheckedAllValues)
-                {
-                    values = invokeForm.DatabaseHelper.GroupCountOfColumn(columnName, tableName).Keys;
-                }
-                else if (item.SaveRemaining)
+                if (item.SaveRemaining)
                 {
                     values = invokeForm.DatabaseHelper.GroupCountOfColumn(columnName, tableName).Keys.Where(key => !Files.Any(file => file.Column == columnName && file.Values.Contains(key)));
+                }
+                else if (item.CheckedAllValues)
+                {
+                    values = invokeForm.DatabaseHelper.GroupCountOfColumn(columnName, tableName).Keys;
                 }
                 else
                 {
                     values = item.Values;
                 }
-                return new ExportCustomItem(item.Name, columnName, values, item.Format, item.CheckedAllValues || item.SaveRemaining);
+                return new ExportCustomItem(item.Name, columnName, values, item.Format, item.CheckedAllValues);
             });
 
             invokeForm.ExportHelper.ExportTableWithColumnCondition(items, filePath, invokeForm.FileEncoding, sortingOrder, orderType, invokeForm, ContinuedColumn ? NewColumn : null, tableName, invokeForm.SetWorkflowText);
