@@ -2142,7 +2142,7 @@ namespace DataTableConverter.Assisstant
         private int ChecksumEAN9(string data)
         {
             int result = -1;
-            if (int.TryParse(data, out int _))
+            if (long.TryParse(data, out long _))
             {
                 int sum1 = 0;
                 for (int i = data.Length - 2; i >= 0; i -= 2)
