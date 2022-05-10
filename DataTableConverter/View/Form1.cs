@@ -251,7 +251,11 @@ namespace DataTableConverter
 
         private void SetOptimalColumnWidth(DataGridViewColumn col)
         {
-            string result = (dgTable.DataSource as DataTable)?.AsEnumerable().Select(row => row[col.Name].ToString()).Concat(new string[] { col.HeaderText }).Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
+            string result = (dgTable.DataSource as DataTable)
+                ?.AsEnumerable()
+                .Select(row => row[col.Name].ToString())
+                .Concat(new string[] { col.HeaderText })
+                .Aggregate(string.Empty, (seed, f) => f.Length > seed.Length ? f : seed);
             col.Width = TextRenderer.MeasureText(result, dgTable.DefaultCellStyle.Font).Width + ColumnWidthTolerance;
 
             AddColumnWidth(col);
@@ -401,6 +405,8 @@ namespace DataTableConverter
                     headers.AddRange(wpHeaders.Select(header => header + Properties.Settings.Default.OldAffix));
                 }
 
+                // ProcSplit: No way to check if the column is available or not because the amount of created columns is dynamic and depends on the cells
+
                 notFoundColumns.AddRange(wpHeaders.Where(header => !headers.Contains(header, System.StringComparer.OrdinalIgnoreCase)));
 
                 if (notFoundColumns.Count > 0)
@@ -445,7 +451,7 @@ namespace DataTableConverter
                                     {
                                         nf.Wp.RemoveHeader(from[i]);
                                     }
-                                    else if (wpHeaders[y] == from[i] && nf.Headers.Contains(from[i])) //Kann sein, dass eine Spalte hinzugefügt wird und sie bei manchen Valid und bei manchen inValid ist, je nachdem wann sie ausgeführt werden
+                                    else if (to[i] != SelectDuplicateColumns.KeepColumn && wpHeaders[y] == from[i] && nf.Headers.Contains(from[i]))
                                     {
                                         nf.Wp.RenameHeaders(from[i], to[i]);
                                     }

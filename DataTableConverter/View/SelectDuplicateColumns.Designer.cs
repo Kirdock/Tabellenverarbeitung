@@ -30,6 +30,7 @@
         {
             this.dgDuplicate = new System.Windows.Forms.DataGridView();
             this.btnConfirm = new System.Windows.Forms.Button();
+            this.labelKeepColumn = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgDuplicate)).BeginInit();
             this.SuspendLayout();
             // 
@@ -43,16 +44,16 @@
             this.dgDuplicate.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgDuplicate.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgDuplicate.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dgDuplicate.Location = new System.Drawing.Point(12, 12);
+            this.dgDuplicate.Location = new System.Drawing.Point(12, 37);
             this.dgDuplicate.Name = "dgDuplicate";
             this.dgDuplicate.RowHeadersVisible = false;
-            this.dgDuplicate.Size = new System.Drawing.Size(408, 426);
+            this.dgDuplicate.Size = new System.Drawing.Size(408, 401);
             this.dgDuplicate.TabIndex = 0;
             // 
             // btnConfirm
             // 
             this.btnConfirm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnConfirm.Location = new System.Drawing.Point(435, 12);
+            this.btnConfirm.Location = new System.Drawing.Point(435, 37);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(91, 23);
             this.btnConfirm.TabIndex = 1;
@@ -60,11 +61,22 @@
             this.btnConfirm.UseVisualStyleBackColor = true;
             this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
             // 
+            // labelKeepColumn
+            // 
+            this.labelKeepColumn.Location = new System.Drawing.Point(12, 2);
+            this.labelKeepColumn.Name = "labelKeepColumn";
+            this.labelKeepColumn.Size = new System.Drawing.Size(408, 32);
+            this.labelKeepColumn.TabIndex = 2;
+            this.labelKeepColumn.Text = "Vorsicht: Wenn \"<Beibehalten>\" ausgewählt wird, kann das dazu führen, dass die Au" +
+    "sführung fehlschlägt, da die Spalte nicht gefunden werden kann";
+            this.labelKeepColumn.Visible = false;
+            // 
             // SelectDuplicateColumns
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(551, 450);
+            this.Controls.Add(this.labelKeepColumn);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.dgDuplicate);
             this.Name = "SelectDuplicateColumns";
@@ -79,5 +91,6 @@
 
         private System.Windows.Forms.DataGridView dgDuplicate;
         private System.Windows.Forms.Button btnConfirm;
+        private System.Windows.Forms.Label labelKeepColumn;
     }
 }

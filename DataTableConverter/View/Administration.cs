@@ -1824,6 +1824,7 @@ namespace DataTableConverter.View
             if (oldColumn.Visible = !newColumn.Checked)
             {
                 newColumnTextbox.SetText(string.Empty);
+                GetSelectedWorkProcedure().NewColumn = string.Empty;
             }
             else
             {

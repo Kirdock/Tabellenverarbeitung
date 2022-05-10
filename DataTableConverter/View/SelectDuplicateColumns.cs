@@ -9,7 +9,8 @@ namespace DataTableConverter.View
     public partial class SelectDuplicateColumns : Form
     {
         internal DataTable Table { get; set; }
-        internal static readonly string IgnoreColumn = "Ignorieren";
+        internal static readonly string IgnoreColumn = "<Ignorieren>";
+        internal static readonly string KeepColumn = "<Beibehalten>";
         private int ComboBoxIndex;
         internal SelectDuplicateColumns(string[] caseHeaders, Dictionary<string, string> importTableColumnAliasMapping, bool mustBeAssigned, string heading = null, string firstColumnName = null)
         {
@@ -72,12 +73,15 @@ namespace DataTableConverter.View
                 }
                 else
                 {
+                    labelKeepColumn.Visible = true;
                     string[] headers = (string[])importTableColumnAliasMapping;
-                    newHeadersArray = new string[headers.Length + 1];
+                    int offset = 2;
+                    newHeadersArray = new string[headers.Length + offset];
                     newHeadersArray[0] = IgnoreColumn;
+                    newHeadersArray[1] = KeepColumn;
                     for (int i = 0; i < headers.Length; i++)
                     {
-                        newHeadersArray[i + 1] = headers[i];
+                        newHeadersArray[i + offset] = headers[i];
                     }
                 }
                 firstValue = newHeadersArray[0];
