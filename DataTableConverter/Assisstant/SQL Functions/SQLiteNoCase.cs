@@ -7,7 +7,7 @@ namespace DataTableConverter.Assisstant.SQL_Functions
     {
         public override int Compare(string a, string b)
         {
-            return string.Compare(a, b, true);
+            return string.Compare(a, b, comparisonType: System.StringComparison.OrdinalIgnoreCase);
         }
     }
 }
