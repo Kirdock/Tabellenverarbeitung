@@ -322,7 +322,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             for (int i = 0; i < headers.Length; i++)
             {
-                dict.Add(new FormatIdentifier { Header = headers[i], Index = i }, i != headers.Length && headers.Skip(i + 1).All(header => isEmpty[header]));
+                dict.Add(new FormatIdentifier { Header = headers[i], Index = i }, i != (headers.Length - 1) && headers.Skip(i + 1).All(header => isEmpty[header]));
             }
 
             return dict;

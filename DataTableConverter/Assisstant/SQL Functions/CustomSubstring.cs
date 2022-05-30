@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SQLite;
+using System.Text;
 
 namespace DataTableConverter.Assisstant.SQL_Functions
 {
@@ -9,44 +10,46 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         public override object Invoke(object[] args)
         {
             string value = args[0].ToString();
-            string result;
             string replaceText = args[1].ToString();
-            int start = int.Parse(args[2].ToString());
-            int end = int.Parse(args[3].ToString());
+            int startIndex = int.Parse(args[2].ToString()) -1;
+            int endIndex = int.Parse(args[3].ToString()) - 1;
             bool replace = int.Parse(args[4].ToString()) == 1;
-            Func<string, int, int, string> substring = int.Parse(args[5].ToString()) == 1 ? (Func<string, int, int, string>)SubstringReverse : Substring;
+            bool reverse = int.Parse(args[5].ToString()) == 1;
+            if(reverse)
+            {
+                int startBefore = startIndex;
+                startIndex = endIndex == -1 ? 0 : value.Length - endIndex - 1;
+                endIndex = value.Length - startBefore - 1;
+            }
+            if(endIndex >= value.Length)
+            {
+                endIndex = -1;
+            }
+            if(startIndex >= value.Length)
+            {
+                return string.Empty;
+            }
             if (!replace)
             {
-                if (end == 0)
+                if (endIndex == -1)
                 {
-                    result = start > value.Length ? string.Empty : substring(value, start - 1, -1);
+                    return value.Substring(startIndex);
                 }
                 else
                 {
-                    int length = (end - start);
-                    result = start > value.Length ? string.Empty : length + start > value.Length ? substring(value, start - 1, -1) : substring(value, start - 1, length + 1);
+                    return value.Substring(startIndex, endIndex - startIndex + 1);
                 }
             }
             else
             {
-                result = start > value.Length ? string.Empty : (substring(value, 0, start-1) + replaceText);
+                StringBuilder result = new StringBuilder(value.Substring(0, startIndex)).Append(replaceText);
 
-                if (end < value.Length && end != 0 && start <= value.Length)
+                if (endIndex != -1)
                 {
-                    result += substring(value, end, -1);
+                    result.Append(value.Substring(endIndex + 1));
                 }
+                return result.ToString();
             }
-            return result;
-        }
-
-        private string Substring(string value, int start, int end)
-        {
-            return end == -1 ? value.Substring(start) : value.Substring(start, end);
-        }
-
-        private string SubstringReverse(string value, int start, int end)
-        {
-            return end == -1 ? value.Substring(0, value.Length - start) : value.Substring(value.Length - end, end - start);
         }
     }
 }

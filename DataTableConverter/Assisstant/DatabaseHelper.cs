@@ -2459,7 +2459,7 @@ namespace DataTableConverter.Assisstant
                 StringBuilder builder = new StringBuilder($"UPDATE [{tableName}] SET ");
                 for (int i = 0; i < sourceColumns.Length; ++i)
                 {
-                    builder.Append("[").Append(destinationColumns[i]).Append("] = CUSTOMSUBSTRING([").Append(sourceColumns[i]).Append("],$replaceText,$start,$end, $replaceChecked, $reverseCheck),");
+                    builder.Append($"[{destinationColumns[i]}] = CUSTOMSUBSTRING([{sourceColumns[i]}],$replaceText,$start,$end, $replaceChecked, $reverseCheck),");
                 }
                 command.CommandText = builder.Remove(builder.Length - 1, 1).ToString();
                 command.Parameters.AddWithValue("$replaceText", replaceText);
