@@ -100,7 +100,7 @@ namespace DataTableConverter.Assisstant
                 {
                     res = form.ShowDialog(invokeForm);
                 }));
-                if (result = (res == DialogResult.OK))
+                if (result = (res == DialogResult.OK || res == DialogResult.Yes))
                 {
                     importColumns = form.SelectedColumns.ToArray();
                     sourceColumnName = form.OriginalIdentifierColumnName;
