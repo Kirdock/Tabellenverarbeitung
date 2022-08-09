@@ -74,7 +74,7 @@ namespace DataTableConverter.Assisstant
                 }
                 
 
-                bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm, out string orderColumn);
+                bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm, out string orderColumn, out List<string> importIdentifiers);
 
                 if (abort) return 0;
 
@@ -83,7 +83,7 @@ namespace DataTableConverter.Assisstant
 
                 if (Properties.Settings.Default.SplitPVM)
                 {
-                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, string.Empty, Classes.OrderType.Windows, tableName);
+                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, string.Empty, Classes.OrderType.Windows, tableName, sourceIdentifierColumnName, importIdentifiers);
                 }
                 invokeForm.DatabaseHelper.DeleteInvalidRows(tableName, invalidColumnName);
             }

@@ -913,7 +913,7 @@ namespace DataTableConverter.Assisstant
         }
 
         /// <summary>
-        /// Add columns of import table depending on a given identifier on destination and import table
+        /// Add columns of import table depending on a given identifier on destination and import table. Only rows that are defined in the imported table are kept
         /// </summary>
         /// <param name="importTable"></param>
         /// <param name="importColumnNames"></param>
@@ -922,9 +922,10 @@ namespace DataTableConverter.Assisstant
         /// <param name="destinationTableColumnAliasMapping"></param>
         /// <param name="importTableColumnAliasMapping"></param>
         /// <param name="destinationTable"></param>
-        internal bool PVMImport(string importTable, string[] importColumnNames, string destinationIdentifierColumn, string importIdentifierColumn, string destinationTable, Form1 invokeForm, out string sortOrderColumn)
+        internal bool PVMImport(string importTable, string[] importColumnNames, string destinationIdentifierColumn, string importIdentifierColumn, string destinationTable, Form1 invokeForm, out string sortOrderColumn, out List<string> importIdentifiers)
         {
             bool abort;
+            importIdentifiers = new List<string>();
             if (!(abort = CreateIndexOn(destinationTable, destinationIdentifierColumn, invokeForm)))
             {
                 AddColumnsWithAdditionalIfExists(importColumnNames, string.Empty, out string[] destinationColumnNames, destinationTable);
@@ -953,6 +954,7 @@ namespace DataTableConverter.Assisstant
                                 {
                                     destinationCommand.Parameters[i + 1].Value = reader.GetValue(i).ToString();
                                 }
+                                importIdentifiers.Add(reader.GetValue(reader.FieldCount - 1).ToString());
                                 destinationCommand.ExecuteNonQuery();
                                 sortOrder++;
                             }
@@ -1301,24 +1303,28 @@ namespace DataTableConverter.Assisstant
             return command.Substring(0, index == -1 ? command.Length - 1 : index).ToUpper();
         }
 
-        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnName, string order, OrderType orderType, string tableName)
+        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnName, string order, OrderType orderType, string tableName, string identifier, List<string> adjustedIdentifiers)
         {
             string directory = Path.GetDirectoryName(sourceFilePath);
             string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 
-            SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.FailAddressText, encoding, order, orderType, invokeForm, false);
-            return SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.RightAddressText, encoding, order, orderType, invokeForm, true); //return count of rows
+            SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.FailAddressText, encoding, order, orderType, invokeForm, false, identifier, adjustedIdentifiers);
+            return SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.RightAddressText, encoding, order, orderType, invokeForm, true, identifier, adjustedIdentifiers); //return count of rows
         }
 
-        private int SplitAndSavePVM(string tableName, string invalidColumnName, string directory, string fileName, int encoding, string order, OrderType orderType, Form1 invokeForm, bool saveValidRows)
+        private int SplitAndSavePVM(string tableName, string invalidColumnName, string directory, string fileName, int encoding, string order, OrderType orderType, Form1 invokeForm, bool saveValidRows, string identifier, List<string> adjustedIdentifiers)
         {
             int rowCount = 0;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
-                command.CommandText = $"SELECT {GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ?";
-                command.Parameters.Add(new SQLiteParameter() { Value = Properties.Settings.Default.FailAddressValue });
 
+                Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
+                command.CommandText = $"SELECT {GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ? AND [{identifier}] IN ({GetValueString(adjustedIdentifiers.Count)})";
+                command.Parameters.Add(new SQLiteParameter() { Value = Properties.Settings.Default.FailAddressValue });
+                foreach(string adjustedIdentifier in adjustedIdentifiers)
+                {
+                    command.Parameters.Add(new SQLiteParameter() { Value = adjustedIdentifier });
+                }
                 rowCount = ExportHelper.Save(directory, fileName, null, encoding, (SaveFormat)Properties.Settings.Default.PVMSaveFormat, order, orderType, invokeForm, tableName, command);
             }
             return rowCount;
