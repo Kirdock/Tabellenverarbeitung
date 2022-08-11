@@ -987,7 +987,7 @@ namespace DataTableConverter.Assisstant
             return "[" + string.Join("],[", headers) + "]";
         }
 
-        private string GetHeaderStringWithAlias(Dictionary<string, string> columnAliasMapping)
+        private string GetHeaderStringWithAlias(IEnumerable<KeyValuePair<string, string>> columnAliasMapping)
         {
             StringBuilder builder = new StringBuilder();
             foreach (KeyValuePair<string, string> pair in columnAliasMapping)
@@ -1303,29 +1303,29 @@ namespace DataTableConverter.Assisstant
             return command.Substring(0, index == -1 ? command.Length - 1 : index).ToUpper();
         }
 
-        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnName, string order, OrderType orderType, string tableName, string identifier, List<string> adjustedIdentifiers)
+        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnName, string tableName, string identifier, List<string> adjustedIdentifiers, string orderColumnName)
         {
             string directory = Path.GetDirectoryName(sourceFilePath);
             string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 
-            SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.FailAddressText, encoding, order, orderType, invokeForm, false, identifier, adjustedIdentifiers);
-            return SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.RightAddressText, encoding, order, orderType, invokeForm, true, identifier, adjustedIdentifiers); //return count of rows
+            SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.FailAddressText, encoding, invokeForm, false, identifier, adjustedIdentifiers, orderColumnName);
+            return SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.RightAddressText, encoding, invokeForm, true, identifier, adjustedIdentifiers, orderColumnName); //return count of rows
         }
 
-        private int SplitAndSavePVM(string tableName, string invalidColumnName, string directory, string fileName, int encoding, string order, OrderType orderType, Form1 invokeForm, bool saveValidRows, string identifier, List<string> adjustedIdentifiers)
+        private int SplitAndSavePVM(string tableName, string invalidColumnName, string directory, string fileName, int encoding, Form1 invokeForm, bool saveValidRows, string identifier, List<string> adjustedIdentifiers, string orderColumnName)
         {
             int rowCount = 0;
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
 
-                Dictionary<string, string> columnAliasMapping = GetAliasColumnMapping(tableName);
-                command.CommandText = $"SELECT {GetHeaderStringWithAlias(columnAliasMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ? AND [{identifier}] IN ({GetValueString(adjustedIdentifiers.Count)})";
+                IEnumerable<KeyValuePair<string, string>> aliasColumnMapping = GetAliasColumnMapping(tableName).Where(pair => pair.Value != orderColumnName);
+                command.CommandText = $"SELECT {GetHeaderStringWithAlias(aliasColumnMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ? AND [{identifier}] IN ({GetValueString(adjustedIdentifiers.Count)}) ORDER BY [{orderColumnName}] ASC";
                 command.Parameters.Add(new SQLiteParameter() { Value = Properties.Settings.Default.FailAddressValue });
                 foreach(string adjustedIdentifier in adjustedIdentifiers)
                 {
                     command.Parameters.Add(new SQLiteParameter() { Value = adjustedIdentifier });
                 }
-                rowCount = ExportHelper.Save(directory, fileName, null, encoding, (SaveFormat)Properties.Settings.Default.PVMSaveFormat, order, orderType, invokeForm, tableName, command);
+                rowCount = ExportHelper.Save(directory, fileName, null, encoding, (SaveFormat)Properties.Settings.Default.PVMSaveFormat, string.Empty, OrderType.Windows, invokeForm, tableName, command);
             }
             return rowCount;
         }
