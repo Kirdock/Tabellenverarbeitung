@@ -10,11 +10,10 @@ namespace DataTableConverter.Assisstant
     class DataHelper
     {
 
-        internal static int StartMerge(string importTable, int encoding, string filePath, string sourceIdentifierColumnName, string importIdentifierColumnName, string invalidColumnAlias, Form1 invokeForm, string tableName)
+        internal static void StartMerge(string importTable, int encoding, string filePath, string sourceIdentifierColumnName, string importIdentifierColumnName, string invalidColumnAlias, Form1 invokeForm, string tableName)
         {
             string[] importColumnNames = new string[0];
             string filename = System.IO.Path.GetFileNameWithoutExtension(filePath);
-            int count = 0;
             DialogResult result = DialogResult.No;
             int importRowCount = invokeForm.DatabaseHelper.GetRowCount(importTable);
             int originalRowCount = invokeForm.DatabaseHelper.GetRowCount(tableName);
@@ -76,20 +75,26 @@ namespace DataTableConverter.Assisstant
 
                 bool abort = invokeForm.DatabaseHelper.PVMImport(importTable, importColumnNames, sourceIdentifierColumnName, importIdentifierColumnName, tableName, invokeForm, out string orderColumn, out List<string> importIdentifiers);
 
-                if (abort) return 0;
+                if (abort) return;
 
                 invokeForm.DatabaseHelper.ApplyOrder(orderColumn, tableName);
                 
 
                 if (Properties.Settings.Default.SplitPVM)
                 {
-                    count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, tableName, sourceIdentifierColumnName, importIdentifiers, orderColumn);
+                    int count = invokeForm.DatabaseHelper.PVMSplit(filePath, invokeForm, encoding, invalidColumnName, tableName, sourceIdentifierColumnName, importIdentifiers, orderColumn);
+                    if (count != 0)
+                    {
+                        invokeForm.Invoke(new MethodInvoker(() =>
+                        {
+                            invokeForm.ValidRows = count;
+                        }));
+                    }
                 }
 
                 invokeForm.DatabaseHelper.DeleteColumn(orderColumn, tableName);
                 invokeForm.DatabaseHelper.DeleteInvalidRows(tableName, invalidColumnName);
             }
-            return count;
         }
 
         private static DialogResult ShowMergeForm(ref string[] importColumns, ref string sourceColumnName, ref string importColumnName, Dictionary<string, string> originalTableHeaders, int originalRowCount, Dictionary<string, string> importTableHeaders, int importRowCount, string filename, Form1 invokeForm)

@@ -599,18 +599,10 @@ namespace DataTableConverter
                             try
                             {
                                 StartLoadingBar();
-                                int count = DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, this, TableName);
+                                DataHelper.StartMerge(tableName, encoding, FilePath, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.PVMIdentifier, Properties.Settings.Default.InvalidColumnName, this, TableName);
                                 StopLoadingBar();
                                 DatabaseHelper.SetSavepoint();
                                 LoadData(true);
-
-                                if (count != 0)
-                                {
-                                    Invoke(new MethodInvoker(() =>
-                                    {
-                                        ValidRows = count;
-                                    }));
-                                }
                             }
                             catch (Exception ex)
                             {
