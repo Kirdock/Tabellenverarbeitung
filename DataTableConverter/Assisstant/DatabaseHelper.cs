@@ -29,6 +29,7 @@ namespace DataTableConverter.Assisstant
         private SQLiteTransaction Transaction, TempTransaction;
         internal ExportHelper ExportHelper;
         private readonly DatabaseHistory DatabaseHistory;
+        private readonly string isNewRowIdentifier = "1";
 
         private readonly HashSet<string> IgnoreCommands = new HashSet<string>()
         {
@@ -922,24 +923,27 @@ namespace DataTableConverter.Assisstant
         /// <param name="destinationTableColumnAliasMapping"></param>
         /// <param name="importTableColumnAliasMapping"></param>
         /// <param name="destinationTable"></param>
-        internal bool PVMImport(string importTable, string[] importColumnNames, string destinationIdentifierColumn, string importIdentifierColumn, string destinationTable, Form1 invokeForm, out string sortOrderColumn, out List<string> importIdentifiers)
+        internal bool PVMImport(string importTable, string[] importColumnNames, string destinationIdentifierColumn, string importIdentifierColumn, string destinationTable, Form1 invokeForm, out string sortOrderColumn, out string isNewRowColumn)
         {
             bool abort;
-            importIdentifiers = new List<string>();
+            isNewRowColumn = string.Empty;
             if (!(abort = CreateIndexOn(destinationTable, destinationIdentifierColumn, invokeForm)))
             {
                 AddColumnsWithAdditionalIfExists(importColumnNames, string.Empty, out string[] destinationColumnNames, destinationTable);
                 sortOrderColumn = AddColumnWithAdditionalIfExists("Importiersortierung", destinationTable);
+                isNewRowColumn = AddColumnWithAdditionalIfExists("$$isNewRow", destinationTable);
                 //int rowCount = GetRowCount(importTable);
                 int sortOrder = 0;
+                int offset = 2;
                 using (SQLiteCommand destinationCommand = GetConnection(destinationTable).CreateCommand())
                 {
-                    destinationCommand.CommandText = $"UPDATE [{destinationTable}] SET [{string.Join("]=?,[", new string[] { sortOrderColumn }.Concat(destinationColumnNames))}] =? where [{destinationIdentifierColumn}] = ?";
+                    destinationCommand.CommandText = $"UPDATE [{destinationTable}] SET [{string.Join("]=?,[", new string[] { sortOrderColumn, isNewRowColumn }.Concat(destinationColumnNames))}] =? where [{destinationIdentifierColumn}] = ?";
 
-                    for (int i = 0; i < destinationColumnNames.Length + 2; i++) //+2 because of sortOrder and where statement
+                    for (int i = 0; i < destinationColumnNames.Length + 3; i++) //+3 because of sortOrder and where statement
                     {
                         destinationCommand.Parameters.Add(new SQLiteParameter());
                     }
+                    destinationCommand.Parameters[1].Value = isNewRowIdentifier;
 
                     using (SQLiteCommand command = GetConnection(importTable).CreateCommand())
                     {
@@ -952,9 +956,8 @@ namespace DataTableConverter.Assisstant
                                 destinationCommand.Parameters[0].Value = sortOrder;
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
-                                    destinationCommand.Parameters[i + 1].Value = reader.GetValue(i).ToString();
+                                    destinationCommand.Parameters[i + offset].Value = reader.GetValue(i).ToString();
                                 }
-                                importIdentifiers.Add(reader.GetValue(reader.FieldCount - 1).ToString());
                                 destinationCommand.ExecuteNonQuery();
                                 sortOrder++;
                             }
@@ -1303,28 +1306,28 @@ namespace DataTableConverter.Assisstant
             return command.Substring(0, index == -1 ? command.Length - 1 : index).ToUpper();
         }
 
-        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnName, string tableName, string identifier, List<string> adjustedIdentifiers, string orderColumnName)
+        internal int PVMSplit(string sourceFilePath, Form1 invokeForm, int encoding, string invalidColumnName, string tableName, string isNewRowColumn, string orderColumnName)
         {
             string directory = Path.GetDirectoryName(sourceFilePath);
             string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
 
-            SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.FailAddressText, encoding, invokeForm, false, identifier, adjustedIdentifiers, orderColumnName);
-            return SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.RightAddressText, encoding, invokeForm, true, identifier, adjustedIdentifiers, orderColumnName); //return count of rows
+            SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.FailAddressText, encoding, invokeForm, false, isNewRowColumn, orderColumnName);
+            return SplitAndSavePVM(tableName, invalidColumnName, directory, fileName + Properties.Settings.Default.RightAddressText, encoding, invokeForm, true, isNewRowColumn, orderColumnName); //return count of rows
         }
 
-        private int SplitAndSavePVM(string tableName, string invalidColumnName, string directory, string fileName, int encoding, Form1 invokeForm, bool saveValidRows, string identifier, List<string> adjustedIdentifiers, string orderColumnName)
+        private int SplitAndSavePVM(string tableName, string invalidColumnName, string directory, string fileName, int encoding, Form1 invokeForm, bool saveValidRows, string isNewRowColumn, string orderColumnName)
         {
             int rowCount = 0;
+            HashSet<string> ignoreColumns = new HashSet<string>();
+            ignoreColumns.Add(orderColumnName);
+            ignoreColumns.Add(isNewRowColumn);
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
 
-                IEnumerable<KeyValuePair<string, string>> aliasColumnMapping = GetAliasColumnMapping(tableName).Where(pair => pair.Value != orderColumnName);
-                command.CommandText = $"SELECT {GetHeaderStringWithAlias(aliasColumnMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ? AND [{identifier}] IN ({GetValueString(adjustedIdentifiers.Count)}) ORDER BY [{orderColumnName}] ASC";
+                IEnumerable<KeyValuePair<string, string>> aliasColumnMapping = GetAliasColumnMapping(tableName).Where(pair => !ignoreColumns.Contains(pair.Value));
+                command.CommandText = $"SELECT {GetHeaderStringWithAlias(aliasColumnMapping)} from [{tableName}] where [{invalidColumnName}] {(saveValidRows ? "!=" : "=")} ? AND [{isNewRowColumn}]=? ORDER BY [{orderColumnName}] ASC";
                 command.Parameters.Add(new SQLiteParameter() { Value = Properties.Settings.Default.FailAddressValue });
-                foreach(string adjustedIdentifier in adjustedIdentifiers)
-                {
-                    command.Parameters.Add(new SQLiteParameter() { Value = adjustedIdentifier });
-                }
+                command.Parameters.Add(new SQLiteParameter() { Value = isNewRowIdentifier });
                 rowCount = ExportHelper.Save(directory, fileName, null, encoding, (SaveFormat)Properties.Settings.Default.PVMSaveFormat, string.Empty, OrderType.Windows, invokeForm, tableName, command);
             }
             return rowCount;
