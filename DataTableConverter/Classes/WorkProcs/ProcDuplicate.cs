@@ -181,7 +181,7 @@ namespace DataTableConverter.Classes.WorkProcs
             foreach (Tolerance tol in tolerances)
             {
                 List<string> array = new List<string>(tol.getColumnsAsArrayToLower()).Distinct().ToList();
-                string replaceWith = array.Contains(string.Empty) ? string.Empty : array.First();
+                string replaceWith = array.Contains(string.Empty) ? string.Empty : (array.FirstOrDefault() ?? string.Empty);
                 array.Remove(string.Empty);
                 string[] patterns = array.Select(t => @"(?<=^|[\s>])" + System.Text.RegularExpressions.Regex.Escape(t) + @"(?!\w)").ToArray();
                 preparedTolerances[i] = new PreparedTolerance() { ReplaceWith = replaceWith, Patterns = patterns };
