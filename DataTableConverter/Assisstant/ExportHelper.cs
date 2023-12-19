@@ -551,6 +551,38 @@ namespace DataTableConverter
             return rowCount;
         }
 
+        private void RetryInsert(Worksheet worksheet, object[,] data, int rowStart, int newRows, string[] aliases, Form invokeForm)
+        {
+            int retries = 0;
+            do
+            {
+                try
+                {
+                    InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, aliases.Length);
+                }
+                catch (Exception ex)
+                {
+                    retries++;
+                    if (retries >= 5)
+                    {
+                        DialogResult result = MessageHandler.MessagesYesNoCancel(invokeForm, MessageBoxIcon.Warning, $"Zeile {rowStart} konnte nicht geschrieben, da Excel höchstwahrscheinlich ausgelastet ist.\nErneut probieren?");
+                        if(result == DialogResult.Yes)
+                        {
+                            retries = 1;
+                        }
+                        else
+                        {
+                            throw ex;
+                        }                       
+                    } else
+                    {
+                        Thread.Sleep(5_000);
+                    }
+                    
+                }
+            } while (retries != 0 && retries < 5);
+        }
+
         private int ExportExcel(string directory, string fileName, string oldFileExtension, SQLiteCommand command, Form invokeForm, string tableName, System.Action updateLoadingBar)
         {
             int rowCount = 0;
@@ -610,7 +642,7 @@ namespace DataTableConverter
 
                             try
                             {
-                                InsertRowsToExcel(worksheet, data, rowStart, newRows - 1, aliases.Length);
+                                RetryInsert(worksheet, data, rowStart, newRows, aliases, invokeForm);
                             }
                             catch (Exception ex)
                             {
