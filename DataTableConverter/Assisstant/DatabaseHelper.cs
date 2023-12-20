@@ -1549,9 +1549,10 @@ namespace DataTableConverter.Assisstant
             }
         }
 
-        internal void InsertDataPerColumnValue(string columnName, OrderType orderType, int limit, string sourceTable, string destinationTable)
+        internal void InsertDataPerColumnValue(string columnName, OrderType orderType, int limit, string sourceTable, string destinationTable, Form1 invokeForm)
         {
             List<string> groupColumn = GroupColumn(columnName, orderType, sourceTable);
+            invokeForm?.StartLoadingBarCount(groupColumn.Count);
 
             using (SQLiteCommand command = GetConnection(sourceTable).CreateCommand())
             {
@@ -1581,6 +1582,7 @@ namespace DataTableConverter.Assisstant
                                 insertCommand.ExecuteNonQuery();
                             }
                         }
+                        invokeForm?.UpdateLoadingBar();
                     }
                 }
             }
@@ -1681,9 +1683,10 @@ namespace DataTableConverter.Assisstant
             return max;
         }
 
-        internal void DictionaryToTable(Dictionary<string, long> dict, string columnName, bool showFromTo, string tableName, int sourceRowCount)
+        internal void DictionaryToTable(Dictionary<string, long> dict, string columnName, bool showFromTo, string tableName, int sourceRowCount, Form1 invokeForm)
         {
             SQLiteCommand command = null;
+            invokeForm?.StartLoadingBarCount(dict.Count);
             if (showFromTo)
             {
                 string[] columns = new string[] { columnName, "Anzahl", "Von", "Bis" };
@@ -1694,6 +1697,7 @@ namespace DataTableConverter.Assisstant
                 {
                     long newCount = count + item.Value;
                     command = InsertRow(columns, new object[] { item.Key, item.Value.ToString(), count.ToString(), (newCount - 1).ToString() }, tableName, command);
+                    invokeForm?.UpdateLoadingBar();
                     count = newCount;
                 }
             }
@@ -1704,6 +1708,7 @@ namespace DataTableConverter.Assisstant
                 foreach (KeyValuePair<string, long> item in dict)
                 {
                     command = InsertRow(columns, new object[] { item.Key, item.Value.ToString() }, tableName, command);
+                    invokeForm?.UpdateLoadingBar();
                 }
             }
             InsertRow(new string[] { columnName, "Anzahl" }, new object[] { "Gesamt", sourceRowCount.ToString() }, tableName, command);

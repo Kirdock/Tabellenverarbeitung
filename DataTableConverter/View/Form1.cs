@@ -1199,7 +1199,7 @@ namespace DataTableConverter
                     StartLoadingBar();
                     Thread thread = new Thread(() =>
                     {
-                        string newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, OrderType, TableName);
+                        string newTable = ExportHelper.ExportCount(export.getSelectedValue(), export.CountChecked ? export.Count : 0, export.ShowFromTo, OrderType, TableName, this);
                         BeginInvoke(new MethodInvoker(() =>
                         {
                             DatabaseHelper.CopyToNewDatabaseFile(newTable);

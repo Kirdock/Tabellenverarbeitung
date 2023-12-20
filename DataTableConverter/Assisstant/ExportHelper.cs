@@ -834,19 +834,19 @@ namespace DataTableConverter
         /// <param name="tableName"></param>
         /// <param name="orderType"></param>
         /// <returns></returns>
-        internal string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName)
+        internal string ExportCount(string columnName, int count, bool showFromTo, OrderType orderType, string tableName, Form1 invokeForm = null)
         {
             string newTable = Guid.NewGuid().ToString();
 
             if (count == 0)
             {
                 Dictionary<string, long> pair = DatabaseHelper.GroupCountOfColumn(columnName, tableName);
-                DatabaseHelper.DictionaryToTable(pair, columnName, showFromTo, newTable, DatabaseHelper.GetRowCount(tableName));
+                DatabaseHelper.DictionaryToTable(pair, columnName, showFromTo, newTable, DatabaseHelper.GetRowCount(tableName), invokeForm);
             }
             else
             {
                 DatabaseHelper.CreateTable(DatabaseHelper.GetSortedColumnsAsAlias(tableName), newTable);
-                DatabaseHelper.InsertDataPerColumnValue(columnName, orderType, count, tableName, newTable);
+                DatabaseHelper.InsertDataPerColumnValue(columnName, orderType, count, tableName, newTable, invokeForm);
             }
             return newTable;
         }
