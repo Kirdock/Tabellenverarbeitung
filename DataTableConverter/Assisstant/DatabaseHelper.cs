@@ -1551,6 +1551,7 @@ namespace DataTableConverter.Assisstant
 
         internal void InsertDataPerColumnValue(string columnName, OrderType orderType, int limit, string sourceTable, string destinationTable, Form1 invokeForm)
         {
+            CreateIndexOn(sourceTable, columnName, unique: false); // create index on column to speed up the following queries
             List<string> groupColumn = GroupColumn(columnName, orderType, sourceTable);
             invokeForm?.StartLoadingBarCount(groupColumn.Count);
 
