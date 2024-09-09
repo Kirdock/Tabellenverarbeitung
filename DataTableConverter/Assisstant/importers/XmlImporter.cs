@@ -25,7 +25,6 @@ namespace DataTableConverter.Assisstant.importers
             foreach (var row in doc.Root.Elements())
             {
                 // revert everything to empty string and keep columns, so that the SQL command does not need to be re-created and can be optimized
-                var time = Stopwatch.StartNew();
                 foreach (var key in rowData.Keys.ToList()) // two list because on enumerable there can't be edits in a foreach
                 {
                     rowData[key] = string.Empty;
@@ -44,8 +43,6 @@ namespace DataTableConverter.Assisstant.importers
                 }
 
                 insertCommand = databaseHelper.InsertRow(rowData, tableName, insertCommand);
-                time.Stop();
-                Console.WriteLine(time.Elapsed.TotalMilliseconds);
                 progressBar?.UpdateLoadingBar(mainForm);
             }
         }
