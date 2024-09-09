@@ -1180,7 +1180,7 @@ namespace DataTableConverter
             }));
         }
 
-        private void StopLoadingBar()
+        internal void StopLoadingBar()
         {
             pgbLoading.BeginInvoke(new MethodInvoker(() =>
             {

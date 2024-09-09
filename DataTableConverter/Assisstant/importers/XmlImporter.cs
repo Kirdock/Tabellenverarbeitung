@@ -1,10 +1,13 @@
 ﻿using DataTableConverter.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace DataTableConverter.Assisstant.importers
@@ -12,17 +15,24 @@ namespace DataTableConverter.Assisstant.importers
     internal static class XmlImporter
     {
 
-        internal static void Import(string path, DatabaseHelper databaseHelper, ProgressBar progressBar, Form mainForm, string tableName)
+        internal static void Import(string path, DatabaseHelper databaseHelper, ProgressBar progressBar, Form1 mainForm, string tableName)
         {
-            XDocument doc = XDocument.Load(path);
             HashSet<string> overallColumns = new HashSet<string>();
-            databaseHelper.CreateTable(new List<string>(), tableName);
-            progressBar?.StartLoadingBar(doc.Root.Elements().Count(), mainForm);
+            int counter = 0;
             SQLiteCommand insertCommand = null;
             Dictionary<string, string> rowData = new Dictionary<string, string>();
-            
+            databaseHelper.CreateTable(new List<string>(), tableName);
 
-            foreach (var row in doc.Root.Elements())
+            XmlReaderSettings settings = new XmlReaderSettings
+            {
+                Async = true,
+                IgnoreWhitespace = true,
+                IgnoreComments = true,
+            };
+            XmlReader reader = XmlReader.Create(path, settings);
+            reader.Read();
+            // reading rows
+            while (reader.Read())
             {
                 // revert everything to empty string and keep columns, so that the SQL command does not need to be re-created and can be optimized
                 foreach (var key in rowData.Keys.ToList()) // two list because on enumerable there can't be edits in a foreach
@@ -31,7 +41,7 @@ namespace DataTableConverter.Assisstant.importers
                 }
 
                 HashSet<string> rowColumns = new HashSet<string>();
-                LoadRowData(row, rowData, rowColumns);
+                LoadRowData(reader, rowData, rowColumns);
 
                 foreach (var columnName in rowColumns)
                 {
@@ -43,47 +53,110 @@ namespace DataTableConverter.Assisstant.importers
                 }
 
                 insertCommand = databaseHelper.InsertRow(rowData, tableName, insertCommand);
-                progressBar?.UpdateLoadingBar(mainForm);
+                mainForm?.SetWorkflowText($"{++counter} Zeilen gelesen");
             }
+            mainForm?.SetWorkflowText(string.Empty);
         }
 
-        internal static void LoadRowData(XElement row, Dictionary<string, string> rowData, HashSet<string> columns, string parentName = "")
+        internal static HashSet<string> LoadRowData(XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns, string parentPath = "")
         {
-            foreach (var attribute in row.Attributes())
+            HashSet<string> newCols = new HashSet<string>();
+            string rowElementName = rowReader.LocalName;
+            if(rowReader.NodeType == XmlNodeType.EndElement)
             {
-                string columnName = MergeColumnName(attribute.Name.LocalName, parentName);
-                rowData[columnName] = attribute.Value;
-                columns.Add(columnName);
+                return newCols;
+            }
+            if (rowReader.HasAttributes)
+            {
+                while(rowReader.MoveToNextAttribute())
+                {
+                    string columnName = MergeColumnName(rowReader.LocalName, parentPath);
+                    rowData[columnName] = rowReader.Value;
+                    rowColumns.Add(columnName);
+                    newCols.Add(columnName);
+                }
+                
             }
 
-            bool isParentList = row.Elements(row.Elements().First().Name.LocalName).Count() > 1;
+            // Read Cells
             int itemNumber = 1;
-            HashSet<string> itemNames = new HashSet<string>();
-            foreach (var itemAttribute in row.Elements())
+            string previousElement = null;
+            HashSet<string> previousNewCols = new HashSet<string>();
+            while (rowReader.Read() && rowReader.LocalName != rowElementName && rowReader.NodeType != XmlNodeType.EndElement)
             {
-                string columnName = MergeColumnName(itemAttribute.Name.LocalName, parentName, itemNumber, isParentList);
-                if (itemAttribute.HasElements)
+                bool isParentList = previousElement == rowReader.LocalName;
+                previousElement = rowReader.LocalName;
+                if (isParentList)
                 {
-                    LoadRowData(itemAttribute, rowData, columns, columnName);
+                    parentPath = AlignArrayItemsAndPath(parentPath, rowElementName, itemNumber, previousNewCols, rowReader, rowData, rowColumns);
+                }
+                string columnName = MergeColumnName(rowReader.LocalName, parentPath, itemNumber, isParentList);
+                if (rowReader.NodeType == XmlNodeType.Text)
+                {
+                    rowData[columnName] = rowReader.Value;
+                    rowColumns.Add(columnName);
+                    newCols.Add(columnName);
                 }
                 else
                 {
-                    rowData[columnName] = itemAttribute.Value;
-                    columns.Add(columnName);
+                    previousNewCols = LoadRowData(rowReader, rowData, rowColumns, columnName);
+                    newCols.UnionWith(previousNewCols);
                 }
                 itemNumber++;
             }
+            if(itemNumber == 1)
+            {
+                // empty value
+                rowData[parentPath] = string.Empty;
+                rowColumns.Add(parentPath);
+                newCols.Add(parentPath);
+            }
+            return newCols;
+        }
+
+        private static string AlignArrayItemsAndPath(string parentPath, string parentNodeName, int itemNumber, HashSet<string> previousNewCols, XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns)
+        {
+            int endIndex = parentPath.Length - parentNodeName.Length - 1;
+            string newParentPath = endIndex < 0 ? string.Empty : parentPath.Substring(0, endIndex);
+
+            // update the first array element so that it contains "1" and it does not contain the array name
+            if (itemNumber == 2)
+            {
+                foreach (string previousColumnName in previousNewCols)
+                {
+                    string col = previousColumnName.Substring(parentPath.Length + rowReader.LocalName.Length + 2);
+                    string adjustedParentPath = newParentPath + (newParentPath == string.Empty ? string.Empty : " ");
+                    string newColumnName = $"{adjustedParentPath}{rowReader.LocalName} 1 {col}";
+                    string previousValue = rowData[previousColumnName];
+
+                    rowColumns.Remove(previousColumnName);
+                    rowData.Remove(previousColumnName);
+
+                    rowData[newColumnName] = previousValue;
+                    rowColumns.Add(newColumnName);
+                }
+            }
+            return newParentPath;
         }
 
         private static string MergeColumnName(string columnName, string parentName, int itemNumber = 0, bool isParentList = false)
         {
             if (parentName == string.Empty)
             {
+                if(isParentList)
+                {
+                    return $"{columnName} {itemNumber}";
+                }
                 return columnName;
             }
             if (isParentList)
             {
                 return $"{parentName} {itemNumber} {columnName}";
+            }
+            if (columnName == string.Empty)
+            {
+                // value of an element
+                return parentName;
             }
             return $"{parentName} {columnName}";
         }
