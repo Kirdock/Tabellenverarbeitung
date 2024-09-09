@@ -1,4 +1,5 @@
-﻿using DataTableConverter.Classes;
+﻿using DataTableConverter.Assisstant.importers;
+using DataTableConverter.Classes;
 using DataTableConverter.Classes.WorkProcs;
 using DataTableConverter.Extensions;
 using DataTableConverter.View;
@@ -87,6 +88,10 @@ namespace DataTableConverter.Assisstant
             if (extension == ".dbf")
             {
                 OpenDBF(file, progressBar, mainForm, tableName);
+            }
+            else if (extension == ".xml")
+            {
+                XmlImporter.Import(file, DatabaseHelper, progressBar, mainForm, tableName);
             }
             else if (extension != string.Empty && AccessExt.Contains(extension))
             {
