@@ -14,7 +14,7 @@ namespace DataTableConverter.Assisstant.importers
 {
     internal static class XmlImporter
     {
-
+        // Assumption: First XML-Element is the root object and this one contains a list. e.g. <Members><Member></Member></Members>
         internal static void Import(string path, DatabaseHelper databaseHelper, ProgressBar progressBar, Form1 mainForm, string tableName)
         {
             HashSet<string> overallColumns = new HashSet<string>();
@@ -33,12 +33,12 @@ namespace DataTableConverter.Assisstant.importers
             XmlReader reader = XmlReader.Create(path, settings);
             reader.Read();
 
-            // read static rows
+            // read static columns
             if (reader.HasAttributes)
             {
                 while (reader.MoveToNextAttribute())
                 {
-                    string columnName = reader.LocalName;
+                    string columnName = reader.LocalName.Replace('-', '_');
                     staticColumns[columnName] = reader.Value;
                     rowData[columnName] = reader.Value;
                     overallColumns.Add(columnName);
