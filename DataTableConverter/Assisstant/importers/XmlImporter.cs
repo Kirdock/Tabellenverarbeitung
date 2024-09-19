@@ -21,6 +21,7 @@ namespace DataTableConverter.Assisstant.importers
             int counter = 0;
             SQLiteCommand insertCommand = null;
             Dictionary<string, string> rowData = new Dictionary<string, string>();
+            Dictionary<string, string> staticColumns = new Dictionary<string, string>();
             databaseHelper.CreateTable(new List<string>(), tableName);
 
             XmlReaderSettings settings = new XmlReaderSettings
@@ -31,6 +32,21 @@ namespace DataTableConverter.Assisstant.importers
             };
             XmlReader reader = XmlReader.Create(path, settings);
             reader.Read();
+
+            // read static rows
+            if (reader.HasAttributes)
+            {
+                while (reader.MoveToNextAttribute())
+                {
+                    string columnName = reader.LocalName;
+                    staticColumns[columnName] = reader.Value;
+                    rowData[columnName] = reader.Value;
+                    overallColumns.Add(columnName);
+                    databaseHelper.AddColumn(tableName, columnName);
+                }
+
+            }
+
             // reading rows
             while (reader.Read())
             {
@@ -38,6 +54,11 @@ namespace DataTableConverter.Assisstant.importers
                 foreach (var key in rowData.Keys.ToList()) // two list because on enumerable there can't be edits in a foreach
                 {
                     rowData[key] = string.Empty;
+                }
+                // add static attributes
+                foreach (var pair in staticColumns)
+                {
+                    rowData[pair.Key] = pair.Value;
                 }
 
                 HashSet<string> rowColumns = new HashSet<string>();
@@ -125,8 +146,8 @@ namespace DataTableConverter.Assisstant.importers
                 foreach (string previousColumnName in previousNewCols)
                 {
                     string col = previousColumnName.Substring(parentPath.Length + rowReader.LocalName.Length + 2);
-                    string adjustedParentPath = newParentPath + (newParentPath == string.Empty ? string.Empty : " ");
-                    string newColumnName = $"{adjustedParentPath}{rowReader.LocalName} 1 {col}";
+                    string adjustedParentPath = newParentPath + (newParentPath == string.Empty ? string.Empty : "_");
+                    string newColumnName = $"{adjustedParentPath}{rowReader.LocalName}_1_{col}";
                     string previousValue = rowData[previousColumnName];
 
                     rowColumns.Remove(previousColumnName);
@@ -145,20 +166,20 @@ namespace DataTableConverter.Assisstant.importers
             {
                 if(isParentList)
                 {
-                    return $"{columnName} {itemNumber}";
+                    return $"{columnName}_{itemNumber}";
                 }
                 return columnName;
             }
             if (isParentList)
             {
-                return $"{parentName} {itemNumber} {columnName}";
+                return $"{parentName}_{itemNumber}_{columnName}";
             }
             if (columnName == string.Empty)
             {
                 // value of an element
                 return parentName;
             }
-            return $"{parentName} {columnName}";
+            return $"{parentName}_{columnName}";
         }
     }
 }
