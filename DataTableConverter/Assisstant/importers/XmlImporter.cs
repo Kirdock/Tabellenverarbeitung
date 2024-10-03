@@ -33,6 +33,12 @@ namespace DataTableConverter.Assisstant.importers
             XmlReader reader = XmlReader.Create(path, settings);
             reader.Read();
 
+            // skip header information
+            if(reader.NodeType == XmlNodeType.XmlDeclaration)
+            {
+                reader.Read();
+            }
+
             // read static columns
             if (reader.HasAttributes)
             {
@@ -83,7 +89,8 @@ namespace DataTableConverter.Assisstant.importers
         {
             HashSet<string> newCols = new HashSet<string>();
             string rowElementName = rowReader.LocalName;
-            if(rowReader.NodeType == XmlNodeType.EndElement)
+            bool isEmptyElement = rowReader.IsEmptyElement;
+            if (rowReader.NodeType == XmlNodeType.EndElement)
             {
                 return newCols;
             }
@@ -99,10 +106,16 @@ namespace DataTableConverter.Assisstant.importers
                 
             }
 
+            if (isEmptyElement)
+            {
+                return newCols;
+            }
+
             // Read Cells
             int itemNumber = 1;
             string previousElement = null;
             HashSet<string> previousNewCols = new HashSet<string>();
+
             while (rowReader.Read() && rowReader.LocalName != rowElementName && rowReader.NodeType != XmlNodeType.EndElement)
             {
                 bool isParentList = previousElement == rowReader.LocalName;
@@ -125,6 +138,7 @@ namespace DataTableConverter.Assisstant.importers
                 }
                 itemNumber++;
             }
+            
             if(itemNumber == 1)
             {
                 // empty value
