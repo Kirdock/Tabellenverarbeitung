@@ -53,8 +53,8 @@ namespace DataTableConverter.Assisstant.importers
 
             }
 
-            // reading rows
-            while (reader.Read())
+            // reading rows. Without the EndElement check there will be an empty row at the end
+            while (reader.Read() && reader.NodeType != XmlNodeType.EndElement)
             {
                 // revert everything to empty string and keep columns, so that the SQL command does not need to be re-created and can be optimized
                 foreach (var key in rowData.Keys.ToList()) // two list because on enumerable there can't be edits in a foreach
