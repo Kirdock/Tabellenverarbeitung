@@ -21,6 +21,7 @@ namespace DataTableConverter.Assisstant.importers
             int counter = 0;
             SQLiteCommand insertCommand = null;
             Dictionary<string, string> rowData = new Dictionary<string, string>();
+            HashSet<string> isArrayDict = new HashSet<string>();
             Dictionary<string, string> staticColumns = new Dictionary<string, string>();
             databaseHelper.CreateTable(new List<string>(), tableName);
 
@@ -68,7 +69,7 @@ namespace DataTableConverter.Assisstant.importers
                 }
 
                 HashSet<string> rowColumns = new HashSet<string>();
-                LoadRowData(reader, rowData, rowColumns);
+                LoadRowData(reader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName);
 
                 foreach (var columnName in rowColumns)
                 {
@@ -85,7 +86,7 @@ namespace DataTableConverter.Assisstant.importers
             mainForm?.SetWorkflowText(string.Empty);
         }
 
-        internal static HashSet<string> LoadRowData(XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns, string parentPath = "")
+        internal static HashSet<string> LoadRowData(XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns, HashSet<string> isArrayDict, HashSet<string> overallColumns, DatabaseHelper databaseHelper, string tableName, string parentPath = "")
         {
             HashSet<string> newCols = new HashSet<string>();
             string rowElementName = rowReader.LocalName;
@@ -112,17 +113,51 @@ namespace DataTableConverter.Assisstant.importers
             }
 
             // Read Cells
+            string oldParentPath = parentPath;
             int itemNumber = 1;
             string previousElement = null;
             HashSet<string> previousNewCols = new HashSet<string>();
 
             while (rowReader.Read() && rowReader.LocalName != rowElementName && rowReader.NodeType != XmlNodeType.EndElement)
             {
-                bool isParentList = previousElement == rowReader.LocalName;
+                bool isArray = isArrayDict.Contains(oldParentPath);
+                bool isArrayInternal = previousElement == rowReader.LocalName;
+                bool isParentList = isArray || isArrayInternal;
                 previousElement = rowReader.LocalName;
-                if (isParentList)
+
+                if(isParentList && parentPath == oldParentPath)
                 {
-                    parentPath = AlignArrayItemsAndPath(parentPath, rowElementName, itemNumber, previousNewCols, rowReader, rowData, rowColumns);
+                    parentPath = AlignArrayItemsAndPath(oldParentPath, rowElementName, itemNumber, previousNewCols, rowReader, rowData, rowColumns);
+                }
+
+                // rename existing or already added rows. It may be that ón the first iteration an array was not seen as an array because it contained only one item
+                if (isArrayInternal && !isArray)
+                {
+                    isArrayDict.Add(oldParentPath);
+                    string from = MergeColumnName(rowReader.LocalName, oldParentPath, itemNumber, false);
+                    string to = MergeColumnName(rowReader.LocalName, parentPath, itemNumber, true);
+
+
+                    // if in a previous row an array was not seen as an array and now it is, the previous items need to be adapted
+                    if(overallColumns.Contains(from))
+                    {
+                        databaseHelper.RenameAlias(from, to, tableName);
+                    }
+                    overallColumns.Remove(from);
+                    overallColumns.Add(to);
+
+                    rowColumns.Remove(from);
+                    rowColumns.Add(to);
+
+                    newCols.Remove(from);
+                    newCols.Add(to);
+
+                    if (rowData.TryGetValue(from, out string value))
+                    {
+                        rowData.Remove(from);
+                        rowData.Add(to, value);
+                    }
+
                 }
                 string columnName = MergeColumnName(rowReader.LocalName, parentPath, itemNumber, isParentList);
                 if (rowReader.NodeType == XmlNodeType.Text)
@@ -133,7 +168,7 @@ namespace DataTableConverter.Assisstant.importers
                 }
                 else
                 {
-                    previousNewCols = LoadRowData(rowReader, rowData, rowColumns, columnName);
+                    previousNewCols = LoadRowData(rowReader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName, columnName);
                     newCols.UnionWith(previousNewCols);
                 }
                 itemNumber++;
