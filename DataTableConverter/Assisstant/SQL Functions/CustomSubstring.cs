@@ -10,6 +10,10 @@ namespace DataTableConverter.Assisstant.SQL_Functions
         public override object Invoke(object[] args)
         {
             string value = args[0].ToString();
+            if (value.Length == 0)
+            {
+                return string.Empty;
+            }
             string replaceText = args[1].ToString();
             int startIndex = int.Parse(args[2].ToString()) -1;
             int endIndex = int.Parse(args[3].ToString()) - 1;
