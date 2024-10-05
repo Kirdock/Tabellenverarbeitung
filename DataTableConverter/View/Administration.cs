@@ -1991,10 +1991,6 @@ namespace DataTableConverter.View
 
         private void ndSubstringStart_ValueChanged(object sender, EventArgs e)
         {
-            if (nbSubstringEnd.Value < nbSubstringStart.Value && nbSubstringEnd.Value != 0)
-            {
-                nbSubstringStart.Value = nbSubstringEnd.Value;
-            }
             (GetSelectedWorkProcedure() as ProcSubstring).Start = (int)nbSubstringStart.Value;
         }
 
@@ -2005,10 +2001,6 @@ namespace DataTableConverter.View
 
         private void nbSubstringEnd_ValueChanged(object sender, EventArgs e)
         {
-            if (nbSubstringEnd.Value < nbSubstringStart.Value && nbSubstringEnd.Value != 0)
-            {
-                nbSubstringEnd.Value = Convert.ToInt32(nbSubstringEnd.Text) > nbSubstringEnd.Value ? 0 : nbSubstringStart.Value;
-            }
             (GetSelectedWorkProcedure() as ProcSubstring).End = (int)nbSubstringEnd.Value;
         }
 
