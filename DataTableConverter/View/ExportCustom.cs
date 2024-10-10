@@ -195,7 +195,7 @@ namespace DataTableConverter.View
                 }
                 else
                 {
-                    ExportCustomItem item = new ExportCustomItem(newText, ((KeyValuePair<string, string>)cmbColumn.Items[0]).Value);
+                    ExportCustomItem item = new ExportCustomItem(newText, ((KeyValuePair<string, string>)cmbColumn.Items[0]).Value, 2);
                     int index = CmBFileNames.Items.Count;
                     ExportCustomItem lastItem = CmBFileNames.Items.Cast<ExportCustomItem>().LastOrDefault();
                     if (lastItem != null)

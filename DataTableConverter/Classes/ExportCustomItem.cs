@@ -39,12 +39,12 @@ namespace DataTableConverter.Classes
             }
         }
 
-        internal ExportCustomItem(string name, string column)
+        internal ExportCustomItem(string name, string column, int format = 1)
         {
             Name = name;
             Column = column;
             Values = new Dictionary<string, bool>();
-            Format = 1;
+            Format = format;
         }
 
         internal void SetValues(IEnumerable<string> allValues, bool status, IEnumerable<ExportCustomItem> dict)

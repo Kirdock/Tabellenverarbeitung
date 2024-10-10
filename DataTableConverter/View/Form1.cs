@@ -10,6 +10,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
@@ -42,6 +43,17 @@ namespace DataTableConverter
         internal readonly ExportHelper ExportHelper;
         internal readonly ImportHelper ImportHelper;
         private static HashSet<string> FormInstances = new HashSet<string>();
+
+        #region Save settings before shutdown
+        public const int WM_QUERYENDSESSION = 0x0011;
+        public const int WM_ENDSESSION = 0x0016;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool ShutdownBlockReasonCreate(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)] string reason);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool ShutdownBlockReasonDestroy(IntPtr hWnd);
+        #endregion
         private decimal Page
         {
             get
@@ -1741,6 +1753,21 @@ namespace DataTableConverter
             dgTable.RowsAdded -= dgTable_RowsAdded;
             dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
             dgTable.RowsAdded += dgTable_RowsAdded;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_QUERYENDSESSION || m.Msg == WM_ENDSESSION)
+            {
+                // Block shutdown and provide a reason
+                ShutdownBlockReasonCreate(Handle, "Einstellungen werden gespeichert...");
+                Console.WriteLine("saving");
+                // Ensure that there is no settings file corruption by flushing the data
+                Properties.Settings.Default.Save();
+                // Allow shutdown to proceed
+                ShutdownBlockReasonDestroy(Handle);
+            }
+            base.WndProc(ref m);
         }
     }
 }
