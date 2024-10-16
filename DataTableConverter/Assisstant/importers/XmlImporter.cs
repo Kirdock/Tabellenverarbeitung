@@ -1,4 +1,5 @@
 ﻿using DataTableConverter.Extensions;
+using DataTableConverter.Properties;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
@@ -12,8 +13,16 @@ using System.Xml.Linq;
 
 namespace DataTableConverter.Assisstant.importers
 {
+    internal class Renaming
+    {
+        internal string OldPath;
+        internal string ParentPath;
+        internal string Property;
+    }
+
     internal static class XmlImporter
     {
+
         // Assumption: First XML-Element is the root object and this one contains a list. e.g. <Members><Member></Member></Members>
         internal static void Import(string path, DatabaseHelper databaseHelper, ProgressBar progressBar, Form1 mainForm, string tableName)
         {
@@ -23,6 +32,7 @@ namespace DataTableConverter.Assisstant.importers
             Dictionary<string, string> rowData = new Dictionary<string, string>();
             HashSet<string> isArrayDict = new HashSet<string>();
             Dictionary<string, string> staticColumns = new Dictionary<string, string>();
+            List<Renaming> renamings = new List<Renaming>();
             databaseHelper.CreateTable(new List<string>(), tableName);
 
             XmlReaderSettings settings = new XmlReaderSettings
@@ -35,7 +45,7 @@ namespace DataTableConverter.Assisstant.importers
             reader.Read();
 
             // skip header information
-            if(reader.NodeType == XmlNodeType.XmlDeclaration)
+            if (reader.NodeType == XmlNodeType.XmlDeclaration)
             {
                 reader.Read();
             }
@@ -69,7 +79,7 @@ namespace DataTableConverter.Assisstant.importers
                 }
 
                 HashSet<string> rowColumns = new HashSet<string>();
-                LoadRowData(reader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName);
+                LoadRowData(reader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName, renamings);
 
                 foreach (var columnName in rowColumns)
                 {
@@ -83,40 +93,55 @@ namespace DataTableConverter.Assisstant.importers
                 insertCommand = databaseHelper.InsertRow(rowData, tableName, insertCommand);
                 mainForm?.SetWorkflowText($"{++counter} Zeilen gelesen");
             }
+
+            foreach (var renaming in renamings)
+            {
+                foreach (string col in overallColumns.Where(c => c.StartsWith(renaming.OldPath)))
+                {
+                    string from = col;
+                    string newTo = MergeColumnName(renaming.Property, renaming.ParentPath, 1, true, true);
+                    string to = from.Replace(renaming.OldPath, newTo);
+                    to = Settings.Default.ImportHeaderUpperCase ? to.ToUpper() : to;
+
+
+                    // if in a previous row an array was not seen as an array and now it is, the previous items need to be adapted
+                    if (overallColumns.Contains(from))
+                    {
+                        databaseHelper.RenameAlias(from, to, tableName);
+                    }
+                }
+            }
             mainForm?.SetWorkflowText(string.Empty);
         }
 
-        internal static HashSet<string> LoadRowData(XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns, HashSet<string> isArrayDict, HashSet<string> overallColumns, DatabaseHelper databaseHelper, string tableName, string parentPath = "")
+        internal static void LoadRowData(XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns, HashSet<string> isArrayDict, HashSet<string> overallColumns, DatabaseHelper databaseHelper, string tableName, List<Renaming> renamings, string parentPath = "")
         {
-            HashSet<string> newCols = new HashSet<string>();
             string rowElementName = rowReader.LocalName;
             bool isEmptyElement = rowReader.IsEmptyElement;
             if (rowReader.NodeType == XmlNodeType.EndElement)
             {
-                return newCols;
+                return;
             }
             if (rowReader.HasAttributes)
             {
-                while(rowReader.MoveToNextAttribute())
+                while (rowReader.MoveToNextAttribute())
                 {
                     string columnName = MergeColumnName(rowReader.LocalName, parentPath);
                     rowData[columnName] = rowReader.Value;
                     rowColumns.Add(columnName);
-                    newCols.Add(columnName);
                 }
-                
+
             }
 
             if (isEmptyElement)
             {
-                return newCols;
+                return;
             }
 
             // Read Cells
             string oldParentPath = parentPath;
             int itemNumber = 1;
             string previousElement = null;
-            HashSet<string> previousNewCols = new HashSet<string>();
 
             while (rowReader.Read() && rowReader.LocalName != rowElementName && rowReader.NodeType != XmlNodeType.EndElement)
             {
@@ -125,101 +150,58 @@ namespace DataTableConverter.Assisstant.importers
                 bool isParentList = isArray || isArrayInternal;
                 previousElement = rowReader.LocalName;
 
-                if(isParentList && parentPath == oldParentPath)
+                if (itemNumber != 1 && isParentList && parentPath == oldParentPath)
                 {
-                    parentPath = AlignArrayItemsAndPath(oldParentPath, rowElementName, itemNumber, previousNewCols, rowReader, rowData, rowColumns);
+                    parentPath = AlignArrayItemsAndPath(oldParentPath, rowElementName);
                 }
 
                 // rename existing or already added rows. It may be that ón the first iteration an array was not seen as an array because it contained only one item
                 if (isArrayInternal && !isArray)
                 {
                     isArrayDict.Add(oldParentPath);
-                    string from = MergeColumnName(rowReader.LocalName, oldParentPath, itemNumber, false);
-                    string to = MergeColumnName(rowReader.LocalName, parentPath, itemNumber, true);
-
-
-                    // if in a previous row an array was not seen as an array and now it is, the previous items need to be adapted
-                    if(overallColumns.Contains(from))
-                    {
-                        databaseHelper.RenameAlias(from, to, tableName);
-                    }
-                    overallColumns.Remove(from);
-                    overallColumns.Add(to);
-
-                    rowColumns.Remove(from);
-                    rowColumns.Add(to);
-
-                    newCols.Remove(from);
-                    newCols.Add(to);
-
-                    if (rowData.TryGetValue(from, out string value))
-                    {
-                        rowData.Remove(from);
-                        rowData.Add(to, value);
-                    }
-
+                    string oldPrefix = $"{oldParentPath}_{rowReader.LocalName}";
+                    renamings.Add(new Renaming() { OldPath = oldPrefix, ParentPath = AlignArrayItemsAndPath(oldParentPath, rowElementName), Property = rowReader.LocalName });
                 }
+
                 string columnName = MergeColumnName(rowReader.LocalName, parentPath, itemNumber, isParentList);
                 if (rowReader.NodeType == XmlNodeType.Text)
                 {
                     rowData[columnName] = rowReader.Value;
                     rowColumns.Add(columnName);
-                    newCols.Add(columnName);
                 }
                 else
                 {
-                    previousNewCols = LoadRowData(rowReader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName, columnName);
-                    newCols.UnionWith(previousNewCols);
+                    LoadRowData(rowReader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName, renamings, columnName);
                 }
                 itemNumber++;
             }
-            
-            if(itemNumber == 1)
+
+            if (itemNumber == 1)
             {
                 // empty value
                 rowData[parentPath] = string.Empty;
                 rowColumns.Add(parentPath);
-                newCols.Add(parentPath);
             }
-            return newCols;
         }
 
-        private static string AlignArrayItemsAndPath(string parentPath, string parentNodeName, int itemNumber, HashSet<string> previousNewCols, XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns)
+        private static string AlignArrayItemsAndPath(string parentPath, string parentNodeName)
         {
             int endIndex = parentPath.Length - parentNodeName.Length - 1;
-            string newParentPath = endIndex < 0 ? string.Empty : parentPath.Substring(0, endIndex);
-
-            // update the first array element so that it contains "1" and it does not contain the array name
-            if (itemNumber == 2)
-            {
-                foreach (string previousColumnName in previousNewCols)
-                {
-                    string col = previousColumnName.Substring(parentPath.Length + rowReader.LocalName.Length + 2);
-                    string adjustedParentPath = newParentPath + (newParentPath == string.Empty ? string.Empty : "_");
-                    string newColumnName = $"{adjustedParentPath}{rowReader.LocalName}_1_{col}";
-                    string previousValue = rowData[previousColumnName];
-
-                    rowColumns.Remove(previousColumnName);
-                    rowData.Remove(previousColumnName);
-
-                    rowData[newColumnName] = previousValue;
-                    rowColumns.Add(newColumnName);
-                }
-            }
-            return newParentPath;
+            return endIndex < 0 ? string.Empty : parentPath.Substring(0, endIndex);
         }
 
-        private static string MergeColumnName(string columnName, string parentName, int itemNumber = 0, bool isParentList = false)
+        private static string MergeColumnName(string columnName, string parentName, int itemNumber = 0, bool isParentList = false, bool forceOne = false)
         {
+            bool allowOne = itemNumber != 1 || forceOne;
             if (parentName == string.Empty)
             {
-                if(isParentList)
+                if (isParentList && allowOne)
                 {
                     return $"{columnName}_{itemNumber}";
                 }
                 return columnName;
             }
-            if (isParentList)
+            if (isParentList && allowOne)
             {
                 return $"{parentName}_{itemNumber}_{columnName}";
             }
