@@ -94,21 +94,16 @@ namespace DataTableConverter.Assisstant.importers
                 mainForm?.SetWorkflowText($"{++counter} Zeilen gelesen");
             }
 
+            // Rename the first items of an array. From LIST_ITEM_ID to ITEM_1_ID
             foreach (var renaming in renamings)
             {
-                foreach (string col in overallColumns.Where(c => c.StartsWith(renaming.OldPath)))
+                foreach (string from in overallColumns.Where(c => c.StartsWith(renaming.OldPath)))
                 {
-                    string from = col;
                     string newTo = MergeColumnName(renaming.Property, renaming.ParentPath, 1, true, true);
                     string to = from.Replace(renaming.OldPath, newTo);
                     to = Settings.Default.ImportHeaderUpperCase ? to.ToUpper() : to;
 
-
-                    // if in a previous row an array was not seen as an array and now it is, the previous items need to be adapted
-                    if (overallColumns.Contains(from))
-                    {
-                        databaseHelper.RenameAlias(from, to, tableName);
-                    }
+                    databaseHelper.RenameAlias(from, to, tableName);
                 }
             }
             mainForm?.SetWorkflowText(string.Empty);

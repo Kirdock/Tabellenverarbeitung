@@ -1100,7 +1100,14 @@ namespace DataTableConverter.Assisstant
             return headers;
         }
 
-        private bool AddColumnIfNotExists(string tableName, ref string column, string defaultValue = "")
+        /// <summary>
+        /// Adds "column" to the database and overrides it if a new column gets created (colum name not alias name)
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="column"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        private bool AddColumnViaAliasIfNotExists(string tableName, ref string column, string defaultValue = "")
         {
             bool status;
             if (!(status = ContainsAlias(tableName, column)))
@@ -1138,15 +1145,16 @@ namespace DataTableConverter.Assisstant
         internal void ConcatTable(string destinationTable, string newTable, string fileNameBefore, string filename)
         {
             string fileNameColumn = FileNameColumn;
-            AddColumnIfNotExists(destinationTable, ref fileNameColumn, fileNameBefore);
-            AddColumnIfNotExists(newTable, ref fileNameColumn, filename);
+            AddColumnViaAliasIfNotExists(destinationTable, ref fileNameColumn, fileNameBefore);
+            AddColumnViaAliasIfNotExists(newTable, ref fileNameColumn, filename);
             string[] headersAliases = GetSortedColumnsAsAlias(newTable).ToArray();
             List<string> headersColumns = GetSortedColumns(newTable);
             SQLiteConnection destinationConnection = GetConnection(destinationTable);
 
             for (int i = 0; i < headersAliases.Length; ++i)
             {
-                AddColumnIfNotExists(destinationTable, ref headersAliases[i]);
+                string column = headersAliases[i];
+                AddColumnViaAliasIfNotExists(destinationTable, ref column);
             }
 
             Dictionary<string, string> destinationHeaders = GetAliasColumnMapping(destinationTable);
