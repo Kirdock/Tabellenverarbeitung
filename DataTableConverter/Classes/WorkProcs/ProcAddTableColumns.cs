@@ -51,7 +51,7 @@ namespace DataTableConverter.Classes.WorkProcs
             string invalidColumnAlias = Properties.Settings.Default.InvalidColumnName;
             if (!CheckFile(filePath, ref path)) //find file
             {
-                OpenFileDialog dialog = invokeForm.ImportHelper.GetOpenFileDialog(true);
+                OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(true);
                 DialogResult res = DialogResult.Cancel;
                 invokeForm.Invoke(new MethodInvoker(() =>
                 {

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.CmBHeaders = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.dataSourceLabel = new System.Windows.Forms.Label();
             this.BtnConfirm = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -42,14 +42,14 @@
             this.CmBHeaders.Size = new System.Drawing.Size(235, 21);
             this.CmBHeaders.TabIndex = 0;
             // 
-            // label1
+            // dataSourceLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(45, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(40, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Spalte:";
+            this.dataSourceLabel.AutoSize = true;
+            this.dataSourceLabel.Location = new System.Drawing.Point(45, 19);
+            this.dataSourceLabel.Name = "dataSourceLabel";
+            this.dataSourceLabel.Size = new System.Drawing.Size(40, 13);
+            this.dataSourceLabel.TabIndex = 1;
+            this.dataSourceLabel.Text = "Spalte:";
             // 
             // BtnConfirm
             // 
@@ -67,7 +67,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(339, 105);
             this.Controls.Add(this.BtnConfirm);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.dataSourceLabel);
             this.Controls.Add(this.CmBHeaders);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -82,7 +82,7 @@
         #endregion
 
         private System.Windows.Forms.ComboBox CmBHeaders;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label dataSourceLabel;
         private System.Windows.Forms.Button BtnConfirm;
     }
 }

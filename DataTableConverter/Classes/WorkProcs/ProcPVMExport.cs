@@ -64,7 +64,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
             SaveFileDialog saveFileDialog1 = new SaveFileDialog
             {
-                Filter = $"CSV Dateien ({invokeForm.ImportHelper.CsvExt})|{invokeForm.ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
+                Filter = $"CSV Dateien ({ImportHelper.CsvExt})|{ImportHelper.CsvExt}|Alle Dateien (*.*)|*.*",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };

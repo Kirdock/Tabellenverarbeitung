@@ -132,6 +132,7 @@
     <Compile Include="Assisstant\UpdateHelper.cs" />
     <Compile Include="Assisstant\WorkflowFactory.cs" />
     <Compile Include="Assisstant\ImportHelper.cs" />
+    <Compile Include="Assisstant\XMLTransformer.cs" />
     <Compile Include="Classes\CountListboxItem.cs" />
     <Compile Include="Classes\DetectTextEncoding.cs" />
     <Compile Include="Classes\ExportCustomItem.cs" />

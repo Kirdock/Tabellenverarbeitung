@@ -31,11 +31,11 @@ namespace DataTableConverter.Assisstant
         internal readonly string ProjectTolerances;
         internal readonly string ProjectCases;
         internal readonly int PreviewRows = 4;
-        internal readonly string TextExt = "*.txt";
-        internal readonly string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
-        internal readonly string DbfExt = "*.dbf";
-        internal readonly string CsvExt = "*.csv";
-        internal readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
+        internal static readonly string TextExt = "*.txt";
+        internal static readonly string AccessExt = "*.accdb;*.accde;*.accdt;*.accdr;*.mdb";
+        internal static readonly string DbfExt = "*.dbf";
+        internal static readonly string CsvExt = "*.csv";
+        internal static readonly string ExcelExt = "*.xlsx;*.xlsm;*.xlsb;*.xltx;*.xltm;*.xls;*.xlt;*.xls;*.xml;*.xml;*.xlam;*.xla;*.xlw;*.xlr;";
         internal static readonly int MaxCellsPerIteration = 50000;
         private readonly DatabaseHelper DatabaseHelper;
         private readonly ExportHelper ExportHelper;
@@ -148,7 +148,7 @@ namespace DataTableConverter.Assisstant
             return tableName;
         }
 
-        internal OpenFileDialog GetOpenFileDialog(bool multiselect)
+        internal static OpenFileDialog GetOpenFileDialog(bool multiselect)
         {
             return new OpenFileDialog
             {

@@ -44,6 +44,7 @@
             this.funktionenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aufteilenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dividierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.großKleinschreibungToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.längsteZeileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nummerierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,6 +55,7 @@
             this.zeilenZusammenfügenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.substringToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.suchenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tausenderTrennzeichenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textErsetzenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.trimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zählenToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -106,8 +108,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.NumPage = new System.Windows.Forms.NumericUpDown();
             this.dgTable = new DataTableConverter.DataGridViewDoubleBuffered();
-            this.dividierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tausenderTrennzeichenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.xMLTransformierenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ctxBody.SuspendLayout();
             this.ctxHeader.SuspendLayout();
@@ -215,7 +216,8 @@
             this.zeichenAuffüllenToolStripMenuItem,
             this.zeilenAusTabelleHinzufügenToolStripMenuItem,
             this.zeilenLöschenToolStripMenuItem1,
-            this.zeilenZusammenfassenToolStripMenuItem});
+            this.zeilenZusammenfassenToolStripMenuItem,
+            this.xMLTransformierenToolStripMenuItem});
             this.funktionenToolStripMenuItem.Name = "funktionenToolStripMenuItem";
             this.funktionenToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
             this.funktionenToolStripMenuItem.Text = "Funktionen";
@@ -233,6 +235,13 @@
             this.aufteilenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.aufteilenToolStripMenuItem.Text = "Aufteilen";
             this.aufteilenToolStripMenuItem.Click += new System.EventHandler(this.aufteilenToolStripMenuItem_Click);
+            // 
+            // dividierenToolStripMenuItem
+            // 
+            this.dividierenToolStripMenuItem.Name = "dividierenToolStripMenuItem";
+            this.dividierenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.dividierenToolStripMenuItem.Text = "Dividieren";
+            this.dividierenToolStripMenuItem.Click += new System.EventHandler(this.dividierenToolStripMenuItem_Click);
             // 
             // großKleinschreibungToolStripMenuItem
             // 
@@ -305,6 +314,13 @@
             this.suchenToolStripMenuItem.Text = "Suchen";
             this.suchenToolStripMenuItem.Click += new System.EventHandler(this.suchenToolStripMenuItem_Click);
             // 
+            // tausenderTrennzeichenToolStripMenuItem
+            // 
+            this.tausenderTrennzeichenToolStripMenuItem.Name = "tausenderTrennzeichenToolStripMenuItem";
+            this.tausenderTrennzeichenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.tausenderTrennzeichenToolStripMenuItem.Text = "Tausender Trennzeichen";
+            this.tausenderTrennzeichenToolStripMenuItem.Click += new System.EventHandler(this.tausenderTrennzeichenToolStripMenuItem_Click);
+            // 
             // textErsetzenToolStripMenuItem1
             // 
             this.textErsetzenToolStripMenuItem1.Name = "textErsetzenToolStripMenuItem1";
@@ -375,31 +391,31 @@
             // WorkflowItem19
             // 
             this.WorkflowItem19.Name = "WorkflowItem19";
-            this.WorkflowItem19.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItem19.Size = new System.Drawing.Size(99, 22);
             this.WorkflowItem19.Text = "1-9";
             // 
             // WorkflowItemAF
             // 
             this.WorkflowItemAF.Name = "WorkflowItemAF";
-            this.WorkflowItemAF.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemAF.Size = new System.Drawing.Size(99, 22);
             this.WorkflowItemAF.Text = "A-F";
             // 
             // WorkflowItemGL
             // 
             this.WorkflowItemGL.Name = "WorkflowItemGL";
-            this.WorkflowItemGL.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemGL.Size = new System.Drawing.Size(99, 22);
             this.WorkflowItemGL.Text = "G-L";
             // 
             // WorkflowItemMQ
             // 
             this.WorkflowItemMQ.Name = "WorkflowItemMQ";
-            this.WorkflowItemMQ.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemMQ.Size = new System.Drawing.Size(99, 22);
             this.WorkflowItemMQ.Text = "M-Q";
             // 
             // WorkflowItemRZ
             // 
             this.WorkflowItemRZ.Name = "WorkflowItemRZ";
-            this.WorkflowItemRZ.Size = new System.Drawing.Size(180, 22);
+            this.WorkflowItemRZ.Size = new System.Drawing.Size(99, 22);
             this.WorkflowItemRZ.Text = "R-Z";
             // 
             // duplikateToolStripMenuItem
@@ -723,19 +739,12 @@
             this.dgTable.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgTable_KeyDown);
             this.dgTable.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgTable_MouseClick);
             // 
-            // dividierenToolStripMenuItem
+            // xMLTransformierenToolStripMenuItem
             // 
-            this.dividierenToolStripMenuItem.Name = "dividierenToolStripMenuItem";
-            this.dividierenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.dividierenToolStripMenuItem.Text = "Dividieren";
-            this.dividierenToolStripMenuItem.Click += new System.EventHandler(this.dividierenToolStripMenuItem_Click);
-            // 
-            // tausenderTrennzeichenToolStripMenuItem
-            // 
-            this.tausenderTrennzeichenToolStripMenuItem.Name = "tausenderTrennzeichenToolStripMenuItem";
-            this.tausenderTrennzeichenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.tausenderTrennzeichenToolStripMenuItem.Text = "Tausender Trennzeichen";
-            this.tausenderTrennzeichenToolStripMenuItem.Click += new System.EventHandler(this.tausenderTrennzeichenToolStripMenuItem_Click);
+            this.xMLTransformierenToolStripMenuItem.Name = "xMLTransformierenToolStripMenuItem";
+            this.xMLTransformierenToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.xMLTransformierenToolStripMenuItem.Text = "XML transformieren";
+            this.xMLTransformierenToolStripMenuItem.Click += new System.EventHandler(this.xMLTransformierenToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -850,6 +859,7 @@
         private System.Windows.Forms.ToolStripMenuItem commitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem dividierenToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tausenderTrennzeichenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem xMLTransformierenToolStripMenuItem;
     }
 }
 

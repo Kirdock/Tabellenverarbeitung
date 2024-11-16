@@ -6,6 +6,7 @@ using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
@@ -41,72 +42,74 @@ namespace DataTableConverter.Assisstant.importers
                 IgnoreWhitespace = true,
                 IgnoreComments = true,
             };
-            XmlReader reader = XmlReader.Create(path, settings);
-            reader.Read();
-
-            // skip header information
-            if (reader.NodeType == XmlNodeType.XmlDeclaration)
+            using (XmlReader reader = XmlReader.Create(path, settings))
             {
                 reader.Read();
-            }
 
-            // read static columns
-            if (reader.HasAttributes)
-            {
-                while (reader.MoveToNextAttribute())
+                // skip header information
+                if (reader.NodeType == XmlNodeType.XmlDeclaration)
                 {
-                    string columnName = reader.LocalName.Replace('-', '_');
-                    staticColumns[columnName] = reader.Value;
-                    rowData[columnName] = reader.Value;
-                    overallColumns.Add(columnName);
-                    databaseHelper.AddColumn(tableName, columnName);
+                    reader.Read();
                 }
 
-            }
-
-            // reading rows. Without the EndElement check there will be an empty row at the end
-            while (reader.Read() && reader.NodeType != XmlNodeType.EndElement)
-            {
-                // revert everything to empty string and keep columns, so that the SQL command does not need to be re-created and can be optimized
-                foreach (var key in rowData.Keys.ToList()) // two list because on enumerable there can't be edits in a foreach
+                // read static columns
+                if (reader.HasAttributes)
                 {
-                    rowData[key] = string.Empty;
-                }
-                // add static attributes
-                foreach (var pair in staticColumns)
-                {
-                    rowData[pair.Key] = pair.Value;
-                }
-
-                HashSet<string> rowColumns = new HashSet<string>();
-                LoadRowData(reader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName, renamings);
-
-                foreach (var columnName in rowColumns)
-                {
-                    bool added = overallColumns.Add(columnName);
-                    if (added)
+                    while (reader.MoveToNextAttribute())
                     {
+                        string columnName = reader.LocalName.Replace('-', '_');
+                        staticColumns[columnName] = reader.Value;
+                        rowData[columnName] = reader.Value;
+                        overallColumns.Add(columnName);
                         databaseHelper.AddColumn(tableName, columnName);
                     }
+
                 }
 
-                insertCommand = databaseHelper.InsertRow(rowData, tableName, insertCommand);
-                mainForm?.SetWorkflowText($"{++counter} Zeilen gelesen");
-            }
-
-            // Rename the first items of an array. From LIST_ITEM_ID to ITEM_1_ID
-            foreach (var renaming in renamings)
-            {
-                foreach (string from in overallColumns.Where(c => c.StartsWith(renaming.OldPath)))
+                // reading rows. Without the EndElement check there will be an empty row at the end
+                while (reader.Read() && reader.NodeType != XmlNodeType.EndElement)
                 {
-                    string newTo = MergeColumnName(renaming.Property, renaming.ParentPath, 1, true, true);
-                    string to = from.Replace(renaming.OldPath, newTo);
-                    to = Settings.Default.ImportHeaderUpperCase ? to.ToUpper() : to;
+                    // revert everything to empty string and keep columns, so that the SQL command does not need to be re-created and can be optimized
+                    foreach (var key in rowData.Keys.ToList()) // two list because on enumerable there can't be edits in a foreach
+                    {
+                        rowData[key] = string.Empty;
+                    }
+                    // add static attributes
+                    foreach (var pair in staticColumns)
+                    {
+                        rowData[pair.Key] = pair.Value;
+                    }
 
-                    databaseHelper.RenameAlias(from, to, tableName);
+                    HashSet<string> rowColumns = new HashSet<string>();
+                    LoadRowData(reader, rowData, rowColumns, isArrayDict, overallColumns, databaseHelper, tableName, renamings);
+
+                    foreach (var columnName in rowColumns)
+                    {
+                        bool added = overallColumns.Add(columnName);
+                        if (added)
+                        {
+                            databaseHelper.AddColumn(tableName, columnName);
+                        }
+                    }
+
+                    insertCommand = databaseHelper.InsertRow(rowData, tableName, insertCommand);
+                    mainForm?.SetWorkflowText($"{++counter} Zeilen gelesen");
                 }
+
+                // Rename the first items of an array. From LIST_ITEM_ID to ITEM_1_ID
+                foreach (var renaming in renamings)
+                {
+                    foreach (string from in overallColumns.Where(c => c.StartsWith(renaming.OldPath)))
+                    {
+                        string newTo = MergeColumnName(renaming.Property, renaming.ParentPath, 1, true, true);
+                        string to = from.Replace(renaming.OldPath, newTo);
+                        to = Settings.Default.ImportHeaderUpperCase ? to.ToUpper() : to;
+
+                        databaseHelper.RenameAlias(from, to, tableName);
+                    }
+                }
+                mainForm?.SetWorkflowText(string.Empty);
             }
-            mainForm?.SetWorkflowText(string.Empty);
         }
 
         internal static void LoadRowData(XmlReader rowReader, Dictionary<string, string> rowData, HashSet<string> rowColumns, HashSet<string> isArrayDict, HashSet<string> overallColumns, DatabaseHelper databaseHelper, string tableName, List<Renaming> renamings, string parentPath = "")

@@ -7,9 +7,17 @@ namespace DataTableConverter.View
     {
         internal string Column => CmBHeaders.SelectedValue.ToString();
 
-        internal SelectHeader(Dictionary<string, string> aliasColumnMapping)
+        internal SelectHeader(Dictionary<string, string> aliasColumnMapping, string header = null, string label = null)
         {
             InitializeComponent();
+            if(header != null)
+            {
+                Text = header;
+            }
+            if(label != null)
+            {
+                dataSourceLabel.Text = label;
+            }
             CmBHeaders.DataSource = new BindingSource(aliasColumnMapping, null);
             CmBHeaders.DisplayMember = "key";
             CmBHeaders.ValueMember = "value";

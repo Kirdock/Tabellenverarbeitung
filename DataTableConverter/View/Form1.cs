@@ -10,6 +10,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -185,6 +186,8 @@ namespace DataTableConverter
             {
                 SetSubItemEnabled(status, item);
             }
+
+            xMLTransformierenToolStripMenuItem.Enabled = true;
 
             foreach (ToolStripMenuItem item in new ToolStripMenuItem[] { speichernToolStripMenuItem2, sortierenToolStripMenuItem })
             {
@@ -517,7 +520,7 @@ namespace DataTableConverter
             return procedures.FindIndex(p => p.Id == id);
         }
 
-        private void importToolStripMenuItem_Click(ImportState state = ImportState.None, string[] openFiles = null)
+        private void importToolStripMenuItem_Click(ImportState state = ImportState.None, string[] openFiles = null, bool deleteAfterOpen = false, string overrideFileName = null)
         {
             using (OpenFileDialog dialog = ImportHelper.GetOpenFileDialog(state != ImportState.Header))
             {
@@ -561,11 +564,19 @@ namespace DataTableConverter
                                         SetFileMeta(file, fileEncoding);
                                     }
                                 }
+                                if (deleteAfterOpen)
+                                {
+                                    File.Delete(file);
+                                }
                             }
                             catch (Exception ex)
                             {
                                 ErrorHelper.LogMessage(ex, this);
                             }
+                        }
+                        if(overrideFileName != null)
+                        {
+                            SetFileMeta(overrideFileName, fileEncoding);
                         }
                         try
                         {
@@ -1753,6 +1764,35 @@ namespace DataTableConverter
             dgTable.RowsAdded -= dgTable_RowsAdded;
             dgTable.AllowUserToAddRows = NumPage.Value == MaxPages;
             dgTable.RowsAdded += dgTable_RowsAdded;
+        }
+
+        private void xMLTransformierenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetWorkflowText("Datei wird transformiert");
+            Thread thread = new Thread(() =>
+            {
+                try
+                {
+                    string savePath = Path.Combine($"{Guid.NewGuid()}.xml");
+                    string sourceFile = XMLTransformer.Transform(this, savePath, true);
+                    SetWorkflowText();
+                    StopLoadingBar();
+
+                    if (File.Exists(savePath))
+                    {
+                        importToolStripMenuItem_Click(ImportState.None, new string[] { savePath }, true, sourceFile);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    ErrorHelper.LogMessage(ex, this);
+                    SetWorkflowText();
+                    StopLoadingBar();
+                }
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            StartLoadingBar();
         }
 
         protected override void WndProc(ref Message m)
