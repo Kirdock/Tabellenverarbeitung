@@ -20,7 +20,7 @@ namespace DataTableConverter.Assisstant
     {
         internal static string SCHEMA_DIRECTORY = Path.Combine(ExportHelper.ProjectPath, "XML-Schemas");
 
-        internal static string[] GetSchemas() => Directory.GetFiles(SCHEMA_DIRECTORY);
+        internal static string[] GetSchemas() => Directory.GetFiles(SCHEMA_DIRECTORY, "*.xslt");
 
         internal static string SelectFile(Form1 form1)
         {
