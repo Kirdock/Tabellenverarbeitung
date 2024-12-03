@@ -133,6 +133,8 @@ namespace DataTableConverter.Assisstant.importers
 
             if (isEmptyElement)
             {
+                rowData[parentPath] = string.Empty;
+                rowColumns.Add(parentPath);
                 return;
             }
 
