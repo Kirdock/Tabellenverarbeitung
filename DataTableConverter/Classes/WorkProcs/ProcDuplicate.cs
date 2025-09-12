@@ -213,7 +213,7 @@ namespace DataTableConverter.Classes.WorkProcs
 
                 int begin;
                 #region Set Substring
-                if (subStringBegin != null && subStringBegin.Length > i && (begin = subStringBegin[i - 1]) != -1)
+                if (subStringBegin != null && subStringBegin.Length >= i && (begin = subStringBegin[i - 1]) != -1)
                 {
                     int end = subStringEnd[i-1];
                     if (begin - 1 > result.Length)
