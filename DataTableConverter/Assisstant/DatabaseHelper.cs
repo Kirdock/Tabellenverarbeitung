@@ -1560,7 +1560,7 @@ namespace DataTableConverter.Assisstant
         internal void InsertDataPerColumnValue(string columnName, OrderType orderType, int limit, string sourceTable, string destinationTable, Form1 invokeForm)
         {
             CreateIndexOn(sourceTable, columnName, unique: false); // create index on column to speed up the following queries
-            List<string> groupColumn = GroupColumn(columnName, orderType, sourceTable);
+            List<string> groupColumn = GroupColumnInCase(columnName, orderType, sourceTable);
             invokeForm?.StartLoadingBarCount(groupColumn.Count);
 
             using (SQLiteCommand command = GetConnection(sourceTable).CreateCommand())
@@ -1603,12 +1603,12 @@ namespace DataTableConverter.Assisstant
             return $"[{columnName}] asc";
         }
 
-        internal List<string> GroupColumn(string columnName, OrderType orderType, string tableName)
+        internal List<string> GroupColumnInCase(string columnName, OrderType orderType, string tableName)
         {
             List<string> list = new List<string>();
             using (SQLiteCommand command = GetConnection(tableName).CreateCommand())
             {
-                command.CommandText = GetSortedSelectString($"[{columnName}]", GenerateOrderAsc(columnName), orderType, -1, 0, false, tableName, $"group by [{columnName}] COLLATE CASESENSITIVE");
+                command.CommandText = GetSortedSelectString($"[{columnName}]", GenerateOrderAsc(columnName), orderType, -1, 0, false, tableName, $"group by [{columnName}]");
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
